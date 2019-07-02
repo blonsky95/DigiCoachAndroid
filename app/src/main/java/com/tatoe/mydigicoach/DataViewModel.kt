@@ -1,13 +1,22 @@
 package com.tatoe.mydigicoach
 
+import android.app.Application
 import android.content.Context
-import com.tatoe.mydigicoach.database.DataSource
+import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import com.tatoe.mydigicoach.database.AppDatabase
+import com.tatoe.mydigicoach.entity.Exercise
 
-class DataViewModel(context: Context) {
+class DataViewModel(application: Application) : AndroidViewModel(application) {
+        //todo add the coroutine scope
+    private val repository: ExerciseRepository
 
-//    fun addExercise(name:String, desc:String) {
-//        val db = DataSource.AppDatabase(c)
-//    }
+    val allExercises: LiveData<List<Exercise>>
 
+    init {
+        val exerciseDao = AppDatabase.buildDatabase(application).ExercisesDao()
+        repository = ExerciseRepository(exerciseDao)
+        allExercises = repository.allExercises
+    }
 
 }
