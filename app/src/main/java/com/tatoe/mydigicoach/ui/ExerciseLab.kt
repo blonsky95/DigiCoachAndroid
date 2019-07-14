@@ -1,7 +1,7 @@
 package com.tatoe.mydigicoach.ui
 
-import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.database.AppDatabase
 import kotlinx.android.synthetic.main.activity_exercise_lab.*

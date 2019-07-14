@@ -1,6 +1,5 @@
 package com.tatoe.mydigicoach.database
 
-import android.arch.lifecycle.LiveData
 import androidx.room.*
 import com.tatoe.mydigicoach.entity.Exercise
 
