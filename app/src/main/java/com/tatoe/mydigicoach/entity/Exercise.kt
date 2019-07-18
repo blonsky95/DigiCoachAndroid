@@ -6,8 +6,7 @@ import androidx.room.PrimaryKey
 
 @Entity (tableName = "exercise_table")
 data class Exercise(
-    @PrimaryKey(autoGenerate = true)
-    var id: Int,
+    //todo add primary key from example so not needed in every exercise constructyor
 
     @ColumnInfo(name = "name") var name: String,
     @ColumnInfo(name = "description") var description: String
