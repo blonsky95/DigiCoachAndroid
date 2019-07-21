@@ -11,6 +11,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import timber.log.Timber
 
 class DataViewModel(application: Application) : AndroidViewModel(application) {
 
@@ -34,6 +35,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun insert(newExercise: Exercise) = viewModelScope.launch {
+        Timber.d("data view model - insert called")
         repository.insert(newExercise)
     }
 

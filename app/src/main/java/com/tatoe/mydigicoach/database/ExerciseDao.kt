@@ -15,7 +15,7 @@ interface ExerciseDao {
     fun insertAll(vararg exercise: Exercise)
 
     @Insert
-    fun addExercise(exercise: Exercise)
+    suspend fun addExercise(exercise: Exercise) : Long
 
     @Delete
     fun delete(exercise: Exercise)

@@ -1,12 +1,15 @@
 package com.tatoe.mydigicoach.ui
 
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.material.snackbar.Snackbar
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import kotlinx.android.synthetic.main.activity_exercise_lab.*
+import timber.log.Timber
 
 class ExerciseLab : AppCompatActivity() {
 
@@ -18,30 +21,24 @@ class ExerciseLab : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_lab)
 
+        var view = exercise_lab_layout as View
+
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
 
-        floatingActionButton.setOnClickListener {
+        addExerciseButton.setOnClickListener {
             exerciseName=EditText1.text.trim().toString()
             exerciseDesc=editText2.text.trim().toString()
 
             var newExercise = Exercise(exerciseName,exerciseDesc)
+
+            Timber.d("New exercise - built: ${newExercise.name} ${newExercise.description}")
             dataViewModel.insert(newExercise)
+            val mySnackbar = Snackbar.make(view, "adding new exercise", Snackbar.LENGTH_LONG)
+            //todo update snackbar when you get a succesfull exercise added
+            mySnackbar.show()
 
 
-
-            //todo use a coroutine to store the exercise
-            //todo use another DAO method to check if it has been updated
-            //todo check for autoincrement and why am i providing it as a parameter
-            //todo add navigation so can circulate through app
-//            GlobalScope.launch {
-//                db.todoDao().insertAll(TodoEntry("Title", "Content"))
-//                data = db.todoDao().getAll()
-//
-//                data?.forEach {
-//                    println(it)
-//                }
-//            }
         }
     }
 }

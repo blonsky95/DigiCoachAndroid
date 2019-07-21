@@ -12,6 +12,10 @@ class BlockLab : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_lab)
 
+        //todo display list of exercises - modify the method for retrieving all the exercises
+
+        // add the delete as well
+
         button4.setOnClickListener {
             var intent = Intent(this, ExerciseLab::class.java)
             startActivity(intent)
