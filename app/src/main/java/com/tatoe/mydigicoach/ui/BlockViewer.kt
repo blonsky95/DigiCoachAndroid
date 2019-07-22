@@ -11,6 +11,7 @@ class BlockViewer : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_viewer)
+        title = "Block Viewer"
 
         button3.setOnClickListener {
             var intent = Intent(this, BlockLab::class.java)

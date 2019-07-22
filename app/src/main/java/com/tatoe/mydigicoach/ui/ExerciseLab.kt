@@ -20,6 +20,7 @@ class ExerciseLab : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_lab)
+        title = "Exercise Lab"
 
         var view = exercise_lab_layout as View
 

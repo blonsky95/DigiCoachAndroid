@@ -13,7 +13,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-            //todo set titles to each activity
+        title = "Home"
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         } else {
