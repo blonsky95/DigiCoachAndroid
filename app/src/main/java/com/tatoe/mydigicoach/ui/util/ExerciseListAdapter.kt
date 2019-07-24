@@ -29,6 +29,8 @@ class ExerciseListAdapter(var context: Context) : RecyclerView.Adapter<ExerciseL
     override fun onBindViewHolder(holder: ExerciseViewHolder, position: Int) {
         val current = exercises[position]
         holder.exerciseItemView.text = current.name
+        holder.exerciseView.setOnClickListener(MyClickListener(current))
+        holder.exerciseView.setOnLongClickListener(MyClickListener(current))
         //todo add the onclicklistener to this holder using interface or inheriting class or something
     }
 
@@ -39,22 +41,25 @@ class ExerciseListAdapter(var context: Context) : RecyclerView.Adapter<ExerciseL
 
     inner class ExerciseViewHolder(singleItemView: View) : RecyclerView.ViewHolder(singleItemView) {
 
-
         val exerciseItemView: TextView = singleItemView.findViewById(R.id.textView)
+        val exerciseView: View = singleItemView
 
     }
 
-    open inner class MyClickListener (var exercise: Exercise):View.OnClickListener,View.OnLongClickListener{
+    inner class MyClickListener(var exercise: Exercise) : View.OnClickListener, View.OnLongClickListener {
 
         override fun onClick(v: View?) {
             val intent = Intent(context, ExerciseLab::class.java)
-            intent.putExtra("exercise_name", exercise.name)
-            intent.putExtra("exercise_desc", exercise.description)
-            Timber.d("View exercise: ${exercise.name}")
-            context.startActivity(intent)        }
+            intent.putExtra(ExerciseLab.EXERCISE_ACTION, ExerciseLab.EXERCISE_UPDATE)
+            intent.putExtra(ExerciseLab.EXERCISE_NAME_KEY, exercise.name)
+            intent.putExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY, exercise.description)
+            Timber.d("on click list item - View exercise: ${exercise.name}")
+            context.startActivity(intent)
+        }
 
         override fun onLongClick(v: View?): Boolean {
-            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+            Timber.d("on long click list item - View exercise: ${exercise.name}")
+            return true
         }
 
     }
