@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
@@ -22,6 +23,9 @@ class ExerciseLab : AppCompatActivity() {
         setContentView(R.layout.activity_exercise_lab)
         title = "Exercise Lab"
 
+        Timber.d("How did i get to exercise lab")
+
+
         var view = exercise_lab_layout as View
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
@@ -37,6 +41,7 @@ class ExerciseLab : AppCompatActivity() {
             dataViewModel.insert(newExercise)
             val mySnackbar = Snackbar.make(view, "adding new exercise", Snackbar.LENGTH_LONG)
             //todo update snackbar when you get a succesfull exercise added
+            //todo SOON fix - notify adapter to update when pressing back button (doesnt go through on create) look android room with a view project
             mySnackbar.show()
 
 

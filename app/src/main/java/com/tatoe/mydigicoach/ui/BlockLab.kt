@@ -11,6 +11,7 @@ import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_block_lab.*
+import timber.log.Timber
 
 class BlockLab : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
@@ -29,6 +30,7 @@ class BlockLab : AppCompatActivity() {
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let { adapter.setExercises(it) }
+            Timber.d("all exercises: ${exercises.toString()}")
         })
 
         //todo display list of exercises - modify the method for retrieving all the exercises
@@ -38,6 +40,8 @@ class BlockLab : AppCompatActivity() {
         // add the delete as well
 
         button4.setOnClickListener {
+            Timber.d("block lab --> Exercise lab")
+
             var intent = Intent(this, ExerciseLab::class.java)
             startActivity(intent)
         }
