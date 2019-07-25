@@ -9,6 +9,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
@@ -18,6 +19,7 @@ import timber.log.Timber
 
 class BlockLab : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
+    private lateinit var recyclerView: RecyclerView
 
     private val exerciseLabAcitivtyRequestCode = 1
 
@@ -27,7 +29,7 @@ class BlockLab : AppCompatActivity() {
         setContentView(R.layout.activity_block_lab)
         title = "Block Lab"
 
-        val recyclerView = recyclerview as RecyclerView
+        recyclerView = recyclerview as RecyclerView
         val adapter = ExerciseListAdapter(this)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -39,33 +41,38 @@ class BlockLab : AppCompatActivity() {
             Timber.d("all exercises: ${exercises.toString()}")
         })
 
-        //todo display list of exercises - modify the method for retrieving all the exercises
-        //todo check recycler view/adapter doc
-        //todo check the let syntax thing
-
         // add the delete as well
 
         button4.setOnClickListener {
             Timber.d("block lab --> Exercise lab")
 
-            var intent = Intent(this, ExerciseLab::class.java)
-            intent.putExtra(ExerciseLab.EXERCISE_ACTION,ExerciseLab.EXERCISE_NEW)
-            startActivityForResult(intent,exerciseLabAcitivtyRequestCode)
+            val intent = Intent(this, ExerciseLab::class.java)
+            intent.putExtra(ExerciseLab.EXERCISE_ACTION, ExerciseLab.EXERCISE_NEW)
+            startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
         }
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         super.onActivityResult(requestCode, resultCode, intentData)
 
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == Activity.RESULT_OK) {
+        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_NEW_RESULT_CODE) {
             intentData?.let { data ->
-                //todo - 1 this activity only calls for new exercises - if result ok - insert new exercise
-            }
-        } else {
-            //todo - 2  user probably pressed back
-        }
+                val exercise = Exercise(
+                    data.getStringExtra(ExerciseLab.EXERCISE_NAME_KEY),
+                    data.getStringExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY)
+                )
+                dataViewModel.insert(exercise)
 
-        //todo - 3 regardless of activity result - show snackbar saying what
+            }
+            val mySnackbar = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
+            mySnackbar.show()
+        }
+        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_FAIL_RESULT_CODE) {
+            //accounts for user pressing back
+            val mySnackbar = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
+            mySnackbar.show()
+        } else {
+        }
 
         //todo - 4 do the same from the adapter - where it is always an update - see if the intent sends back to block lab (might have to implement the intent from this activity)
     }

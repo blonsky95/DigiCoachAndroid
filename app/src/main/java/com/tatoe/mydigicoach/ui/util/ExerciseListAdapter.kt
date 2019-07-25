@@ -31,7 +31,6 @@ class ExerciseListAdapter(var context: Context) : RecyclerView.Adapter<ExerciseL
         holder.exerciseItemView.text = current.name
         holder.exerciseView.setOnClickListener(MyClickListener(current))
         holder.exerciseView.setOnLongClickListener(MyClickListener(current))
-        //todo add the onclicklistener to this holder using interface or inheriting class or something
     }
 
     internal fun setExercises(exercises: List<Exercise>) {

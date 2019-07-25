@@ -35,6 +35,10 @@ class ExerciseLab : AppCompatActivity() {
 
         var EXERCISE_NAME_KEY = "exercise_name"
         var EXERCISE_DESCRIPTION_KEY = "exercise_description"
+
+        var EXERCISE_FAIL_RESULT_CODE = 0
+        var EXERCISE_NEW_RESULT_CODE = 1
+        var EXERCISE_UPDATE_RESULT_CODE = 2
     }
 
 
@@ -69,17 +73,31 @@ class ExerciseLab : AppCompatActivity() {
             exerciseDesc = descEditText.text.trim().toString()
 
             var newExercise = Exercise(exerciseName, exerciseDesc)
+            var replyIntent = Intent()
+
+
+            if (isNew(newExercise)) {
+
+                Timber.d("New exercise - built: ${newExercise.name} ${newExercise.description}")
+
+                replyIntent.putExtra(EXERCISE_NAME_KEY,exerciseName)
+                replyIntent.putExtra(EXERCISE_DESCRIPTION_KEY,exerciseDesc)
+                setResult(EXERCISE_NEW_RESULT_CODE,replyIntent)
+            }
+
+            if (exerciseName.isEmpty()) {
+                setResult(EXERCISE_FAIL_RESULT_CODE,replyIntent)
+            }
             //todo - 5  get the update method - this and navigation tomorrow
-            Timber.d("New exercise - built: ${newExercise.name} ${newExercise.description}")
             dataViewModel.insert(newExercise)
 
-            val mySnackbar = Snackbar.make(view, "adding new exercise", Snackbar.LENGTH_LONG)
-            //todo update snackbar when you get a succesfull exercise added
-            //todo SOON fix - notify adapter to update when pressing back button (doesnt go through on create) look android room with a view project
-            mySnackbar.show()
-//            finish()
-            startActivity(Intent(this,BlockLab::class.java))
+            finish()
         }
+    }
+
+    private fun isNew(newExercise: Exercise): Boolean {
+        //todo check if exercise exists?
+        return true
     }
 
     private fun modifyUI(buttonText: String, nameText: String = "", descText: String = "") {
