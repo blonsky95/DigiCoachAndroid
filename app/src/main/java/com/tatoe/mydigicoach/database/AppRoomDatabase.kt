@@ -24,7 +24,7 @@ abstract class AppRoomDatabase : RoomDatabase(){
         }
 
         fun buildDatabase(context: Context) = Room.databaseBuilder(context,
-            AppRoomDatabase::class.java, "currentExercise-list.db")
+            AppRoomDatabase::class.java, "exercise-list.db")
             .build()
     }
 }
