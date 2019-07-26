@@ -9,10 +9,11 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.BlockLab
 import com.tatoe.mydigicoach.ui.ExerciseLab
 import timber.log.Timber
 
-class ExerciseListAdapter(var context: Context) : RecyclerView.Adapter<ExerciseListAdapter.ExerciseViewHolder>() {
+class ExerciseListAdapter(context: Context, var myClickListener: BlockLab.MyClickListener) : RecyclerView.Adapter<ExerciseListAdapter.ExerciseViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var exercises = emptyList<Exercise>() // Cached copy of words
@@ -28,9 +29,10 @@ class ExerciseListAdapter(var context: Context) : RecyclerView.Adapter<ExerciseL
 
     override fun onBindViewHolder(holder: ExerciseViewHolder, position: Int) {
         val current = exercises[position]
+        myClickListener.setExercise(current)
         holder.exerciseItemView.text = current.name
-        holder.exerciseView.setOnClickListener(MyClickListener(current))
-        holder.exerciseView.setOnLongClickListener(MyClickListener(current))
+        holder.exerciseView.setOnClickListener(myClickListener)
+        holder.exerciseView.setOnLongClickListener(myClickListener)
     }
 
     internal fun setExercises(exercises: List<Exercise>) {
@@ -45,21 +47,4 @@ class ExerciseListAdapter(var context: Context) : RecyclerView.Adapter<ExerciseL
 
     }
 
-    inner class MyClickListener(var exercise: Exercise) : View.OnClickListener, View.OnLongClickListener {
-
-        override fun onClick(v: View?) {
-            val intent = Intent(context, ExerciseLab::class.java)
-            intent.putExtra(ExerciseLab.EXERCISE_ACTION, ExerciseLab.EXERCISE_UPDATE)
-            intent.putExtra(ExerciseLab.EXERCISE_NAME_KEY, exercise.name)
-            intent.putExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY, exercise.description)
-            Timber.d("on click list item - View exercise: ${exercise.name}")
-            context.startActivity(intent)
-        }
-
-        override fun onLongClick(v: View?): Boolean {
-            Timber.d("on long click list item - View exercise: ${exercise.name}")
-            return true
-        }
-
-    }
 }

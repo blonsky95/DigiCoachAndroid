@@ -10,7 +10,11 @@ class ExerciseRepository (private val exerciseDao: ExerciseDao) {
 
     suspend fun insert (exercise: Exercise) {
         var rowId = exerciseDao.addExercise(exercise)
-        Timber.d("new exercise, row: $rowId")
+        Timber.d("new currentExercise, row: $rowId")
         //todo add snackbar + check if returns row id - if it does put success message
+    }
+
+    suspend fun update(updatedExercise: Exercise, previousExerciseName:String) {
+        //todo - 1 - do update function which checks for old name
     }
 }

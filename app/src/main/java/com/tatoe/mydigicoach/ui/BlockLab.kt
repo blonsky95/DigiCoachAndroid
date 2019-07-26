@@ -1,9 +1,8 @@
 package com.tatoe.mydigicoach.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.widget.Toast
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -30,7 +29,9 @@ class BlockLab : AppCompatActivity() {
         title = "Block Lab"
 
         recyclerView = recyclerview as RecyclerView
-        val adapter = ExerciseListAdapter(this)
+
+        var myClickListener = MyClickListener()
+        val adapter = ExerciseListAdapter(this, myClickListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -49,6 +50,7 @@ class BlockLab : AppCompatActivity() {
             val intent = Intent(this, ExerciseLab::class.java)
             intent.putExtra(ExerciseLab.EXERCISE_ACTION, ExerciseLab.EXERCISE_NEW)
             startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+
         }
     }
 
@@ -67,13 +69,48 @@ class BlockLab : AppCompatActivity() {
             val mySnackbar = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
             mySnackbar.show()
         }
+        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_UPDATE_RESULT_CODE) {
+            intentData?.let { data ->
+                val exercise = Exercise(
+                    data.getStringExtra(ExerciseLab.EXERCISE_NAME_KEY),
+                    data.getStringExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY)
+                )
+                dataViewModel.update(exercise, data.getStringExtra(ExerciseLab.EXERCISE_OLD_NAME_KEY))
+
+            }
+            val mySnackbar = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
+            mySnackbar.show()
+        }
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_FAIL_RESULT_CODE) {
             //accounts for user pressing back
             val mySnackbar = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
             mySnackbar.show()
         } else {
         }
+    }
 
-        //todo - 4 do the same from the adapter - where it is always an update - see if the intent sends back to block lab (might have to implement the intent from this activity)
+    inner class MyClickListener : View.OnClickListener, View.OnLongClickListener {
+        //todo change name of MyClickListener
+
+        lateinit var currentExercise: Exercise
+
+        fun setExercise(exercise: Exercise) {
+            currentExercise = exercise
+        }
+
+        override fun onClick(v: View?) {
+            val intent = Intent(this@BlockLab, ExerciseLab::class.java)
+            intent.putExtra(ExerciseLab.EXERCISE_ACTION, ExerciseLab.EXERCISE_UPDATE)
+            intent.putExtra(ExerciseLab.EXERCISE_NAME_KEY, currentExercise.name)
+            intent.putExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY, currentExercise.description)
+            Timber.d("on click list item - View currentExercise: ${currentExercise.name}")
+            startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+        }
+
+        override fun onLongClick(v: View?): Boolean {
+            Timber.d("on long click list item - View currentExercise: ${currentExercise.name}")
+            return true
+        }
+
     }
 }

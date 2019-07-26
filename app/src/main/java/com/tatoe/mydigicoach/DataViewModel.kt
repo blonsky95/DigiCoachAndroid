@@ -39,5 +39,10 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository.insert(newExercise)
     }
 
+    fun update(exercise: Exercise, oldExerciseName: String) = viewModelScope.launch {
+        Timber.d("data view model - update called")
+        repository.update(exercise,oldExerciseName)
+    }
+
 
 }
