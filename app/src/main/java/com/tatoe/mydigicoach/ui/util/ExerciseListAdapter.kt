@@ -13,7 +13,8 @@ import com.tatoe.mydigicoach.ui.BlockLab
 import com.tatoe.mydigicoach.ui.ExerciseLab
 import timber.log.Timber
 
-class ExerciseListAdapter(context: Context, var myClickListener: BlockLab.MyClickListener) : RecyclerView.Adapter<ExerciseListAdapter.ExerciseViewHolder>() {
+class ExerciseListAdapter(context: Context, var listenerRecyclerView: ClickListenerRecyclerView) :
+    RecyclerView.Adapter<ExerciseViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var exercises = emptyList<Exercise>() // Cached copy of words
@@ -24,27 +25,18 @@ class ExerciseListAdapter(context: Context, var myClickListener: BlockLab.MyClic
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ExerciseViewHolder {
         val itemView = inflater.inflate(R.layout.recycler_view_item, parent, false)
-        return ExerciseViewHolder(itemView)
+        return ExerciseViewHolder(itemView,listenerRecyclerView)
     }
 
     override fun onBindViewHolder(holder: ExerciseViewHolder, position: Int) {
         val current = exercises[position]
-        myClickListener.setExercise(current)
-        holder.exerciseItemView.text = current.name
-        holder.exerciseView.setOnClickListener(myClickListener)
-        holder.exerciseView.setOnLongClickListener(myClickListener)
+        val textString = "${current.exerciseId} ${current.name}"
+        holder.exerciseItemView.text = textString
     }
 
     internal fun setExercises(exercises: List<Exercise>) {
         this.exercises = exercises
         notifyDataSetChanged()
-    }
-
-    inner class ExerciseViewHolder(singleItemView: View) : RecyclerView.ViewHolder(singleItemView) {
-
-        val exerciseItemView: TextView = singleItemView.findViewById(R.id.textView)
-        val exerciseView: View = singleItemView
-
     }
 
 }

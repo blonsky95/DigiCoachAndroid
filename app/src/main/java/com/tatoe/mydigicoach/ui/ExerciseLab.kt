@@ -11,6 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.util.Dataholder
 import kotlinx.android.synthetic.main.activity_exercise_lab.*
 import timber.log.Timber
 
@@ -18,13 +19,19 @@ class ExerciseLab : AppCompatActivity() {
 
     lateinit var exerciseName: String
     lateinit var exerciseDesc: String
-    lateinit var exerciseOldName: String
+    var exerciseId: Int? = null
+
+//    lateinit var exerciseOldName: String
 
 
     lateinit var nameEditText: EditText
     lateinit var descEditText: EditText
     lateinit var saveExerciseButton: Button
+    lateinit var deleteButton: Button
+
     private lateinit var dataViewModel: DataViewModel
+
+    lateinit var updatingExercise: Exercise
 
     private var BUTTON_ADD = "ADD"
     private var BUTTON_UPDATE = "UPDATE"
@@ -36,12 +43,14 @@ class ExerciseLab : AppCompatActivity() {
 
         var EXERCISE_NAME_KEY = "exercise_name"
         var EXERCISE_DESCRIPTION_KEY = "exercise_description"
-        var EXERCISE_OLD_NAME_KEY = "exercise_old_name"
-
+        //        var EXERCISE_OLD_NAME_KEY = "exercise_old_name"
+        var EXERCISE_ID_KEY = "exercise_id"
 
         var EXERCISE_FAIL_RESULT_CODE = 0
         var EXERCISE_NEW_RESULT_CODE = 1
         var EXERCISE_UPDATE_RESULT_CODE = 2
+        var EXERCISE_DELETE_RESULT_CODE = 3
+
     }
 
 
@@ -50,57 +59,51 @@ class ExerciseLab : AppCompatActivity() {
         setContentView(R.layout.activity_exercise_lab)
         title = "Exercise Lab"
 
+        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+
         nameEditText = EditText1
         descEditText = EditText2
         saveExerciseButton = addExerciseButton
+        deleteButton = delete_button
 
         if (intent.hasExtra(EXERCISE_ACTION)) {
             var action = intent.getStringExtra(EXERCISE_ACTION)
+
+            if (action == EXERCISE_UPDATE) {
+                exerciseId = intent.getIntExtra(EXERCISE_ID_KEY, -1)
+            }
+
             when (action) {
                 EXERCISE_NEW -> modifyUI(BUTTON_ADD)
-                EXERCISE_UPDATE -> modifyUI(
-                    BUTTON_UPDATE,
-                    intent.getStringExtra(EXERCISE_NAME_KEY),
-                    intent.getStringExtra(EXERCISE_DESCRIPTION_KEY)
-                )
+                EXERCISE_UPDATE -> modifyUI(BUTTON_UPDATE)
             }
         }
 
-        var view = exercise_lab_layout as View
-
-        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+//        var view = exercise_lab_layout as View
 
 
-//        saveExerciseButton.setOnClickListener {
-//            exerciseName = nameEditText.text.trim().toString()
-//            exerciseDesc = descEditText.text.trim().toString()
-//
-//            var newExercise = Exercise(exerciseName, exerciseDesc)
-//            var replyIntent = Intent()
-//
-//            Timber.d("New currentExercise - built: ${newExercise.name} ${newExercise.description}")
-//
-//            replyIntent.putExtra(EXERCISE_NAME_KEY, exerciseName)
-//            replyIntent.putExtra(EXERCISE_DESCRIPTION_KEY, exerciseDesc)
-//            setResult(EXERCISE_NEW_RESULT_CODE, replyIntent)
-//
-//            if (exerciseName.isEmpty()) {
-//                setResult(EXERCISE_FAIL_RESULT_CODE, replyIntent)
-//            }
-//            finish()
-//        }
     }
 
 
-    private fun modifyUI(buttonText: String, nameText: String = "", descText: String = "") {
-        nameEditText.text = SpannableStringBuilder(nameText)
-        descEditText.text = SpannableStringBuilder(descText)
+    private fun modifyUI(buttonText: String) {
+
+        var nameTextField = ""
+        var descTextField = ""
+
         saveExerciseButton.text = buttonText
-        if (buttonText==BUTTON_ADD) {
+        if (buttonText == BUTTON_ADD) {
+            deleteButton.visibility = View.GONE
             saveExerciseButton.setOnClickListener(addButtonListener)
         } else {
             saveExerciseButton.setOnClickListener(updateButtonListener)
+            deleteButton.setOnClickListener(deleteButtonListener)
+            updatingExercise = Dataholder.activeExerciseHolder
+            nameTextField = updatingExercise.name
+            descTextField = updatingExercise.description
         }
+
+        nameEditText.text = SpannableStringBuilder(nameTextField)
+        descEditText.text = SpannableStringBuilder(descTextField)
     }
 
     private val addButtonListener = View.OnClickListener {
@@ -108,16 +111,17 @@ class ExerciseLab : AppCompatActivity() {
         exerciseDesc = descEditText.text.trim().toString()
 
         var newExercise = Exercise(exerciseName, exerciseDesc)
+        Dataholder.newExerciseHolder = newExercise
+
         var replyIntent = Intent()
 
         Timber.d("add currentExercise - built: ${newExercise.name} ${newExercise.description}")
-
-        replyIntent.putExtra(EXERCISE_NAME_KEY, exerciseName)
-        replyIntent.putExtra(EXERCISE_DESCRIPTION_KEY, exerciseDesc)
-        setResult(EXERCISE_NEW_RESULT_CODE, replyIntent)
+//
 
         if (exerciseName.isEmpty()) {
             setResult(EXERCISE_FAIL_RESULT_CODE, replyIntent)
+        } else {
+            setResult(EXERCISE_NEW_RESULT_CODE, replyIntent)
         }
         finish()
     }
@@ -126,19 +130,31 @@ class ExerciseLab : AppCompatActivity() {
         exerciseName = nameEditText.text.trim().toString()
         exerciseDesc = descEditText.text.trim().toString()
 
-        var newExercise = Exercise(exerciseName, exerciseDesc)
+        updatingExercise.name = exerciseName
+        updatingExercise.description = exerciseDesc
+        Dataholder.activeExerciseHolder = updatingExercise
         var replyIntent = Intent()
 
-        Timber.d("update currentExercise - built: ${newExercise.name} ${newExercise.description} old name was $exerciseOldName")
+        Timber.d("update currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
 
-        replyIntent.putExtra(EXERCISE_NAME_KEY, exerciseName)
-        replyIntent.putExtra(EXERCISE_OLD_NAME_KEY, exerciseOldName)
-        replyIntent.putExtra(EXERCISE_DESCRIPTION_KEY, exerciseDesc)
-        setResult(EXERCISE_NEW_RESULT_CODE, replyIntent)
 
         if (exerciseName.isEmpty()) {
             setResult(EXERCISE_FAIL_RESULT_CODE, replyIntent)
+        } else {
+            setResult(EXERCISE_UPDATE_RESULT_CODE, replyIntent)
         }
+        finish()
+    }
+
+    private val deleteButtonListener = View.OnClickListener {
+
+        Dataholder.activeExerciseHolder = updatingExercise
+        var replyIntent = Intent()
+
+        Timber.d("delete currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
+
+        setResult(EXERCISE_DELETE_RESULT_CODE, replyIntent)
+
         finish()
     }
 

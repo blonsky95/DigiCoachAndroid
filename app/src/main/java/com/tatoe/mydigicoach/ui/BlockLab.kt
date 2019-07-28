@@ -10,36 +10,61 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.tatoe.mydigicoach.DataViewModel
-import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_block_lab.*
 import timber.log.Timber
+import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
+import android.widget.Toast
+import com.tatoe.mydigicoach.ui.util.Dataholder
+
 
 class BlockLab : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
     private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ExerciseListAdapter
+
 
     private val exerciseLabAcitivtyRequestCode = 1
 
-
+    //todo ptg
+    //todo navigation
+    //
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_block_lab)
+        setContentView(com.tatoe.mydigicoach.R.layout.activity_block_lab)
         title = "Block Lab"
 
         recyclerView = recyclerview as RecyclerView
 
-        var myClickListener = MyClickListener()
-        val adapter = ExerciseListAdapter(this, myClickListener)
+        val myListener = object : ClickListenerRecyclerView {
+            override fun onClick(view: View, position: Int) {
+                super.onClick(view, position)
+
+                //todo fix this
+                Toast.makeText(this@BlockLab, "$position was clicked", Toast.LENGTH_SHORT).show()
+                val intent = Intent(this@BlockLab, ExerciseLab::class.java)
+                intent.putExtra(ExerciseLab.EXERCISE_ACTION, ExerciseLab.EXERCISE_UPDATE)
+                updateUpdatingExercise(position)
+//                intent.putExtra(ExerciseLab.EXERCISE_NAME_KEY, currentExercise.name)
+//                intent.putExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY, currentExercise.description)
+//                intent.putExtra(ExerciseLab.EXERCISE_ID_KEY, currentExercise.exerciseId)
+//
+                startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+
+            }
+        }
+
+        adapter = ExerciseListAdapter(this, myListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
-            exercises?.let { adapter.setExercises(it) }
-            Timber.d("all exercises: ${exercises.toString()}")
+            exercises?.let {
+                Timber.d("PTG all exercises observer triggered: ${exercises.toString()}")
+                adapter.setExercises(it)
+            }
         })
 
         // add the delete as well
@@ -54,32 +79,45 @@ class BlockLab : AppCompatActivity() {
         }
     }
 
+    private fun updateUpdatingExercise(position: Int) {
+
+        var clickedExercise = dataViewModel.allExercises.value?.get(position)
+
+        if (clickedExercise != null) {
+            Dataholder.activeExerciseHolder = clickedExercise
+        } else {
+            Timber.d("upsy error")
+        }
+
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         super.onActivityResult(requestCode, resultCode, intentData)
 
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_NEW_RESULT_CODE) {
-            intentData?.let { data ->
-                val exercise = Exercise(
-                    data.getStringExtra(ExerciseLab.EXERCISE_NAME_KEY),
-                    data.getStringExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY)
-                )
-                dataViewModel.insert(exercise)
 
-            }
-            val mySnackbar = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
-            mySnackbar.show()
+            val newExercise = Dataholder.newExerciseHolder
+            dataViewModel.insert(newExercise)
+
+            val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
+            actionNotification.show()
         }
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_UPDATE_RESULT_CODE) {
-            intentData?.let { data ->
-                val exercise = Exercise(
-                    data.getStringExtra(ExerciseLab.EXERCISE_NAME_KEY),
-                    data.getStringExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY)
-                )
-                dataViewModel.update(exercise, data.getStringExtra(ExerciseLab.EXERCISE_OLD_NAME_KEY))
 
-            }
-            val mySnackbar = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
-            mySnackbar.show()
+            val updatedExercise = Dataholder.activeExerciseHolder
+            Timber.d("PTG exercise trying to be updated: ${updatedExercise.name} ${updatedExercise.description}")
+            dataViewModel.update(updatedExercise)
+
+            val actionNotification = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
+            actionNotification.show()
+        }
+        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_DELETE_RESULT_CODE) {
+
+            val deleteExercise = Dataholder.activeExerciseHolder
+            Timber.d("PTG exercise trying to be deleted: ${deleteExercise.name} ${deleteExercise.description}")
+            dataViewModel.delete(deleteExercise)
+            val actionNotification = Snackbar.make(recyclerView, "Exercise deleted", Snackbar.LENGTH_LONG)
+            actionNotification.show()
         }
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseLab.EXERCISE_FAIL_RESULT_CODE) {
             //accounts for user pressing back
@@ -89,28 +127,4 @@ class BlockLab : AppCompatActivity() {
         }
     }
 
-    inner class MyClickListener : View.OnClickListener, View.OnLongClickListener {
-        //todo change name of MyClickListener
-
-        lateinit var currentExercise: Exercise
-
-        fun setExercise(exercise: Exercise) {
-            currentExercise = exercise
-        }
-
-        override fun onClick(v: View?) {
-            val intent = Intent(this@BlockLab, ExerciseLab::class.java)
-            intent.putExtra(ExerciseLab.EXERCISE_ACTION, ExerciseLab.EXERCISE_UPDATE)
-            intent.putExtra(ExerciseLab.EXERCISE_NAME_KEY, currentExercise.name)
-            intent.putExtra(ExerciseLab.EXERCISE_DESCRIPTION_KEY, currentExercise.description)
-            Timber.d("on click list item - View currentExercise: ${currentExercise.name}")
-            startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
-        }
-
-        override fun onLongClick(v: View?): Boolean {
-            Timber.d("on long click list item - View currentExercise: ${currentExercise.name}")
-            return true
-        }
-
-    }
 }

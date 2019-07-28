@@ -23,6 +23,10 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
     val allExercises: LiveData<List<Exercise>>
 
+//    lateinit var activeExerciseHolder: Exercise
+//    lateinit var newExerciseHolder: Exercise
+
+
     init {
         val exerciseDao = AppRoomDatabase.buildDatabase(application).exercisesDao()
         repository = ExerciseRepository(exerciseDao)
@@ -35,14 +39,35 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun insert(newExercise: Exercise) = viewModelScope.launch {
-        Timber.d("data view model - insert called")
+        Timber.d("ptg - data view model - insert called")
         repository.insert(newExercise)
     }
 
-    fun update(exercise: Exercise, oldExerciseName: String) = viewModelScope.launch {
-        Timber.d("data view model - update called")
-        repository.update(exercise,oldExerciseName)
+    fun update(exercise: Exercise) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update called")
+        repository.update(exercise)
     }
+
+    fun delete(exercise: Exercise) = viewModelScope.launch {
+        Timber.d("ptg - data view model - delete called")
+        repository.delete(exercise)
+    }
+
+//    fun updateClickedExercise(position: Int) {
+//
+//        val listExercises = allExercises.value
+//
+//        if (listExercises != null && listExercises.isNotEmpty()) {
+//            activeExerciseHolder = listExercises[position]
+//            Timber.d("updating exercise is now: ${activeExerciseHolder.exerciseId} ${activeExerciseHolder.name}")
+//        }
+//    }
+//
+//    fun storeNewExercise(mNewExercise :Exercise) {
+//        newExerciseHolder = mNewExercise
+//        Timber.d("new exercise is now: ${newExerciseHolder.exerciseId} ${newExerciseHolder.name}")
+//
+//    }
 
 
 }
