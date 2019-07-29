@@ -13,7 +13,7 @@ class BlockViewer : AppCompatActivity() {
         setContentView(R.layout.activity_block_viewer)
         title = "Block Viewer"
 
-        button3.setOnClickListener {
+        createBlockBtn.setOnClickListener {
             var intent = Intent(this, ExerciseViewer::class.java)
             startActivity(intent)
         }
