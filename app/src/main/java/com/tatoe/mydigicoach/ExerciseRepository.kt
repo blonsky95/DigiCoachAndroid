@@ -9,7 +9,7 @@ class ExerciseRepository (private val exerciseDao: ExerciseDao) {
     val allExercises: androidx.lifecycle.LiveData<List<Exercise>> = exerciseDao.getAll()
 
     suspend fun insert (exercise: Exercise) {
-        var rowId = exerciseDao.addExercise(exercise)
+        var rowId = exerciseDao.insert(exercise)
         Timber.d("new currentExercise, row: $rowId")
     }
 
