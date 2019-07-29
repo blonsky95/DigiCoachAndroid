@@ -14,7 +14,7 @@ class BlockViewer : AppCompatActivity() {
         title = "Block Viewer"
 
         button3.setOnClickListener {
-            var intent = Intent(this, BlockLab::class.java)
+            var intent = Intent(this, ExerciseViewer::class.java)
             startActivity(intent)
         }
     }

@@ -15,8 +15,4 @@ data class Exercise(
     @PrimaryKey(autoGenerate = true)
     var exerciseId: Int = 0
 
-    fun addExeId (id:Int) {
-        exerciseId=id
-        //todo is this legal? Can set automatically exerciseId so might not need this method
-    }
 }

@@ -6,7 +6,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:id="@+id/exercise_lab_layout"
-        tools:context=".ui.ExerciseLab">
+        tools:context=".ui.ExerciseCreator">
 
     <EditText
             android:layout_width="0dp"

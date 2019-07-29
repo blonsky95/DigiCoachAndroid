@@ -19,13 +19,18 @@ class MainActivity : AppCompatActivity() {
         } else {
         }
 
-        button1.setOnClickListener {
+        calendarBtn.setOnClickListener {
             var intent = Intent(this, ViewOfWeek::class.java)
             startActivity(intent)
         }
 
-        button2.setOnClickListener {
+        blocksBtn.setOnClickListener {
             var intent = Intent(this, BlockViewer::class.java)
+            startActivity(intent)
+        }
+
+        exercisesBtn.setOnClickListener {
+            var intent = Intent(this, ExerciseViewer::class.java)
             startActivity(intent)
         }
     }

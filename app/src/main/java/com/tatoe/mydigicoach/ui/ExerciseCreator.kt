@@ -12,10 +12,10 @@ import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.Dataholder
-import kotlinx.android.synthetic.main.activity_exercise_lab.*
+import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import timber.log.Timber
 
-class ExerciseLab : AppCompatActivity() {
+class ExerciseCreator : AppCompatActivity() {
 
     lateinit var exerciseName: String
     lateinit var exerciseDesc: String
@@ -56,7 +56,7 @@ class ExerciseLab : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_exercise_lab)
+        setContentView(R.layout.activity_exercise_creator)
         title = "Exercise Lab"
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)

@@ -7,13 +7,31 @@
         android:layout_height="match_parent"
         tools:context=".ui.BlockViewer">
 
-    <Button
-            android:text="Create block"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/button3" android:layout_marginTop="8dp"
-            app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
-            app:layout_constraintBottom_toBottomOf="parent"/>
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/blockRecyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:background="@android:color/darker_gray"
+            tools:listitem="@layout/recycler_view_block"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+            app:layout_constraintVertical_bias="0.0"/>
+
+    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
+                  app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
+                  app:layout_constraintBottom_toBottomOf="parent"
+                  android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/blockRecyclerView"
+                  app:layout_constraintVertical_bias="1.0" android:id="@+id/linearLayout"
+                  android:layout_marginBottom="8dp">
+        <Button
+                android:text="Create block"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/createBlockBtn" android:layout_marginTop="8dp"
+                app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
+                android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"/>
+    </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
