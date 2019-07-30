@@ -5,14 +5,14 @@
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.BlockViewer">
+        tools:context=".ui.ExerciseViewer">
 
     <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/blockRecyclerView"
+            android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="@android:color/darker_gray"
-            tools:listitem="@layout/recycler_view_block"
+            tools:listitem="@layout/recycler_view_exercise"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/linearLayout"
@@ -22,7 +22,7 @@
               android:layout_height="match_parent"
               android:gravity="center"
               android:visibility="gone"
-              android:text="No blocks found, create new exercises to view them here"
+              android:text="No exercises found, create new exercises to view them here"
               android:id="@+id/ifEmptyText"/>
 
     <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
@@ -31,13 +31,16 @@
                   android:id="@+id/linearLayout"
                   android:layout_marginBottom="8dp">
         <Button
-                android:text="Create block"
+                android:text="Add Exercise"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/createBlockBtn" android:layout_marginTop="8dp"
-                app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
-                android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="8dp" android:layout_marginBottom="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                android:id="@+id/addExerciseBtn"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_marginTop="0dp" app:layout_constraintTop_toBottomOf="@+id/recyclerview"
+                app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="0dp"/>
+
     </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -1,6 +1,5 @@
 package com.tatoe.mydigicoach.database
 
-import android.arch.lifecycle.LiveData
 import androidx.room.*
 import com.tatoe.mydigicoach.entity.Exercise
 
@@ -12,14 +11,17 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercise_table WHERE name LIKE :title")
     fun findByName(title: String): Exercise
 
+    @Update
+    suspend fun update(exercise: Exercise)
+
     @Insert
     fun insertAll(vararg exercise: Exercise)
 
     @Insert
-    fun addExercise(exercise: Exercise)
+    suspend fun insert(exercise: Exercise) : Long
 
     @Delete
-    fun delete(exercise: Exercise)
+    suspend fun delete(exercise: Exercise)
 
     @Update
     fun updateTodo(vararg exercises: Exercise)

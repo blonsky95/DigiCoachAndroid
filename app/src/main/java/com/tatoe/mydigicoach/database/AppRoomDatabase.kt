@@ -4,18 +4,22 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 
 @Database(
-    entities = [Exercise::class],
+    entities = [Exercise::class,Block::class],
     version = 1
 )
-abstract class AppDatabase : RoomDatabase(){
+abstract class AppRoomDatabase : RoomDatabase(){
 
-    abstract fun ExercisesDao(): ExerciseDao
+    abstract fun exercisesDao(): ExerciseDao
+    abstract fun blockDao(): BlockDao
 
+        //todo do the migration change, change version and add the schema
     companion object {
-        @Volatile private var instance: AppDatabase? = null
+        @Volatile private var instance: AppRoomDatabase? = null
+
         private val LOCK = Any()
 
         operator fun invoke(context: Context)= instance ?: synchronized(LOCK){
@@ -23,7 +27,7 @@ abstract class AppDatabase : RoomDatabase(){
         }
 
         fun buildDatabase(context: Context) = Room.databaseBuilder(context,
-            AppDatabase::class.java, "exercise-list.db")
+            AppRoomDatabase::class.java, "exercise-list.db")
             .build()
     }
 }
