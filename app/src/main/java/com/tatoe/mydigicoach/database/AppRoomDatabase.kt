@@ -4,30 +4,41 @@ import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.migration.Migration
+import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 
 @Database(
-    entities = [Exercise::class,Block::class],
+    entities = [Exercise::class, Block::class],
     version = 1
 )
-abstract class AppRoomDatabase : RoomDatabase(){
+abstract class AppRoomDatabase : RoomDatabase() {
 
     abstract fun exercisesDao(): ExerciseDao
     abstract fun blockDao(): BlockDao
 
-        //todo do the migration change, change version and add the schema
+    //todo do the migration change, change version and add the schema
     companion object {
-        @Volatile private var instance: AppRoomDatabase? = null
+        @Volatile
+        private var instance: AppRoomDatabase? = null
 
         private val LOCK = Any()
 
-        operator fun invoke(context: Context)= instance ?: synchronized(LOCK){
-            instance ?: buildDatabase(context).also { instance = it}
+//        val MIGRATION_1_2: Migration = object : Migration(1, 2) {
+//            override fun migrate(database: SupportSQLiteDatabase) {
+//                database.execSQL("CREATE TABLE IF NOT EXISTS `block_table` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `question_id` INTEGER NOT NULL, `answer` TEXT NOT NULL, FOREIGN KEY(`question_id`) REFERENCES `question`(`id`) ON UPDATE NO ACTION ON DELETE CASCADE )")
+//            }
+//        }
+
+        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
+            instance ?: buildDatabase(context).also { instance = it }
         }
 
-        fun buildDatabase(context: Context) = Room.databaseBuilder(context,
-            AppRoomDatabase::class.java, "exercise-list.db")
+        fun buildDatabase(context: Context) = Room.databaseBuilder(
+            context,
+            AppRoomDatabase::class.java, "digital_coach.db"
+        )
             .build()
     }
 }
