@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
 
 import com.tatoe.mydigicoach.database.AppRoomDatabase
+import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -15,13 +16,14 @@ import timber.log.Timber
 
 class DataViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val repository: ExerciseRepository
+    private val repository: AppRepository
 
     private val viewModelJob = SupervisorJob()
     private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
 
     val allExercises: LiveData<List<Exercise>>
+    val allBlocks: LiveData<List<Block>>
 
 //    lateinit var activeExerciseHolder: Exercise
 //    lateinit var newExerciseHolder: Exercise
@@ -29,8 +31,11 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
     init {
         val exerciseDao = AppRoomDatabase.buildDatabase(application).exercisesDao()
-        repository = ExerciseRepository(exerciseDao)
+        val blockDao = AppRoomDatabase.buildDatabase(application).blockDao()
+
+        repository = AppRepository(exerciseDao,blockDao)
         allExercises = repository.allExercises
+        allBlocks = repository.allBlocks
     }
 
     override fun onCleared() {
@@ -38,19 +43,19 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         viewModelJob.cancel()
     }
 
-    fun insert(newExercise: Exercise) = viewModelScope.launch {
+    fun insertExercise(newExercise: Exercise) = viewModelScope.launch {
         Timber.d("ptg - data view model - insert called")
-        repository.insert(newExercise)
+        repository.insertExercise(newExercise)
     }
 
-    fun update(exercise: Exercise) = viewModelScope.launch {
+    fun updateExercise(exercise: Exercise) = viewModelScope.launch {
         Timber.d("ptg - data view model - update called")
-        repository.update(exercise)
+        repository.updateExercise(exercise)
     }
 
-    fun delete(exercise: Exercise) = viewModelScope.launch {
+    fun deleteExercise(exercise: Exercise) = viewModelScope.launch {
         Timber.d("ptg - data view model - delete called")
-        repository.delete(exercise)
+        repository.deleteExercise(exercise)
     }
 
 //    fun updateClickedExercise(position: Int) {

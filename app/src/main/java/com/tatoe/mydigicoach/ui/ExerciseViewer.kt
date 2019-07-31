@@ -98,7 +98,7 @@ class ExerciseViewer : AppCompatActivity() {
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_NEW_RESULT_CODE) {
 
             val newExercise = Dataholder.newExerciseHolder
-            dataViewModel.insert(newExercise)
+            dataViewModel.insertExercise(newExercise)
 
             val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
             actionNotification.show()
@@ -107,7 +107,7 @@ class ExerciseViewer : AppCompatActivity() {
 
             val updatedExercise = Dataholder.activeExerciseHolder
             Timber.d("PTG exercise trying to be updated: ${updatedExercise.name} ${updatedExercise.description}")
-            dataViewModel.update(updatedExercise)
+            dataViewModel.updateExercise(updatedExercise)
 
             val actionNotification = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
             actionNotification.show()
@@ -116,7 +116,7 @@ class ExerciseViewer : AppCompatActivity() {
 
             val deleteExercise = Dataholder.activeExerciseHolder
             Timber.d("PTG exercise trying to be deleted: ${deleteExercise.name} ${deleteExercise.description}")
-            dataViewModel.delete(deleteExercise)
+            dataViewModel.deleteExercise(deleteExercise)
             val actionNotification = Snackbar.make(recyclerView, "Exercise deleted", Snackbar.LENGTH_LONG)
             actionNotification.show()
         }

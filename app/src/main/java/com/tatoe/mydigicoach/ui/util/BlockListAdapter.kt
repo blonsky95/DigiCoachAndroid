@@ -5,18 +5,19 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 
-class ExerciseListAdapter(context: Context, private var listenerRecyclerView: ClickListenerRecyclerView) :
+class BlockListAdapter(context: Context, private var listenerRecyclerView: ClickListenerRecyclerView) :
     RecyclerView.Adapter<ItemViewHolder>() {
 
     //todo use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var exercises = emptyList<Exercise>() // Cached copy of words
+    private var blocks = emptyList<Block>() // Cached copy of words
 
     override fun getItemCount(): Int {
-        return exercises.size
+        return blocks.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
@@ -25,13 +26,13 @@ class ExerciseListAdapter(context: Context, private var listenerRecyclerView: Cl
     }
 
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
-        val current = exercises[position]
-        val textString = "${current.exerciseId} ${current.name}"
+        val current = blocks[position]
+        val textString = "${current.blockId} ${current.name}"
         holder.exerciseItemView.text = textString
     }
 
-    internal fun setExercises(exercises: List<Exercise>) {
-        this.exercises = exercises
+    internal fun setBlocks(blocks: List<Block>) {
+        this.blocks = blocks
         notifyDataSetChanged()
     }
 

@@ -5,7 +5,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 
-class ExerciseViewHolder(v: View, var listener: ClickListenerRecyclerView) : RecyclerView.ViewHolder(v),
+class ItemViewHolder(v: View, var listener: ClickListenerRecyclerView) : RecyclerView.ViewHolder(v),
     View.OnClickListener {
 
     override fun onClick(v: View) {

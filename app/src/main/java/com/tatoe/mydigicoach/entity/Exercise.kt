@@ -3,13 +3,18 @@ package com.tatoe.mydigicoach.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import androidx.room.TypeConverters
+import com.google.gson.annotations.SerializedName
+import com.tatoe.mydigicoach.database.DataConverter
 
 @Entity(tableName = "exercise_table")
+
 data class Exercise(
     @PrimaryKey(autoGenerate = true)
+    @field: SerializedName("id")
     var exerciseId: Int = 0,
-    @ColumnInfo(name = "name") var name: String,
-    @ColumnInfo(name = "description") var description: String
+    @ColumnInfo(name = "name") @field: SerializedName("name") var name: String,
+    @ColumnInfo(name = "description") @field: SerializedName("description") var description: String
 ) {
     //I only want name and description as constructors, so primary key id is outside
     // constructor and starts with 0 (initialization required).
