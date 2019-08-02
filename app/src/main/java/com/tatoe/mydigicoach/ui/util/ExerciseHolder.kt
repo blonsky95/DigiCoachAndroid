@@ -3,7 +3,7 @@ package com.tatoe.mydigicoach.ui.util
 import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
 
-object Dataholder {
+object ExerciseHolder {
 
     lateinit var activeExerciseHolder: Exercise
     lateinit var newExerciseHolder: Exercise

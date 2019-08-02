@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import android.widget.Toast
-import com.tatoe.mydigicoach.ui.util.Dataholder
+import com.tatoe.mydigicoach.ui.util.ExerciseHolder
 
 
 class ExerciseViewer : AppCompatActivity() {
@@ -85,7 +85,7 @@ class ExerciseViewer : AppCompatActivity() {
         var clickedExercise = dataViewModel.allExercises.value?.get(position)
 
         if (clickedExercise != null) {
-            Dataholder.activeExerciseHolder = clickedExercise
+            ExerciseHolder.activeExerciseHolder = clickedExercise
         } else {
             Timber.d("upsy error")
         }
@@ -97,7 +97,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_NEW_RESULT_CODE) {
 
-            val newExercise = Dataholder.newExerciseHolder
+            val newExercise = ExerciseHolder.newExerciseHolder
             dataViewModel.insertExercise(newExercise)
 
             val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
@@ -105,7 +105,7 @@ class ExerciseViewer : AppCompatActivity() {
         }
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_UPDATE_RESULT_CODE) {
 
-            val updatedExercise = Dataholder.activeExerciseHolder
+            val updatedExercise = ExerciseHolder.activeExerciseHolder
             Timber.d("PTG exercise trying to be updated: ${updatedExercise.name} ${updatedExercise.description}")
             dataViewModel.updateExercise(updatedExercise)
 
@@ -114,7 +114,7 @@ class ExerciseViewer : AppCompatActivity() {
         }
         if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_DELETE_RESULT_CODE) {
 
-            val deleteExercise = Dataholder.activeExerciseHolder
+            val deleteExercise = ExerciseHolder.activeExerciseHolder
             Timber.d("PTG exercise trying to be deleted: ${deleteExercise.name} ${deleteExercise.description}")
             dataViewModel.deleteExercise(deleteExercise)
             val actionNotification = Snackbar.make(recyclerView, "Exercise deleted", Snackbar.LENGTH_LONG)

@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.util.Dataholder
+import com.tatoe.mydigicoach.ui.util.ExerciseHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import timber.log.Timber
 
@@ -97,7 +97,7 @@ class ExerciseCreator : AppCompatActivity() {
         } else {
             saveExerciseButton.setOnClickListener(updateButtonListener)
             deleteButton.setOnClickListener(deleteButtonListener)
-            updatingExercise = Dataholder.activeExerciseHolder
+            updatingExercise = ExerciseHolder.activeExerciseHolder
             nameTextField = updatingExercise.name
             descTextField = updatingExercise.description
         }
@@ -111,7 +111,7 @@ class ExerciseCreator : AppCompatActivity() {
         exerciseDesc = descEditText.text.trim().toString()
 
         var newExercise = Exercise(exerciseName, exerciseDesc)
-        Dataholder.newExerciseHolder = newExercise
+        ExerciseHolder.newExerciseHolder = newExercise
 
         var replyIntent = Intent()
 
@@ -132,7 +132,7 @@ class ExerciseCreator : AppCompatActivity() {
 
         updatingExercise.name = exerciseName
         updatingExercise.description = exerciseDesc
-        Dataholder.activeExerciseHolder = updatingExercise
+        ExerciseHolder.activeExerciseHolder = updatingExercise
         var replyIntent = Intent()
 
         Timber.d("update currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
@@ -148,7 +148,7 @@ class ExerciseCreator : AppCompatActivity() {
 
     private val deleteButtonListener = View.OnClickListener {
 
-        Dataholder.activeExerciseHolder = updatingExercise
+        ExerciseHolder.activeExerciseHolder = updatingExercise
         var replyIntent = Intent()
 
         Timber.d("delete currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
