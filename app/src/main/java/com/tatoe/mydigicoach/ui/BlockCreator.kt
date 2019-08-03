@@ -86,7 +86,7 @@ class BlockCreator : AppCompatActivity() {
             "Unnamed Block" //todo perhaps set a date
         }
         block = Block(blockTitle,currentBlockComponents)
-        dataViewModel.insertBlock(block) //todo IMPORTANT - foreign key fails when saved - seee whats up
+        dataViewModel.insertBlock(block) //todo IMPORTANT - foreign key fails when saved - seee whats up asd
         Timber.d("${block.name} ${block.components}")
     }
 
