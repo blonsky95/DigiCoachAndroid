@@ -53,7 +53,7 @@ class BlockViewer : AppCompatActivity() {
 
         dataViewModel.allBlocks.observe(this, Observer { blocks ->
             blocks?.let {
-                Timber.d("PTG all blocks observer triggered: ${blocks.toString()}")
+                Timber.d("PTG all blocks observer triggered: $blocks")
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility= View.VISIBLE

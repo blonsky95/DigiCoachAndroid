@@ -27,4 +27,9 @@ class AppRepository (private val exerciseDao: ExerciseDao, private val blockDao:
         Timber.d("deleted: ${exercise.name}")
 
     }
+
+    suspend fun insertBlock(block: Block) {
+        var rowId = blockDao.addBlock(block)
+        Timber.d("new block, row: $rowId")
+    }
 }

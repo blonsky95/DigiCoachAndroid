@@ -25,10 +25,6 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     val allExercises: LiveData<List<Exercise>>
     val allBlocks: LiveData<List<Block>>
 
-//    lateinit var activeExerciseHolder: Exercise
-//    lateinit var newExerciseHolder: Exercise
-
-
     init {
         val exerciseDao = AppRoomDatabase.buildDatabase(application).exercisesDao()
         val blockDao = AppRoomDatabase.buildDatabase(application).blockDao()
@@ -56,6 +52,11 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteExercise(exercise: Exercise) = viewModelScope.launch {
         Timber.d("ptg - data view model - delete called")
         repository.deleteExercise(exercise)
+    }
+
+    fun insertBlock(block: Block) = viewModelScope.launch{
+        Timber.d("ptg - data view model - insert block called")
+        repository.insertBlock(block)
     }
 
 //    fun updateClickedExercise(position: Int) {
