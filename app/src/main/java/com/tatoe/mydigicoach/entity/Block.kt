@@ -12,7 +12,8 @@ import com.google.gson.annotations.SerializedName
         entity = Exercise::class,
         parentColumns = arrayOf("exerciseId"),
         childColumns = arrayOf("components"),
-        onDelete = ForeignKey.CASCADE
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE
     )]
 )
 data class Block(
@@ -21,7 +22,9 @@ data class Block(
     var blockId: Int = 0,
     @ColumnInfo(name = "name") @field: SerializedName("name") var name: String,
     @ColumnInfo(name = "components") @field: SerializedName("components") var components: List<Exercise>
+//todo add columninfo for 10 exercises, they should all be foreign keys, see example
 ) {
     constructor(name: String,components: List<Exercise>) : this (0, name,components)
+    //todo in this constructir decompose the list into 10 exercises which are then used
 
 }
