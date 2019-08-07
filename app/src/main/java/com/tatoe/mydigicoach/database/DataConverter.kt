@@ -9,12 +9,12 @@ import com.tatoe.mydigicoach.entity.Exercise
 class DataConverter {
 
     @TypeConverter
-    fun stringToListExercises(data: String?): List<Exercise>? {
-        return Gson().fromJson(data, object : TypeToken<ArrayList<Exercise>>() {}.type)
+    fun stringToExercise(data: String?): Exercise? {
+        return Gson().fromJson(data, object : TypeToken<Exercise>() {}.type)
     }
 
     @TypeConverter
-    fun ListExerciseToString(listExercise: List<Exercise>): String? {
-        return Gson().toJson(listExercise)
+    fun exerciseToString(exercise: Exercise?): String? {
+        return Gson().toJson(exercise)
     }
 }

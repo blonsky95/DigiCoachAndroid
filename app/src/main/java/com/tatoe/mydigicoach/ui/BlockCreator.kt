@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
+import com.tatoe.mydigicoach.entity.BlockV2
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
@@ -26,12 +27,12 @@ class BlockCreator : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
-    private lateinit var block: Block
+    private lateinit var blockV2: BlockV2
     private lateinit var blockPreviewText: TextView
     private lateinit var blockNameText: EditText
 
     private var blockString = ""
-    private lateinit var currentBlockComponents: MutableList<Exercise>
+    private lateinit var currentBlockComponents: ArrayList<Exercise>
     private lateinit var allExercises: List<Exercise>
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -43,7 +44,7 @@ class BlockCreator : AppCompatActivity() {
 
         allExercises = listOf()
 
-        currentBlockComponents = mutableListOf()
+        currentBlockComponents = arrayListOf()
         recyclerView = recyclerview as RecyclerView
         blockPreviewText = BlockPreviewText as TextView
         blockNameText = BlockNameText as EditText
@@ -58,6 +59,7 @@ class BlockCreator : AppCompatActivity() {
                 blockPreviewText.text = blockString
                 currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
                 Timber.d("block creator exercise list - $currentBlockComponents")
+                Timber.d("text being displayed: $blockString")
             }
         }
 
@@ -85,9 +87,9 @@ class BlockCreator : AppCompatActivity() {
         } else {
             "Unnamed Block" //todo perhaps set a date
         }
-        block = Block(blockTitle,currentBlockComponents)
-        dataViewModel.insertBlock(block) //todo IMPORTANT - foreign key fails when saved - seee whats up asd
-        Timber.d("${block.name} ${block.components}")
+        blockV2 = BlockV2(blockTitle,currentBlockComponents)
+        dataViewModel.insertBlock(blockV2.toBlock()) //todo IMPORTANT - foreign key fails when saved - seee whats up asd
+        Timber.d("${blockV2.name} ${blockV2.components}")
     }
 
 }
