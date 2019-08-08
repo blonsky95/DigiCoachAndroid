@@ -8,19 +8,22 @@ import com.google.gson.annotations.SerializedName
 
 
 @Entity(
-    tableName = "block_table"
-    //todo IMPORTANT FIX THE FOREIGN KEY SHIT
-    //todo implement the activity for result so pressing back is an intent and updates block viewer
-    //todo add update and delete - do its magic
-    //todo calendar!!!!!
-//    foreignKeys = [ForeignKey(
-//        entity = Exercise::class,
-//        parentColumns = arrayOf("exerciseId"),
-//        childColumns = arrayOf("exercise1"),
-//        onDelete = ForeignKey.CASCADE,
-//        onUpdate = ForeignKey.CASCADE
-//    )]
+    tableName = "block_table",
+    foreignKeys = [ForeignKey(
+        entity = Exercise::class,
+        parentColumns = arrayOf("exerciseId"),
+        childColumns = arrayOf("exercise1"),
+        onDelete = ForeignKey.CASCADE,
+        onUpdate = ForeignKey.CASCADE
+    )]
 )
+
+
+//todo IMPORTANT FIX THE FOREIGN KEY SHIT
+//todo implement the activity for result so pressing back is an intent and updates block viewer
+//todo add update and delete - do its magic
+//todo calendar!!!!!
+
 data class Block(
     @PrimaryKey(autoGenerate = true)
     @field: SerializedName("id")

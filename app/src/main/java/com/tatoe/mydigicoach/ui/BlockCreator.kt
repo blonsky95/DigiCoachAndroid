@@ -1,7 +1,10 @@
 package com.tatoe.mydigicoach.ui
 
+import android.content.Intent
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.View
+import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
@@ -16,6 +19,7 @@ import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.BlockV2
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 
 import kotlinx.android.synthetic.main.activity_block_creator.*
@@ -31,10 +35,31 @@ class BlockCreator : AppCompatActivity() {
     private lateinit var blockPreviewText: TextView
     private lateinit var blockNameText: EditText
 
+    lateinit var saveBlockButton: Button
+    lateinit var deleteButton: Button
+
     private var blockString = ""
     private lateinit var currentBlockComponents: ArrayList<Exercise>
     private lateinit var allExercises: List<Exercise>
 
+    lateinit var updatingBlock : BlockV2
+
+    private var BUTTON_ADD = "ADD"
+    private var BUTTON_UPDATE = "UPDATE"
+
+    companion object {
+        var BLOCK_ACTION = "exercise_action"
+        var BLOCK_NEW = "exercise_new"
+        var BLOCK_UPDATE = "exercise_update"
+
+        var BLOCK_ID_KEY = "exercise_id"
+
+        var BLOCK_FAIL_RESULT_CODE = 0
+        var BLOCK_NEW_RESULT_CODE = 1
+        var BLOCK_UPDATE_RESULT_CODE = 2
+        var BLOCK_DELETE_RESULT_CODE = 3
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_creator)
@@ -48,6 +73,17 @@ class BlockCreator : AppCompatActivity() {
         recyclerView = recyclerview as RecyclerView
         blockPreviewText = BlockPreviewText as TextView
         blockNameText = BlockNameText as EditText
+        saveBlockButton = AddBlockBtn as Button
+        deleteButton = delete_button as Button
+
+        if (intent.hasExtra(BLOCK_ACTION)) {
+            var action = intent.getStringExtra(BLOCK_ACTION)
+
+            when (action) {
+                BLOCK_NEW -> modifyUI(BUTTON_ADD)
+                BLOCK_UPDATE -> modifyUI(BUTTON_UPDATE)
+            }
+        }
 
         val exerciseSelectorListener = object : ClickListenerRecyclerView {
             override fun onClick(view: View, position: Int) {
@@ -77,7 +113,7 @@ class BlockCreator : AppCompatActivity() {
             }
         })
 
-        AddBlockBtn.setOnClickListener(addBlockAction)
+//        AddBlockBtn.setOnClickListener(addBlockAction)
 
     }
 
@@ -90,6 +126,49 @@ class BlockCreator : AppCompatActivity() {
         blockV2 = BlockV2(blockTitle,currentBlockComponents)
         dataViewModel.insertBlock(blockV2.toBlock()) //todo IMPORTANT - foreign key fails when saved - seee whats up asd
         Timber.d("${blockV2.name} ${blockV2.components}")
+    }
+
+    private fun modifyUI(buttonText: String) {
+
+        var nameTextField = ""
+        var componentsTextField = ""
+
+        saveBlockButton.text = buttonText
+        if (buttonText == BUTTON_ADD) {
+            deleteButton.visibility = View.GONE
+            saveBlockButton.setOnClickListener(addButtonListener)
+        } else {
+//            saveBlockButton.setOnClickListener(updateButtonListener)
+//            deleteButton.setOnClickListener(deleteButtonListener)
+            updatingBlock = DataHolder.activeBlockHolder
+            //todo update UI
+        }
+
+        blockNameText.text = SpannableStringBuilder(nameTextField)
+        blockPreviewText.text=SpannableStringBuilder(componentsTextField)
+    }
+
+    private val addButtonListener = View.OnClickListener {
+        val blockTitle = if (blockNameText.text.isNotEmpty()) {
+            blockNameText.text.toString()
+        } else {
+            "Unnamed Block" //todo perhaps set a date
+        }
+        blockV2 = BlockV2(blockTitle,currentBlockComponents)
+//        dataViewModel.insertBlock(blockV2.toBlock()) //todo IMPORTANT - foreign key fails when saved - seee whats up asd
+        Timber.d("${blockV2.name} ${blockV2.components}")
+
+        DataHolder.newBlockHolder = blockV2
+
+        var replyIntent = Intent()
+//
+
+        if (blockV2.name.isEmpty()) {
+            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
+        } else {
+            setResult(BLOCK_NEW_RESULT_CODE, replyIntent)
+        }
+        finish()
     }
 
 }

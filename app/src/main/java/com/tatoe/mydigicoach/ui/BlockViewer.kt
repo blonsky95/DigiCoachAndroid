@@ -9,10 +9,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.snackbar.Snackbar
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_block_viewer.*
 import kotlinx.android.synthetic.main.activity_block_viewer.ifEmptyText
@@ -23,6 +25,8 @@ class BlockViewer : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: BlockListAdapter
+
+    private val blockCreatorAcitivtyRequestCode = 1
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,8 +71,50 @@ class BlockViewer : AppCompatActivity() {
         })
 
         createBlockBtn.setOnClickListener {
-            var intent = Intent(this, BlockCreator::class.java)
-            startActivity(intent)
+//            var intent = Intent(this, BlockCreator::class.java)
+//            startActivity(intent)
+
+            Timber.d("Block Viewer --> Block creator")
+
+            val intent = Intent(this, BlockCreator::class.java)
+            intent.putExtra(BlockCreator.BLOCK_ACTION, BlockCreator.BLOCK_NEW)
+            startActivityForResult(intent, blockCreatorAcitivtyRequestCode)
         }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intentData)
+
+        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_NEW_RESULT_CODE) {
+
+            val newBlock = DataHolder.newBlockHolder
+            dataViewModel.insertBlock(newBlock.toBlock())
+
+            val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
+            actionNotification.show()
+        }
+//        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_UPDATE_RESULT_CODE) {
+//
+//            val updatedExercise = DataHolder.activeExerciseHolder
+//            Timber.d("PTG exercise trying to be updated: ${updatedExercise.name} ${updatedExercise.description}")
+//            dataViewModel.updateExercise(updatedExercise)
+//
+//            val actionNotification = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
+//        }
+//        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_DELETE_RESULT_CODE) {
+//
+//            val deleteExercise = DataHolder.activeExerciseHolder
+//            Timber.d("PTG exercise trying to be deleted: ${deleteExercise.name} ${deleteExercise.description}")
+//            dataViewModel.deleteExercise(deleteExercise)
+//            val actionNotification = Snackbar.make(recyclerView, "Exercise deleted", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
+//        }
+//        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_FAIL_RESULT_CODE) {
+//            //accounts for user pressing back
+//            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
+//        } else {
+//        }
     }
 }

@@ -11,7 +11,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.util.ExerciseHolder
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import timber.log.Timber
 
@@ -37,13 +37,10 @@ class ExerciseCreator : AppCompatActivity() {
     private var BUTTON_UPDATE = "UPDATE"
 
     companion object {
-        var EXERCISE_ACTION = "exercise_new"
+        var EXERCISE_ACTION = "exercise_action"
         var EXERCISE_NEW = "exercise_new"
-        var EXERCISE_UPDATE = "exercise_action"
+        var EXERCISE_UPDATE = "exercise_update"
 
-        var EXERCISE_NAME_KEY = "exercise_name"
-        var EXERCISE_DESCRIPTION_KEY = "exercise_description"
-        //        var EXERCISE_OLD_NAME_KEY = "exercise_old_name"
         var EXERCISE_ID_KEY = "exercise_id"
 
         var EXERCISE_FAIL_RESULT_CODE = 0
@@ -69,10 +66,6 @@ class ExerciseCreator : AppCompatActivity() {
         if (intent.hasExtra(EXERCISE_ACTION)) {
             var action = intent.getStringExtra(EXERCISE_ACTION)
 
-            if (action == EXERCISE_UPDATE) {
-                exerciseId = intent.getIntExtra(EXERCISE_ID_KEY, -1)
-            }
-
             when (action) {
                 EXERCISE_NEW -> modifyUI(BUTTON_ADD)
                 EXERCISE_UPDATE -> modifyUI(BUTTON_UPDATE)
@@ -97,7 +90,7 @@ class ExerciseCreator : AppCompatActivity() {
         } else {
             saveExerciseButton.setOnClickListener(updateButtonListener)
             deleteButton.setOnClickListener(deleteButtonListener)
-            updatingExercise = ExerciseHolder.activeExerciseHolder
+            updatingExercise = DataHolder.activeExerciseHolder
             nameTextField = updatingExercise.name
             descTextField = updatingExercise.description
         }
@@ -111,7 +104,7 @@ class ExerciseCreator : AppCompatActivity() {
         exerciseDesc = descEditText.text.trim().toString()
 
         var newExercise = Exercise(exerciseName, exerciseDesc)
-        ExerciseHolder.newExerciseHolder = newExercise
+        DataHolder.newExerciseHolder = newExercise
 
         var replyIntent = Intent()
 
@@ -132,7 +125,7 @@ class ExerciseCreator : AppCompatActivity() {
 
         updatingExercise.name = exerciseName
         updatingExercise.description = exerciseDesc
-        ExerciseHolder.activeExerciseHolder = updatingExercise
+        DataHolder.activeExerciseHolder = updatingExercise
         var replyIntent = Intent()
 
         Timber.d("update currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
@@ -148,7 +141,7 @@ class ExerciseCreator : AppCompatActivity() {
 
     private val deleteButtonListener = View.OnClickListener {
 
-        ExerciseHolder.activeExerciseHolder = updatingExercise
+        DataHolder.activeExerciseHolder = updatingExercise
         var replyIntent = Intent()
 
         Timber.d("delete currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")

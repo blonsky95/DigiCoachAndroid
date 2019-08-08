@@ -15,7 +15,7 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import android.widget.Toast
-import com.tatoe.mydigicoach.ui.util.ExerciseHolder
+import com.tatoe.mydigicoach.ui.util.DataHolder
 
 
 class ExerciseViewer : AppCompatActivity() {
@@ -24,7 +24,7 @@ class ExerciseViewer : AppCompatActivity() {
     private lateinit var adapter: ExerciseListAdapter
 
 
-    private val exerciseLabAcitivtyRequestCode = 1
+    private val exerciseCreatorAcitivtyRequestCode = 1
 
     //todo navigation
 
@@ -44,7 +44,7 @@ class ExerciseViewer : AppCompatActivity() {
                 intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_UPDATE)
                 updateUpdatingExercise(position)
 
-                startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+                startActivityForResult(intent, exerciseCreatorAcitivtyRequestCode)
 
             }
         }
@@ -71,11 +71,11 @@ class ExerciseViewer : AppCompatActivity() {
         })
 
         addExerciseBtn.setOnClickListener {
-            Timber.d("block lab --> Exercise lab")
+            Timber.d("Exercise Viewer --> Exercise creator")
 
             val intent = Intent(this, ExerciseCreator::class.java)
             intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_NEW)
-            startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+            startActivityForResult(intent, exerciseCreatorAcitivtyRequestCode)
 
         }
     }
@@ -85,7 +85,7 @@ class ExerciseViewer : AppCompatActivity() {
         var clickedExercise = dataViewModel.allExercises.value?.get(position)
 
         if (clickedExercise != null) {
-            ExerciseHolder.activeExerciseHolder = clickedExercise
+            DataHolder.activeExerciseHolder = clickedExercise
         } else {
             Timber.d("upsy error")
         }
@@ -95,32 +95,32 @@ class ExerciseViewer : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         super.onActivityResult(requestCode, resultCode, intentData)
 
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_NEW_RESULT_CODE) {
+        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_NEW_RESULT_CODE) {
 
-            val newExercise = ExerciseHolder.newExerciseHolder
+            val newExercise = DataHolder.newExerciseHolder
             dataViewModel.insertExercise(newExercise)
 
             val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
             actionNotification.show()
         }
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_UPDATE_RESULT_CODE) {
+        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_UPDATE_RESULT_CODE) {
 
-            val updatedExercise = ExerciseHolder.activeExerciseHolder
+            val updatedExercise = DataHolder.activeExerciseHolder
             Timber.d("PTG exercise trying to be updated: ${updatedExercise.name} ${updatedExercise.description}")
             dataViewModel.updateExercise(updatedExercise)
 
             val actionNotification = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
             actionNotification.show()
         }
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_DELETE_RESULT_CODE) {
+        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_DELETE_RESULT_CODE) {
 
-            val deleteExercise = ExerciseHolder.activeExerciseHolder
+            val deleteExercise = DataHolder.activeExerciseHolder
             Timber.d("PTG exercise trying to be deleted: ${deleteExercise.name} ${deleteExercise.description}")
             dataViewModel.deleteExercise(deleteExercise)
             val actionNotification = Snackbar.make(recyclerView, "Exercise deleted", Snackbar.LENGTH_LONG)
             actionNotification.show()
         }
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_FAIL_RESULT_CODE) {
+        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_FAIL_RESULT_CODE) {
             //accounts for user pressing back
             val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
             actionNotification.show()
