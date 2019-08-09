@@ -26,7 +26,7 @@ class ExerciseViewer : AppCompatActivity() {
 
     private val exerciseCreatorAcitivtyRequestCode = 1
 
-    //todo navigation
+    //navigation
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

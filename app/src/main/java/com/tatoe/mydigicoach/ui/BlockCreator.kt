@@ -16,22 +16,26 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
-import com.tatoe.mydigicoach.entity.BlockV2
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 
 import kotlinx.android.synthetic.main.activity_block_creator.*
-import org.w3c.dom.Text
 import timber.log.Timber
 
 class BlockCreator : AppCompatActivity() {
 
+    //todo fix UI - quick fix so keyboard doesnt displace it, also get rid of snackbars, comment them
+    //text view at bottom should probably be an adapter too - so user can delete exercises
+    //set up junit tests to stop having to create exercises and shit
+
+    //calendar shite
+
     private lateinit var dataViewModel: DataViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
-    private lateinit var blockV2: BlockV2
+    private lateinit var block: Block
     private lateinit var blockPreviewText: TextView
     private lateinit var blockNameText: EditText
 
@@ -42,7 +46,7 @@ class BlockCreator : AppCompatActivity() {
     private lateinit var currentBlockComponents: ArrayList<Exercise>
     private lateinit var allExercises: List<Exercise>
 
-    lateinit var updatingBlock : BlockV2
+    lateinit var updatingBlock : Block
 
     private var BUTTON_ADD = "ADD"
     private var BUTTON_UPDATE = "UPDATE"
@@ -64,7 +68,7 @@ class BlockCreator : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_creator)
         title = "Block Creator"
-        //todo add init block in classes that require variables to be initialised
+        // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         allExercises = listOf()
@@ -119,24 +123,28 @@ class BlockCreator : AppCompatActivity() {
 
     private fun modifyUI(buttonText: String) {
 
+        var namePreviewEText=""
+        var blockPreviewEText=""
+
         saveBlockButton.text = buttonText
         if (buttonText == BUTTON_ADD) {
             deleteButton.visibility = View.GONE
             saveBlockButton.setOnClickListener(addButtonListener)
         } else {
             saveBlockButton.setOnClickListener(updateButtonListener)
-//            deleteButton.setOnClickListener(deleteButtonListener)
+            deleteButton.setOnClickListener(deleteButtonListener)
 
             updatingBlock = DataHolder.activeBlockHolder
             currentBlockComponents = updatingBlock.components
             for (exercise in currentBlockComponents) {
                 exercise.let { blockString += "${exercise.name}\n" }
             }
-            //todo update UI
+            namePreviewEText=updatingBlock.name
+            blockPreviewEText=blockString
         }
 
-        blockNameText.text = SpannableStringBuilder(updatingBlock.name)
-        blockPreviewText.text=SpannableStringBuilder(blockString)
+        blockNameText.text = SpannableStringBuilder(namePreviewEText)
+        blockPreviewText.text=SpannableStringBuilder(blockPreviewEText)
     }
 
 
@@ -145,18 +153,18 @@ class BlockCreator : AppCompatActivity() {
         val blockTitle = if (blockNameText.text.isNotEmpty()) {
             blockNameText.text.toString()
         } else {
-            "Unnamed Block" //todo perhaps set a date
+            "Unnamed Block"
         }
-        blockV2 = BlockV2(blockTitle,currentBlockComponents)
-//        dataViewModel.insertBlock(blockV2.toBlock())
-        Timber.d("${blockV2.name} ${blockV2.components}")
+        block = Block(blockTitle,currentBlockComponents)
+//        dataViewModel.insertBlock(block.toBlock())
+        Timber.d("${block.name} ${block.components}")
 
-        DataHolder.newBlockHolder = blockV2
+        DataHolder.newBlockHolder = block
 
         var replyIntent = Intent()
 //
 
-        if (blockV2.name.isEmpty()) {
+        if (block.name.isEmpty()) {
             setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
         } else {
             setResult(BLOCK_NEW_RESULT_CODE, replyIntent)
@@ -171,7 +179,7 @@ class BlockCreator : AppCompatActivity() {
         DataHolder.activeBlockHolder = updatingBlock
         var replyIntent = Intent()
 
-        Timber.d("update currentBlock - built: ${updatingBlock.blockPrimaryKeyId} ${updatingBlock.name} ${updatingBlock.components} ")
+        Timber.d("update currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
 
 
         if (blockNameText.text.trim().toString().isEmpty()) {
@@ -187,7 +195,7 @@ class BlockCreator : AppCompatActivity() {
         DataHolder.activeBlockHolder = updatingBlock
         var replyIntent = Intent()
 
-        Timber.d("delete currentBlock - built: ${updatingBlock.blockPrimaryKeyId} ${updatingBlock.name} ${updatingBlock.components} ")
+        Timber.d("delete currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
 
         setResult(BLOCK_DELETE_RESULT_CODE, replyIntent)
 

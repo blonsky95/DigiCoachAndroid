@@ -10,7 +10,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 class ExerciseListAdapter(context: Context, private var listenerRecyclerView: ClickListenerRecyclerView) :
     RecyclerView.Adapter<ItemViewHolder>() {
 
-    //todo use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
+    // use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var exercises = emptyList<Exercise>() // Cached copy of words

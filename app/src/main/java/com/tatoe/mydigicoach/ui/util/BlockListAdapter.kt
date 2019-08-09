@@ -11,8 +11,6 @@ import com.tatoe.mydigicoach.entity.Exercise
 class BlockListAdapter(context: Context, private var listenerRecyclerView: ClickListenerRecyclerView) :
     RecyclerView.Adapter<ItemViewHolder>() {
 
-    //todo use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
-
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>() // Cached copy of words
 

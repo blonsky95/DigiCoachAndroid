@@ -17,7 +17,7 @@ abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun exercisesDao(): ExerciseDao
     abstract fun blockDao(): BlockDao
 
-    //todo do the migration change, change version and add the schema
+    // do the migration change, change version and add the schema
     companion object {
         @Volatile
         private var instance: AppRoomDatabase? = null

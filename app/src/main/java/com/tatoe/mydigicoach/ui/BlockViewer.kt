@@ -81,7 +81,7 @@ class BlockViewer : AppCompatActivity() {
     }
 
     private fun updateUpdatingBlock(position: Int) {
-        var clickedBlock = dataViewModel.allBlocks.value?.get(position)?.toBlockV2()
+        var clickedBlock = dataViewModel.allBlocks.value?.get(position)
 
         if (clickedBlock != null) {
             DataHolder.activeBlockHolder = clickedBlock
@@ -96,7 +96,7 @@ class BlockViewer : AppCompatActivity() {
         if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_NEW_RESULT_CODE) {
 
             val newBlock = DataHolder.newBlockHolder
-            dataViewModel.insertBlock(newBlock.toBlock())
+            dataViewModel.insertBlock(newBlock)
 
             val actionNotification = Snackbar.make(recyclerView, "Block added", Snackbar.LENGTH_LONG)
             actionNotification.show()
