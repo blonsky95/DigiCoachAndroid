@@ -68,10 +68,15 @@ data class Block(
         exercise10
     )
 
-//    companion object {
-//        fun createBlock(block: BlockV2): Block {
-//
-//        }
-//    }
+    fun toBlockV2(): BlockV2 {
+        val arrayList: ArrayList<Exercise> = arrayListOf()
+        val exerciseList = listOf(exercise1,exercise2,exercise3,exercise4,exercise5,exercise6,exercise7,exercise8,exercise9,exercise10)
+        for (exercise in exerciseList) {
+            exercise?.let { arrayList.add(it) }
+        }
+        var blockV2 = BlockV2(name,arrayList)
+        blockV2.blockPrimaryKeyId=blockId
+        return blockV2
+    }
 
 }

@@ -2,6 +2,8 @@ package com.tatoe.mydigicoach.entity
 
 class BlockV2(var name: String, var components: ArrayList<Exercise>) {
 
+    var blockPrimaryKeyId = 0
+
     fun toBlock() : Block {
         val componentsArray = arrayOfNulls<Exercise>(10)
         for ((i, exercise) in components.withIndex()) {
@@ -19,5 +21,6 @@ class BlockV2(var name: String, var components: ArrayList<Exercise>) {
         val exercise10:Exercise? = componentsArray[9]
         return Block(name,exercise1,exercise2,exercise3,exercise4,exercise5,exercise6,exercise7,exercise8,exercise9,exercise10)
     }
+
 
 }

@@ -15,7 +15,6 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_block_viewer.*
 import kotlinx.android.synthetic.main.activity_block_viewer.ifEmptyText
 import timber.log.Timber
@@ -40,15 +39,14 @@ class BlockViewer : AppCompatActivity() {
                 super.onClick(view, position)
 
                 Toast.makeText(this@BlockViewer, "$position was clicked", Toast.LENGTH_SHORT).show()
-//                val intent = Intent(this@BlockViewer, ExerciseCreator::class.java)
-//                intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_UPDATE)
-//                updateUpdatingExercise(position)
-//
-//                startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+                val intent = Intent(this@BlockViewer, BlockCreator::class.java)
+                intent.putExtra(BlockCreator.BLOCK_ACTION, BlockCreator.BLOCK_UPDATE)
+                updateUpdatingBlock(position)
+
+                startActivityForResult(intent, blockCreatorAcitivtyRequestCode)
 
             }
         }
-        // todo ptg - make a block creator and a button to create block
         adapter = BlockListAdapter(this, myListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -82,39 +80,49 @@ class BlockViewer : AppCompatActivity() {
         }
     }
 
+    private fun updateUpdatingBlock(position: Int) {
+        var clickedBlock = dataViewModel.allBlocks.value?.get(position)?.toBlockV2()
+
+        if (clickedBlock != null) {
+            DataHolder.activeBlockHolder = clickedBlock
+        } else {
+            Timber.d("upsy error")
+        }
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         super.onActivityResult(requestCode, resultCode, intentData)
 
-        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_NEW_RESULT_CODE) {
+        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_NEW_RESULT_CODE) {
 
             val newBlock = DataHolder.newBlockHolder
             dataViewModel.insertBlock(newBlock.toBlock())
 
-            val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
+            val actionNotification = Snackbar.make(recyclerView, "Block added", Snackbar.LENGTH_LONG)
             actionNotification.show()
         }
-//        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_UPDATE_RESULT_CODE) {
-//
-//            val updatedExercise = DataHolder.activeExerciseHolder
-//            Timber.d("PTG exercise trying to be updated: ${updatedExercise.name} ${updatedExercise.description}")
-//            dataViewModel.updateExercise(updatedExercise)
-//
-//            val actionNotification = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-//        }
-//        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_DELETE_RESULT_CODE) {
-//
-//            val deleteExercise = DataHolder.activeExerciseHolder
-//            Timber.d("PTG exercise trying to be deleted: ${deleteExercise.name} ${deleteExercise.description}")
-//            dataViewModel.deleteExercise(deleteExercise)
-//            val actionNotification = Snackbar.make(recyclerView, "Exercise deleted", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-//        }
-//        if (requestCode == exerciseCreatorAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_FAIL_RESULT_CODE) {
-//            //accounts for user pressing back
-//            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-//        } else {
-//        }
+        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_UPDATE_RESULT_CODE) {
+
+            val updatedBlock = DataHolder.activeBlockHolder
+            Timber.d("PTG block trying to be updated: ${updatedBlock.name} ${updatedBlock.components}")
+            dataViewModel.updateBlock(updatedBlock)
+
+            val actionNotification = Snackbar.make(recyclerView, "Block updated", Snackbar.LENGTH_LONG)
+            actionNotification.show()
+        }
+        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_DELETE_RESULT_CODE) {
+
+            val deletedBlock = DataHolder.activeBlockHolder
+            Timber.d("PTG block trying to be deleted: ${deletedBlock.name} ${deletedBlock.components}")
+            dataViewModel.deleteBlock(deletedBlock)
+            val actionNotification = Snackbar.make(recyclerView, "Block deleted", Snackbar.LENGTH_LONG)
+            actionNotification.show()
+        }
+        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_FAIL_RESULT_CODE) {
+            //accounts for user pressing back
+            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
+            actionNotification.show()
+        } else {
+        }
     }
 }

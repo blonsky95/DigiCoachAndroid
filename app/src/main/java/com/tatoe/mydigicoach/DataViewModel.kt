@@ -59,6 +59,16 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository.insertBlock(block)
     }
 
+    fun updateBlock(block: Block) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update block called")
+        repository.updateBlock(block)
+    }
+
+    fun deleteBlock(block: Block) = viewModelScope.launch {
+        Timber.d("ptg - data view model - delete block called")
+        repository.deleteBlock(block)
+    }
+
 //    fun updateClickedExercise(position: Int) {
 //
 //        val listExercises = allExercises.value

@@ -85,23 +85,11 @@ class BlockCreator : AppCompatActivity() {
             }
         }
 
-        val exerciseSelectorListener = object : ClickListenerRecyclerView {
-            override fun onClick(view: View, position: Int) {
-                super.onClick(view, position)
-                Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
-                val clickedExercise = dataViewModel.allExercises.value?.get(position)
-                val string = clickedExercise?.name + "\n"
-                blockString += string
-                blockPreviewText.text = blockString
-                currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
-                Timber.d("block creator exercise list - $currentBlockComponents")
-                Timber.d("text being displayed: $blockString")
-            }
-        }
 
         adapter = ExerciseListAdapter(this, exerciseSelectorListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
@@ -113,40 +101,45 @@ class BlockCreator : AppCompatActivity() {
             }
         })
 
-//        AddBlockBtn.setOnClickListener(addBlockAction)
-
     }
 
-    private val addBlockAction = View.OnClickListener {
-        val blockTitle = if (blockNameText.text.isNotEmpty()) {
-            blockNameText.text.toString()
-        } else {
-            "Unnamed Block" //todo perhaps set a date
+    val exerciseSelectorListener = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+            Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
+            val clickedExercise = dataViewModel.allExercises.value?.get(position)
+            val string = clickedExercise?.name + "\n"
+            blockString += string
+            blockPreviewText.text = blockString
+            currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
+            Timber.d("block creator exercise list - $currentBlockComponents")
+            Timber.d("text being displayed: $blockString")
         }
-        blockV2 = BlockV2(blockTitle,currentBlockComponents)
-        dataViewModel.insertBlock(blockV2.toBlock()) //todo IMPORTANT - foreign key fails when saved - seee whats up asd
-        Timber.d("${blockV2.name} ${blockV2.components}")
     }
 
     private fun modifyUI(buttonText: String) {
-
-        var nameTextField = ""
-        var componentsTextField = ""
 
         saveBlockButton.text = buttonText
         if (buttonText == BUTTON_ADD) {
             deleteButton.visibility = View.GONE
             saveBlockButton.setOnClickListener(addButtonListener)
         } else {
-//            saveBlockButton.setOnClickListener(updateButtonListener)
+            saveBlockButton.setOnClickListener(updateButtonListener)
 //            deleteButton.setOnClickListener(deleteButtonListener)
+
             updatingBlock = DataHolder.activeBlockHolder
+            currentBlockComponents = updatingBlock.components
+            for (exercise in currentBlockComponents) {
+                exercise.let { blockString += "${exercise.name}\n" }
+            }
             //todo update UI
         }
 
-        blockNameText.text = SpannableStringBuilder(nameTextField)
-        blockPreviewText.text=SpannableStringBuilder(componentsTextField)
+        blockNameText.text = SpannableStringBuilder(updatingBlock.name)
+        blockPreviewText.text=SpannableStringBuilder(blockString)
     }
+
+
 
     private val addButtonListener = View.OnClickListener {
         val blockTitle = if (blockNameText.text.isNotEmpty()) {
@@ -155,7 +148,7 @@ class BlockCreator : AppCompatActivity() {
             "Unnamed Block" //todo perhaps set a date
         }
         blockV2 = BlockV2(blockTitle,currentBlockComponents)
-//        dataViewModel.insertBlock(blockV2.toBlock()) //todo IMPORTANT - foreign key fails when saved - seee whats up asd
+//        dataViewModel.insertBlock(blockV2.toBlock())
         Timber.d("${blockV2.name} ${blockV2.components}")
 
         DataHolder.newBlockHolder = blockV2
@@ -168,6 +161,36 @@ class BlockCreator : AppCompatActivity() {
         } else {
             setResult(BLOCK_NEW_RESULT_CODE, replyIntent)
         }
+        finish()
+    }
+
+    private val updateButtonListener = View.OnClickListener {
+
+        updatingBlock.name = blockNameText.text.trim().toString()
+        updatingBlock.components = currentBlockComponents
+        DataHolder.activeBlockHolder = updatingBlock
+        var replyIntent = Intent()
+
+        Timber.d("update currentBlock - built: ${updatingBlock.blockPrimaryKeyId} ${updatingBlock.name} ${updatingBlock.components} ")
+
+
+        if (blockNameText.text.trim().toString().isEmpty()) {
+            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
+        } else {
+            setResult(BLOCK_UPDATE_RESULT_CODE, replyIntent)
+        }
+        finish()
+    }
+
+    private val deleteButtonListener = View.OnClickListener {
+
+        DataHolder.activeBlockHolder = updatingBlock
+        var replyIntent = Intent()
+
+        Timber.d("delete currentBlock - built: ${updatingBlock.blockPrimaryKeyId} ${updatingBlock.name} ${updatingBlock.components} ")
+
+        setResult(BLOCK_DELETE_RESULT_CODE, replyIntent)
+
         finish()
     }
 
