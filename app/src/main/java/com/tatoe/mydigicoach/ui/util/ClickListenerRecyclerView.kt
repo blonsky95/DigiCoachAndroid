@@ -8,4 +8,8 @@ interface ClickListenerRecyclerView {
 
     }
 
+    fun onLongClick(view: View, position: Int) {
+
+    }
+
 }

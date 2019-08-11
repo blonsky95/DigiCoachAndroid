@@ -6,7 +6,6 @@ import android.text.SpannableStringBuilder
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer
@@ -26,23 +25,26 @@ import timber.log.Timber
 
 class BlockCreator : AppCompatActivity() {
 
-    //todo fix UI - quick fix so keyboard doesnt displace it, also get rid of snackbars, comment them
-    //text view at bottom should probably be an adapter too - so user can delete exercises
+    //todo so, I should make the adapterV2 different, add a delete cross at the end of the item view
+    // todo - add the layout, and the listener functionality to ItemViewHolder, and then see how I can check if it should be visible
     //set up junit tests to stop having to create exercises and shit
 
     //calendar shite
 
     private lateinit var dataViewModel: DataViewModel
     private lateinit var recyclerView: RecyclerView
+    private lateinit var recyclerViewV2: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
+    private lateinit var adapterV2: ExerciseListAdapter
+
     private lateinit var block: Block
-    private lateinit var blockPreviewText: TextView
+//    private lateinit var blockPreviewText: TextView
     private lateinit var blockNameText: EditText
 
     lateinit var saveBlockButton: Button
     lateinit var deleteButton: Button
 
-    private var blockString = ""
+//    private var blockString = ""
     private lateinit var currentBlockComponents: ArrayList<Exercise>
     private lateinit var allExercises: List<Exercise>
 
@@ -75,10 +77,19 @@ class BlockCreator : AppCompatActivity() {
 
         currentBlockComponents = arrayListOf()
         recyclerView = recyclerview as RecyclerView
-        blockPreviewText = BlockPreviewText as TextView
+        recyclerViewV2 = CurrentBlockDisplay as RecyclerView
+//        blockPreviewText = BlockPreviewText as TextView
         blockNameText = BlockNameText as EditText
         saveBlockButton = AddBlockBtn as Button
         deleteButton = delete_button as Button
+
+        adapter = ExerciseListAdapter(this, exerciseSelectorListenerV2)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        adapterV2 = ExerciseListAdapter(this,exerciseSelectorListener)
+        recyclerViewV2.adapter = adapterV2
+        recyclerViewV2.layoutManager = LinearLayoutManager(this)
 
         if (intent.hasExtra(BLOCK_ACTION)) {
             var action = intent.getStringExtra(BLOCK_ACTION)
@@ -88,12 +99,6 @@ class BlockCreator : AppCompatActivity() {
                 BLOCK_UPDATE -> modifyUI(BUTTON_UPDATE)
             }
         }
-
-
-        adapter = ExerciseListAdapter(this, exerciseSelectorListener)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
-
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
@@ -105,20 +110,6 @@ class BlockCreator : AppCompatActivity() {
             }
         })
 
-    }
-
-    val exerciseSelectorListener = object : ClickListenerRecyclerView {
-        override fun onClick(view: View, position: Int) {
-            super.onClick(view, position)
-            Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
-            val clickedExercise = dataViewModel.allExercises.value?.get(position)
-            val string = clickedExercise?.name + "\n"
-            blockString += string
-            blockPreviewText.text = blockString
-            currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
-            Timber.d("block creator exercise list - $currentBlockComponents")
-            Timber.d("text being displayed: $blockString")
-        }
     }
 
     private fun modifyUI(buttonText: String) {
@@ -136,18 +127,42 @@ class BlockCreator : AppCompatActivity() {
 
             updatingBlock = DataHolder.activeBlockHolder
             currentBlockComponents = updatingBlock.components
-            for (exercise in currentBlockComponents) {
-                exercise.let { blockString += "${exercise.name}\n" }
-            }
+//            for (exercise in currentBlockComponents) {
+//                exercise.let { blockString += "${exercise.name}\n" }
+//            }
             namePreviewEText=updatingBlock.name
-            blockPreviewEText=blockString
+//            blockPreviewEText=blockString
         }
 
         blockNameText.text = SpannableStringBuilder(namePreviewEText)
-        blockPreviewText.text=SpannableStringBuilder(blockPreviewEText)
+        adapterV2.setExercises(currentBlockComponents)
+//        blockPreviewText.text=SpannableStringBuilder(blockPreviewEText)
     }
 
+    val exerciseSelectorListener = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+            Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
+            val clickedExercise = dataViewModel.allExercises.value?.get(position)
+            val string = clickedExercise?.name + "\n"
+//            blockString += string
+//            blockPreviewText.text = blockString
+            currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
+            Timber.d("block creator exercise list - $currentBlockComponents")
+//            Timber.d("text being displayed: $blockString")
+        }
+    }
 
+    val exerciseSelectorListenerV2 = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+            Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
+            val clickedExercise = dataViewModel.allExercises.value?.get(position)
+            currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
+            adapterV2.setExercises(currentBlockComponents)
+            Timber.d("block creator exercise list - $currentBlockComponents")
+        }
+    }
 
     private val addButtonListener = View.OnClickListener {
         val blockTitle = if (blockNameText.text.isNotEmpty()) {

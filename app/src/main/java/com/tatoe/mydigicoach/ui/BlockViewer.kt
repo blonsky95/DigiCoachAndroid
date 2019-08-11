@@ -98,8 +98,8 @@ class BlockViewer : AppCompatActivity() {
             val newBlock = DataHolder.newBlockHolder
             dataViewModel.insertBlock(newBlock)
 
-            val actionNotification = Snackbar.make(recyclerView, "Block added", Snackbar.LENGTH_LONG)
-            actionNotification.show()
+//            val actionNotification = Snackbar.make(recyclerView, "Block added", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
         }
         if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_UPDATE_RESULT_CODE) {
 
@@ -107,21 +107,21 @@ class BlockViewer : AppCompatActivity() {
             Timber.d("PTG block trying to be updated: ${updatedBlock.name} ${updatedBlock.components}")
             dataViewModel.updateBlock(updatedBlock)
 
-            val actionNotification = Snackbar.make(recyclerView, "Block updated", Snackbar.LENGTH_LONG)
-            actionNotification.show()
+//            val actionNotification = Snackbar.make(recyclerView, "Block updated", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
         }
         if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_DELETE_RESULT_CODE) {
 
             val deletedBlock = DataHolder.activeBlockHolder
             Timber.d("PTG block trying to be deleted: ${deletedBlock.name} ${deletedBlock.components}")
             dataViewModel.deleteBlock(deletedBlock)
-            val actionNotification = Snackbar.make(recyclerView, "Block deleted", Snackbar.LENGTH_LONG)
-            actionNotification.show()
+//            val actionNotification = Snackbar.make(recyclerView, "Block deleted", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
         }
         if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_FAIL_RESULT_CODE) {
             //accounts for user pressing back
-            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
-            actionNotification.show()
+//            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
         } else {
         }
     }

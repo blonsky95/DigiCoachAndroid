@@ -9,13 +9,15 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme">
+            android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
         <activity
                 android:name=".ui.BlockCreator"
                 android:label="@string/title_activity_block_creator"
+                android:windowSoftInputMode="adjustPan"
                 android:theme="@style/AppTheme.NoActionBar">
         </activity>
-        <activity android:name=".ui.ExerciseCreator">
+        <activity android:name=".ui.ExerciseCreator"
+            android:windowSoftInputMode="adjustPan">
         </activity>
         <activity android:name=".ui.ExerciseViewer">
         </activity>
