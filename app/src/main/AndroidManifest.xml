@@ -23,7 +23,7 @@
         </activity>
         <activity android:name=".ui.BlockViewer">
         </activity>
-        <activity android:name=".ui.ViewOfWeek">
+        <activity android:name=".ui.CalendarView">
         </activity>
         <activity android:name=".ui.MainActivity">
             <intent-filter>

@@ -7,10 +7,9 @@ import kotlinx.android.synthetic.main.activity_view_of_week.*
 import java.util.*
 
 
-//todo add on click listeners and add activity to add things?
-//todo create day entity
-//todo swipe right and left to slide through days
-class ViewOfWeek : AppCompatActivity() {
+
+//todo check the calendar provider some time
+class CalendarView : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +17,8 @@ class ViewOfWeek : AppCompatActivity() {
         title = "Week View"
 
         prepareUI()
+
+        //todo NEXT https://developer.android.com/training/animation/screen-slide look at code
 
     }
 
@@ -27,7 +28,7 @@ class ViewOfWeek : AppCompatActivity() {
         val monthLongName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
 
         val string = "$dayLongName ${calendar.get(Calendar.DAY_OF_MONTH)} of $monthLongName"
-        DayToday.text=string
+        DateDisplay.text=string
 
         if (TrainingToday.text.isEmpty()) {
             TrainingToday.text="Add a block or exercise to view them"

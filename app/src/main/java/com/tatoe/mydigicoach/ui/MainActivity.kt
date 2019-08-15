@@ -20,7 +20,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         calendarBtn.setOnClickListener {
-            var intent = Intent(this, ViewOfWeek::class.java)
+            var intent = Intent(this, CalendarView::class.java)
             startActivity(intent)
         }
 

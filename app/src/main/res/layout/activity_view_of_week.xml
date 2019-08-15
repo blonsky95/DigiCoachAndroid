@@ -4,13 +4,13 @@
         xmlns:app="http://schemas.android.com/apk/res-auto" xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".ui.ViewOfWeek">
+        tools:context=".ui.CalendarView">
 
     <TextView
             android:text="TextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:id="@+id/DayToday" android:layout_marginTop="32dp"
+            android:id="@+id/DateDisplay" android:layout_marginTop="32dp"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
             android:layout_marginStart="8dp"/>
@@ -22,7 +22,7 @@
             android:id="@+id/TrainingToday"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="8dp" app:layout_constraintTop_toBottomOf="@+id/DayToday"
+            android:layout_marginStart="8dp" app:layout_constraintTop_toBottomOf="@+id/DateDisplay"
             android:layout_marginTop="16dp"/>
     <Button
             android:text="Add training"
@@ -30,11 +30,5 @@
             android:layout_height="wrap_content"
             android:id="@+id/AddTrainingBtn" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="16dp"
             android:layout_marginBottom="16dp" app:layout_constraintBottom_toBottomOf="parent"/>
-    <Button
-            android:text="Change view"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:id="@+id/ChangeViewBtn" android:layout_marginBottom="16dp"
-            app:layout_constraintBottom_toBottomOf="parent" app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginStart="16dp"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
