@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
+import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,14 +25,18 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
     val allExercises: LiveData<List<Exercise>>
     val allBlocks: LiveData<List<Block>>
+    val allDays: LiveData<List<Day>>
 
     init {
         val exerciseDao = AppRoomDatabase.buildDatabase(application).exercisesDao()
         val blockDao = AppRoomDatabase.buildDatabase(application).blockDao()
+        val dayDao = AppRoomDatabase.buildDatabase(application).dayDao()
 
-        repository = AppRepository(exerciseDao,blockDao)
+
+        repository = AppRepository(exerciseDao,blockDao,dayDao)
         allExercises = repository.allExercises
         allBlocks = repository.allBlocks
+        allDays = repository.allDays
     }
 
     override fun onCleared() {
@@ -69,21 +74,12 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository.deleteBlock(block)
     }
 
-//    fun updateClickedExercise(position: Int) {
-//
-//        val listExercises = allExercises.value
-//
-//        if (listExercises != null && listExercises.isNotEmpty()) {
-//            activeExerciseHolder = listExercises[position]
-//            Timber.d("updating exercise is now: ${activeExerciseHolder.exerciseId} ${activeExerciseHolder.name}")
-//        }
-//    }
-//
-//    fun storeNewExercise(mNewExercise :Exercise) {
-//        newExerciseHolder = mNewExercise
-//        Timber.d("new exercise is now: ${newExerciseHolder.exerciseId} ${newExerciseHolder.name}")
-//
-//    }
+    fun dayExists(dayId : String) = viewModelScope.launch {
+        Timber.d("ptg - data view model - dayExists called")
+        repository.dayExists(dayId)
+
+    }
+
 
 
 }

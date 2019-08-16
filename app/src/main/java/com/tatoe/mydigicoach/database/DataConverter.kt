@@ -17,4 +17,14 @@ class DataConverter {
     fun exerciseListToString(exerciseList: ArrayList<Exercise>): String? {
         return Gson().toJson(exerciseList)
     }
+
+    @TypeConverter
+    fun stringToBlockList(data: String?): ArrayList<Block> {
+        return Gson().fromJson(data, object : TypeToken<ArrayList<Block>>() {}.type)
+    }
+
+    @TypeConverter
+    fun blockListToString(blockList: ArrayList<Block>): String? {
+        return Gson().toJson(blockList)
+    }
 }

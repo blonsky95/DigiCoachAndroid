@@ -5,17 +5,19 @@ import androidx.room.*
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tatoe.mydigicoach.entity.Block
+import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 
 @Database(
-    entities = [Exercise::class, Block::class],
-    version = 1
+    entities = [Exercise::class, Block::class, Day::class],
+    version = 2
 )
 @TypeConverters(DataConverter::class)
 abstract class AppRoomDatabase : RoomDatabase() {
 
     abstract fun exercisesDao(): ExerciseDao
     abstract fun blockDao(): BlockDao
+    abstract fun dayDao(): DayDao
 
     // do the migration change, change version and add the schema
     companion object {
@@ -37,7 +39,6 @@ abstract class AppRoomDatabase : RoomDatabase() {
         fun buildDatabase(context: Context) = Room.databaseBuilder(
             context,
             AppRoomDatabase::class.java, "digital_coach.db"
-        )
-            .build()
+        ).fallbackToDestructiveMigration().build()
     }
 }
