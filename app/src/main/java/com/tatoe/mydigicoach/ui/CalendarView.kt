@@ -14,16 +14,25 @@ import timber.log.Timber
 import java.util.*
 
 
-
 //todo check the calendar provider some time
 class CalendarView : AppCompatActivity() {
 
     private lateinit var mPager: ViewPager
 
-    val calendar = Calendar.getInstance()
+    val calendar: Calendar = Calendar.getInstance()
     val dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
     val monthLongName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
-    val dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK)
+    var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
+
+
+    //day of week goes 1 to 7 (Sunday is 1 and Saturday is 7) - this normalises it to 1 monday, 7 sunday
+    private fun filterDayOfWeek(dayWeek: Int): Int {
+        return if (dayWeek == 1) {
+            7
+        } else {
+            dayWeek - 1
+        }
+    }
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -31,29 +40,26 @@ class CalendarView : AppCompatActivity() {
         setContentView(R.layout.activity_view_of_week)
         title = "Week View"
 
-        prepareUI()
+//        prepareUI()
 
         mPager = findViewById(R.id.pager)
         val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
         mPager.adapter = pagerAdapter
 
-
-        mPager.currentItem = dayOfWeek-1 //day of week goes 1 to 7, position 0 to 6
-
-
+        Timber.d("day of week is $dayOfWeek")
+        mPager.currentItem = dayOfWeek
         AddTrainingBtn.setOnClickListener(updateDay)
 
     }
+
 
     private val updateDay = View.OnClickListener {
         Timber.d("position clicked: ${mPager.currentItem}")
     }
 
     private fun prepareUI() {
-
-
-        val string = "Today is $dayLongName ${calendar.get(Calendar.DAY_OF_MONTH)} of $monthLongName"
-        DateDisplay.text=string
+//        val string = "Today is $dayLongName ${calendar.get(Calendar.DAY_OF_MONTH)} of $monthLongName"
+//        DateDisplay.text = string
 
     }
 
@@ -66,22 +72,35 @@ class CalendarView : AppCompatActivity() {
     }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
+
+        var tempDayOfWeek = ""
+        var tempDayOfMonth = ""
+        var tempMonthOfYear = ""
+
         override fun getCount(): Int = 7
 
         override fun getItem(position: Int): Fragment {
             //todo send the blocks and exercises to DayFragment
+            //todo load data view model and get the Day instance through there -- using dayId#
+            //todo instead of day id it will send a Day instance - look what happens when you try to find a id and there is nothing
 
-            val dayId=getDayId(dayOfWeek-position+1)
-            Timber.d("please please: $dayId") //TODO TEST THIS THING BUT IT WORKS
-            //todo load data view model and get the Day instance through there -- using dayId
-           return DayFragment()
+            val dayId = getDayId(dayOfWeek-(position + 1))
+            var dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
+            return DayFragment(dayId, dataArray)
         }
 
-        private fun getDayId(dayDiff:Int): String {
-            //i need day month and year in int to call the DAY converter
+        private fun getDayId(dayDiff: Int): String {
+
             var fakeCalendar = Calendar.getInstance()
-            fakeCalendar.timeInMillis=System.currentTimeMillis() - ((24*60*60*1000)*dayDiff)
-            return Day.toDayId(fakeCalendar.get(Calendar.DAY_OF_MONTH),fakeCalendar.get(Calendar.MONTH),fakeCalendar.get(Calendar.YEAR))
+            fakeCalendar.timeInMillis = System.currentTimeMillis() - ((24 * 60 * 60 * 1000) * dayDiff)
+            tempDayOfMonth = fakeCalendar.get(Calendar.DAY_OF_MONTH).toString()
+            tempMonthOfYear = fakeCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+            tempDayOfWeek = fakeCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+            return Day.toDayId(
+                fakeCalendar.get(Calendar.DAY_OF_MONTH),
+                fakeCalendar.get(Calendar.MONTH),
+                fakeCalendar.get(Calendar.YEAR)
+            )
         }
     }
 
