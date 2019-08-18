@@ -35,6 +35,7 @@ class DayCreator: AppCompatActivity() {
     //days cant be deleted
 
     //next - present in fragments the infro from the days - design something which leaves open possibility to add more data (results of training)
+    // see if I can add exercises
 
     companion object {
         var DAY_ACTION = "day_action"
