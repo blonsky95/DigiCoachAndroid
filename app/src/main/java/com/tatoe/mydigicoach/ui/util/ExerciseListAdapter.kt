@@ -27,7 +27,7 @@ class ExerciseListAdapter(context: Context, private var itemClickListener: Click
     override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
         val current = exercises[position]
         val textString = "${current.exerciseId} ${current.name}"
-        holder.exerciseItemView.text = textString
+        holder.itemInfoView.text = textString
     }
 
     internal fun setExercises(exercises: List<Exercise>) {

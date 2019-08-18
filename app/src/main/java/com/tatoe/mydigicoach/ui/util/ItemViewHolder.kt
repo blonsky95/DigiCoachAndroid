@@ -26,14 +26,14 @@ class ItemViewHolder(v: View, var listener: ClickListenerRecyclerView, deletable
         listener.onClick(v, adapterPosition)
     }
 
-    val exerciseItemView: TextView = v.findViewById(R.id.textView)
-    private val exerciseItemDeleteBtn: ImageView = v.findViewById(R.id.deleteButton)
+    val itemInfoView: TextView = v.findViewById(R.id.textView)
+    private val itemDeleteBtn: ImageView = v.findViewById(R.id.deleteButton)
 
 
     init {
         if (deletableItem) {
-            exerciseItemDeleteBtn.visibility=View.VISIBLE
-            exerciseItemDeleteBtn.setOnClickListener(this)
+            itemDeleteBtn.visibility=View.VISIBLE
+            itemDeleteBtn.setOnClickListener(this)
         } else {
             v.setOnClickListener(this)
         }

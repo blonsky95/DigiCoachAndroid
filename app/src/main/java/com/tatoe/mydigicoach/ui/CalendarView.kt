@@ -1,12 +1,15 @@
 package com.tatoe.mydigicoach.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
+import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
+import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import kotlinx.android.synthetic.main.activity_view_of_week.*
@@ -14,23 +17,24 @@ import timber.log.Timber
 import java.util.*
 
 
-//todo check the calendar provider some time
 class CalendarView : AppCompatActivity() {
 
     private lateinit var mPager: ViewPager
+    private lateinit var dataViewModel: DataViewModel
+
+    private val dayCreatorAcitivtyRequestCode = 1
 
     val calendar: Calendar = Calendar.getInstance()
-    val dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
-    val monthLongName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+//    val dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+//    val monthLongName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
 
-
-    //day of week goes 1 to 7 (Sunday is 1 and Saturday is 7) - this normalises it to 1 monday, 7 sunday
+    //day of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
     private fun filterDayOfWeek(dayWeek: Int): Int {
         return if (dayWeek == 1) {
-            7
+            6
         } else {
-            dayWeek - 1
+            dayWeek - 2
         }
     }
 
@@ -39,8 +43,7 @@ class CalendarView : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_of_week)
         title = "Week View"
-
-//        prepareUI()
+        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         mPager = findViewById(R.id.pager)
         val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
@@ -55,19 +58,18 @@ class CalendarView : AppCompatActivity() {
 
     private val updateDay = View.OnClickListener {
         Timber.d("position clicked: ${mPager.currentItem}")
-    }
+        Timber.d("Calendar View --> Day Creator")
 
-    private fun prepareUI() {
-//        val string = "Today is $dayLongName ${calendar.get(Calendar.DAY_OF_MONTH)} of $monthLongName"
-//        DateDisplay.text = string
-
+        val intent = Intent(this, DayCreator::class.java)
+        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
+        startActivityForResult(intent, dayCreatorAcitivtyRequestCode)
     }
 
     override fun onBackPressed() {
-        if (mPager.currentItem == 0) {
-            super.onBackPressed()
+        if (mPager.currentItem != dayOfWeek) {
+            mPager.currentItem=dayOfWeek
         } else {
-            mPager.currentItem = mPager.currentItem - 1
+            super.onBackPressed()
         }
     }
 
@@ -80,13 +82,12 @@ class CalendarView : AppCompatActivity() {
         override fun getCount(): Int = 7
 
         override fun getItem(position: Int): Fragment {
-            //todo send the blocks and exercises to DayFragment
-            //todo load data view model and get the Day instance through there -- using dayId#
-            //todo instead of day id it will send a Day instance - look what happens when you try to find a id and there is nothing
 
-            val dayId = getDayId(dayOfWeek-(position + 1))
-            var dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
-            return DayFragment(dayId, dataArray)
+            val dayId = getDayId(dayOfWeek-position)
+            val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
+            val currentDay = dataViewModel.getDayById(dayId)
+            //todo hereee 111
+            return DayFragment(currentDay, dataArray)
         }
 
         private fun getDayId(dayDiff: Int): String {

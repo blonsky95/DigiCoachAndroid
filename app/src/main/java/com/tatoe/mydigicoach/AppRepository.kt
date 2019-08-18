@@ -43,12 +43,12 @@ class AppRepository(private val exerciseDao: ExerciseDao, private val blockDao: 
 
     suspend fun deleteBlock(block: Block) {
         blockDao.delete(block)
-        Timber.d ("deleted: ${block.name}")
+        Timber.d("deleted: ${block.name}")
     }
 
-    suspend fun dayExists(dayId: String) {
+    suspend fun getDayById(dayId: String): Day? {
         var day = dayDao.findByName(dayId)
         Timber.d("day exists?, row: $day")
-
+        return day
     }
 }

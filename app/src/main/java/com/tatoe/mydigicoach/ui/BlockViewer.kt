@@ -69,9 +69,6 @@ class BlockViewer : AppCompatActivity() {
         })
 
         createBlockBtn.setOnClickListener {
-//            var intent = Intent(this, BlockCreator::class.java)
-//            startActivity(intent)
-
             Timber.d("Block Viewer --> Block creator")
 
             val intent = Intent(this, BlockCreator::class.java)

@@ -74,10 +74,17 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository.deleteBlock(block)
     }
 
-    fun dayExists(dayId : String) = viewModelScope.launch {
-        Timber.d("ptg - data view model - dayExists called")
-        repository.dayExists(dayId)
-
+    fun getDayById(currentDayId : String) : Day? {
+        Timber.d("ptg - data view model - getDayById called")
+        if (allDays.value==null) {
+            return null
+        }
+        for (day in allDays.value!!) {
+            if (day.dayId==currentDayId) {
+                return day
+            }
+        }
+        return null
     }
 
 

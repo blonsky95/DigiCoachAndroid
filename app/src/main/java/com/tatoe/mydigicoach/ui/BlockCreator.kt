@@ -53,12 +53,10 @@ class BlockCreator : AppCompatActivity() {
     private var BUTTON_UPDATE = "UPDATE"
 
     companion object {
-        var BLOCK_ACTION = "exercise_action"
-        var BLOCK_NEW = "exercise_new"
-        var BLOCK_UPDATE = "exercise_update"
-
-        var BLOCK_ID_KEY = "exercise_id"
-
+        var BLOCK_ACTION = "block_action"
+        var BLOCK_NEW = "block_new"
+        var BLOCK_UPDATE = "block_update"
+        
         var BLOCK_FAIL_RESULT_CODE = 0
         var BLOCK_NEW_RESULT_CODE = 1
         var BLOCK_UPDATE_RESULT_CODE = 2

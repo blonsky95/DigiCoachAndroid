@@ -25,6 +25,11 @@
         </activity>
         <activity android:name=".ui.CalendarView">
         </activity>
+        <activity
+                android:name=".ui.DayCreator"
+                android:windowSoftInputMode="adjustPan"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
         <activity android:name=".ui.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
