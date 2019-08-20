@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.ui.util
 
 import com.tatoe.mydigicoach.entity.Block
+import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 
 object DataHolder {
@@ -10,5 +11,9 @@ object DataHolder {
 
     lateinit var activeBlockHolder: Block
     lateinit var newBlockHolder: Block
+
+    var oldDayHolder: Day? = null
+    lateinit var updatedDayHolder: Day
+
 
 }

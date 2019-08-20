@@ -48,7 +48,15 @@ class AppRepository(private val exerciseDao: ExerciseDao, private val blockDao: 
 
     suspend fun getDayById(dayId: String): Day? {
         var day = dayDao.findByName(dayId)
-        Timber.d("day exists?, row: $day")
+        Timber.d("activeDay exists?, row: $day")
         return day
+    }
+
+    suspend fun insertDay(day: Day) {
+        dayDao.insert(day)
+    }
+
+    suspend fun updateDay(day: Day) {
+        dayDao.update(day)
     }
 }

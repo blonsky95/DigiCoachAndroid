@@ -18,13 +18,12 @@ import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import kotlinx.android.synthetic.main.activity_block_creator.*
 import kotlinx.android.synthetic.main.activity_day_creator.*
 import timber.log.Timber
 
-class DayCreator: AppCompatActivity() {
+class DayCreator : AppCompatActivity() {
 
-    //todo associate this day creation to a date
+    //todo associate this activeDay creation to a date
     //when add is clicked, update dataholder with current Day, or null if empty (send date array anyways?).
     // DayCreator will get it from dataholder regardless, and if null then fuck it. When button clicked load to dataholder
     //and send it back
@@ -39,6 +38,7 @@ class DayCreator: AppCompatActivity() {
 
     companion object {
         var DAY_ACTION = "day_action"
+        var DAY_ID = "day_id"
         var DAY_NEW = "day_new"
         var DAY_UPDATE = "day_update"
 
@@ -54,11 +54,14 @@ class DayCreator: AppCompatActivity() {
     private lateinit var recyclerViewV2: RecyclerView
     private lateinit var adapterBlocks: BlockListAdapter
     private lateinit var adapterDeletableBlocks: BlockListAdapter
-    private lateinit var currentDayComponents: ArrayList<Block>
+
+    private var currentDayComponents: ArrayList<Block> = arrayListOf()
 
     lateinit var saveDayButton: Button
-    lateinit var dayId:TextView
-    lateinit var day:Day
+    lateinit var dayId: TextView
+    lateinit var activeDay: Day
+    lateinit var activeDayId: String
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,31 +70,27 @@ class DayCreator: AppCompatActivity() {
         // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
-        currentDayComponents = arrayListOf()
+        DataHolder.oldDayHolder?.let { it ->
+            activeDay = it
+            currentDayComponents = activeDay.blocks
+        }
+
+        activeDayId = intent.getStringExtra(DAY_ID)
 
         recyclerView = BlocksDisplay as RecyclerView
         recyclerViewV2 = CurrentDayDisplay as RecyclerView
-//        blockPreviewText = BlockPreviewText as TextView
+
         dayId = DayId as TextView
-        saveDayButton = AddDayBtn as Button
+        AddDayBtn.setOnClickListener(updateDayListener)
 
         adapterBlocks = BlockListAdapter(this, blockSelectorListener)
         recyclerView.adapter = adapterBlocks
         recyclerView.layoutManager = LinearLayoutManager(this)
         adapterBlocks.setBlocks(dataViewModel.allBlocks.value)
 
-        adapterDeletableBlocks = BlockListAdapter(this,itemDeletableListener,true)
+        adapterDeletableBlocks = BlockListAdapter(this, itemDeletableListener, true)
         recyclerViewV2.adapter = adapterDeletableBlocks
         recyclerViewV2.layoutManager = LinearLayoutManager(this)
-
-//        if (intent.hasExtra(BlockCreator.BLOCK_ACTION)) {
-//            var action = intent.getStringExtra(BlockCreator.BLOCK_ACTION)
-//
-//            when (action) {
-//                BlockCreator.BLOCK_NEW -> modifyUI(BUTTON_ADD)
-//                BlockCreator.BLOCK_UPDATE -> modifyUI(BUTTON_UPDATE)
-//            }
-//        }
 
         dataViewModel.allBlocks.observe(this, Observer { exercises ->
             exercises?.let {
@@ -127,23 +126,15 @@ class DayCreator: AppCompatActivity() {
         }
     }
 
-//    private val addButtonListener = View.OnClickListener {
-//        day = Day()
-////        dataViewModel.insertBlock(block.toBlock())
-//        Timber.d("${block.name} ${block.components}")
-//
-//        DataHolder.newBlockHolder = block
-//
-//        var replyIntent = Intent()
-////
-//
-//        if (block.name.isEmpty()) {
-//            setResult(BlockCreator.BLOCK_FAIL_RESULT_CODE, replyIntent)
-//        } else {
-//            setResult(BlockCreator.BLOCK_NEW_RESULT_CODE, replyIntent)
-//        }
-//        finish()
-//    }
+    private val updateDayListener = View.OnClickListener {
+        activeDay = Day(activeDayId, currentDayComponents, arrayListOf())
+        DataHolder.updatedDayHolder = activeDay
+
+        val replyIntent = Intent()
+        setResult(DAY_UPDATE_RESULT_CODE, replyIntent)
+
+        finish()
+    }
 
 
 }

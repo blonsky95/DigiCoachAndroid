@@ -12,6 +12,7 @@ import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_view_of_week.*
 import timber.log.Timber
 import java.util.*
@@ -21,6 +22,8 @@ class CalendarView : AppCompatActivity() {
 
     private lateinit var mPager: ViewPager
     private lateinit var dataViewModel: DataViewModel
+    private var activeDay:Day?=null
+    private lateinit var activeDayId:String
 
     private val dayCreatorAcitivtyRequestCode = 1
 
@@ -29,7 +32,7 @@ class CalendarView : AppCompatActivity() {
 //    val monthLongName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
 
-    //day of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
+    //activeDay of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
     private fun filterDayOfWeek(dayWeek: Int): Int {
         return if (dayWeek == 1) {
             6
@@ -37,6 +40,8 @@ class CalendarView : AppCompatActivity() {
             dayWeek - 2
         }
     }
+
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -49,19 +54,22 @@ class CalendarView : AppCompatActivity() {
         val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
         mPager.adapter = pagerAdapter
 
-        Timber.d("day of week is $dayOfWeek")
+        Timber.d("activeDay of week is $dayOfWeek")
         mPager.currentItem = dayOfWeek
-        AddTrainingBtn.setOnClickListener(updateDay)
+        AddTrainingBtn.setOnClickListener(updateDayListener)
 
     }
 
 
-    private val updateDay = View.OnClickListener {
+    private val updateDayListener = View.OnClickListener {
         Timber.d("position clicked: ${mPager.currentItem}")
         Timber.d("Calendar View --> Day Creator")
 
+        DataHolder.oldDayHolder=activeDay
+
         val intent = Intent(this, DayCreator::class.java)
-        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
+//        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
+        intent.putExtra(DayCreator.DAY_ID,activeDayId)
         startActivityForResult(intent, dayCreatorAcitivtyRequestCode)
     }
 
@@ -83,11 +91,11 @@ class CalendarView : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
 
-            val dayId = getDayId(dayOfWeek-position)
+            activeDayId = getDayId(dayOfWeek-position)
             val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
-            val currentDay = dataViewModel.getDayById(dayId)
-            //todo hereee 111
-            return DayFragment(currentDay, dataArray)
+            activeDay = dataViewModel.getDayById(activeDayId)
+//            Timber.d("currentDay: $activeDay")
+            return DayFragment(activeDay, dataArray)
         }
 
         private fun getDayId(dayDiff: Int): String {
@@ -102,6 +110,27 @@ class CalendarView : AppCompatActivity() {
                 fakeCalendar.get(Calendar.MONTH),
                 fakeCalendar.get(Calendar.YEAR)
             )
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, intentData)
+
+        if (requestCode == dayCreatorAcitivtyRequestCode && resultCode == DayCreator.DAY_UPDATE_RESULT_CODE) {
+
+            val updatedDay = DataHolder.updatedDayHolder
+                        Timber.d("on activity result day: $updatedDay")
+
+            if (DataHolder.oldDayHolder==null) {
+                dataViewModel.insertDay(updatedDay)
+            } else {
+                dataViewModel.updateDay(updatedDay)
+            }
+
+//            val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
+//            actionNotification.show()
+        }
+        else {
         }
     }
 

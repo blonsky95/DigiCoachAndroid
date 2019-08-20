@@ -75,7 +75,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getDayById(currentDayId : String) : Day? {
-        Timber.d("ptg - data view model - getDayById called")
+//        Timber.d("ptg - data view model - getDayById called")
         if (allDays.value==null) {
             return null
         }
@@ -86,6 +86,21 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         }
         return null
     }
+
+    fun insertDay(day: Day) = viewModelScope.launch{
+        Timber.d("ptg - data view model - insert day called")
+        repository.insertDay(day)
+    }
+
+    fun updateDay(day: Day) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update day called")
+        repository.updateDay(day)
+    }
+
+//    fun deleteDay(day: Day) = viewModelScope.launch {
+//        Timber.d("ptg - data view model - delete block called")
+//        repository.deleteBlock(day)
+//    }
 
 
 
