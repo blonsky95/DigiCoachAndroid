@@ -76,11 +76,11 @@ class DayCreator : AppCompatActivity() {
         }
 
         activeDayId = intent.getStringExtra(DAY_ID)
+        DayId.text=activeDayId
 
         recyclerView = BlocksDisplay as RecyclerView
         recyclerViewV2 = CurrentDayDisplay as RecyclerView
 
-        dayId = DayId as TextView
         AddDayBtn.setOnClickListener(updateDayListener)
 
         adapterBlocks = BlockListAdapter(this, blockSelectorListener)

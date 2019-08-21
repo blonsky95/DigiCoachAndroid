@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.ui
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -21,14 +22,16 @@ import java.util.*
 class CalendarView : AppCompatActivity() {
 
     private lateinit var mPager: ViewPager
+    private lateinit var pagerAdapter:ScreenSlidePagerAdapter
     private lateinit var dataViewModel: DataViewModel
-    private var activeDay:Day?=null
-    private lateinit var activeDayId:String
+    private var activeDay: Day? = null
+    private lateinit var activeDayId: String
+    private var allDays: List<Day> = listOf()
 
     private val dayCreatorAcitivtyRequestCode = 1
 
     val calendar: Calendar = Calendar.getInstance()
-//    val dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+    //    val dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
 //    val monthLongName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
 
@@ -41,9 +44,6 @@ class CalendarView : AppCompatActivity() {
         }
     }
 
-
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_of_week)
@@ -51,12 +51,18 @@ class CalendarView : AppCompatActivity() {
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         mPager = findViewById(R.id.pager)
-        val pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+        pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
         mPager.adapter = pagerAdapter
 
         Timber.d("activeDay of week is $dayOfWeek")
         mPager.currentItem = dayOfWeek
         AddTrainingBtn.setOnClickListener(updateDayListener)
+
+        dataViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
+            days?.let {
+                allDays = days
+            }
+        })
 
     }
 
@@ -65,46 +71,66 @@ class CalendarView : AppCompatActivity() {
         Timber.d("position clicked: ${mPager.currentItem}")
         Timber.d("Calendar View --> Day Creator")
 
-        DataHolder.oldDayHolder=activeDay
+        DataHolder.oldDayHolder = activeDay
 
         val intent = Intent(this, DayCreator::class.java)
 //        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
-        intent.putExtra(DayCreator.DAY_ID,activeDayId)
+        intent.putExtra(DayCreator.DAY_ID, activeDayId)
         startActivityForResult(intent, dayCreatorAcitivtyRequestCode)
     }
 
     override fun onBackPressed() {
         if (mPager.currentItem != dayOfWeek) {
-            mPager.currentItem=dayOfWeek
+            mPager.currentItem = dayOfWeek
         } else {
             super.onBackPressed()
         }
     }
 
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
+        FragmentStatePagerAdapter(fm) {
 
         var tempDayOfWeek = ""
         var tempDayOfMonth = ""
         var tempMonthOfYear = ""
+        var primaryItemSet = -1
+
+        override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+            //this says which position is currently active, use it to know which activedayid
+            super.setPrimaryItem(container, position, `object`)
+            //this function is called 2 or 3 times per swipe so avoid reupdating the dayid variable unnecesarily and creating conflicts
+            if (position!=primaryItemSet) {
+                activeDayId = toDayIdFormat(dayOfWeek - position)
+                Timber.d("active day id: $activeDayId")
+                primaryItemSet = position
+            }
+
+
+        }
 
         override fun getCount(): Int = 7
 
         override fun getItem(position: Int): Fragment {
-
-            activeDayId = getDayId(dayOfWeek-position)
+            //this is also called to load the adjacent fragments - so shouldnt be used to know which fragment dayId is currently active
+            var loadingDayId = toDayIdFormat(dayOfWeek - position)
             val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
-            activeDay = dataViewModel.getDayById(activeDayId)
-//            Timber.d("currentDay: $activeDay")
+            activeDay = getDayById(loadingDayId)
             return DayFragment(activeDay, dataArray)
         }
 
-        private fun getDayId(dayDiff: Int): String {
+        private fun toDayIdFormat(dayDiff: Int): String {
 
             var fakeCalendar = Calendar.getInstance()
-            fakeCalendar.timeInMillis = System.currentTimeMillis() - ((24 * 60 * 60 * 1000) * dayDiff)
+            fakeCalendar.timeInMillis =
+                System.currentTimeMillis() - ((24 * 60 * 60 * 1000) * dayDiff)
             tempDayOfMonth = fakeCalendar.get(Calendar.DAY_OF_MONTH).toString()
-            tempMonthOfYear = fakeCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
-            tempDayOfWeek = fakeCalendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
+            tempMonthOfYear =
+                fakeCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+            tempDayOfWeek = fakeCalendar.getDisplayName(
+                Calendar.DAY_OF_WEEK,
+                Calendar.LONG,
+                Locale.getDefault()
+            )
             return Day.toDayId(
                 fakeCalendar.get(Calendar.DAY_OF_MONTH),
                 fakeCalendar.get(Calendar.MONTH),
@@ -113,26 +139,33 @@ class CalendarView : AppCompatActivity() {
         }
     }
 
+    private fun getDayById(activeDayId: String): Day? {
+        for (day in allDays) {
+            if (day.dayId == activeDayId) {
+                return day
+            }
+        }
+        return null
+    }
+
     override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         super.onActivityResult(requestCode, resultCode, intentData)
 
         if (requestCode == dayCreatorAcitivtyRequestCode && resultCode == DayCreator.DAY_UPDATE_RESULT_CODE) {
 
             val updatedDay = DataHolder.updatedDayHolder
-                        Timber.d("on activity result day: $updatedDay")
+            Timber.d("on activity result day: $updatedDay")
 
-            if (DataHolder.oldDayHolder==null) {
+            if (DataHolder.oldDayHolder == null) {
                 dataViewModel.insertDay(updatedDay)
             } else {
                 dataViewModel.updateDay(updatedDay)
             }
 
-//            val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-        }
-        else {
+//            pagerAdapter.notifyDataSetChanged()
+
+        } else {
         }
     }
-
 
 }
