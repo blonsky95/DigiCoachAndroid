@@ -12,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_view_of_week.*
@@ -21,8 +22,11 @@ import java.util.*
 
 class CalendarView : AppCompatActivity() {
 
+    //todo - when add training - the days arent loading their day components in the lower adapter
+    //todo - make UI in days more fancy (take in account space for exercises?) and something for results
+
     private lateinit var mPager: ViewPager
-    private lateinit var pagerAdapter:ScreenSlidePagerAdapter
+    private lateinit var pagerAdapter: ScreenSlidePagerAdapter
     private lateinit var dataViewModel: DataViewModel
     private var activeDay: Day? = null
     private lateinit var activeDayId: String
@@ -51,21 +55,23 @@ class CalendarView : AppCompatActivity() {
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         mPager = findViewById(R.id.pager)
-        pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
-        mPager.adapter = pagerAdapter
 
         Timber.d("activeDay of week is $dayOfWeek")
-        mPager.currentItem = dayOfWeek
         AddTrainingBtn.setOnClickListener(updateDayListener)
 
         dataViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
             days?.let {
                 allDays = days
             }
+            //for now this will do, the observer is being triggered after the adapter creation so it searches in an empty allDays List
+            //this way adapter is created when observer is triggered
+            pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+            mPager.adapter = pagerAdapter
+            mPager.currentItem = dayOfWeek
+
+            Timber.d("list of days has been updated to: $allDays")
         })
-
     }
-
 
     private val updateDayListener = View.OnClickListener {
         Timber.d("position clicked: ${mPager.currentItem}")
@@ -99,13 +105,10 @@ class CalendarView : AppCompatActivity() {
             //this says which position is currently active, use it to know which activedayid
             super.setPrimaryItem(container, position, `object`)
             //this function is called 2 or 3 times per swipe so avoid reupdating the dayid variable unnecesarily and creating conflicts
-            if (position!=primaryItemSet) {
+            if (position != primaryItemSet) {
                 activeDayId = toDayIdFormat(dayOfWeek - position)
-                Timber.d("active day id: $activeDayId")
                 primaryItemSet = position
             }
-
-
         }
 
         override fun getCount(): Int = 7
@@ -115,6 +118,8 @@ class CalendarView : AppCompatActivity() {
             var loadingDayId = toDayIdFormat(dayOfWeek - position)
             val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
             activeDay = getDayById(loadingDayId)
+            Timber.d("get item created day instance: $activeDay at position $position")
+            Timber.d("list of days: $allDays")
             return DayFragment(activeDay, dataArray)
         }
 
