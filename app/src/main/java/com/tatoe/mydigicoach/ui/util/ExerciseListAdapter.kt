@@ -8,7 +8,7 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 
 class ExerciseListAdapter(context: Context, private var itemClickListener: ClickListenerRecyclerView, var deletableItems:Boolean = false) :
-    RecyclerView.Adapter<ItemViewHolder>() {
+    RecyclerView.Adapter<EditableItemViewHolder>() {
 
     // use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
 
@@ -19,12 +19,12 @@ class ExerciseListAdapter(context: Context, private var itemClickListener: Click
         return exercises.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        val itemView = inflater.inflate(R.layout.recycler_view_exercise, parent, false)
-        return ItemViewHolder(itemView, itemClickListener, deletableItems) //if deletable Items, then will assign the listener to the delete button (plus make it visible)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableItemViewHolder {
+        val itemView = inflater.inflate(R.layout.item_holder_exercise, parent, false)
+        return EditableItemViewHolder(itemView, itemClickListener, deletableItems) //if deletable Items, then will assign the listener to the delete button (plus make it visible)
     }
 
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: EditableItemViewHolder, position: Int) {
         val current = exercises[position]
         val textString = "${current.exerciseId} ${current.name}"
         holder.itemInfoView.text = textString

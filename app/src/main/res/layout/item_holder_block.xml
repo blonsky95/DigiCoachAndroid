@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:orientation="vertical" android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <View
+                android:layout_height="2dp"
+                android:layout_width="match_parent"
+                android:background="#D3D3D3"
+                android:id="@+id/item_divider" />
+        <TextView
+                android:id="@+id/block_title"
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"/>
+        <LinearLayout
+                android:id="@+id/collapsible_layout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:visibility="gone"
+                android:orientation="vertical">
+            <TextView
+                    android:id="@+id/exercise_test"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="No exercises in this block"/>
+
+        </LinearLayout>
+
+</LinearLayout>

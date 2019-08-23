@@ -73,6 +73,7 @@ class DayCreator : AppCompatActivity() {
         DataHolder.oldDayHolder?.let { it ->
             activeDay = it
             currentDayComponents = activeDay.blocks
+            Timber.d("data holder: active day: $activeDay")
         }
 
         activeDayId = intent.getStringExtra(DAY_ID)
@@ -86,11 +87,11 @@ class DayCreator : AppCompatActivity() {
         adapterBlocks = BlockListAdapter(this, blockSelectorListener)
         recyclerView.adapter = adapterBlocks
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapterBlocks.setBlocks(dataViewModel.allBlocks.value)
 
         adapterDeletableBlocks = BlockListAdapter(this, itemDeletableListener, true)
         recyclerViewV2.adapter = adapterDeletableBlocks
         recyclerViewV2.layoutManager = LinearLayoutManager(this)
+        adapterDeletableBlocks.setBlocks(currentDayComponents)
 
         dataViewModel.allBlocks.observe(this, Observer { exercises ->
             exercises?.let {

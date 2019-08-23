@@ -6,9 +6,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 
-class ItemViewHolder(v: View, var listener: ClickListenerRecyclerView, deletableItem: Boolean = false) :
+class EditableItemViewHolder(v: View, var listener: ClickListenerRecyclerView, deletableItem: Boolean = false) :
     RecyclerView.ViewHolder(v),
     View.OnClickListener, View.OnLongClickListener {
+
+    val itemInfoView: TextView = v.findViewById(R.id.textView)
+    private val itemDeleteBtn: ImageView = v.findViewById(R.id.deleteButton)
 
     //this class can have 2 usages
     // 1. In a read only mode, where clicking takes you to a exerciseCreator activity where you can delete, update...
@@ -25,10 +28,6 @@ class ItemViewHolder(v: View, var listener: ClickListenerRecyclerView, deletable
     override fun onClick(v: View) {
         listener.onClick(v, adapterPosition)
     }
-
-    val itemInfoView: TextView = v.findViewById(R.id.textView)
-    private val itemDeleteBtn: ImageView = v.findViewById(R.id.deleteButton)
-
 
     init {
         if (deletableItem) {

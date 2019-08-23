@@ -12,7 +12,7 @@
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:background="@android:color/darker_gray"
-            tools:listitem="@layout/recycler_view_exercise"
+            tools:listitem="@layout/item_holder_exercise"
             app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/linearLayout"
