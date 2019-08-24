@@ -10,6 +10,8 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
+    //todo when basic functionalities are there - FIX FIX CLEAN WARNINGS
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

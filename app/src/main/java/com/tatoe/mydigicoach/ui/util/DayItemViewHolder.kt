@@ -13,6 +13,5 @@ class DayItemViewHolder (v: View) :
 
     val blockName: TextView = v.findViewById(R.id.block_title)
     val collapsibleLayout: LinearLayout = v.findViewById(R.id.collapsible_layout)
-    val testTextView:TextView = v.findViewById(R.id.exercise_test)
 
 }
