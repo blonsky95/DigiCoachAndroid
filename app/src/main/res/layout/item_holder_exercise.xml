@@ -1,24 +1,40 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:orientation="horizontal" android:layout_width="match_parent"
-              android:layout_height="wrap_content">
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
-    <TextView
-            android:id="@+id/textView"
-            android:layout_width="0dp"
-            android:layout_weight="4"
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="12dp"
-            android:background="@android:color/holo_orange_light"/>
+            android:orientation="horizontal">
 
-    <ImageView android:layout_width="0dp"
-               android:layout_weight="1"
-               android:layout_height="match_parent"
-               android:id="@+id/deleteButton"
-               android:src="@drawable/cross_white"
-               android:background="#971212"
-               android:contentDescription="delete_sticker"
-               android:visibility="gone"/>
+        <TextView
+                android:id="@+id/textView"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="4"
+                android:background="@android:color/holo_orange_light"
+                android:padding="12dp" />
+
+        <ImageView
+                android:id="@+id/deleteButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#971212"
+                android:contentDescription="delete_sticker"
+                android:src="@drawable/cross_white"
+                android:visibility="gone" />
+    </LinearLayout>
+
+    <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray"/>
+
 </LinearLayout>
 

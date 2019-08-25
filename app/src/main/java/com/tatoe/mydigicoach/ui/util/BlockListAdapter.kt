@@ -24,7 +24,7 @@ class BlockListAdapter(context: Context, private var listenerRecyclerView: Click
 
     override fun onBindViewHolder(holder: EditableItemViewHolder, position: Int) {
         val current = blocks[position]
-        val textString = "${current.blockId} ${current.name}"
+        val textString = current.name
         holder.itemInfoView.text = textString
     }
 

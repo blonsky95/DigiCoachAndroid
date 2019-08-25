@@ -23,19 +23,6 @@ import timber.log.Timber
 
 class DayCreator : AppCompatActivity() {
 
-    //todo associate this activeDay creation to a date
-    //when add is clicked, update dataholder with current Day, or null if empty (send date array anyways?).
-    // DayCreator will get it from dataholder regardless, and if null then fuck it. When button clicked load to dataholder
-    //and send it back
-    //back in daycreator check if that ID is contained in the current data with the dvm function (might have to use observer to trigger it)
-    // and if it is then update, else insert
-
-
-    //days cant be deleted
-
-    //next - present in fragments the infro from the days - design something which leaves open possibility to add more data (results of training)
-    // see if I can add exercises
-
     companion object {
         var DAY_ACTION = "day_action"
         var DAY_ID = "day_id"
@@ -57,8 +44,6 @@ class DayCreator : AppCompatActivity() {
 
     private var currentDayComponents: ArrayList<Block> = arrayListOf()
 
-    lateinit var saveDayButton: Button
-    lateinit var dayId: TextView
     lateinit var activeDay: Day
     lateinit var activeDayId: String
 
@@ -66,7 +51,6 @@ class DayCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_day_creator)
-        title = "Day Creator"
         // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
@@ -77,7 +61,10 @@ class DayCreator : AppCompatActivity() {
         }
 
         activeDayId = intent.getStringExtra(DAY_ID)
-        DayId.text=activeDayId
+
+//        DayId.text=Day.dayIDtoDayMonth(activeDayId)
+        title = Day.dayIDtoDayMonth(activeDayId)
+
 
         recyclerView = BlocksDisplay as RecyclerView
         recyclerViewV2 = CurrentDayDisplay as RecyclerView

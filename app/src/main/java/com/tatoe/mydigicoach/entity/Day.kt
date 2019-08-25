@@ -12,13 +12,15 @@ data class Day(
     @ColumnInfo(name = "blocks") @field:SerializedName("blocks") var blocks: ArrayList<Block>,
     @ColumnInfo(name = "exercises") @field:SerializedName("exercises") var exercises: ArrayList<Exercise>
 ) {
-
     companion object {
-        fun toDayId(day: Int, month: Int, year: Int): String {
+        fun intDatetoDayId(day: Int, month: Int, year: Int): String {
             val format = DecimalFormat("00")
             return "${format.format(day)}${format.format(month)}$year"
         }
 
+        fun dayIDtoDayMonth(dayId:String) : String {
+            return " ${dayId.substring(0,2)}-${dayId.substring(2,4)}-${dayId.substring(4,8)}"
+        }
     }
 
 }

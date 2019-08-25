@@ -13,8 +13,7 @@
         <activity
                 android:name=".ui.BlockCreator"
                 android:label="@string/title_activity_block_creator"
-                android:windowSoftInputMode="adjustPan"
-                android:theme="@style/AppTheme.NoActionBar">
+                android:windowSoftInputMode="adjustPan">
         </activity>
         <activity android:name=".ui.ExerciseCreator"
             android:windowSoftInputMode="adjustPan">
@@ -27,8 +26,7 @@
         </activity>
         <activity
                 android:name=".ui.DayCreator"
-                android:windowSoftInputMode="adjustPan"
-                android:theme="@style/AppTheme.NoActionBar">
+                android:windowSoftInputMode="adjustPan">
         </activity>
         <activity android:name=".ui.MainActivity">
             <intent-filter>

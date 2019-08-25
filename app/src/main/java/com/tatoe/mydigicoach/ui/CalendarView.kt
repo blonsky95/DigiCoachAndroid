@@ -9,24 +9,19 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.DayContentAdapter
 import kotlinx.android.synthetic.main.activity_view_of_week.*
-import kotlinx.android.synthetic.main.fragment_day_view.*
 import timber.log.Timber
 import java.util.*
 
 
 class CalendarView : AppCompatActivity() {
 
-    //todo - fix UI so there is more space
-    //todo - add text views dynamically for exercises in block CHALLENGE
+
 
     private lateinit var mPager: ViewPager
     private lateinit var pagerAdapter: ScreenSlidePagerAdapter
@@ -70,10 +65,21 @@ class CalendarView : AppCompatActivity() {
             //this way Adapter is created when observer is triggered
             pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
             mPager.adapter = pagerAdapter
-            mPager.currentItem = dayOfWeek
+            if (DataHolder.pagerPosition>=0) {
+                mPager.currentItem = DataHolder.pagerPosition
+                DataHolder.pagerPosition=-1
+            } else {
+                mPager.currentItem = dayOfWeek
+            }
+
 
             Timber.d("list of days has been updated to: $allDays")
         })
+    }
+
+    override fun onDestroy() {
+        DataHolder.pagerPosition=-1
+        super.onDestroy()
     }
 
     private val updateDayListener = View.OnClickListener {
@@ -86,6 +92,7 @@ class CalendarView : AppCompatActivity() {
         val intent = Intent(this, DayCreator::class.java)
 //        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
         intent.putExtra(DayCreator.DAY_ID, activeDayId)
+        DataHolder.pagerPosition=mPager.currentItem
         startActivityForResult(intent, dayCreatorAcitivtyRequestCode)
     }
 
@@ -139,7 +146,7 @@ class CalendarView : AppCompatActivity() {
                 Calendar.LONG,
                 Locale.getDefault()
             )
-            return Day.toDayId(
+            return Day.intDatetoDayId(
                 fakeCalendar.get(Calendar.DAY_OF_MONTH),
                 fakeCalendar.get(Calendar.MONTH),
                 fakeCalendar.get(Calendar.YEAR)
@@ -159,6 +166,8 @@ class CalendarView : AppCompatActivity() {
     override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
         super.onActivityResult(requestCode, resultCode, intentData)
 
+        mPager.currentItem=DataHolder.pagerPosition
+        Timber.d("pager position holder: ${DataHolder.pagerPosition}")
         if (requestCode == dayCreatorAcitivtyRequestCode && resultCode == DayCreator.DAY_UPDATE_RESULT_CODE) {
 
             val updatedDay = DataHolder.updatedDayHolder
@@ -170,7 +179,6 @@ class CalendarView : AppCompatActivity() {
                 dataViewModel.updateDay(updatedDay)
             }
 
-//            pagerAdapter.notifyDataSetChanged()
 
         } else {
         }

@@ -31,7 +31,7 @@ class ExerciseViewer : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(com.tatoe.mydigicoach.R.layout.activity_exercise_viewer)
-        title = "Block Lab"
+        title = "Exercise Viewer"
 
         recyclerView = recyclerview as RecyclerView
 

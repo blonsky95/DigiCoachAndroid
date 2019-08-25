@@ -54,7 +54,7 @@ class ExerciseCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_creator)
-        title = "Exercise Lab"
+        title = "Exercise Creator"
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
