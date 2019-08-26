@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-          xmlns:tools="http://schemas.android.com/tools"
-          package="com.tatoe.mydigicoach">
+        xmlns:tools="http://schemas.android.com/tools"
+        package="com.tatoe.mydigicoach">
 
     <application
             android:allowBackup="true"
@@ -9,32 +9,35 @@
             android:label="@string/app_name"
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
-            android:theme="@style/AppTheme" tools:ignore="GoogleAppIndexingWarning">
-        <activity
-                android:name=".ui.BlockCreator"
-                android:label="@string/title_activity_block_creator"
-                android:windowSoftInputMode="adjustPan">
-        </activity>
-        <activity android:name=".ui.ExerciseCreator"
-            android:windowSoftInputMode="adjustPan">
-        </activity>
-        <activity android:name=".ui.ExerciseViewer">
-        </activity>
-        <activity android:name=".ui.BlockViewer">
-        </activity>
-        <activity android:name=".ui.CalendarView">
-        </activity>
-        <activity
-                android:name=".ui.DayCreator"
-                android:windowSoftInputMode="adjustPan">
-        </activity>
+            android:theme="@style/Theme.AppCompat.Light.NoActionBar"
+            tools:ignore="GoogleAppIndexingWarning">
+
         <activity android:name=".ui.MainActivity">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
-
-                <category android:name="android.intent.category.LAUNCHER"/>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity
+                android:name=".ui.ExerciseViewer"
+                android:parentActivityName=".ui.MainActivity" />
+        <activity
+                android:name=".ui.BlockViewer"
+                android:parentActivityName=".ui.MainActivity" />
+        <activity
+                android:name=".ui.CalendarView"
+                android:parentActivityName=".ui.MainActivity" />
+        <activity
+                android:name=".ui.ExerciseCreator"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.BlockCreator"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.DayCreator"
+                android:windowSoftInputMode="adjustPan" />
+
     </application>
 
 </manifest>

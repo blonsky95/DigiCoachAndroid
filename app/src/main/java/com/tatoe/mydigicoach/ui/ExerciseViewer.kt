@@ -15,6 +15,7 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import android.widget.Toast
+import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.ui.util.DataHolder
 
 
@@ -30,8 +31,11 @@ class ExerciseViewer : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.tatoe.mydigicoach.R.layout.activity_exercise_viewer)
+        setContentView(R.layout.activity_exercise_viewer)
         title = "Exercise Viewer"
+
+        setSupportActionBar(findViewById(R.id.my_toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         recyclerView = recyclerview as RecyclerView
 
