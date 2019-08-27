@@ -8,6 +8,17 @@
         android:id="@+id/exercise_lab_layout"
         tools:context=".ui.ExerciseCreator">
 
+    <androidx.appcompat.widget.Toolbar
+            android:id="@+id/my_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            android:elevation="4dp"
+            app:menu="@menu/creator_toolbar_menu"
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:layout_constraintTop_toTopOf="parent"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+
     <EditText
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -17,7 +28,7 @@
             android:id="@+id/EditText1" android:layout_marginStart="8dp"
             app:layout_constraintStart_toStartOf="parent" android:layout_marginEnd="8dp"
             app:layout_constraintEnd_toEndOf="parent" app:layout_constraintHorizontal_bias="0.0"
-            android:layout_marginTop="32dp" app:layout_constraintTop_toTopOf="parent" android:padding="12dp"/>
+            android:layout_marginTop="32dp" app:layout_constraintTop_toBottomOf="@id/my_toolbar" android:padding="12dp"/>
     <EditText
             android:layout_width="0dp"
             android:layout_height="0dp"

@@ -3,6 +3,8 @@ package com.tatoe.mydigicoach.ui
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -11,7 +13,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.util.Dataholder
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import timber.log.Timber
 
@@ -37,13 +39,10 @@ class ExerciseCreator : AppCompatActivity() {
     private var BUTTON_UPDATE = "UPDATE"
 
     companion object {
-        var EXERCISE_ACTION = "exercise_new"
+        var EXERCISE_ACTION = "exercise_action"
         var EXERCISE_NEW = "exercise_new"
-        var EXERCISE_UPDATE = "exercise_action"
+        var EXERCISE_UPDATE = "exercise_update"
 
-        var EXERCISE_NAME_KEY = "exercise_name"
-        var EXERCISE_DESCRIPTION_KEY = "exercise_description"
-        //        var EXERCISE_OLD_NAME_KEY = "exercise_old_name"
         var EXERCISE_ID_KEY = "exercise_id"
 
         var EXERCISE_FAIL_RESULT_CODE = 0
@@ -57,7 +56,11 @@ class ExerciseCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_creator)
-        title = "Exercise Lab"
+        title = "Exercise Creator"
+
+        setSupportActionBar(findViewById(R.id.my_toolbar))
+
+
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
@@ -69,10 +72,6 @@ class ExerciseCreator : AppCompatActivity() {
         if (intent.hasExtra(EXERCISE_ACTION)) {
             var action = intent.getStringExtra(EXERCISE_ACTION)
 
-            if (action == EXERCISE_UPDATE) {
-                exerciseId = intent.getIntExtra(EXERCISE_ID_KEY, -1)
-            }
-
             when (action) {
                 EXERCISE_NEW -> modifyUI(BUTTON_ADD)
                 EXERCISE_UPDATE -> modifyUI(BUTTON_UPDATE)
@@ -82,6 +81,25 @@ class ExerciseCreator : AppCompatActivity() {
 //        var view = exercise_lab_layout as View
 
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.creator_toolbar_menu, menu)
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+
+        R.id.action_back -> {
+            super.onBackPressed()
+            true
+        }
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
     }
 
 
@@ -97,7 +115,7 @@ class ExerciseCreator : AppCompatActivity() {
         } else {
             saveExerciseButton.setOnClickListener(updateButtonListener)
             deleteButton.setOnClickListener(deleteButtonListener)
-            updatingExercise = Dataholder.activeExerciseHolder
+            updatingExercise = DataHolder.activeExerciseHolder
             nameTextField = updatingExercise.name
             descTextField = updatingExercise.description
         }
@@ -111,7 +129,7 @@ class ExerciseCreator : AppCompatActivity() {
         exerciseDesc = descEditText.text.trim().toString()
 
         var newExercise = Exercise(exerciseName, exerciseDesc)
-        Dataholder.newExerciseHolder = newExercise
+        DataHolder.newExerciseHolder = newExercise
 
         var replyIntent = Intent()
 
@@ -132,7 +150,7 @@ class ExerciseCreator : AppCompatActivity() {
 
         updatingExercise.name = exerciseName
         updatingExercise.description = exerciseDesc
-        Dataholder.activeExerciseHolder = updatingExercise
+        DataHolder.activeExerciseHolder = updatingExercise
         var replyIntent = Intent()
 
         Timber.d("update currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
@@ -148,7 +166,7 @@ class ExerciseCreator : AppCompatActivity() {
 
     private val deleteButtonListener = View.OnClickListener {
 
-        Dataholder.activeExerciseHolder = updatingExercise
+        DataHolder.activeExerciseHolder = updatingExercise
         var replyIntent = Intent()
 
         Timber.d("delete currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")

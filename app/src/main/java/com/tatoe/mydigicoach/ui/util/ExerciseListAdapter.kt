@@ -7,10 +7,10 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 
-class ExerciseListAdapter(context: Context, private var listenerRecyclerView: ClickListenerRecyclerView) :
-    RecyclerView.Adapter<ItemViewHolder>() {
+class ExerciseListAdapter(context: Context, private var itemClickListener: ClickListenerRecyclerView, var deletableItems:Boolean = false) :
+    RecyclerView.Adapter<EditableItemViewHolder>() {
 
-    //todo use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
+    // use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var exercises = emptyList<Exercise>() // Cached copy of words
@@ -19,15 +19,15 @@ class ExerciseListAdapter(context: Context, private var listenerRecyclerView: Cl
         return exercises.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        val itemView = inflater.inflate(R.layout.recycler_view_exercise, parent, false)
-        return ItemViewHolder(itemView, listenerRecyclerView)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableItemViewHolder {
+        val itemView = inflater.inflate(R.layout.item_holder_exercise, parent, false)
+        return EditableItemViewHolder(itemView, itemClickListener, deletableItems) //if deletable Items, then will assign the listener to the delete button (plus make it visible)
     }
 
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: EditableItemViewHolder, position: Int) {
         val current = exercises[position]
-        val textString = "${current.exerciseId} ${current.name}"
-        holder.exerciseItemView.text = textString
+        val textString = current.name
+        holder.itemInfoView.text = textString
     }
 
     internal fun setExercises(exercises: List<Exercise>) {
