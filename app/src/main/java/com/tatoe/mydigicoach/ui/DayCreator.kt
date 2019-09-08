@@ -76,11 +76,13 @@ class DayCreator : AppCompatActivity() {
 
         AddDayBtn.setOnClickListener(updateDayListener)
 
-        adapterBlocks = BlockListAdapter(this, blockSelectorListener)
+        adapterBlocks = BlockListAdapter(this)
+        adapterBlocks.setListener(blockSelectorListener)
         recyclerView.adapter = adapterBlocks
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapterDeletableBlocks = BlockListAdapter(this, itemDeletableListener, true)
+        adapterDeletableBlocks = BlockListAdapter(this, true)
+        adapterDeletableBlocks.setListener(itemDeletableListener)
         recyclerViewV2.adapter = adapterDeletableBlocks
         recyclerViewV2.layoutManager = LinearLayoutManager(this)
         adapterDeletableBlocks.setBlocks(currentDayComponents)

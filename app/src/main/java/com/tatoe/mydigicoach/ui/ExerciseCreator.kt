@@ -42,6 +42,8 @@ class ExerciseCreator : AppCompatActivity() {
         var EXERCISE_ACTION = "exercise_action"
         var EXERCISE_NEW = "exercise_new"
         var EXERCISE_UPDATE = "exercise_update"
+        var EXERCISE_VIEW = "exercise_view"
+
 
         var EXERCISE_ID_KEY = "exercise_id"
 
@@ -75,6 +77,7 @@ class ExerciseCreator : AppCompatActivity() {
             when (action) {
                 EXERCISE_NEW -> modifyUI(BUTTON_ADD)
                 EXERCISE_UPDATE -> modifyUI(BUTTON_UPDATE)
+                EXERCISE_VIEW -> readModeOn()
             }
         }
 
@@ -82,6 +85,8 @@ class ExerciseCreator : AppCompatActivity() {
 
 
     }
+
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.creator_toolbar_menu, menu)
@@ -122,6 +127,19 @@ class ExerciseCreator : AppCompatActivity() {
 
         nameEditText.text = SpannableStringBuilder(nameTextField)
         descEditText.text = SpannableStringBuilder(descTextField)
+    }
+
+    private fun readModeOn() {
+        nameEditText.visibility=View.GONE
+        descEditText.visibility=View.GONE
+        saveExerciseButton.visibility=View.INVISIBLE
+        deleteButton.visibility=View.INVISIBLE
+        TextView1.visibility=View.VISIBLE
+        TextView2.visibility=View.VISIBLE
+
+        TextView1.text=DataHolder.activeExerciseHolder.name
+        TextView2.text=DataHolder.activeExerciseHolder.description
+        Timber.d("name ${DataHolder.activeExerciseHolder.name} and desc ${DataHolder.activeExerciseHolder.description}")
     }
 
     private val addButtonListener = View.OnClickListener {

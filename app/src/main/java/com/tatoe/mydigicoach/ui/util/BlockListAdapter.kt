@@ -2,16 +2,21 @@ package com.tatoe.mydigicoach.ui.util
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
 
-class BlockListAdapter(context: Context, private var listenerRecyclerView: ClickListenerRecyclerView, var deletableItems:Boolean = false) :
+class BlockListAdapter(context: Context, var deletableItems:Boolean = false) :
     RecyclerView.Adapter<EditableItemViewHolder>() {
+
+    //this adapter doesnt take the listener as a parameter, instead it is set from the invoking
+    //activity with the setListener method, where do we want the listeners?
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>()
+    private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
     override fun getItemCount(): Int {
         return blocks.size
@@ -19,7 +24,8 @@ class BlockListAdapter(context: Context, private var listenerRecyclerView: Click
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableItemViewHolder {
         val itemView = inflater.inflate(R.layout.item_holder_exercise, parent, false)
-        return EditableItemViewHolder(itemView, listenerRecyclerView, deletableItems)
+        return EditableItemViewHolder(itemView,
+            listenerRecyclerView, deletableItems)
     }
 
     override fun onBindViewHolder(holder: EditableItemViewHolder, position: Int) {
@@ -33,6 +39,10 @@ class BlockListAdapter(context: Context, private var listenerRecyclerView: Click
             this.blocks = blocks
             notifyDataSetChanged()
         }
+    }
+
+    fun setListener (listener: ClickListenerRecyclerView) {
+        this.listenerRecyclerView=listener
     }
 
 }

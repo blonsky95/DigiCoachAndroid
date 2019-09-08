@@ -51,7 +51,9 @@ class BlockViewer : AppCompatActivity() {
 
             }
         }
-        adapter = BlockListAdapter(this, myListener)
+        adapter = BlockListAdapter(this)
+        adapter.setListener(myListener)
+
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 

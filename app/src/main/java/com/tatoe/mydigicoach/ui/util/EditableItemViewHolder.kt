@@ -6,7 +6,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 
-class EditableItemViewHolder(v: View, var listener: ClickListenerRecyclerView, deletableItem: Boolean = false) :
+class EditableItemViewHolder(v: View, var listener: ClickListenerRecyclerView?, deletableItem: Boolean = false) :
     RecyclerView.ViewHolder(v),
     View.OnClickListener, View.OnLongClickListener {
 
@@ -26,7 +26,7 @@ class EditableItemViewHolder(v: View, var listener: ClickListenerRecyclerView, d
     }
 
     override fun onClick(v: View) {
-        listener.onClick(v, adapterPosition)
+        listener?.onClick(v, adapterPosition)
     }
 
     init {

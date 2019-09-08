@@ -1,20 +1,22 @@
 package com.tatoe.mydigicoach.ui.util
 
 import android.content.Context
+import android.content.Intent
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.ExerciseCreator
 import timber.log.Timber
 
 
 class DayContentAdapter(var context: Context) : RecyclerView.Adapter<DayItemViewHolder>() {
-
-    //todo MYSTERY FUCKING SOLVED - now find out what that grey layout shit is
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>()
@@ -32,25 +34,18 @@ class DayContentAdapter(var context: Context) : RecyclerView.Adapter<DayItemView
 
     override fun onBindViewHolder(holder: DayItemViewHolder, position: Int) {
 
-        //1. create as many collapsible layouts as there is blocks
-        //2. create as many items in the collapsible layout as exercises with block
-
-        // - create an exercise text view - day_block_exercise_calendar - which will fill with an exercise name
-        // - create a collapsible layout with the block name - day_block_calendar - so a Vertical linear layout
-        // of a textview and another vert. layout (which will be filled, and which visibility will vary)
         val bindingBlock = blocks[position]
-
         holder.blockName.text = bindingBlock.name
-        Timber.d("darude $position blockname: ${holder.blockName.text}")
-
         var exercises = bindingBlock.components
         if (exercises.isNotEmpty()) {
             for (exercise in exercises) {
                 var exerciseText = TextView(context)
                 exerciseText.text = exercise.name
-                exerciseText.setPadding(5,3,5,3)
+                exerciseText.setPadding(12,12,5,16)
                 exerciseText.setTextSize(TypedValue.COMPLEX_UNIT_SP,exerciseTextSize)
-
+                exerciseText.setOnClickListener {
+                    viewExerciseInCreator(exercise)
+                }
                 holder.collapsibleLayout.addView(exerciseText)
             }
         } else {
@@ -66,6 +61,13 @@ class DayContentAdapter(var context: Context) : RecyclerView.Adapter<DayItemView
             holder.collapsibleLayout.visibility = if (!holder.expanded) View.VISIBLE else View.GONE
             holder.expanded = !holder.expanded
         }
+    }
+
+    private fun viewExerciseInCreator(exercise: Exercise) {
+        DataHolder.activeExerciseHolder = exercise
+        val intent = Intent(context, ExerciseCreator::class.java)
+        intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_VIEW)
+        startActivity(context,intent, null)
     }
 
     internal fun setContent(day: Day?) {
