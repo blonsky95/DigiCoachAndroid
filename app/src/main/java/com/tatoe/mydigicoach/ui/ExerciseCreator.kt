@@ -8,6 +8,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
@@ -28,8 +29,12 @@ class ExerciseCreator : AppCompatActivity() {
 
     lateinit var nameEditText: EditText
     lateinit var descEditText: EditText
-    lateinit var saveExerciseButton: Button
-    lateinit var deleteButton: Button
+    lateinit var nameTextView: TextView
+    lateinit var descTextView: TextView
+
+    lateinit var rightButton: Button
+    lateinit var leftButton: Button
+    lateinit var centreButton: Button
 
     private lateinit var dataViewModel: DataViewModel
 
@@ -62,30 +67,30 @@ class ExerciseCreator : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
-
-
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         nameEditText = EditText1
         descEditText = EditText2
-        saveExerciseButton = addExerciseButton
-        deleteButton = delete_button
+        nameTextView = TextView1
+        descTextView = TextView2
 
-        if (intent.hasExtra(EXERCISE_ACTION)) {
+        rightButton = right_button
+        leftButton = left_button
+        centreButton = centre_button
+
+        if (intent.hasExtra(EXERCISE_ACTION)) { //can only reach this with an intent extra
             var action = intent.getStringExtra(EXERCISE_ACTION)
+            updateButtonUI(action)
+            updateBodyUI(action)
 
-            when (action) {
-                EXERCISE_NEW -> modifyUI(BUTTON_ADD)
-                EXERCISE_UPDATE -> modifyUI(BUTTON_UPDATE)
-                EXERCISE_VIEW -> readModeOn()
-            }
+//            when (action) {
+//                EXERCISE_NEW -> {modifyUI(BUTTON_ADD)
+//                EXERCISE_UPDATE -> modifyUI(BUTTON_UPDATE)
+//                EXERCISE_VIEW -> readModeOn()
+//            }
         }
 
-//        var view = exercise_lab_layout as View
-
-
     }
-
 
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -108,38 +113,106 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
 
-    private fun modifyUI(buttonText: String) {
+//    private fun modifyUI(buttonText: String) {
+//
+//        var nameTextField = ""
+//        var descTextField = ""
+//
+//        rightButton.text = buttonText
+//        if (buttonText == BUTTON_ADD) {
+//            leftButton.visibility = View.GONE
+//            rightButton.setOnClickListener(addButtonListener)
+//        } else {
+//            rightButton.setOnClickListener(updateButtonListener)
+//            leftButton.setOnClickListener(deleteButtonListener)
+//            updatingExercise = DataHolder.activeExerciseHolder
+//            nameTextField = updatingExercise.name
+//            descTextField = updatingExercise.description
+//        }
+//
+//        nameEditText.text = SpannableStringBuilder(nameTextField)
+//        descEditText.text = SpannableStringBuilder(descTextField)
+//    }
 
-        var nameTextField = ""
-        var descTextField = ""
+//    private fun readModeOn() {
+//        nameEditText.visibility=View.GONE
+//        descEditText.visibility=View.GONE
+//        rightButton.visibility=View.INVISIBLE
+//        leftButton.visibility=View.INVISIBLE
+//        TextView1.visibility=View.VISIBLE
+//        TextView2.visibility=View.VISIBLE
+//
+//        TextView1.text=DataHolder.activeExerciseHolder.name
+//        TextView2.text=DataHolder.activeExerciseHolder.description
+//        Timber.d("name ${DataHolder.activeExerciseHolder.name} and desc ${DataHolder.activeExerciseHolder.description}")
+//    }
 
-        saveExerciseButton.text = buttonText
-        if (buttonText == BUTTON_ADD) {
-            deleteButton.visibility = View.GONE
-            saveExerciseButton.setOnClickListener(addButtonListener)
+    private fun updateButtonUI(actionType: String) {
+        if (actionType == EXERCISE_NEW) {
+            rightButton.visibility = View.VISIBLE
+            rightButton.text = "ADD"
+            rightButton.setOnClickListener(addButtonListener)
+
+            centreButton.visibility = View.INVISIBLE
+            leftButton.visibility = View.INVISIBLE
+            return
         } else {
-            saveExerciseButton.setOnClickListener(updateButtonListener)
-            deleteButton.setOnClickListener(deleteButtonListener)
-            updatingExercise = DataHolder.activeExerciseHolder
-            nameTextField = updatingExercise.name
-            descTextField = updatingExercise.description
-        }
+            updatingExercise=DataHolder.activeExerciseHolder //todo put this somewhere
+            //todo PRIORITY removes for results in update, creator will comm with dataviewmodel
+            //todo next thing is edit text squish it so text doesnt go out of borders
+            //todo dyanmically check blocks and days for calendar view (currently displaying old version, not dynamic to updates)
+            if (actionType == EXERCISE_UPDATE) {
+                rightButton.visibility = View.VISIBLE
+                rightButton.text = "UPDATE"
+                rightButton.setOnClickListener(updateButtonListener)
 
-        nameEditText.text = SpannableStringBuilder(nameTextField)
-        descEditText.text = SpannableStringBuilder(descTextField)
+                centreButton.visibility = View.VISIBLE
+                centreButton.text = "VIEW"
+                centreButton.setOnClickListener(viewButtonListener)
+
+                leftButton.visibility = View.VISIBLE
+                leftButton.text = "DELETE"
+                leftButton.setOnClickListener(deleteButtonListener)
+            }
+            if (actionType == EXERCISE_VIEW) {
+                rightButton.visibility = View.INVISIBLE
+
+                centreButton.visibility = View.VISIBLE
+                centreButton.text = "EDIT"
+                centreButton.setOnClickListener(editButtonListener)
+
+                leftButton.visibility = View.INVISIBLE
+            }
+        }
     }
 
-    private fun readModeOn() {
-        nameEditText.visibility=View.GONE
-        descEditText.visibility=View.GONE
-        saveExerciseButton.visibility=View.INVISIBLE
-        deleteButton.visibility=View.INVISIBLE
-        TextView1.visibility=View.VISIBLE
-        TextView2.visibility=View.VISIBLE
+    private fun updateBodyUI(actionType: String) {
+        if (actionType == EXERCISE_NEW) {
+            nameTextView.visibility = View.GONE
+            descTextView.visibility = View.GONE
 
-        TextView1.text=DataHolder.activeExerciseHolder.name
-        TextView2.text=DataHolder.activeExerciseHolder.description
-        Timber.d("name ${DataHolder.activeExerciseHolder.name} and desc ${DataHolder.activeExerciseHolder.description}")
+            nameEditText.visibility = View.VISIBLE
+            descEditText.visibility = View.VISIBLE
+        }
+        if (actionType == EXERCISE_UPDATE) {
+            nameTextView.visibility = View.GONE
+            descTextView.visibility = View.GONE
+
+            nameEditText.visibility = View.VISIBLE
+            nameEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.name)
+            descEditText.visibility = View.VISIBLE
+            descEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.description)
+
+        }
+        if (actionType == EXERCISE_VIEW) {
+            nameEditText.visibility = View.GONE
+            descEditText.visibility = View.GONE
+
+            nameTextView.visibility = View.VISIBLE
+            nameTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.name)
+            descTextView.visibility = View.VISIBLE
+            descTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.description)
+        }
     }
 
     private val addButtonListener = View.OnClickListener {
@@ -192,6 +265,16 @@ class ExerciseCreator : AppCompatActivity() {
         setResult(EXERCISE_DELETE_RESULT_CODE, replyIntent)
 
         finish()
+    }
+
+    private val viewButtonListener = View.OnClickListener {
+        updateButtonUI(EXERCISE_VIEW)
+        updateBodyUI(EXERCISE_VIEW)
+    }
+
+    private val editButtonListener = View.OnClickListener {
+        updateButtonUI(EXERCISE_UPDATE)
+        updateBodyUI(EXERCISE_UPDATE)
     }
 
 
