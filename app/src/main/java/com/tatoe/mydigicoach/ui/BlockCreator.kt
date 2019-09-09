@@ -55,12 +55,6 @@ class BlockCreator : AppCompatActivity() {
         var BLOCK_ACTION = "block_action"
         var BLOCK_NEW = "block_new"
         var BLOCK_UPDATE = "block_update"
-
-        var BLOCK_FAIL_RESULT_CODE = 0
-        var BLOCK_NEW_RESULT_CODE = 1
-        var BLOCK_UPDATE_RESULT_CODE = 2
-        var BLOCK_DELETE_RESULT_CODE = 3
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -144,7 +138,9 @@ class BlockCreator : AppCompatActivity() {
             deleteButton.setOnClickListener(deleteButtonListener)
 
             updatingBlock = DataHolder.activeBlockHolder
-            currentBlockComponents = updatingBlock.components
+            currentBlockComponents = updatingBlock.getExercises() //todo why the fuck does this update the block in Dataholder???????
+            Timber.d("current block components 1 : $currentBlockComponents ")
+
             namePreviewEText = updatingBlock.name
         }
 
@@ -158,10 +154,13 @@ class BlockCreator : AppCompatActivity() {
             super.onClick(view, position)
             val clickedExercise = currentBlockComponents[position]
             var removedSuccess = currentBlockComponents.remove(clickedExercise)
+            Timber.d("current block components delete : $currentBlockComponents ")
+            Timber.d("real block components delete : ${DataHolder.activeBlockHolder.components} ")
+
+
             Timber.d("removal success $removedSuccess")
 
             adapterDeletableExercises.setExercises(currentBlockComponents)
-            Timber.d("block creator exercise list after removal - $currentBlockComponents")
         }
     }
 
@@ -171,8 +170,11 @@ class BlockCreator : AppCompatActivity() {
             Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
             val clickedExercise = dataViewModel.allExercises.value?.get(position)
             currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
+            Timber.d("current block components add : $currentBlockComponents ")
+            Timber.d("real block components add : ${DataHolder.activeBlockHolder.components}} ")
+
+
             adapterDeletableExercises.setExercises(currentBlockComponents)
-            Timber.d("block creator exercise list after addition - $currentBlockComponents")
         }
     }
 
@@ -184,18 +186,6 @@ class BlockCreator : AppCompatActivity() {
         }
         block = Block(blockTitle, currentBlockComponents)
         dataViewModel.insertBlock(block)
-//        Timber.d("${block.name} ${block.components}")
-//
-//        DataHolder.newBlockHolder = block
-//
-//        var replyIntent = Intent()
-////
-//
-//        if (block.name.isEmpty()) {
-//            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
-//        } else {
-//            setResult(BLOCK_NEW_RESULT_CODE, replyIntent)
-//        }
         backToViewer()
     }
 
@@ -205,29 +195,11 @@ class BlockCreator : AppCompatActivity() {
         updatingBlock.components = currentBlockComponents
         dataViewModel.updateBlock(updatingBlock)
 
-//        DataHolder.activeBlockHolder = updatingBlock
-//        var replyIntent = Intent()
-//
-//        Timber.d("update currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
-//
-//
-//        if (blockNameText.text.trim().toString().isEmpty()) {
-//            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
-//        } else {
-//            setResult(BLOCK_UPDATE_RESULT_CODE, replyIntent)
-//        }
         backToViewer()
     }
 
     private val deleteButtonListener = View.OnClickListener {
         dataViewModel.deleteBlock(updatingBlock)
-
-//        DataHolder.activeBlockHolder = updatingBlock
-//        var replyIntent = Intent()
-//
-//        Timber.d("delete currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
-//
-//        setResult(BLOCK_DELETE_RESULT_CODE, replyIntent)
 
         backToViewer()
     }

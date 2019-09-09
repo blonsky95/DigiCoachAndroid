@@ -25,4 +25,7 @@ interface DayDao {
 
     @Update
     fun updateTodo(vararg exercises: Day)
+
+    @Query("SELECT * FROM day_table ORDER BY dayId ASC")
+    suspend fun getDays(): List<Day>
 }

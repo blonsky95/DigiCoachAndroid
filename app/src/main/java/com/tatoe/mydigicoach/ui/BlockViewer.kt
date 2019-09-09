@@ -2,6 +2,7 @@ package com.tatoe.mydigicoach.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -64,11 +65,11 @@ class BlockViewer : AppCompatActivity() {
                 Timber.d("PTG all blocks observer triggered: $blocks")
 
                 if (it.isEmpty()) {
-                    ifEmptyText.visibility= View.VISIBLE
-                    recyclerView.visibility= View.GONE
+                    ifEmptyText.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
                 } else {
-                    ifEmptyText.visibility= View.GONE
-                    recyclerView.visibility= View.VISIBLE
+                    ifEmptyText.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
                     adapter.setBlocks(it)
                 }
             }
@@ -96,45 +97,16 @@ class BlockViewer : AppCompatActivity() {
         var clickedBlock = dataViewModel.allBlocks.value?.get(position)
 
         if (clickedBlock != null) {
+//            if (DataHolder.activeBlockHolder != null) {
+//                Timber.d("old active block holder: ${DataHolder.activeBlockHolder} ")
+//            }
+
             DataHolder.activeBlockHolder = clickedBlock
+            Timber.d("active block: $clickedBlock ")
+
         } else {
             Timber.d("upsy error")
         }
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, intentData)
-//
-//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_NEW_RESULT_CODE) {
-//
-//            val newBlock = DataHolder.newBlockHolder
-//            dataViewModel.insertBlock(newBlock)
-//
-////            val actionNotification = Snackbar.make(recyclerView, "Block added", Snackbar.LENGTH_LONG)
-////            actionNotification.show()
-//        }
-//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_UPDATE_RESULT_CODE) {
-//
-//            val updatedBlock = DataHolder.activeBlockHolder
-//            Timber.d("PTG block trying to be updated: ${updatedBlock.name} ${updatedBlock.components}")
-//            dataViewModel.updateBlock(updatedBlock)
-//
-////            val actionNotification = Snackbar.make(recyclerView, "Block updated", Snackbar.LENGTH_LONG)
-////            actionNotification.show()
-//        }
-//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_DELETE_RESULT_CODE) {
-//
-//            val deletedBlock = DataHolder.activeBlockHolder
-//            Timber.d("PTG block trying to be deleted: ${deletedBlock.name} ${deletedBlock.components}")
-//            dataViewModel.deleteBlock(deletedBlock)
-////            val actionNotification = Snackbar.make(recyclerView, "Block deleted", Snackbar.LENGTH_LONG)
-////            actionNotification.show()
-//        }
-//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_FAIL_RESULT_CODE) {
-//            //accounts for user pressing back
-////            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
-////            actionNotification.show()
-//        } else {
-//        }
-//    }
 }

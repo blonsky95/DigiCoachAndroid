@@ -8,7 +8,11 @@ import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
 
-class AppRepository(private val exerciseDao: ExerciseDao, private val blockDao: BlockDao, private val dayDao: DayDao) {
+class AppRepository(
+    private val exerciseDao: ExerciseDao,
+    private val blockDao: BlockDao,
+    private val dayDao: DayDao
+) {
 
     val allExercises: androidx.lifecycle.LiveData<List<Exercise>> = exerciseDao.getAll()
     val allBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getAll()
@@ -34,9 +38,9 @@ class AppRepository(private val exerciseDao: ExerciseDao, private val blockDao: 
                 for (exercise in block.components) {
                     Timber.d("looking for ${updatedExercise.exerciseId} and this is ${exercise.exerciseId}")
 
-                    if (exercise.exerciseId==updatedExercise.exerciseId) {
+                    if (exercise.exerciseId == updatedExercise.exerciseId) {
                         Timber.d("MATCH FOUND bef block: $block")
-                        block.components[block.components.indexOf(exercise)]=updatedExercise
+                        block.components[block.components.indexOf(exercise)] = updatedExercise
                         Timber.d("MATCH FOUND after block: $block")
                         updateBlock(block)
                     }
@@ -56,11 +60,27 @@ class AppRepository(private val exerciseDao: ExerciseDao, private val blockDao: 
     }
 
     suspend fun updateBlock(block: Block) {
-        //todo update days when blocks update
-        // in block creator going back saves block changes??
+        //todo in block creator going back saves block changes??
+        blockDao.update(block)
+        updateDaysContainingBlocks(block)
+        Timber.d("updated currentBlock")
+    }
 
-        var rowId = blockDao.update(block)
-        Timber.d("updated currentBlock, row: $rowId")
+    private suspend fun updateDaysContainingBlocks(updatedBlock: Block) {
+        val days = dayDao.getDays()
+
+        if (days.isNotEmpty()) {
+            for (day in days) {
+                for (block in day.blocks) {
+                    if (block.blockId == updatedBlock.blockId) {
+                        Timber.d("MATCH FOUND bef day: $day")
+                        day.blocks[day.blocks.indexOf(block)] = updatedBlock
+                        Timber.d("MATCH FOUND after day: $day")
+                        updateDay(day)
+                    }
+                }
+            }
+        }
     }
 
     suspend fun deleteBlock(block: Block) {

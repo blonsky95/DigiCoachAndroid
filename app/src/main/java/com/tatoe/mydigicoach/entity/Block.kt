@@ -19,4 +19,8 @@ data class Block(
 ) {
     constructor(name: String, components: ArrayList<Exercise>) : this(0, name, components)
 
+    fun getExercises() : ArrayList<Exercise> {
+        return components
+    }
+
 }
