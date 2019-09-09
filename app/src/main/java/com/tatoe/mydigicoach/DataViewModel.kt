@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 
 import com.tatoe.mydigicoach.database.AppRoomDatabase
@@ -50,7 +51,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateExercise(exercise: Exercise) = viewModelScope.launch {
-        Timber.d("ptg - data view model - update called")
+        Timber.d("ptg - data view model - update called ${allBlocks.value}")
         repository.updateExercise(exercise)
     }
 

@@ -47,7 +47,7 @@ class BlockViewer : AppCompatActivity() {
                 intent.putExtra(BlockCreator.BLOCK_ACTION, BlockCreator.BLOCK_UPDATE)
                 updateUpdatingBlock(position)
 
-                startActivityForResult(intent, blockCreatorAcitivtyRequestCode)
+                startActivity(intent)
 
             }
         }
@@ -79,7 +79,7 @@ class BlockViewer : AppCompatActivity() {
 
             val intent = Intent(this, BlockCreator::class.java)
             intent.putExtra(BlockCreator.BLOCK_ACTION, BlockCreator.BLOCK_NEW)
-            startActivityForResult(intent, blockCreatorAcitivtyRequestCode)
+            startActivity(intent)
         }
     }
 
@@ -102,39 +102,39 @@ class BlockViewer : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intentData)
-
-        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_NEW_RESULT_CODE) {
-
-            val newBlock = DataHolder.newBlockHolder
-            dataViewModel.insertBlock(newBlock)
-
-//            val actionNotification = Snackbar.make(recyclerView, "Block added", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-        }
-        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_UPDATE_RESULT_CODE) {
-
-            val updatedBlock = DataHolder.activeBlockHolder
-            Timber.d("PTG block trying to be updated: ${updatedBlock.name} ${updatedBlock.components}")
-            dataViewModel.updateBlock(updatedBlock)
-
-//            val actionNotification = Snackbar.make(recyclerView, "Block updated", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-        }
-        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_DELETE_RESULT_CODE) {
-
-            val deletedBlock = DataHolder.activeBlockHolder
-            Timber.d("PTG block trying to be deleted: ${deletedBlock.name} ${deletedBlock.components}")
-            dataViewModel.deleteBlock(deletedBlock)
-//            val actionNotification = Snackbar.make(recyclerView, "Block deleted", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-        }
-        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_FAIL_RESULT_CODE) {
-            //accounts for user pressing back
-//            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
-//            actionNotification.show()
-        } else {
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, intentData)
+//
+//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_NEW_RESULT_CODE) {
+//
+//            val newBlock = DataHolder.newBlockHolder
+//            dataViewModel.insertBlock(newBlock)
+//
+////            val actionNotification = Snackbar.make(recyclerView, "Block added", Snackbar.LENGTH_LONG)
+////            actionNotification.show()
+//        }
+//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_UPDATE_RESULT_CODE) {
+//
+//            val updatedBlock = DataHolder.activeBlockHolder
+//            Timber.d("PTG block trying to be updated: ${updatedBlock.name} ${updatedBlock.components}")
+//            dataViewModel.updateBlock(updatedBlock)
+//
+////            val actionNotification = Snackbar.make(recyclerView, "Block updated", Snackbar.LENGTH_LONG)
+////            actionNotification.show()
+//        }
+//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_DELETE_RESULT_CODE) {
+//
+//            val deletedBlock = DataHolder.activeBlockHolder
+//            Timber.d("PTG block trying to be deleted: ${deletedBlock.name} ${deletedBlock.components}")
+//            dataViewModel.deleteBlock(deletedBlock)
+////            val actionNotification = Snackbar.make(recyclerView, "Block deleted", Snackbar.LENGTH_LONG)
+////            actionNotification.show()
+//        }
+//        if (requestCode == blockCreatorAcitivtyRequestCode && resultCode == BlockCreator.BLOCK_FAIL_RESULT_CODE) {
+//            //accounts for user pressing back
+////            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
+////            actionNotification.show()
+//        } else {
+//        }
+//    }
 }

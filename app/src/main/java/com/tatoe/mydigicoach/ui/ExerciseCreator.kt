@@ -22,10 +22,6 @@ class ExerciseCreator : AppCompatActivity() {
 
     lateinit var exerciseName: String
     lateinit var exerciseDesc: String
-    var exerciseId: Int? = null
-
-//    lateinit var exerciseOldName: String
-
 
     lateinit var nameEditText: EditText
     lateinit var descEditText: EditText
@@ -40,23 +36,11 @@ class ExerciseCreator : AppCompatActivity() {
 
     lateinit var updatingExercise: Exercise
 
-    private var BUTTON_ADD = "ADD"
-    private var BUTTON_UPDATE = "UPDATE"
-
     companion object {
         var EXERCISE_ACTION = "exercise_action"
         var EXERCISE_NEW = "exercise_new"
         var EXERCISE_UPDATE = "exercise_update"
         var EXERCISE_VIEW = "exercise_view"
-
-
-        var EXERCISE_ID_KEY = "exercise_id"
-
-        var EXERCISE_FAIL_RESULT_CODE = 0
-        var EXERCISE_NEW_RESULT_CODE = 1
-        var EXERCISE_UPDATE_RESULT_CODE = 2
-        var EXERCISE_DELETE_RESULT_CODE = 3
-
     }
 
 
@@ -80,18 +64,13 @@ class ExerciseCreator : AppCompatActivity() {
 
         if (intent.hasExtra(EXERCISE_ACTION)) { //can only reach this with an intent extra
             var action = intent.getStringExtra(EXERCISE_ACTION)
+            if (action == EXERCISE_UPDATE || action == EXERCISE_VIEW) {
+                updatingExercise = DataHolder.activeExerciseHolder
+            }
             updateButtonUI(action)
             updateBodyUI(action)
-
-//            when (action) {
-//                EXERCISE_NEW -> {modifyUI(BUTTON_ADD)
-//                EXERCISE_UPDATE -> modifyUI(BUTTON_UPDATE)
-//                EXERCISE_VIEW -> readModeOn()
-//            }
         }
-
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.creator_toolbar_menu, menu)
@@ -113,40 +92,6 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
 
-//    private fun modifyUI(buttonText: String) {
-//
-//        var nameTextField = ""
-//        var descTextField = ""
-//
-//        rightButton.text = buttonText
-//        if (buttonText == BUTTON_ADD) {
-//            leftButton.visibility = View.GONE
-//            rightButton.setOnClickListener(addButtonListener)
-//        } else {
-//            rightButton.setOnClickListener(updateButtonListener)
-//            leftButton.setOnClickListener(deleteButtonListener)
-//            updatingExercise = DataHolder.activeExerciseHolder
-//            nameTextField = updatingExercise.name
-//            descTextField = updatingExercise.description
-//        }
-//
-//        nameEditText.text = SpannableStringBuilder(nameTextField)
-//        descEditText.text = SpannableStringBuilder(descTextField)
-//    }
-
-//    private fun readModeOn() {
-//        nameEditText.visibility=View.GONE
-//        descEditText.visibility=View.GONE
-//        rightButton.visibility=View.INVISIBLE
-//        leftButton.visibility=View.INVISIBLE
-//        TextView1.visibility=View.VISIBLE
-//        TextView2.visibility=View.VISIBLE
-//
-//        TextView1.text=DataHolder.activeExerciseHolder.name
-//        TextView2.text=DataHolder.activeExerciseHolder.description
-//        Timber.d("name ${DataHolder.activeExerciseHolder.name} and desc ${DataHolder.activeExerciseHolder.description}")
-//    }
-
     private fun updateButtonUI(actionType: String) {
         if (actionType == EXERCISE_NEW) {
             rightButton.visibility = View.VISIBLE
@@ -157,10 +102,8 @@ class ExerciseCreator : AppCompatActivity() {
             leftButton.visibility = View.INVISIBLE
             return
         } else {
-            updatingExercise=DataHolder.activeExerciseHolder //todo put this somewhere
-            //todo PRIORITY removes for results in update, creator will comm with dataviewmodel
-            //todo next thing is edit text squish it so text doesnt go out of borders
-            //todo dyanmically check blocks and days for calendar view (currently displaying old version, not dynamic to updates)
+
+            //todo dynamically check blocks and days for calendar view (currently displaying old version, not dynamic to updates)
             if (actionType == EXERCISE_UPDATE) {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "UPDATE"
@@ -220,19 +163,8 @@ class ExerciseCreator : AppCompatActivity() {
         exerciseDesc = descEditText.text.trim().toString()
 
         var newExercise = Exercise(exerciseName, exerciseDesc)
-        DataHolder.newExerciseHolder = newExercise
-
-        var replyIntent = Intent()
-
-        Timber.d("add currentExercise - built: ${newExercise.name} ${newExercise.description}")
-//
-
-        if (exerciseName.isEmpty()) {
-            setResult(EXERCISE_FAIL_RESULT_CODE, replyIntent)
-        } else {
-            setResult(EXERCISE_NEW_RESULT_CODE, replyIntent)
-        }
-        finish()
+        dataViewModel.insertExercise(newExercise)
+        backToViewer()
     }
 
     private val updateButtonListener = View.OnClickListener {
@@ -241,30 +173,15 @@ class ExerciseCreator : AppCompatActivity() {
 
         updatingExercise.name = exerciseName
         updatingExercise.description = exerciseDesc
-        DataHolder.activeExerciseHolder = updatingExercise
-        var replyIntent = Intent()
+        dataViewModel.updateExercise(updatingExercise)
 
-        Timber.d("update currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
-
-
-        if (exerciseName.isEmpty()) {
-            setResult(EXERCISE_FAIL_RESULT_CODE, replyIntent)
-        } else {
-            setResult(EXERCISE_UPDATE_RESULT_CODE, replyIntent)
-        }
-        finish()
+        backToViewer()
     }
 
     private val deleteButtonListener = View.OnClickListener {
+        dataViewModel.deleteExercise(updatingExercise)
 
-        DataHolder.activeExerciseHolder = updatingExercise
-        var replyIntent = Intent()
-
-        Timber.d("delete currentExercise - built: ${updatingExercise.exerciseId} ${updatingExercise.name} ${updatingExercise.description} ")
-
-        setResult(EXERCISE_DELETE_RESULT_CODE, replyIntent)
-
-        finish()
+        backToViewer()
     }
 
     private val viewButtonListener = View.OnClickListener {
@@ -275,6 +192,12 @@ class ExerciseCreator : AppCompatActivity() {
     private val editButtonListener = View.OnClickListener {
         updateButtonUI(EXERCISE_UPDATE)
         updateBodyUI(EXERCISE_UPDATE)
+    }
+
+    private fun backToViewer() {
+        val intent = Intent(this, ExerciseViewer::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
     }
 
 

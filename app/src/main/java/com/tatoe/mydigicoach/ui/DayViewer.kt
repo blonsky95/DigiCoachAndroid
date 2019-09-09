@@ -63,7 +63,6 @@ class DayViewer : AppCompatActivity() {
         AddTrainingBtn.setOnClickListener(updateDayListener)
 
         dataViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
-            //TODO YOW PABS IMPORTANT - add observers for blocks and exercises as it is not updated here
             days?.let {
                 allDays = days
             }

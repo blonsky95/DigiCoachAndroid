@@ -21,9 +21,28 @@ class AppRepository(private val exerciseDao: ExerciseDao, private val blockDao: 
     }
 
     suspend fun updateExercise(updatedExercise: Exercise) {
-        var rowId = exerciseDao.update(updatedExercise)
-        Timber.d("updated currentExercise, row: $rowId")
+        exerciseDao.update(updatedExercise)
+        Timber.d("updated currentExercise: $updatedExercise)")
+        updateBlocksContainingExercise(updatedExercise)
+    }
 
+    private suspend fun updateBlocksContainingExercise(updatedExercise: Exercise) {
+        val blocks = blockDao.getBlocks()
+
+        if (blocks.isNotEmpty()) {
+            for (block in blocks) {
+                for (exercise in block.components) {
+                    Timber.d("looking for ${updatedExercise.exerciseId} and this is ${exercise.exerciseId}")
+
+                    if (exercise.exerciseId==updatedExercise.exerciseId) {
+                        Timber.d("MATCH FOUND bef block: $block")
+                        block.components[block.components.indexOf(exercise)]=updatedExercise
+                        Timber.d("MATCH FOUND after block: $block")
+                        updateBlock(block)
+                    }
+                }
+            }
+        }
     }
 
     suspend fun deleteExercise(exercise: Exercise) {
@@ -37,6 +56,9 @@ class AppRepository(private val exerciseDao: ExerciseDao, private val blockDao: 
     }
 
     suspend fun updateBlock(block: Block) {
+        //todo update days when blocks update
+        // in block creator going back saves block changes??
+
         var rowId = blockDao.update(block)
         Timber.d("updated currentBlock, row: $rowId")
     }

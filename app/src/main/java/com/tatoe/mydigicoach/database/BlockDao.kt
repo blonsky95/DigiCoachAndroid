@@ -9,6 +9,9 @@ interface BlockDao {
     @Query("SELECT * FROM block_table ORDER BY name ASC")
     fun getAll(): androidx.lifecycle.LiveData<List<Block>>
 
+    @Query("SELECT * FROM block_table ORDER BY name ASC")
+    suspend fun getBlocks(): List<Block>
+
     @Update
     suspend fun update(block : Block)
 

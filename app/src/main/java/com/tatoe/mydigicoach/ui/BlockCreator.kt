@@ -36,17 +36,17 @@ class BlockCreator : AppCompatActivity() {
     private lateinit var adapterDeletableExercises: ExerciseListAdapter
 
     private lateinit var block: Block
-//    private lateinit var blockPreviewText: TextView
+    //    private lateinit var blockPreviewText: TextView
     private lateinit var blockNameText: EditText
 
     lateinit var saveBlockButton: Button
     lateinit var deleteButton: Button
 
-//    private var blockString = ""
+    //    private var blockString = ""
     private lateinit var currentBlockComponents: ArrayList<Exercise>
     private lateinit var allExercises: List<Exercise>
 
-    lateinit var updatingBlock : Block
+    lateinit var updatingBlock: Block
 
     private var BUTTON_ADD = "ADD"
     private var BUTTON_UPDATE = "UPDATE"
@@ -55,13 +55,14 @@ class BlockCreator : AppCompatActivity() {
         var BLOCK_ACTION = "block_action"
         var BLOCK_NEW = "block_new"
         var BLOCK_UPDATE = "block_update"
-        
+
         var BLOCK_FAIL_RESULT_CODE = 0
         var BLOCK_NEW_RESULT_CODE = 1
         var BLOCK_UPDATE_RESULT_CODE = 2
         var BLOCK_DELETE_RESULT_CODE = 3
 
     }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_block_creator)
@@ -86,7 +87,7 @@ class BlockCreator : AppCompatActivity() {
         recyclerView.adapter = adapterExercises
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapterDeletableExercises = ExerciseListAdapter(this,itemDeletableListener,true)
+        adapterDeletableExercises = ExerciseListAdapter(this, itemDeletableListener, true)
         recyclerViewV2.adapter = adapterDeletableExercises
         recyclerViewV2.layoutManager = LinearLayoutManager(this)
 
@@ -132,7 +133,7 @@ class BlockCreator : AppCompatActivity() {
 
     private fun modifyUI(buttonText: String) {
 
-        var namePreviewEText=""
+        var namePreviewEText = ""
 
         saveBlockButton.text = buttonText
         if (buttonText == BUTTON_ADD) {
@@ -144,7 +145,7 @@ class BlockCreator : AppCompatActivity() {
 
             updatingBlock = DataHolder.activeBlockHolder
             currentBlockComponents = updatingBlock.components
-            namePreviewEText=updatingBlock.name
+            namePreviewEText = updatingBlock.name
         }
 
         blockNameText.text = SpannableStringBuilder(namePreviewEText)
@@ -181,51 +182,60 @@ class BlockCreator : AppCompatActivity() {
         } else {
             "Unnamed Block"
         }
-        block = Block(blockTitle,currentBlockComponents)
-//        dataViewModel.insertBlock(block.toBlock())
-        Timber.d("${block.name} ${block.components}")
-
-        DataHolder.newBlockHolder = block
-
-        var replyIntent = Intent()
+        block = Block(blockTitle, currentBlockComponents)
+        dataViewModel.insertBlock(block)
+//        Timber.d("${block.name} ${block.components}")
 //
-
-        if (block.name.isEmpty()) {
-            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
-        } else {
-            setResult(BLOCK_NEW_RESULT_CODE, replyIntent)
-        }
-        finish()
+//        DataHolder.newBlockHolder = block
+//
+//        var replyIntent = Intent()
+////
+//
+//        if (block.name.isEmpty()) {
+//            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
+//        } else {
+//            setResult(BLOCK_NEW_RESULT_CODE, replyIntent)
+//        }
+        backToViewer()
     }
 
     private val updateButtonListener = View.OnClickListener {
 
         updatingBlock.name = blockNameText.text.trim().toString()
         updatingBlock.components = currentBlockComponents
-        DataHolder.activeBlockHolder = updatingBlock
-        var replyIntent = Intent()
+        dataViewModel.updateBlock(updatingBlock)
 
-        Timber.d("update currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
-
-
-        if (blockNameText.text.trim().toString().isEmpty()) {
-            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
-        } else {
-            setResult(BLOCK_UPDATE_RESULT_CODE, replyIntent)
-        }
-        finish()
+//        DataHolder.activeBlockHolder = updatingBlock
+//        var replyIntent = Intent()
+//
+//        Timber.d("update currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
+//
+//
+//        if (blockNameText.text.trim().toString().isEmpty()) {
+//            setResult(BLOCK_FAIL_RESULT_CODE, replyIntent)
+//        } else {
+//            setResult(BLOCK_UPDATE_RESULT_CODE, replyIntent)
+//        }
+        backToViewer()
     }
 
     private val deleteButtonListener = View.OnClickListener {
+        dataViewModel.deleteBlock(updatingBlock)
 
-        DataHolder.activeBlockHolder = updatingBlock
-        var replyIntent = Intent()
+//        DataHolder.activeBlockHolder = updatingBlock
+//        var replyIntent = Intent()
+//
+//        Timber.d("delete currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
+//
+//        setResult(BLOCK_DELETE_RESULT_CODE, replyIntent)
 
-        Timber.d("delete currentBlock - built: ${updatingBlock.blockId} ${updatingBlock.name} ${updatingBlock.components} ")
+        backToViewer()
+    }
 
-        setResult(BLOCK_DELETE_RESULT_CODE, replyIntent)
-
-        finish()
+    private fun backToViewer() {
+        val intent = Intent(this, BlockViewer::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
     }
 
 }
