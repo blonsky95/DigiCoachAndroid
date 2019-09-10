@@ -103,7 +103,6 @@ class ExerciseCreator : AppCompatActivity() {
             return
         } else {
 
-            //todo dynamically check blocks and days for calendar view (currently displaying old version, not dynamic to updates)
             if (actionType == EXERCISE_UPDATE) {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "UPDATE"

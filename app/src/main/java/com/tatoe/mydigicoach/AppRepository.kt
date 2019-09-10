@@ -60,7 +60,6 @@ class AppRepository(
     }
 
     suspend fun updateBlock(block: Block) {
-        //todo in block creator going back saves block changes??
         blockDao.update(block)
         updateDaysContainingBlocks(block)
         Timber.d("updated currentBlock")

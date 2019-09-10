@@ -13,12 +13,11 @@ class MainActivity : AppCompatActivity() {
 
     //todo when basic functionalities are there - FIX FIX CLEAN WARNINGS
 
-    //todo might change viewers toolbars from back button to home icon and button
+    //todo NEXT - think about the READ/EDIT mode - keyboard in edit text doesnt have enter
 
-    //todo NEXT NEXT - write down in paper how to - Exercises need a read - edit mode -- investigate how to turn text view into edit text and vice versa easily dynamically
-    // so put a pencil icon at right border which allows editing if possible
+    //todo NEXT NEXT - section in exercises to see which days it is assigned (think of UI and content here as well as in the Calendar View) - for now just string
 
-    //todo NEXT NEXT NEXT - section in exercises to see which days it is assigned (think of UI and content here as well as in the Calendar View)
+    //todo BASICALLY check notebook
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

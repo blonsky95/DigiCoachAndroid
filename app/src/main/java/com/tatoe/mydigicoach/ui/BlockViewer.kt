@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
@@ -26,8 +27,7 @@ class BlockViewer : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: BlockListAdapter
-
-    private val blockCreatorAcitivtyRequestCode = 1
+    private lateinit var allBlocks:ArrayList<Block>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -63,6 +63,7 @@ class BlockViewer : AppCompatActivity() {
         dataViewModel.allBlocks.observe(this, Observer { blocks ->
             blocks?.let {
                 Timber.d("PTG all blocks observer triggered: $blocks")
+                allBlocks= ArrayList(it)
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
@@ -94,19 +95,17 @@ class BlockViewer : AppCompatActivity() {
     }
 
     private fun updateUpdatingBlock(position: Int) {
-        var clickedBlock = dataViewModel.allBlocks.value?.get(position)
 
-        if (clickedBlock != null) {
-//            if (DataHolder.activeBlockHolder != null) {
-//                Timber.d("old active block holder: ${DataHolder.activeBlockHolder} ")
-//            }
+        if (allBlocks.isNotEmpty()) {
+            val clickedBlock = allBlocks[position]
 
             DataHolder.activeBlockHolder = clickedBlock
             Timber.d("active block: $clickedBlock ")
 
-        } else {
-            Timber.d("upsy error")
+
         }
     }
+
+
 
 }

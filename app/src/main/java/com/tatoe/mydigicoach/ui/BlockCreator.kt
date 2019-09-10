@@ -43,18 +43,18 @@ class BlockCreator : AppCompatActivity() {
     lateinit var deleteButton: Button
 
     //    private var blockString = ""
-    private lateinit var currentBlockComponents: ArrayList<Exercise>
+    private var currentBlockComponents: ArrayList<Exercise>? = arrayListOf()
     private lateinit var allExercises: List<Exercise>
 
-    lateinit var updatingBlock: Block
+    private var updatingBlock: Block? = null
 
     private var BUTTON_ADD = "ADD"
     private var BUTTON_UPDATE = "UPDATE"
 
     companion object {
-        var BLOCK_ACTION = "block_action"
-        var BLOCK_NEW = "block_new"
-        var BLOCK_UPDATE = "block_update"
+        const val BLOCK_ACTION = "block_action"
+        const val BLOCK_NEW = "block_new"
+        const val BLOCK_UPDATE = "block_update"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -69,7 +69,7 @@ class BlockCreator : AppCompatActivity() {
 
         allExercises = listOf()
 
-        currentBlockComponents = arrayListOf()
+//        currentBlockComponents = arrayListOf()
         recyclerView = recyclerview as RecyclerView
         recyclerViewV2 = CurrentBlockDisplay as RecyclerView
 //        blockPreviewText = BlockPreviewText as TextView
@@ -137,30 +137,32 @@ class BlockCreator : AppCompatActivity() {
             saveBlockButton.setOnClickListener(updateButtonListener)
             deleteButton.setOnClickListener(deleteButtonListener)
 
-            updatingBlock = DataHolder.activeBlockHolder
-            currentBlockComponents = updatingBlock.getExercises() //todo why the fuck does this update the block in Dataholder???????
+            updatingBlock = DataHolder.activeBlockHolder?.copy()
+
+            currentBlockComponents = updatingBlock?.components
+
             Timber.d("current block components 1 : $currentBlockComponents ")
 
-            namePreviewEText = updatingBlock.name
+            namePreviewEText = updatingBlock!!.name
         }
 
         blockNameText.text = SpannableStringBuilder(namePreviewEText)
-        adapterDeletableExercises.setExercises(currentBlockComponents)
+        adapterDeletableExercises.setExercises(currentBlockComponents!!)
     }
 
 
     val itemDeletableListener = object : ClickListenerRecyclerView {
         override fun onClick(view: View, position: Int) {
             super.onClick(view, position)
-            val clickedExercise = currentBlockComponents[position]
-            var removedSuccess = currentBlockComponents.remove(clickedExercise)
+            val clickedExercise = currentBlockComponents!![position]
+            var removedSuccess = currentBlockComponents!!.remove(clickedExercise)
             Timber.d("current block components delete : $currentBlockComponents ")
-            Timber.d("real block components delete : ${DataHolder.activeBlockHolder.components} ")
+            Timber.d("real block components delete : ${DataHolder.activeBlockHolder?.components} ")
 
 
             Timber.d("removal success $removedSuccess")
 
-            adapterDeletableExercises.setExercises(currentBlockComponents)
+            adapterDeletableExercises.setExercises(currentBlockComponents!!)
         }
     }
 
@@ -169,12 +171,13 @@ class BlockCreator : AppCompatActivity() {
             super.onClick(view, position)
             Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
             val clickedExercise = dataViewModel.allExercises.value?.get(position)
-            currentBlockComponents.add(currentBlockComponents.size, clickedExercise!!)
+            currentBlockComponents!!.add(currentBlockComponents!!.size, clickedExercise!!)
             Timber.d("current block components add : $currentBlockComponents ")
-            Timber.d("real block components add : ${DataHolder.activeBlockHolder.components}} ")
+            Timber.d("real block components add : ${DataHolder.activeBlockHolder?.components}} ")
 
 
-            adapterDeletableExercises.setExercises(currentBlockComponents)
+
+            adapterDeletableExercises.setExercises(currentBlockComponents!!)
         }
     }
 
@@ -184,22 +187,22 @@ class BlockCreator : AppCompatActivity() {
         } else {
             "Unnamed Block"
         }
-        block = Block(blockTitle, currentBlockComponents)
+        block = Block(blockTitle, currentBlockComponents!!)
         dataViewModel.insertBlock(block)
         backToViewer()
     }
 
     private val updateButtonListener = View.OnClickListener {
 
-        updatingBlock.name = blockNameText.text.trim().toString()
-        updatingBlock.components = currentBlockComponents
-        dataViewModel.updateBlock(updatingBlock)
+        updatingBlock!!.name = blockNameText.text.trim().toString()
+        updatingBlock!!.components = currentBlockComponents!!
+        dataViewModel.updateBlock(updatingBlock!!)
 
         backToViewer()
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        dataViewModel.deleteBlock(updatingBlock)
+        dataViewModel.deleteBlock(updatingBlock!!)
 
         backToViewer()
     }
@@ -210,4 +213,13 @@ class BlockCreator : AppCompatActivity() {
         startActivity(intent)
     }
 
+    override fun onBackPressed() {
+        backToViewer() ////todo problem
+    }
+
+    //problem - Every time the updating block is being touched, even using a copy() of it. It modifies the value up to inside allBlocks observer
+    // this happens because what you are using is just a pointer, so would have to create a new object
+    // the object cant be created from constructor as it has autogenerated id. And using a copy of the real one doesn't have any effect.
+    // Not clear what is causing this, or what line in OnCreate is making it reset, but its not the adapter nor the observer.
+    // should Stack Overflow this
 }
