@@ -18,6 +18,8 @@ class AppRepository(
     val allBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getAll()
     val allDays: androidx.lifecycle.LiveData<List<Day>> = dayDao.getAll()
 
+    private val ACTION_UPDATE = 1
+    private val ACTION_DELETE = 2
 
     suspend fun insertExercise(exercise: Exercise) {
         var rowId = exerciseDao.insert(exercise)
@@ -27,31 +29,38 @@ class AppRepository(
     suspend fun updateExercise(updatedExercise: Exercise) {
         exerciseDao.update(updatedExercise)
         Timber.d("updated currentExercise: $updatedExercise)")
-        updateBlocksContainingExercise(updatedExercise)
-    }
-
-    private suspend fun updateBlocksContainingExercise(updatedExercise: Exercise) {
-        val blocks = blockDao.getBlocks()
-
-        if (blocks.isNotEmpty()) {
-            for (block in blocks) {
-                for (exercise in block.components) {
-                    Timber.d("looking for ${updatedExercise.exerciseId} and this is ${exercise.exerciseId}")
-
-                    if (exercise.exerciseId == updatedExercise.exerciseId) {
-                        Timber.d("MATCH FOUND bef block: $block")
-                        block.components[block.components.indexOf(exercise)] = updatedExercise
-                        Timber.d("MATCH FOUND after block: $block")
-                        updateBlock(block)
-                    }
-                }
-            }
-        }
+        updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
     }
 
     suspend fun deleteExercise(exercise: Exercise) {
         exerciseDao.delete(exercise)
         Timber.d("deleted: ${exercise.name}")
+        updateBlocksContainingExercise(ACTION_DELETE,exercise)
+
+    }
+
+    private suspend fun updateBlocksContainingExercise(actionCode:Int, exercise: Exercise) {
+        val blocks = blockDao.getBlocks()
+
+        if (blocks.isNotEmpty()) {
+            for (block in blocks) { //todo make here a contains function in block class, and return position
+                for (tmpExercise in block.components) {
+                    Timber.d("looking for ${exercise.exerciseId} and this is ${tmpExercise.exerciseId}")
+
+                    if (tmpExercise.exerciseId == exercise.exerciseId) {
+//                        Timber.d("MATCH FOUND bef block: $block")
+                        if (actionCode==ACTION_UPDATE) {
+                            block.components[block.components.indexOf(tmpExercise)] = exercise
+                            updateBlock(block)
+                        }
+                        if (actionCode==ACTION_DELETE) {
+                            block.components.removeAt(block.components.indexOf(tmpExercise))
+                            updateBlock(block)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     suspend fun insertBlock(block: Block) {
@@ -61,30 +70,36 @@ class AppRepository(
 
     suspend fun updateBlock(block: Block) {
         blockDao.update(block)
-        updateDaysContainingBlocks(block)
+        updateDaysContainingBlocks(ACTION_UPDATE,block)
         Timber.d("updated currentBlock")
-    }
-
-    private suspend fun updateDaysContainingBlocks(updatedBlock: Block) {
-        val days = dayDao.getDays()
-
-        if (days.isNotEmpty()) {
-            for (day in days) {
-                for (block in day.blocks) {
-                    if (block.blockId == updatedBlock.blockId) {
-                        Timber.d("MATCH FOUND bef day: $day")
-                        day.blocks[day.blocks.indexOf(block)] = updatedBlock
-                        Timber.d("MATCH FOUND after day: $day")
-                        updateDay(day)
-                    }
-                }
-            }
-        }
     }
 
     suspend fun deleteBlock(block: Block) {
         blockDao.delete(block)
+        updateDaysContainingBlocks(ACTION_DELETE,block)
         Timber.d("deleted: ${block.name}")
+    }
+
+    private suspend fun updateDaysContainingBlocks(actionCode:Int, block: Block) {
+        val days = dayDao.getDays()
+
+        if (days.isNotEmpty()) {
+            for (day in days) {
+                for (tmpBlock in day.blocks) {
+                    if (tmpBlock.blockId == block.blockId) {
+
+                        if (actionCode==ACTION_UPDATE) {
+                            day.blocks[day.blocks.indexOf(tmpBlock)] = block
+                            updateDay(day)
+                        }
+                        if (actionCode==ACTION_DELETE) {
+                            day.blocks.removeAt(day.blocks.indexOf(tmpBlock))
+                            updateBlock(block)
+                        }
+                    }
+                }
+            }
+        }
     }
 
     suspend fun getDayById(dayId: String): Day? {
