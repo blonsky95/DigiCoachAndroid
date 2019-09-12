@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.ExerciseCreator
+import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import timber.log.Timber
 
 

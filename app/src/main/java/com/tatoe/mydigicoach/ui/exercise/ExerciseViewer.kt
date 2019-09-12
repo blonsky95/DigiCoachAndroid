@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach.ui
+package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,7 +9,6 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*

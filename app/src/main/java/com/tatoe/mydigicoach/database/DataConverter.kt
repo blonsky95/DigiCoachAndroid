@@ -19,6 +19,16 @@ class DataConverter {
     }
 
     @TypeConverter
+    fun exerciseMapToString(resultsMap: MutableMap<String,String>) :String? {
+        return Gson().toJson(resultsMap)
+    }
+
+    @TypeConverter
+    fun stringToexerciseMap(data: String?) : MutableMap<String,String> {
+        return Gson().fromJson(data, object :TypeToken<MutableMap<String,String>>() {}.type)
+    }
+
+    @TypeConverter
     fun stringToBlockList(data: String?): ArrayList<Block> {
         return Gson().fromJson(data, object : TypeToken<ArrayList<Block>>() {}.type)
     }

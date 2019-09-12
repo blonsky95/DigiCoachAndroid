@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach.ui
+package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
 import android.os.Bundle
@@ -16,7 +16,6 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
-import timber.log.Timber
 
 class ExerciseCreator : AppCompatActivity() {
 
@@ -117,7 +116,9 @@ class ExerciseCreator : AppCompatActivity() {
                 leftButton.setOnClickListener(deleteButtonListener)
             }
             if (actionType == EXERCISE_VIEW) {
-                rightButton.visibility = View.INVISIBLE
+                rightButton.visibility = View.VISIBLE
+                rightButton.text="HISTORY"
+                rightButton.setOnClickListener(historyButtonListener)
 
                 centreButton.visibility = View.VISIBLE
                 centreButton.text = "EDIT"
@@ -191,6 +192,13 @@ class ExerciseCreator : AppCompatActivity() {
     private val editButtonListener = View.OnClickListener {
         updateButtonUI(EXERCISE_UPDATE)
         updateBodyUI(EXERCISE_UPDATE)
+    }
+
+    private val historyButtonListener = View.OnClickListener {
+        val intent = Intent(this, ExerciseResults::class.java)
+        DataHolder.activeExerciseHolder=updatingExercise
+        intent.putExtra(ExerciseResults.RESULTS_ACTION,ExerciseResults.RESULTS_VIEW)
+        startActivity(intent)
     }
 
     private fun backToViewer() {

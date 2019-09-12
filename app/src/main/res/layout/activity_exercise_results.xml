@@ -18,22 +18,22 @@
             app:menu="@menu/creator_toolbar_menu"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <EditText
-            android:id="@+id/EditText1"
-            android:visibility="visible"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:hint="Exercise Name"
-            android:inputType="textPersonName"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
+<!--    <EditText-->
+<!--            android:id="@+id/EditText1"-->
+<!--            android:visibility="visible"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:layout_marginTop="32dp"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:ems="10"-->
+<!--            android:hint="Exercise Name"-->
+<!--            android:inputType="textPersonName"-->
+<!--            android:padding="12dp"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.0"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />-->
 
     <TextView
             android:id="@+id/TextView1"
@@ -71,24 +71,24 @@
             app:layout_constraintTop_toBottomOf="@+id/EditText1"
             app:layout_constraintVertical_bias="1.0" />
 
-    <TextView
-            android:id="@+id/TextView2"
-            android:visibility="gone"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:ems="10"
-            android:gravity="top"
-            android:padding="12dp"
-            app:layout_constraintBottom_toTopOf="@+id/right_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/TextView1"
-            app:layout_constraintVertical_bias="0.0" />
+<!--    <TextView-->
+<!--            android:id="@+id/TextView2"-->
+<!--            android:visibility="gone"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="0dp"-->
+<!--            android:layout_marginStart="8dp"-->
+<!--            android:layout_marginTop="24dp"-->
+<!--            android:layout_marginEnd="8dp"-->
+<!--            android:layout_marginBottom="8dp"-->
+<!--            android:ems="10"-->
+<!--            android:gravity="top"-->
+<!--            android:padding="12dp"-->
+<!--            app:layout_constraintBottom_toTopOf="@+id/right_button"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.0"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/TextView1"-->
+<!--            app:layout_constraintVertical_bias="0.0" />-->
 
     <Button
             android:id="@+id/right_button"

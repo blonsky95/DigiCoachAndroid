@@ -20,22 +20,25 @@
         </activity>
 
         <activity
-                android:name=".ui.ExerciseViewer"
+                android:name=".ui.exercise.ExerciseViewer"
                 android:parentActivityName=".ui.MainActivity" />
         <activity
-                android:name=".ui.BlockViewer"
+                android:name=".ui.block.BlockViewer"
                 android:parentActivityName=".ui.MainActivity" />
         <activity
-                android:name=".ui.DayViewer"
+                android:name=".ui.day.DayViewer"
                 android:parentActivityName=".ui.MainActivity" />
         <activity
-                android:name=".ui.ExerciseCreator"
+                android:name=".ui.exercise.ExerciseCreator"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".ui.BlockCreator"
+                android:name=".ui.block.BlockCreator"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".ui.DayCreator"
+                android:name=".ui.day.DayCreator"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.exercise.ExerciseResults"
                 android:windowSoftInputMode="adjustPan" />
 
     </application>

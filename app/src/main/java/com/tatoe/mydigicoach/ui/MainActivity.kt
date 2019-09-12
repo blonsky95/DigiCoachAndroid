@@ -6,6 +6,9 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.tatoe.mydigicoach.BuildConfig
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.ui.block.BlockViewer
+import com.tatoe.mydigicoach.ui.day.DayViewer
+import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 
