@@ -16,7 +16,7 @@ import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import timber.log.Timber
 
 
-class DayContentAdapter(var context: Context) : RecyclerView.Adapter<DayItemViewHolder>() {
+class DayContentAdapter(var context: Context) : RecyclerView.Adapter<CollapsibleItemViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>()
@@ -26,13 +26,13 @@ class DayContentAdapter(var context: Context) : RecyclerView.Adapter<DayItemView
         return blocks.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DayItemViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollapsibleItemViewHolder {
         val itemView =
             inflater.inflate(com.tatoe.mydigicoach.R.layout.item_holder_block, parent, false)
-        return DayItemViewHolder(itemView)
+        return CollapsibleItemViewHolder(itemView)
     }
 
-    override fun onBindViewHolder(holder: DayItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: CollapsibleItemViewHolder, position: Int) {
 
         val bindingBlock = blocks[position]
         holder.blockName.text = bindingBlock.name

@@ -11,6 +11,7 @@ import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_results.*
 import timber.log.Timber
 
@@ -19,9 +20,12 @@ class ExerciseResults : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
 
     lateinit var updatingExercise: Exercise
+    lateinit var adapter:ResultListAdapter
 
     companion object {
         var RESULTS_ACTION = "results_action"
+        var RESULTS_DATE = "results_date"
+
         var RESULTS_VIEW = "results_view"
         var RESULTS_ADD = "results_add"
     }
@@ -38,11 +42,22 @@ class ExerciseResults : AppCompatActivity() {
 
         if (intent.hasExtra(RESULTS_ACTION)) { //can only reach this with an intent extra
             val action = intent.getStringExtra(RESULTS_ACTION)
+            var date:String? = null
+            if (intent.hasExtra(RESULTS_DATE)){
+                date = intent.getStringExtra(RESULTS_DATE)
+
+            }
+//            title = updatingExercise.name
             updatingExercise = DataHolder.activeExerciseHolder
-            title = updatingExercise.name
+
             updateButtonUI(action)
-            updateBodyUI(action)
+            updateBodyUI(action,date)
+            //todo send intent from click in day viewer - add a button that takes you here with date as extra! then start testing
+
         }
+
+
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -79,30 +94,25 @@ class ExerciseResults : AppCompatActivity() {
 
             centre_button.visibility = View.INVISIBLE
             left_button.visibility = View.INVISIBLE
-//            centreButton.visibility = View.VISIBLE
-//            centreButton.text = "VIEW"
-//            centreButton.setOnClickListener(viewButtonListener)
-//
-//            leftButton.visibility = View.VISIBLE
-//            leftButton.text = "DELETE"
-//            leftButton.setOnClickListener(deleteButtonListener)
         }
 
     }
 
-    private fun updateBodyUI(actionType: String) {
+    private fun updateBodyUI(actionType: String, date:String?) {
         if (actionType == RESULTS_VIEW) {
             TextView1.visibility = View.GONE
             EditText2.visibility = View.GONE
 
-            //add adapters from dayviewer here, well their visibulity, add them in xml
+            ResultsRecyclerView.visibility= View.VISIBLE
+            adapter=ResultListAdapter(this)
+            ResultsRecyclerView.adapter=adapter
+            adapter.setContent(updatingExercise)
         }
         if (actionType == RESULTS_ADD) {
             TextView1.visibility = View.VISIBLE
+            TextView1.text=date
             EditText2.visibility = View.VISIBLE
-
-            //make adapters invisible
-            //todo continue here - probably have to edit xml a bit, use textview1 as layout reference to edittext2
+            ResultsRecyclerView.visibility= View.GONE
 
         }
 

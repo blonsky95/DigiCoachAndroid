@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.database
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.tatoe.mydigicoach.ResultSet
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 
@@ -19,13 +20,13 @@ class DataConverter {
     }
 
     @TypeConverter
-    fun exerciseMapToString(resultsMap: MutableMap<String,String>) :String? {
-        return Gson().toJson(resultsMap)
+    fun resultSetListToString(resultsList: ArrayList<ResultSet>) :String? {
+        return Gson().toJson(resultsList)
     }
 
     @TypeConverter
-    fun stringToexerciseMap(data: String?) : MutableMap<String,String> {
-        return Gson().fromJson(data, object :TypeToken<MutableMap<String,String>>() {}.type)
+    fun stringToResultSetList(data: String?) : ArrayList<ResultSet> {
+        return Gson().fromJson(data, object :TypeToken<ArrayList<ResultSet>>() {}.type)
     }
 
     @TypeConverter
