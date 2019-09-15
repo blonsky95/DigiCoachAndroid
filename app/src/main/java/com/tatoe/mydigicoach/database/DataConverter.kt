@@ -20,13 +20,13 @@ class DataConverter {
     }
 
     @TypeConverter
-    fun resultSetListToString(resultsList: ArrayList<ResultSet>) :String? {
-        return Gson().toJson(resultsList)
+    fun stringToResultSetList(data: String?) : ArrayList<ResultSet> {
+        return Gson().fromJson(data, object :TypeToken<ArrayList<ResultSet>>() {}.type)
     }
 
     @TypeConverter
-    fun stringToResultSetList(data: String?) : ArrayList<ResultSet> {
-        return Gson().fromJson(data, object :TypeToken<ArrayList<ResultSet>>() {}.type)
+    fun resultSetListToString(resultsList: ArrayList<ResultSet>) :String? {
+        return Gson().toJson(resultsList)
     }
 
     @TypeConverter

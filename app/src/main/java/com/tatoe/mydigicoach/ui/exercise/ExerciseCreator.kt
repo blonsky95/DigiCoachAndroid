@@ -16,6 +16,7 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
+import timber.log.Timber
 
 class ExerciseCreator : AppCompatActivity() {
 
@@ -65,6 +66,8 @@ class ExerciseCreator : AppCompatActivity() {
             var action = intent.getStringExtra(EXERCISE_ACTION)
             if (action == EXERCISE_UPDATE || action == EXERCISE_VIEW) {
                 updatingExercise = DataHolder.activeExerciseHolder
+                Timber.d("exercise creator view result exercise 4 : $updatingExercise ${updatingExercise.results}")
+
             }
             updateButtonUI(action)
             updateBodyUI(action)
@@ -196,6 +199,8 @@ class ExerciseCreator : AppCompatActivity() {
 
     private val historyButtonListener = View.OnClickListener {
         val intent = Intent(this, ExerciseResults::class.java)
+        Timber.d("history button pressed result exercise 5 : $updatingExercise ${updatingExercise.results}")
+
         DataHolder.activeExerciseHolder=updatingExercise
         intent.putExtra(ExerciseResults.RESULTS_ACTION,ExerciseResults.RESULTS_VIEW)
         startActivity(intent)

@@ -3,14 +3,35 @@
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-
-
         <TextView
                 android:id="@+id/block_title"
                 android:layout_height="wrap_content"
                 android:layout_width="match_parent"
                 android:padding="12dp"
                 android:background="@android:color/holo_orange_light"/>
+
+<!--        <LinearLayout-->
+<!--                android:layout_width="match_parent"-->
+<!--                android:layout_height="wrap_content">-->
+
+<!--                <TextView-->
+<!--                        android:id="@+id/result_date"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_weight="4"-->
+<!--                        android:layout_height="wrap_content"-->
+<!--                        android:background="@android:color/holo_orange_light"-->
+<!--                        android:padding="12dp" />-->
+<!--                <ImageView-->
+<!--                        android:id="@+id/result_button"-->
+<!--                        android:layout_width="0dp"-->
+<!--                        android:layout_height="match_parent"-->
+<!--                        android:layout_weight="1"-->
+<!--                        android:background="#971212"-->
+<!--                        android:contentDescription="result_sticker"-->
+<!--                        android:src="@drawable/tick_white"-->
+<!--                        android:visibility="visible" />-->
+<!--        </LinearLayout>-->
+
         <LinearLayout
                 android:id="@+id/collapsible_layout"
                 android:layout_width="match_parent"

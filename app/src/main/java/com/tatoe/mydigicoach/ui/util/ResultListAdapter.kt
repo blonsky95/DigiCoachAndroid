@@ -35,25 +35,15 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
 
 
         if (results.isNotEmpty()) {
-            for (result in results) {
-                holder.resultDate.text=result.sDate
-                if (result.sResult!=null) {
-                    holder.resultResult.text=result.sResult
+                holder.resultDate.text=results[position].sDate
+                if (results[position].sResult!=null) {
+                    holder.resultResult.text=results[position].sResult
+                    holder.resultResult.visibility=View.GONE
                 } else {
                     holder.resultResult.text="nothing written here"
                 }
             }
-        } else {
 
-
-
-//            var exerciseText = TextView(context)
-//            exerciseText.text = "No exercises in ths block"
-//            exerciseText.setPadding(5,3,5,3)
-//            exerciseText.setTextSize(TypedValue.COMPLEX_UNIT_SP,exerciseTextSize)
-
-//            holder.collapsibleLayout.addView(exerciseText)
-        }
 
         holder.resultDate.setOnClickListener {
             holder.resultResult.visibility = if (!holder.expanded) View.VISIBLE else View.GONE
@@ -69,6 +59,8 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
 //    }
 
     internal fun setContent(exercise : Exercise) {
+        Timber.d("adapter exercise results: ${exercise.results}")
+
         this.results = exercise.results
         notifyDataSetChanged()
     }

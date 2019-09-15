@@ -7,6 +7,7 @@ import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
@@ -19,8 +20,8 @@ class ExerciseResults : AppCompatActivity() {
 
     private lateinit var dataViewModel: DataViewModel
 
-    lateinit var updatingExercise: Exercise
-    lateinit var adapter:ResultListAdapter
+    lateinit var activeExercise: Exercise
+    lateinit var adapter: ResultListAdapter
 
     companion object {
         var RESULTS_ACTION = "results_action"
@@ -42,20 +43,22 @@ class ExerciseResults : AppCompatActivity() {
 
         if (intent.hasExtra(RESULTS_ACTION)) { //can only reach this with an intent extra
             val action = intent.getStringExtra(RESULTS_ACTION)
-            var date:String? = null
-            if (intent.hasExtra(RESULTS_DATE)){
+            Timber.d("intent extra action: $action")
+            var date: String? = null
+            if (intent.hasExtra(RESULTS_DATE)) {
                 date = intent.getStringExtra(RESULTS_DATE)
 
             }
 //            title = updatingExercise.name
-            updatingExercise = DataHolder.activeExerciseHolder
+            activeExercise = DataHolder.activeExerciseHolder
+            Timber.d("exercise results open intent 2/6 : ${activeExercise} ${activeExercise.results}")
+
 
             updateButtonUI(action)
-            updateBodyUI(action,date)
+            updateBodyUI(action, date)
             //todo send intent from click in day viewer - add a button that takes you here with date as extra! then start testing
 
         }
-
 
 
     }
@@ -80,6 +83,7 @@ class ExerciseResults : AppCompatActivity() {
     }
 
     private fun updateButtonUI(actionType: String) {
+
         if (actionType == RESULTS_VIEW) {
             right_button.visibility = View.INVISIBLE
             centre_button.visibility = View.INVISIBLE
@@ -98,21 +102,23 @@ class ExerciseResults : AppCompatActivity() {
 
     }
 
-    private fun updateBodyUI(actionType: String, date:String?) {
+    private fun updateBodyUI(actionType: String, date: String?) {
         if (actionType == RESULTS_VIEW) {
             TextView1.visibility = View.GONE
             EditText2.visibility = View.GONE
 
-            ResultsRecyclerView.visibility= View.VISIBLE
-            adapter=ResultListAdapter(this)
-            ResultsRecyclerView.adapter=adapter
-            adapter.setContent(updatingExercise)
+            ResultsRecyclerView.visibility = View.VISIBLE
+            adapter = ResultListAdapter(this)
+            ResultsRecyclerView.adapter = adapter
+            ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
+            Timber.d("update adapter exercise results 7 :$activeExercise ${activeExercise.results}")
+            adapter.setContent(activeExercise)
         }
         if (actionType == RESULTS_ADD) {
             TextView1.visibility = View.VISIBLE
-            TextView1.text=date
+            TextView1.text = date
             EditText2.visibility = View.VISIBLE
-            ResultsRecyclerView.visibility= View.GONE
+            ResultsRecyclerView.visibility = View.GONE
 
         }
 
@@ -122,8 +128,9 @@ class ExerciseResults : AppCompatActivity() {
         var resultDate = TextView1.text.toString()
         var resultString = SpannableStringBuilder(EditText2.text.trim().toString()).toString()
 
-        updatingExercise.addResult(resultDate,resultString)
-        Timber.d("map of results: ${updatingExercise.results}")
+        activeExercise.addResult(resultDate, resultString)
+        dataViewModel.updateExercise(activeExercise)
+        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise.results}")
         finish() //?
     }
 }

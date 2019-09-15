@@ -100,8 +100,8 @@
             android:text="ADD"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/EditText2"
             app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintVertical_bias="1.0"
             app:layout_constraintStart_toStartOf="parent" />
 
     <Button
