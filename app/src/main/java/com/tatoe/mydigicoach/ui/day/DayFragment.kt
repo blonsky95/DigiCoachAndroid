@@ -1,37 +1,30 @@
 package com.tatoe.mydigicoach.ui.day
 
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
-import com.tatoe.mydigicoach.ui.util.BlockListAdapter
-import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DayContentAdapter
-import kotlinx.android.synthetic.main.fragment_day_view.*
 import kotlinx.android.synthetic.main.fragment_day_view.view.*
 
-class DayFragment(val day: Day?, var dataArray: ArrayList<String>) : Fragment() {
-    //todo use a map instead of an array so there is keys
+class DayFragment(val day: Day?, var date: String) : Fragment() {
 
     private lateinit var fragmentView: View
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         fragmentView = inflater.inflate(R.layout.fragment_day_view, container, false)
-        var date = "${dataArray[0]} ${dataArray[1]} of ${dataArray[2]}"
-        fragmentView.weekDay.text = date
+//        var date = "${dataArray[0]} ${dataArray[1]} of ${dataArray[2]}"
+        fragmentView.weekDay.text = Day.dayIDtoDashSeparator(date)
         val string = "There are no blocks nor exercises, add them to see them here"
 
         var recyclerView = fragmentView.dayContentRecyclerView as RecyclerView
-
-        var dayContentAdapter = DayContentAdapter(context!!)
+        var dayContentAdapter = DayContentAdapter(context!!,date)
         recyclerView.adapter = dayContentAdapter
         recyclerView.layoutManager = LinearLayoutManager(context!!)
         dayContentAdapter.setContent(day)

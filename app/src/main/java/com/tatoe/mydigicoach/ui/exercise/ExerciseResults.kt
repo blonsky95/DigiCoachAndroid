@@ -10,6 +10,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
@@ -20,7 +21,7 @@ class ExerciseResults : AppCompatActivity() {
 
     private lateinit var dataViewModel: DataViewModel
 
-    lateinit var activeExercise: Exercise
+    private var activeExercise: Exercise? = null
     lateinit var adapter: ResultListAdapter
 
     companion object {
@@ -47,16 +48,17 @@ class ExerciseResults : AppCompatActivity() {
             var date: String? = null
             if (intent.hasExtra(RESULTS_DATE)) {
                 date = intent.getStringExtra(RESULTS_DATE)
+                Timber.d("intent extra date: $date")
 
             }
 //            title = updatingExercise.name
             activeExercise = DataHolder.activeExerciseHolder
-            Timber.d("exercise results open intent 2/6 : ${activeExercise} ${activeExercise.results}")
+
+            Timber.d("exercise results open intent 2/6 : $activeExercise ${activeExercise?.results}")
 
 
             updateButtonUI(action)
             updateBodyUI(action, date)
-            //todo send intent from click in day viewer - add a button that takes you here with date as extra! then start testing
 
         }
 
@@ -111,12 +113,14 @@ class ExerciseResults : AppCompatActivity() {
             adapter = ResultListAdapter(this)
             ResultsRecyclerView.adapter = adapter
             ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
-            Timber.d("update adapter exercise results 7 :$activeExercise ${activeExercise.results}")
-            adapter.setContent(activeExercise)
+            Timber.d("update adapter exercise results 7 :$activeExercise ${activeExercise?.results}")
+            if (activeExercise!=null){
+                adapter.setContent(activeExercise!!)
+            }
         }
         if (actionType == RESULTS_ADD) {
             TextView1.visibility = View.VISIBLE
-            TextView1.text = date
+            TextView1.text = Day.dayIDtoDashSeparator(date!!)
             EditText2.visibility = View.VISIBLE
             ResultsRecyclerView.visibility = View.GONE
 
@@ -128,9 +132,11 @@ class ExerciseResults : AppCompatActivity() {
         var resultDate = TextView1.text.toString()
         var resultString = SpannableStringBuilder(EditText2.text.trim().toString()).toString()
 
-        activeExercise.addResult(resultDate, resultString)
-        dataViewModel.updateExercise(activeExercise)
-        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise.results}")
+        activeExercise?.addResult(resultDate, resultString)
+        if (activeExercise!=null){
+            dataViewModel.updateExercise(activeExercise!!)
+        }
+        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.results}")
         finish() //?
     }
 }

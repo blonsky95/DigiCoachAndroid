@@ -6,12 +6,10 @@ import com.tatoe.mydigicoach.entity.Exercise
 
 object DataHolder {
 
-    lateinit var activeExerciseHolder: Exercise
-    lateinit var newExerciseHolder: Exercise
+    var activeExerciseHolder: Exercise? = null
 
     var activeBlockHolder: Block? = null
 
-    lateinit var newBlockHolder: Block
 
     var oldDayHolder: Day? = null
     lateinit var updatedDayHolder: Day

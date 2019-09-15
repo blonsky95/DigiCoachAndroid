@@ -65,8 +65,8 @@ class DayCreator : AppCompatActivity() {
 
         activeDayId = intent.getStringExtra(DAY_ID)
 
-//        DayId.text=Day.dayIDtoDayMonth(activeDayId)
-        title = Day.dayIDtoDayMonth(activeDayId)
+//        DayId.text=Day.dayIDtoDashSeparator(activeDayId)
+        title = Day.dayIDtoDashSeparator(activeDayId)
 
 
         recyclerView = BlocksDisplay as RecyclerView

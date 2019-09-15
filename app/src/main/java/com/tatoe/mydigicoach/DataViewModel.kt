@@ -29,10 +29,13 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     val allDays: LiveData<List<Day>>
 
     init {
-        val exerciseDao = AppRoomDatabase.buildDatabase(application).exercisesDao()
-        val blockDao = AppRoomDatabase.buildDatabase(application).blockDao()
-        val dayDao = AppRoomDatabase.buildDatabase(application).dayDao()
 
+        val appDB=AppRoomDatabase.buildDatabase(application)
+        val exerciseDao = appDB.exercisesDao()
+        val blockDao = appDB.blockDao()
+        val dayDao = appDB.dayDao()
+
+        Timber.d("Dataviewmodel initialised")
 
         repository = AppRepository(exerciseDao,blockDao,dayDao)
         allExercises = repository.allExercises

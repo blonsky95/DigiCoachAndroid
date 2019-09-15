@@ -5,6 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import java.text.DecimalFormat
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Entity(tableName = "day_table")
 data class Day(
@@ -18,9 +21,14 @@ data class Day(
             return "${format.format(day)}${format.format(month)}$year"
         }
 
-        fun dayIDtoDayMonth(dayId:String) : String {
+        fun dayIDtoDashSeparator(dayId:String) : String {
             return " ${dayId.substring(0,2)}-${dayId.substring(2,4)}-${dayId.substring(4,8)}"
         }
+
+        var dashSeparatedDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        var presentableDateFormat = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault())
+
+
     }
 
 }

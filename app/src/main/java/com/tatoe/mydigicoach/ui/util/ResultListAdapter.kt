@@ -35,7 +35,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
 
 
         if (results.isNotEmpty()) {
-                holder.resultDate.text=results[position].sDate
+                holder.resultDate.text=results[position].getReadableDate()
                 if (results[position].sResult!=null) {
                     holder.resultResult.text=results[position].sResult
                     holder.resultResult.visibility=View.GONE

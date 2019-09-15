@@ -141,10 +141,10 @@ class DayViewer : AppCompatActivity() {
         override fun getItem(position: Int): Fragment {
             //this is also called to load the adjacent fragments - so shouldnt be used to know which fragment dayId is currently active
             var loadingDayId = toDayIdFormat(dayOfWeek - position)
-            val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
+//            val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
             var loadDay = getDayById(loadingDayId)
             Timber.d("get item created day instance: $loadDay at position $position")
-            return DayFragment(loadDay, dataArray)
+            return DayFragment(loadDay, loadingDayId)
         }
 
         private fun toDayIdFormat(dayDiff: Int): String {

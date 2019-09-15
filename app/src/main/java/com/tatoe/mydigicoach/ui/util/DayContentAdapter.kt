@@ -20,7 +20,7 @@ import kotlinx.android.synthetic.main.item_day_result.view.*
 import timber.log.Timber
 
 
-class DayContentAdapter(var context: Context) : RecyclerView.Adapter<CollapsibleItemViewHolderDay>() {
+class DayContentAdapter(var context: Context, var date:String) : RecyclerView.Adapter<CollapsibleItemViewHolderDay>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>()
@@ -32,7 +32,7 @@ class DayContentAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollapsibleItemViewHolderDay {
         val itemView =
-            inflater.inflate(com.tatoe.mydigicoach.R.layout.item_holder_block, parent, false)
+            inflater.inflate(R.layout.item_holder_block, parent, false)
         return CollapsibleItemViewHolderDay(itemView)
     }
 
@@ -83,7 +83,7 @@ class DayContentAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
         DataHolder.activeExerciseHolder = exercise
         val intent = Intent(context, ExerciseResults::class.java)
         intent.putExtra(ExerciseResults.RESULTS_ACTION, ExerciseResults.RESULTS_ADD)
-        intent.putExtra(ExerciseResults.RESULTS_DATE, "01012011")     //todo get date from day, probably will have to pass it with a parameter
+        intent.putExtra(ExerciseResults.RESULTS_DATE, date)
 
         startActivity(context,intent, null)
     }

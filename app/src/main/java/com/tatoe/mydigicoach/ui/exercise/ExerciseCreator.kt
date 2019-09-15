@@ -65,7 +65,9 @@ class ExerciseCreator : AppCompatActivity() {
         if (intent.hasExtra(EXERCISE_ACTION)) { //can only reach this with an intent extra
             var action = intent.getStringExtra(EXERCISE_ACTION)
             if (action == EXERCISE_UPDATE || action == EXERCISE_VIEW) {
-                updatingExercise = DataHolder.activeExerciseHolder
+                if (DataHolder.activeExerciseHolder!=null) {
+                    updatingExercise = DataHolder.activeExerciseHolder!!
+                }
                 Timber.d("exercise creator view result exercise 4 : $updatingExercise ${updatingExercise.results}")
 
             }
@@ -145,9 +147,9 @@ class ExerciseCreator : AppCompatActivity() {
             descTextView.visibility = View.GONE
 
             nameEditText.visibility = View.VISIBLE
-            nameEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.name)
+            nameEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.name)
             descEditText.visibility = View.VISIBLE
-            descEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.description)
+            descEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.description)
 
         }
         if (actionType == EXERCISE_VIEW) {
@@ -155,9 +157,9 @@ class ExerciseCreator : AppCompatActivity() {
             descEditText.visibility = View.GONE
 
             nameTextView.visibility = View.VISIBLE
-            nameTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.name)
+            nameTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.name)
             descTextView.visibility = View.VISIBLE
-            descTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder.description)
+            descTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.description)
         }
     }
 

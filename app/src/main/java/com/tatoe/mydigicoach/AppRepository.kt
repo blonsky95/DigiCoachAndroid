@@ -94,7 +94,7 @@ class AppRepository(
                         }
                         if (actionCode==ACTION_DELETE) {
                             day.blocks.removeAt(day.blocks.indexOf(tmpBlock))
-                            updateBlock(block)
+                            updateDay(day)
                         }
                     }
                 }
