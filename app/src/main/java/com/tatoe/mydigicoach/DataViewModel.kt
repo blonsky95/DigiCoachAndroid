@@ -54,9 +54,18 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateExercise(exercise: Exercise) = viewModelScope.launch {
-        Timber.d("ptg - data view model - update called ${allBlocks.value}")
+        Timber.d("ptg - data view model - update called $exercise")
         repository.updateExercise(exercise)
     }
+
+    fun updateExerciseResult(exercise: Exercise) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update result called $exercise")
+        repository.updateExerciseResult(exercise)
+    }
+
+//    fun getExerciseById(exerciseId: Int) = viewModelScope.launch {
+//        repository.getExerciseById(exerciseId)
+//    }
 
     fun deleteExercise(exercise: Exercise) = viewModelScope.launch {
         Timber.d("ptg - data view model - delete called")

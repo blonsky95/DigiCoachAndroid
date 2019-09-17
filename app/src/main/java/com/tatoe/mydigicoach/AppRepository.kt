@@ -26,10 +26,20 @@ class AppRepository(
         Timber.d("new currentExercise, row: $rowId")
     }
 
+//    suspend fun getExerciseById(exeId:Int){
+//        exerciseDao.findByName(exeId)
+//    }
+
     suspend fun updateExercise(updatedExercise: Exercise) {
         exerciseDao.update(updatedExercise)
         Timber.d("updated currentExercise: $updatedExercise)")
         updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
+    }
+
+    suspend fun updateExerciseResult(updatedExercise: Exercise) {
+        exerciseDao.update(updatedExercise)
+        Timber.d("updated currentExerciseResult: $updatedExercise)")
+//        updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
     }
 
     suspend fun deleteExercise(exercise: Exercise) {
@@ -40,6 +50,8 @@ class AppRepository(
     }
 
     private suspend fun updateBlocksContainingExercise(actionCode:Int, exercise: Exercise) {
+        Timber.d("updating blocks containing exercise: $exercise)")
+
         val blocks = blockDao.getBlocks()
 
         if (blocks.isNotEmpty()) {

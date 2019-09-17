@@ -203,8 +203,10 @@ class ExerciseCreator : AppCompatActivity() {
         val intent = Intent(this, ExerciseResults::class.java)
         Timber.d("history button pressed result exercise 5 : $updatingExercise ${updatingExercise.results}")
 
-        DataHolder.activeExerciseHolder=updatingExercise
+//        DataHolder.activeExerciseHolder=updatingExercise
         intent.putExtra(ExerciseResults.RESULTS_ACTION,ExerciseResults.RESULTS_VIEW)
+        intent.putExtra(ExerciseResults.RESULTS_EXE_ID, updatingExercise.exerciseId)
+
         startActivity(intent)
     }
 

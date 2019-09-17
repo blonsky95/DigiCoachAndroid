@@ -143,7 +143,7 @@ class DayViewer : AppCompatActivity() {
             var loadingDayId = toDayIdFormat(dayOfWeek - position)
 //            val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
             var loadDay = getDayById(loadingDayId)
-            Timber.d("get item created day instance: $loadDay at position $position")
+//            Timber.d("get item created day instance: $loadDay at position $position")
             return DayFragment(loadDay, loadingDayId)
         }
 
@@ -162,7 +162,7 @@ class DayViewer : AppCompatActivity() {
             )
             return Day.intDatetoDayId(
                 fakeCalendar.get(Calendar.DAY_OF_MONTH),
-                fakeCalendar.get(Calendar.MONTH),
+                fakeCalendar.get(Calendar.MONTH)+1, //month is always 1 behind despite consistent Locale.getDefault() (?)
                 fakeCalendar.get(Calendar.YEAR)
             )
         }

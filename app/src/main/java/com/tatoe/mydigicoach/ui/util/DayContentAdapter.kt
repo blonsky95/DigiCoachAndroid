@@ -80,17 +80,19 @@ class DayContentAdapter(var context: Context, var date:String) : RecyclerView.Ad
     private fun goToExerciseResults(exercise: Exercise) {
         Timber.d("go to exercise results 1 : $exercise")
 
-        DataHolder.activeExerciseHolder = exercise
+//        DataHolder.activeExerciseHolder = exercise
         val intent = Intent(context, ExerciseResults::class.java)
         intent.putExtra(ExerciseResults.RESULTS_ACTION, ExerciseResults.RESULTS_ADD)
         intent.putExtra(ExerciseResults.RESULTS_DATE, date)
+        intent.putExtra(ExerciseResults.RESULTS_EXE_ID, exercise.exerciseId)
+
 
         startActivity(context,intent, null)
     }
 
     internal fun setContent(day: Day?) {
         if (day != null) {
-            Timber.d("darude ${day.dayId}")
+//            Timber.d("darude ${day.dayId}")
 
             this.blocks = day.blocks
             notifyDataSetChanged()

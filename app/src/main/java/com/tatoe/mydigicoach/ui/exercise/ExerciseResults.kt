@@ -6,13 +6,13 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_results.*
 import timber.log.Timber
@@ -24,9 +24,19 @@ class ExerciseResults : AppCompatActivity() {
     private var activeExercise: Exercise? = null
     lateinit var adapter: ResultListAdapter
 
+    var exerciseId = -1
+    private var intentAction:String? =null
+    private var intentDate:String? = null
+
+
+    private var allExercises = listOf<Exercise>()
+
+
     companion object {
         var RESULTS_ACTION = "results_action"
         var RESULTS_DATE = "results_date"
+        var RESULTS_EXE_ID = "results_exe_id"
+
 
         var RESULTS_VIEW = "results_view"
         var RESULTS_ADD = "results_add"
@@ -40,29 +50,42 @@ class ExerciseResults : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        initObserver()
 
+        if (intent.hasExtra(RESULTS_EXE_ID)) {
+            exerciseId = intent.getIntExtra(RESULTS_EXE_ID, -1)
+            Timber.d("exerciseId received")
+        }
 
         if (intent.hasExtra(RESULTS_ACTION)) { //can only reach this with an intent extra
-            val action = intent.getStringExtra(RESULTS_ACTION)
-            Timber.d("intent extra action: $action")
-            var date: String? = null
+            intentAction = intent.getStringExtra(RESULTS_ACTION)
+            Timber.d("intent extra action: $intentAction")
             if (intent.hasExtra(RESULTS_DATE)) {
-                date = intent.getStringExtra(RESULTS_DATE)
-                Timber.d("intent extra date: $date")
-
+                intentDate = intent.getStringExtra(RESULTS_DATE)
+                Timber.d("intent extra date: $intentDate")
             }
-//            title = updatingExercise.name
-            activeExercise = DataHolder.activeExerciseHolder
-
-            Timber.d("exercise results open intent 2/6 : $activeExercise ${activeExercise?.results}")
-
-
-            updateButtonUI(action)
-            updateBodyUI(action, date)
-
         }
 
 
+    }
+
+    private fun initObserver() {
+        dataViewModel.allExercises.observe(this, Observer { exercises ->
+            exercises?.let {
+                allExercises = it
+                Timber.d("all exercises updated")
+                for (exercise in allExercises) {
+                    if (exercise.exerciseId == exerciseId) {
+                        activeExercise = exercise
+                        return@let
+                    }
+                }
+
+            }
+            updateButtonUI(intentAction)
+            updateBodyUI(intentAction, intentDate)
+
+        })
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -84,7 +107,7 @@ class ExerciseResults : AppCompatActivity() {
         }
     }
 
-    private fun updateButtonUI(actionType: String) {
+    private fun updateButtonUI(actionType: String?) {
 
         if (actionType == RESULTS_VIEW) {
             right_button.visibility = View.INVISIBLE
@@ -104,7 +127,7 @@ class ExerciseResults : AppCompatActivity() {
 
     }
 
-    private fun updateBodyUI(actionType: String, date: String?) {
+    private fun updateBodyUI(actionType: String?, date: String?) {
         if (actionType == RESULTS_VIEW) {
             TextView1.visibility = View.GONE
             EditText2.visibility = View.GONE
@@ -114,7 +137,7 @@ class ExerciseResults : AppCompatActivity() {
             ResultsRecyclerView.adapter = adapter
             ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
             Timber.d("update adapter exercise results 7 :$activeExercise ${activeExercise?.results}")
-            if (activeExercise!=null){
+            if (activeExercise != null) {
                 adapter.setContent(activeExercise!!)
             }
         }
@@ -133,8 +156,8 @@ class ExerciseResults : AppCompatActivity() {
         var resultString = SpannableStringBuilder(EditText2.text.trim().toString()).toString()
 
         activeExercise?.addResult(resultDate, resultString)
-        if (activeExercise!=null){
-            dataViewModel.updateExercise(activeExercise!!)
+        if (activeExercise != null) {
+            dataViewModel.updateExerciseResult(activeExercise!!)
         }
         Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.results}")
         finish() //?
