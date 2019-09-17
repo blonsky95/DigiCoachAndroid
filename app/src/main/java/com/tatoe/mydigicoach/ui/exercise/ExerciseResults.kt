@@ -82,11 +82,13 @@ class ExerciseResults : AppCompatActivity() {
                 }
 
             }
-            updateButtonUI(intentAction)
-            updateBodyUI(intentAction, intentDate)
-
+            updateUI()
         })
     }
+
+    private fun updateUI() {
+        updateButtonUI(intentAction)
+        updateBodyUI(intentAction, intentDate)    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.creator_toolbar_menu, menu)
