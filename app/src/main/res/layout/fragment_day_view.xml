@@ -31,14 +31,13 @@
     <!--            app:layout_constraintVertical_bias="1.0"-->
     <!--            tools:layout_editor_absoluteX="0dp">-->
 
-    <!--        <TextView-->
-    <!--                android:padding="16dp"-->
-    <!--                android:id="@+id/dayBlocks"-->
-    <!--                android:lineSpacingMultiplier="1.2"-->
-    <!--                android:gravity="center"-->
-    <!--                android:layout_width="match_parent"-->
-    <!--                android:layout_height="wrap_content"-->
-    <!--                android:text="duuuude whats up"/>-->
+    <TextView
+            android:id="@+id/ifEmptyDaytext"
+            android:gravity="center"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:visibility="visible"
+            android:text="No blocks/exercises have been added here yet, press add training"/>
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dayContentRecyclerView"
@@ -50,7 +49,8 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/weekDay"
             app:layout_constraintVertical_bias="0.0"
-            tools:listitem="@layout/item_holder_block" />
+            tools:listitem="@layout/item_holder_block"
+            android:visibility="gone"/>
 
     <!--    </ScrollView>-->
 </androidx.constraintlayout.widget.ConstraintLayout>

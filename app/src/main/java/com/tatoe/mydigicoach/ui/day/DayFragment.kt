@@ -19,21 +19,28 @@ class DayFragment(val day: Day?, var date: String) : Fragment() {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
 
         fragmentView = inflater.inflate(R.layout.fragment_day_view, container, false)
-//        var date = "${dataArray[0]} ${dataArray[1]} of ${dataArray[2]}"
         fragmentView.weekDay.text = Day.dayIDtoDashSeparator(date)
-        val string = "There are no blocks nor exercises, add them to see them here"
 
         var recyclerView = fragmentView.dayContentRecyclerView as RecyclerView
-        var dayContentAdapter = DayContentAdapter(context!!,date)
-        recyclerView.adapter = dayContentAdapter
-        recyclerView.layoutManager = LinearLayoutManager(context!!)
-        dayContentAdapter.setContent(day)
 
+        if (day!=null) {
+            if (day.blocks.isEmpty()) {
 
-//        fragmentView.dayBlocks.text = string
-//        if (day != null) {
-//            fragmentView.dayBlocks.text = day.blocks.toString()
-//        }
+                fragmentView.ifEmptyDaytext.visibility = View.VISIBLE
+                recyclerView.visibility = View.GONE
+
+            } else {
+
+                fragmentView.ifEmptyDaytext.visibility = View.GONE
+                recyclerView.visibility = View.VISIBLE
+
+                var dayContentAdapter = DayContentAdapter(context!!, date)
+                recyclerView.adapter = dayContentAdapter
+                recyclerView.layoutManager = LinearLayoutManager(context!!)
+                dayContentAdapter.setContent(day)
+            }
+        }
+
         return fragmentView
     }
 

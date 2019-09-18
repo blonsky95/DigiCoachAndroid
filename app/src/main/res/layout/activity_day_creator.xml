@@ -83,5 +83,29 @@
             app:layout_constraintHorizontal_bias="1.0"
             android:layout_marginBottom="8dp" app:layout_constraintBottom_toBottomOf="parent"/>
 
+    <TextView
+            android:id="@+id/IfBlocksEmptyText"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="Your block list is empty, add them in blocks"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/divider"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
+
+    <TextView
+            android:id="@+id/IfDayEmptyText"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="Tap blocks to add them to this date"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/AddDayBtn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/divider" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

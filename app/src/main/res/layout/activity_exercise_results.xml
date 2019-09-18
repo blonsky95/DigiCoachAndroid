@@ -78,13 +78,25 @@
             android:layout_marginTop="16dp"
             android:layout_marginBottom="24dp"
             android:background="@android:color/darker_gray"
-            android:visibility="visible"
+            android:visibility="gone"
             app:layout_constraintBottom_toTopOf="@id/centre_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/TextView1"
             app:layout_constraintVertical_bias="0.0"
             tools:listitem="@layout/item_holder_result" />
+
+    <TextView
+            android:id="@+id/ifEmptyResultsText"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:gravity="center"
+            android:text="No results have been added here yet, add them in your weekly training programme"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
 
 <!--    <TextView-->
 <!--            android:id="@+id/TextView2"-->

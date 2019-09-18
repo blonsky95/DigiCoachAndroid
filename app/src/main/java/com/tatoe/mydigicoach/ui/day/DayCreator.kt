@@ -24,15 +24,8 @@ import timber.log.Timber
 class DayCreator : AppCompatActivity() {
 
     companion object {
-        var DAY_ACTION = "day_action"
         var DAY_ID = "day_id"
-        var DAY_NEW = "day_new"
-        var DAY_UPDATE = "day_update"
-
-        var DAY_FAIL_RESULT_CODE = 0
-        var DAY_NEW_RESULT_CODE = 1
         var DAY_UPDATE_RESULT_CODE = 2
-        var DAY_DELETE_RESULT_CODE = 3
 
     }
 
@@ -83,13 +76,20 @@ class DayCreator : AppCompatActivity() {
         adapterDeletableBlocks.setListener(itemDeletableListener)
         recyclerViewV2.adapter = adapterDeletableBlocks
         recyclerViewV2.layoutManager = LinearLayoutManager(this)
-        adapterDeletableBlocks.setBlocks(currentDayComponents)
+        updateAdaptersDisplay()
 
         dataViewModel.allBlocks.observe(this, Observer { exercises ->
             exercises?.let {
-                Timber.d("PTG all blocks observer triggered: ${exercises.toString()}")
+                Timber.d("PTG all blocks observer triggered: $exercises")
                 if (it.isNotEmpty()) {
                     adapterBlocks.setBlocks(it)
+
+                    IfBlocksEmptyText.visibility = View.GONE
+                    recyclerView.visibility = View.VISIBLE
+                } else {
+                    IfBlocksEmptyText.visibility = View.VISIBLE
+                    recyclerView.visibility = View.GONE
+
                 }
             }
         })
@@ -121,7 +121,7 @@ class DayCreator : AppCompatActivity() {
             Toast.makeText(this@DayCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
             val clickedBlock = dataViewModel.allBlocks.value?.get(position)
             currentDayComponents.add(currentDayComponents.size, clickedBlock!!)
-            adapterDeletableBlocks.setBlocks(currentDayComponents)
+            updateAdaptersDisplay()
             Timber.d("block creator exercise list after addition - $currentDayComponents")
         }
     }
@@ -133,7 +133,7 @@ class DayCreator : AppCompatActivity() {
             var removedSuccess = currentDayComponents.remove(clickedBlock)
             Timber.d("removal success $removedSuccess")
 
-            adapterDeletableBlocks.setBlocks(currentDayComponents)
+            updateAdaptersDisplay()
             Timber.d("block creator exercise list after removal - $currentDayComponents")
         }
     }
@@ -148,5 +148,14 @@ class DayCreator : AppCompatActivity() {
         finish()
     }
 
-
+    private fun updateAdaptersDisplay() {
+        if (currentDayComponents!!.isEmpty()) {
+            recyclerViewV2.visibility = View.GONE
+            IfDayEmptyText.visibility = View.VISIBLE
+        } else {
+            recyclerViewV2.visibility = View.VISIBLE
+            IfDayEmptyText.visibility = View.GONE
+            adapterDeletableBlocks.setBlocks(currentDayComponents!!)
+        }
+    }
 }

@@ -134,20 +134,29 @@ class ExerciseResults : AppCompatActivity() {
             TextView1.visibility = View.GONE
             EditText2.visibility = View.GONE
 
-            ResultsRecyclerView.visibility = View.VISIBLE
-            adapter = ResultListAdapter(this)
-            ResultsRecyclerView.adapter = adapter
-            ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
-            Timber.d("update adapter exercise results 7 :$activeExercise ${activeExercise?.results}")
-            if (activeExercise != null) {
-                adapter.setContent(activeExercise!!)
+            if (activeExercise!!.results.isEmpty()) {
+                ifEmptyResultsText.visibility=View.VISIBLE
+                ResultsRecyclerView.visibility=View.GONE
+            } else {
+                ifEmptyResultsText.visibility=View.GONE
+                ResultsRecyclerView.visibility = View.VISIBLE
+                adapter = ResultListAdapter(this)
+                ResultsRecyclerView.adapter = adapter
+                ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
+                Timber.d("update adapter exercise results 7 :$activeExercise ${activeExercise?.results}")
+                if (activeExercise != null) {
+                    adapter.setContent(activeExercise!!)
+                }
             }
+
         }
         if (actionType == RESULTS_ADD) {
             TextView1.visibility = View.VISIBLE
             TextView1.text = Day.dayIDtoDashSeparator(date!!)
             EditText2.visibility = View.VISIBLE
             ResultsRecyclerView.visibility = View.GONE
+            ifEmptyResultsText.visibility=View.GONE
+
 
         }
 
