@@ -144,7 +144,8 @@ class DayViewer : AppCompatActivity() {
 //            val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
             var loadDay = getDayById(loadingDayId)
 //            Timber.d("get item created day instance: $loadDay at position $position")
-            return DayFragment(loadDay, loadingDayId)
+            return DayFragment.newInstance(loadDay, loadingDayId)
+//            return DayFragment(loadDay, loadingDayId)
         }
 
         private fun toDayIdFormat(dayDiff: Int): String {
