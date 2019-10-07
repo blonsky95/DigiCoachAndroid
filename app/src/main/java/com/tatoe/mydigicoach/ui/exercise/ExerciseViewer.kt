@@ -1,21 +1,22 @@
-package com.tatoe.mydigicoach.ui
+package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.android.material.snackbar.Snackbar
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import android.widget.Toast
-import com.tatoe.mydigicoach.ui.util.ExerciseHolder
+import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.ui.util.DataHolder
 
 
 class ExerciseViewer : AppCompatActivity() {
@@ -23,15 +24,13 @@ class ExerciseViewer : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
 
-
-    private val exerciseLabAcitivtyRequestCode = 1
-
-    //todo navigation
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(com.tatoe.mydigicoach.R.layout.activity_exercise_viewer)
-        title = "Block Lab"
+        setContentView(R.layout.activity_exercise_viewer)
+        title = "Exercise Viewer"
+
+        setSupportActionBar(findViewById(R.id.my_toolbar))
+        supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         recyclerView = recyclerview as RecyclerView
 
@@ -44,7 +43,7 @@ class ExerciseViewer : AppCompatActivity() {
                 intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_UPDATE)
                 updateUpdatingExercise(position)
 
-                startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+                startActivity(intent)
 
             }
         }
@@ -71,12 +70,21 @@ class ExerciseViewer : AppCompatActivity() {
         })
 
         addExerciseBtn.setOnClickListener {
-            Timber.d("block lab --> Exercise lab")
+            Timber.d("Exercise Viewer --> Exercise creator")
 
             val intent = Intent(this, ExerciseCreator::class.java)
             intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_NEW)
-            startActivityForResult(intent, exerciseLabAcitivtyRequestCode)
+            startActivity(intent)
 
+        }
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
         }
     }
 
@@ -85,47 +93,12 @@ class ExerciseViewer : AppCompatActivity() {
         var clickedExercise = dataViewModel.allExercises.value?.get(position)
 
         if (clickedExercise != null) {
-            ExerciseHolder.activeExerciseHolder = clickedExercise
+            DataHolder.activeExerciseHolder = clickedExercise
         } else {
             Timber.d("upsy error")
         }
 
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intentData)
-
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_NEW_RESULT_CODE) {
-
-            val newExercise = ExerciseHolder.newExerciseHolder
-            dataViewModel.insertExercise(newExercise)
-
-            val actionNotification = Snackbar.make(recyclerView, "Exercise added", Snackbar.LENGTH_LONG)
-            actionNotification.show()
-        }
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_UPDATE_RESULT_CODE) {
-
-            val updatedExercise = ExerciseHolder.activeExerciseHolder
-            Timber.d("PTG exercise trying to be updated: ${updatedExercise.name} ${updatedExercise.description}")
-            dataViewModel.updateExercise(updatedExercise)
-
-            val actionNotification = Snackbar.make(recyclerView, "Exercise updated", Snackbar.LENGTH_LONG)
-            actionNotification.show()
-        }
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_DELETE_RESULT_CODE) {
-
-            val deleteExercise = ExerciseHolder.activeExerciseHolder
-            Timber.d("PTG exercise trying to be deleted: ${deleteExercise.name} ${deleteExercise.description}")
-            dataViewModel.deleteExercise(deleteExercise)
-            val actionNotification = Snackbar.make(recyclerView, "Exercise deleted", Snackbar.LENGTH_LONG)
-            actionNotification.show()
-        }
-        if (requestCode == exerciseLabAcitivtyRequestCode && resultCode == ExerciseCreator.EXERCISE_FAIL_RESULT_CODE) {
-            //accounts for user pressing back
-            val actionNotification = Snackbar.make(recyclerView, "Failure is an option", Snackbar.LENGTH_LONG)
-            actionNotification.show()
-        } else {
-        }
-    }
 
 }

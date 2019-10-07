@@ -2,38 +2,47 @@ package com.tatoe.mydigicoach.ui.util
 
 import android.content.Context
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
-import com.tatoe.mydigicoach.entity.Exercise
 
-class BlockListAdapter(context: Context, private var listenerRecyclerView: ClickListenerRecyclerView) :
-    RecyclerView.Adapter<ItemViewHolder>() {
+class BlockListAdapter(context: Context, var deletableItems:Boolean = false) :
+    RecyclerView.Adapter<EditableItemViewHolder>() {
 
-    //todo use the diffutil  https://medium.com/@iammert/using-diffutil-in-android-recyclerview-bdca8e4fbb00
+    //this adapter doesnt take the listener as a parameter, instead it is set from the invoking
+    //activity with the setListener method, where do we want the listeners?
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var blocks = emptyList<Block>() // Cached copy of words
+    private var blocks = emptyList<Block>()
+    private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
     override fun getItemCount(): Int {
         return blocks.size
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ItemViewHolder {
-        val itemView = inflater.inflate(R.layout.recycler_view_exercise, parent, false)
-        return ItemViewHolder(itemView, listenerRecyclerView)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EditableItemViewHolder {
+        val itemView = inflater.inflate(R.layout.item_holder_exercise, parent, false)
+        return EditableItemViewHolder(itemView,
+            listenerRecyclerView, deletableItems)
     }
 
-    override fun onBindViewHolder(holder: ItemViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: EditableItemViewHolder, position: Int) {
         val current = blocks[position]
-        val textString = "${current.blockId} ${current.name}"
-        holder.exerciseItemView.text = textString
+        val textString = current.name
+        holder.itemInfoView.text = textString
     }
 
-    internal fun setBlocks(blocks: List<Block>) {
-        this.blocks = blocks
-        notifyDataSetChanged()
+    internal fun setBlocks(blocks: List<Block>?) {
+        if (blocks!=null) {
+            this.blocks = blocks
+            notifyDataSetChanged()
+        }
+    }
+
+    fun setListener (listener: ClickListenerRecyclerView) {
+        this.listenerRecyclerView=listener
     }
 
 }

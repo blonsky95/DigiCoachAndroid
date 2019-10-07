@@ -8,8 +8,8 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercise_table ORDER BY name ASC")
     fun getAll(): androidx.lifecycle.LiveData<List<Exercise>>
 
-    @Query("SELECT * FROM exercise_table WHERE name LIKE :title")
-    fun findByName(title: String): Exercise
+//    @Query("SELECT * FROM exercise_table WHERE exerciseId LIKE :exeId")
+//    suspend fun findByName(exeId: Int): Exercise
 
     @Update
     suspend fun update(exercise: Exercise)

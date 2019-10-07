@@ -3,10 +3,12 @@ package com.tatoe.mydigicoach
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
+import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,14 +26,21 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
     val allExercises: LiveData<List<Exercise>>
     val allBlocks: LiveData<List<Block>>
+    val allDays: LiveData<List<Day>>
 
     init {
-        val exerciseDao = AppRoomDatabase.buildDatabase(application).exercisesDao()
-        val blockDao = AppRoomDatabase.buildDatabase(application).blockDao()
 
-        repository = AppRepository(exerciseDao,blockDao)
+        val appDB=AppRoomDatabase.buildDatabase(application)
+        val exerciseDao = appDB.exercisesDao()
+        val blockDao = appDB.blockDao()
+        val dayDao = appDB.dayDao()
+
+        Timber.d("Dataviewmodel initialised")
+
+        repository = AppRepository(exerciseDao,blockDao,dayDao)
         allExercises = repository.allExercises
         allBlocks = repository.allBlocks
+        allDays = repository.allDays
     }
 
     override fun onCleared() {
@@ -45,9 +54,18 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun updateExercise(exercise: Exercise) = viewModelScope.launch {
-        Timber.d("ptg - data view model - update called")
+        Timber.d("ptg - data view model - update called $exercise")
         repository.updateExercise(exercise)
     }
+
+    fun updateExerciseResult(exercise: Exercise) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update result called $exercise")
+        repository.updateExerciseResult(exercise)
+    }
+
+//    fun getExerciseById(exerciseId: Int) = viewModelScope.launch {
+//        repository.getExerciseById(exerciseId)
+//    }
 
     fun deleteExercise(exercise: Exercise) = viewModelScope.launch {
         Timber.d("ptg - data view model - delete called")
@@ -59,21 +77,44 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository.insertBlock(block)
     }
 
-//    fun updateClickedExercise(position: Int) {
-//
-//        val listExercises = allExercises.value
-//
-//        if (listExercises != null && listExercises.isNotEmpty()) {
-//            activeExerciseHolder = listExercises[position]
-//            Timber.d("updating exercise is now: ${activeExerciseHolder.exerciseId} ${activeExerciseHolder.name}")
-//        }
+    fun updateBlock(block: Block) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update block called")
+        repository.updateBlock(block)
+    }
+
+    fun deleteBlock(block: Block) = viewModelScope.launch {
+        Timber.d("ptg - data view model - delete block called")
+        repository.deleteBlock(block)
+    }
+
+    fun getDayById(currentDayId : String) : Day? {
+//        Timber.d("ptg - data view model - getDayById called")
+        if (allDays.value==null) {
+            return null
+        }
+        for (day in allDays.value!!) {
+            if (day.dayId==currentDayId) {
+                return day
+            }
+        }
+        return null
+    }
+
+    fun insertDay(day: Day) = viewModelScope.launch{
+        Timber.d("ptg - data view model - insert day called")
+        repository.insertDay(day)
+    }
+
+    fun updateDay(day: Day) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update day called")
+        repository.updateDay(day)
+    }
+
+//    fun deleteDay(day: Day) = viewModelScope.launch {
+//        Timber.d("ptg - data view model - delete block called")
+//        repository.deleteBlock(day)
 //    }
-//
-//    fun storeNewExercise(mNewExercise :Exercise) {
-//        newExerciseHolder = mNewExercise
-//        Timber.d("new exercise is now: ${newExerciseHolder.exerciseId} ${newExerciseHolder.name}")
-//
-//    }
+
 
 
 }
