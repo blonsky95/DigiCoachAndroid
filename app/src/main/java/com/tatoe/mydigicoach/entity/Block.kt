@@ -7,22 +7,16 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 
-@Entity(tableName = "block_table",
-    foreignKeys = [ForeignKey(
-        entity = Exercise::class,
-        parentColumns = arrayOf("exerciseId"),
-        childColumns = arrayOf("components"),
-        onDelete = ForeignKey.CASCADE,
-        onUpdate = ForeignKey.CASCADE
-    )]
+@Entity(tableName = "block_table"
+
 )
 data class Block(
     @PrimaryKey(autoGenerate = true)
     @field: SerializedName("id")
     var blockId: Int = 0,
     @ColumnInfo(name = "name") @field: SerializedName("name") var name: String,
-    @ColumnInfo(name = "components") @field: SerializedName("components") var components: List<Exercise>
+    @ColumnInfo(name = "components") @field: SerializedName("components") var components: ArrayList<Exercise>
 ) {
-    constructor(name: String,components: List<Exercise>) : this (0, name,components)
+    constructor(name: String,components: ArrayList<Exercise>) : this (0, name,components)
 
 }

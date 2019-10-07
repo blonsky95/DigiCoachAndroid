@@ -107,7 +107,8 @@ class DayViewer : AppCompatActivity() {
 //        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
         intent.putExtra(DayCreator.DAY_ID, activeDayId)
         DataHolder.pagerPosition=mPager.currentItem
-        startActivityForResult(intent, dayCreatorAcitivtyRequestCode)
+//        startActivityForResult(intent, dayCreatorAcitivtyRequestCode)
+        startActivity(intent)
     }
 
     override fun onBackPressed() {
@@ -141,11 +142,8 @@ class DayViewer : AppCompatActivity() {
         override fun getItem(position: Int): Fragment {
             //this is also called to load the adjacent fragments - so shouldnt be used to know which fragment dayId is currently active
             var loadingDayId = toDayIdFormat(dayOfWeek - position)
-//            val dataArray = arrayListOf(tempDayOfWeek, tempDayOfMonth, tempMonthOfYear)
             var loadDay = getDayById(loadingDayId)
-//            Timber.d("get item created day instance: $loadDay at position $position")
             return DayFragment.newInstance(loadDay, loadingDayId)
-//            return DayFragment(loadDay, loadingDayId)
         }
 
         private fun toDayIdFormat(dayDiff: Int): String {
@@ -178,25 +176,25 @@ class DayViewer : AppCompatActivity() {
         return null
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-        super.onActivityResult(requestCode, resultCode, intentData)
-
-        mPager.currentItem=DataHolder.pagerPosition
-        Timber.d("pager position holder: ${DataHolder.pagerPosition}")
-        if (requestCode == dayCreatorAcitivtyRequestCode && resultCode == DayCreator.DAY_UPDATE_RESULT_CODE) {
-
-            val updatedDay = DataHolder.updatedDayHolder
-            Timber.d("on activity result day: $updatedDay")
-
-            if (DataHolder.oldDayHolder == null) {
-                dataViewModel.insertDay(updatedDay)
-            } else {
-                dataViewModel.updateDay(updatedDay)
-            }
-
-
-        } else {
-        }
-    }
+//    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
+//        super.onActivityResult(requestCode, resultCode, intentData)
+//
+//        mPager.currentItem=DataHolder.pagerPosition
+//        Timber.d("pager position holder: ${DataHolder.pagerPosition}")
+//        if (requestCode == dayCreatorAcitivtyRequestCode && resultCode == DayCreator.DAY_UPDATE_RESULT_CODE) {
+//
+//            val updatedDay = DataHolder.updatedDayHolder
+//            Timber.d("on activity result day: $updatedDay")
+//
+//            if (DataHolder.oldDayHolder == null) {
+//                dataViewModel.insertDay(updatedDay)
+//            } else {
+//                dataViewModel.updateDay(updatedDay)
+//            }
+//
+//
+//        } else {
+//        }
+//    }
 
 }

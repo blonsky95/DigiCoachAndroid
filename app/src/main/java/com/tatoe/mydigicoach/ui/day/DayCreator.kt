@@ -145,17 +145,23 @@ class DayCreator : AppCompatActivity() {
         val replyIntent = Intent()
         setResult(DAY_UPDATE_RESULT_CODE, replyIntent)
 
-        finish()
+//        finish()
     }
 
     private fun updateAdaptersDisplay() {
-        if (currentDayComponents!!.isEmpty()) {
+        if (currentDayComponents.isEmpty()) {
             recyclerViewV2.visibility = View.GONE
             IfDayEmptyText.visibility = View.VISIBLE
         } else {
             recyclerViewV2.visibility = View.VISIBLE
             IfDayEmptyText.visibility = View.GONE
-            adapterDeletableBlocks.setBlocks(currentDayComponents!!)
+            adapterDeletableBlocks.setBlocks(currentDayComponents)
         }
+    }
+
+    private fun backToViewer() {
+        val intent = Intent(this, DayViewer::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
     }
 }
