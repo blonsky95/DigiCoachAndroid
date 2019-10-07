@@ -100,8 +100,8 @@ class DayViewer : AppCompatActivity() {
         Timber.d("position clicked: ${mPager.currentItem}")
         Timber.d("Calendar View --> Day Creator")
 
-        DataHolder.oldDayHolder = activeDay
-        Timber.d("data holder calendarview : active day: ${DataHolder.oldDayHolder}")
+        DataHolder.activeDayHolder = activeDay
+        Timber.d("data holder calendarview : active day: ${DataHolder.activeDayHolder}")
 
         val intent = Intent(this, DayCreator::class.java)
 //        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
@@ -186,7 +186,7 @@ class DayViewer : AppCompatActivity() {
 //            val updatedDay = DataHolder.updatedDayHolder
 //            Timber.d("on activity result day: $updatedDay")
 //
-//            if (DataHolder.oldDayHolder == null) {
+//            if (DataHolder.activeDayHolder == null) {
 //                dataViewModel.insertDay(updatedDay)
 //            } else {
 //                dataViewModel.updateDay(updatedDay)

@@ -15,6 +15,7 @@ import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
@@ -35,7 +36,8 @@ class DayCreator : AppCompatActivity() {
     private lateinit var adapterBlocks: BlockListAdapter
     private lateinit var adapterDeletableBlocks: BlockListAdapter
 
-    private var currentDayComponents: ArrayList<Block> = arrayListOf()
+    private var currentDayBlocks: ArrayList<Block> = arrayListOf()
+    private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
     lateinit var activeDay: Day
     lateinit var activeDayId: String
@@ -50,9 +52,10 @@ class DayCreator : AppCompatActivity() {
         // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
-        DataHolder.oldDayHolder?.let { it ->
+        DataHolder.activeDayHolder?.let { it ->
             activeDay = it
-            currentDayComponents = activeDay.blocks
+            currentDayBlocks = activeDay.blocks
+            currentDayExercises=activeDay.exercises
             Timber.d("data holder: active day: $activeDay")
         }
 
@@ -120,42 +123,51 @@ class DayCreator : AppCompatActivity() {
             super.onClick(view, position)
             Toast.makeText(this@DayCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
             val clickedBlock = dataViewModel.allBlocks.value?.get(position)
-            currentDayComponents.add(currentDayComponents.size, clickedBlock!!)
+            currentDayBlocks.add(currentDayBlocks.size, clickedBlock!!)
             updateAdaptersDisplay()
-            Timber.d("block creator exercise list after addition - $currentDayComponents")
+            Timber.d("block creator exercise list after addition - $currentDayBlocks")
         }
     }
 
     val itemDeletableListener = object : ClickListenerRecyclerView {
         override fun onClick(view: View, position: Int) {
             super.onClick(view, position)
-            val clickedBlock = currentDayComponents[position]
-            var removedSuccess = currentDayComponents.remove(clickedBlock)
+            val clickedBlock = currentDayBlocks[position]
+            var removedSuccess = currentDayBlocks.remove(clickedBlock)
             Timber.d("removal success $removedSuccess")
 
             updateAdaptersDisplay()
-            Timber.d("block creator exercise list after removal - $currentDayComponents")
+            Timber.d("block creator exercise list after removal - $currentDayBlocks")
         }
     }
 
     private val updateDayListener = View.OnClickListener {
-        activeDay = Day(activeDayId, currentDayComponents, arrayListOf())
-        DataHolder.updatedDayHolder = activeDay
 
-        val replyIntent = Intent()
-        setResult(DAY_UPDATE_RESULT_CODE, replyIntent)
+        if (DataHolder.activeDayHolder!=null) {
+            //update
+            activeDay.blocks=currentDayBlocks
+            dataViewModel.updateDay(activeDay)
+        }
+        else {
+            dataViewModel.insertDay(Day(activeDayId,currentDayBlocks, arrayListOf()))
+        }
+        backToViewer()
+//        activeDay = Day(activeDayId, currentDayBlocks, arrayListOf())
+//        DataHolder.updatedDayHolder = activeDay
+//        val replyIntent = Intent()
+//        setResult(DAY_UPDATE_RESULT_CODE, replyIntent)
 
 //        finish()
     }
 
     private fun updateAdaptersDisplay() {
-        if (currentDayComponents.isEmpty()) {
+        if (currentDayBlocks.isEmpty()) {
             recyclerViewV2.visibility = View.GONE
             IfDayEmptyText.visibility = View.VISIBLE
         } else {
             recyclerViewV2.visibility = View.VISIBLE
             IfDayEmptyText.visibility = View.GONE
-            adapterDeletableBlocks.setBlocks(currentDayComponents)
+            adapterDeletableBlocks.setBlocks(currentDayBlocks)
         }
     }
 
