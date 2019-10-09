@@ -48,7 +48,8 @@ class ExerciseViewer : AppCompatActivity() {
             }
         }
 
-        adapter = ExerciseListAdapter(this, myListener)
+        adapter = ExerciseListAdapter(this)
+        adapter.setListener(myListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 

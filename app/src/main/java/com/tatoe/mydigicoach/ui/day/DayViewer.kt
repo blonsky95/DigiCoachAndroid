@@ -176,25 +176,5 @@ class DayViewer : AppCompatActivity() {
         return null
     }
 
-//    override fun onActivityResult(requestCode: Int, resultCode: Int, intentData: Intent?) {
-//        super.onActivityResult(requestCode, resultCode, intentData)
-//
-//        mPager.currentItem=DataHolder.pagerPosition
-//        Timber.d("pager position holder: ${DataHolder.pagerPosition}")
-//        if (requestCode == dayCreatorAcitivtyRequestCode && resultCode == DayCreator.DAY_UPDATE_RESULT_CODE) {
-//
-//            val updatedDay = DataHolder.updatedDayHolder
-//            Timber.d("on activity result day: $updatedDay")
-//
-//            if (DataHolder.activeDayHolder == null) {
-//                dataViewModel.insertDay(updatedDay)
-//            } else {
-//                dataViewModel.updateDay(updatedDay)
-//            }
-//
-//
-//        } else {
-//        }
-//    }
 
 }

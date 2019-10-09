@@ -7,10 +7,11 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
@@ -21,6 +22,7 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_day_creator.*
 import timber.log.Timber
+import kotlin.collections.ArrayList
 
 class DayCreator : AppCompatActivity() {
 
@@ -30,11 +32,23 @@ class DayCreator : AppCompatActivity() {
 
     }
 
+    private lateinit var mPagerTop: ViewPager
+    private lateinit var mPagerBottom: ViewPager
+
+    private lateinit var pagerAdapterTop: ScreenSlidePagerAdapter
+    private lateinit var pagerAdapterBottom: ScreenSlidePagerAdapter
+
+
+    private lateinit var topBlockFragment: CustomAdapterFragment
+    private lateinit var topExerciseFragment: CustomAdapterFragment
+
+
     private lateinit var dataViewModel: DataViewModel
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var recyclerViewV2: RecyclerView
+    //    private lateinit var recyclerView: RecyclerView
+//    private lateinit var recyclerViewV2: RecyclerView
     private lateinit var adapterBlocks: BlockListAdapter
     private lateinit var adapterDeletableBlocks: BlockListAdapter
+
 
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
@@ -52,10 +66,27 @@ class DayCreator : AppCompatActivity() {
         // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
+        pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager)
+
+        mPagerTop = findViewById(R.id.pager_top)
+        mPagerBottom = findViewById(R.id.pager_bottom)
+
+        pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager)
+        mPagerTop.adapter = pagerAdapterTop
+        mPagerBottom.adapter = pagerAdapterTop
+
+        topBlockFragment = pagerAdapterTop.getItem(CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
+//        topBlockFragment.addListenerToBlockAdapter(blockSelectorListener)
+
+        topExerciseFragment = pagerAdapterTop.getItem(CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
+//        topExerciseFragment.addListenerToExerciseAdapter(exerciseSelectorListener)
+
+
+
         DataHolder.activeDayHolder?.let { it ->
             activeDay = it
             currentDayBlocks = activeDay.blocks
-            currentDayExercises=activeDay.exercises
+            currentDayExercises = activeDay.exercises
             Timber.d("data holder: active day: $activeDay")
         }
 
@@ -65,37 +96,57 @@ class DayCreator : AppCompatActivity() {
         title = Day.dayIDtoDashSeparator(activeDayId)
 
 
-        recyclerView = BlocksDisplay as RecyclerView
-        recyclerViewV2 = CurrentDayDisplay as RecyclerView
+//        recyclerView = BlocksDisplay as RecyclerView
+//        recyclerViewV2 = CurrentDayDisplay as RecyclerView
+
 
         AddDayBtn.setOnClickListener(updateDayListener)
 
-        adapterBlocks = BlockListAdapter(this)
-        adapterBlocks.setListener(blockSelectorListener)
-        recyclerView.adapter = adapterBlocks
-        recyclerView.layoutManager = LinearLayoutManager(this)
+//        adapterBlocks = BlockListAdapter(this)
+//        adapterBlocks.setListener(blockSelectorListener)
+//        recyclerView.adapter = adapterBlocks
+//        recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapterDeletableBlocks = BlockListAdapter(this, true)
-        adapterDeletableBlocks.setListener(itemDeletableListener)
-        recyclerViewV2.adapter = adapterDeletableBlocks
-        recyclerViewV2.layoutManager = LinearLayoutManager(this)
+//        adapterDeletableBlocks.setListener(itemDeletableListener)
+//        recyclerViewV2.adapter = adapterDeletableBlocks
+//        recyclerViewV2.layoutManager = LinearLayoutManager(this)
         updateAdaptersDisplay()
 
-        dataViewModel.allBlocks.observe(this, Observer { exercises ->
-            exercises?.let {
-                Timber.d("PTG all blocks observer triggered: $exercises")
+        dataViewModel.allBlocks.observe(this, Observer { blocks ->
+            blocks?.let {
                 if (it.isNotEmpty()) {
-                    adapterBlocks.setBlocks(it)
-
-                    IfBlocksEmptyText.visibility = View.GONE
-                    recyclerView.visibility = View.VISIBLE
+//                    adapterBlocks.setBlocks(it)
+                    topBlockFragment.updateBlockAdapterContent(it)
+//                    IfBlocksEmptyText.visibility = View.GONE
+//                    recyclerView.visibility = View.VISIBLE
                 } else {
-                    IfBlocksEmptyText.visibility = View.VISIBLE
-                    recyclerView.visibility = View.GONE
+//                    IfBlocksEmptyText.visibility = View.VISIBLE
+//                    recyclerView.visibility = View.GONE
 
                 }
             }
         })
+
+        dataViewModel.allExercises.observe(this, Observer { exercises ->
+            exercises?.let {
+                if (it.isNotEmpty()) {
+                    topExerciseFragment.updateExerciseAdapterContent(it)
+                }
+            }
+        })
+
+    }
+
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
+        FragmentStatePagerAdapter(fm) {
+
+        override fun getCount(): Int = 2
+
+        override fun getItem(position: Int): CustomAdapterFragment {
+
+            return CustomAdapterFragment.newInstance(position)
+        }
 
     }
 
@@ -129,6 +180,17 @@ class DayCreator : AppCompatActivity() {
         }
     }
 
+    val exerciseSelectorListener = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+//            Toast.makeText(this@DayCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
+            val clickedExercise = dataViewModel.allExercises.value?.get(position)
+            currentDayExercises.add(currentDayExercises.size, clickedExercise!!)
+            updateAdaptersDisplay()
+            Timber.d("block creator exercise list after addition - $currentDayBlocks")
+        }
+    }
+
     val itemDeletableListener = object : ClickListenerRecyclerView {
         override fun onClick(view: View, position: Int) {
             super.onClick(view, position)
@@ -143,13 +205,12 @@ class DayCreator : AppCompatActivity() {
 
     private val updateDayListener = View.OnClickListener {
 
-        if (DataHolder.activeDayHolder!=null) {
+        if (DataHolder.activeDayHolder != null) {
             //update
-            activeDay.blocks=currentDayBlocks
+            activeDay.blocks = currentDayBlocks
             dataViewModel.updateDay(activeDay)
-        }
-        else {
-            dataViewModel.insertDay(Day(activeDayId,currentDayBlocks, arrayListOf()))
+        } else {
+            dataViewModel.insertDay(Day(activeDayId, currentDayBlocks, arrayListOf()))
         }
         backToViewer()
 //        activeDay = Day(activeDayId, currentDayBlocks, arrayListOf())
@@ -161,14 +222,15 @@ class DayCreator : AppCompatActivity() {
     }
 
     private fun updateAdaptersDisplay() {
-        if (currentDayBlocks.isEmpty()) {
-            recyclerViewV2.visibility = View.GONE
-            IfDayEmptyText.visibility = View.VISIBLE
-        } else {
-            recyclerViewV2.visibility = View.VISIBLE
-            IfDayEmptyText.visibility = View.GONE
-            adapterDeletableBlocks.setBlocks(currentDayBlocks)
-        }
+//        if (currentDayBlocks.isEmpty()) {
+//            recyclerViewV2.visibility = View.GONE
+//            IfDayEmptyText.visibility = View.VISIBLE
+//        } else {
+//            recyclerViewV2.visibility = View.VISIBLE
+//            IfDayEmptyText.visibility = View.GONE
+
+        adapterDeletableBlocks.setBlocks(currentDayBlocks)
+//        }
     }
 
     private fun backToViewer() {
@@ -176,4 +238,5 @@ class DayCreator : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
     }
+
 }

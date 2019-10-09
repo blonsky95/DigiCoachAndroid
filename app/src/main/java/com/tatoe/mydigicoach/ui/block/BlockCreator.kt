@@ -77,11 +77,13 @@ class BlockCreator : AppCompatActivity() {
         saveBlockButton = AddBlockBtn as Button
         deleteButton = delete_button as Button
 
-        adapterExercises = ExerciseListAdapter(this, exerciseSelectorListener)
+        adapterExercises = ExerciseListAdapter(this)
+        adapterExercises.setListener(exerciseSelectorListener)
         recyclerView.adapter = adapterExercises
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapterDeletableExercises = ExerciseListAdapter(this, itemDeletableListener, true)
+        adapterDeletableExercises = ExerciseListAdapter(this, true)
+        adapterDeletableExercises.setListener(itemDeletableListener)
         recyclerViewV2.adapter = adapterDeletableExercises
         recyclerViewV2.layoutManager = LinearLayoutManager(this)
 
