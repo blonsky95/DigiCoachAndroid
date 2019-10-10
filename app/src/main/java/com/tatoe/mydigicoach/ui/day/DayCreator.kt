@@ -53,6 +53,8 @@ class DayCreator : AppCompatActivity() {
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
+    private var allBlocks:List<Block> = listOf()
+
     lateinit var activeDay: Day
     lateinit var activeDayId: String
 
@@ -66,19 +68,17 @@ class DayCreator : AppCompatActivity() {
         // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
-        pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager)
-
         mPagerTop = findViewById(R.id.pager_top)
-        mPagerBottom = findViewById(R.id.pager_bottom)
 
-        pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager)
-        mPagerTop.adapter = pagerAdapterTop
-        mPagerBottom.adapter = pagerAdapterTop
 
-        topBlockFragment = pagerAdapterTop.getItem(CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
+//        topBlockFragment = pagerAdapterTop.getItem(CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
+//        topExerciseFragment = pagerAdapterTop.getItem(CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
+//        mPagerBottom = findViewById(R.id.pager_bottom)
+
+//        mPagerBottom.adapter = pagerAdapterTop
+
 //        topBlockFragment.addListenerToBlockAdapter(blockSelectorListener)
 
-        topExerciseFragment = pagerAdapterTop.getItem(CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
 //        topExerciseFragment.addListenerToExerciseAdapter(exerciseSelectorListener)
 
 
@@ -115,9 +115,16 @@ class DayCreator : AppCompatActivity() {
 
         dataViewModel.allBlocks.observe(this, Observer { blocks ->
             blocks?.let {
+                Timber.d("blocks observer in day creator: $blocks")
+                    allBlocks=it
+
+                pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager)
+                mPagerTop.adapter = pagerAdapterTop
+//                topBlockFragment.updateBlockAdapterContent(blocks)
+
                 if (it.isNotEmpty()) {
 //                    adapterBlocks.setBlocks(it)
-                    topBlockFragment.updateBlockAdapterContent(it)
+
 //                    IfBlocksEmptyText.visibility = View.GONE
 //                    recyclerView.visibility = View.VISIBLE
                 } else {
@@ -131,11 +138,15 @@ class DayCreator : AppCompatActivity() {
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
                 if (it.isNotEmpty()) {
-                    topExerciseFragment.updateExerciseAdapterContent(it)
+//                    topExerciseFragment.updateExerciseAdapterContent(it)
                 }
             }
         })
 
+    }
+
+    fun fetchBlocks() : List<Block>{
+        return allBlocks
     }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
@@ -229,7 +240,7 @@ class DayCreator : AppCompatActivity() {
 //            recyclerViewV2.visibility = View.VISIBLE
 //            IfDayEmptyText.visibility = View.GONE
 
-        adapterDeletableBlocks.setBlocks(currentDayBlocks)
+//        adapterDeletableBlocks.setBlocks(currentDayBlocks)
 //        }
     }
 

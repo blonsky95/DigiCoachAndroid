@@ -19,6 +19,7 @@ import com.tatoe.mydigicoach.ui.util.DayContentAdapter
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.fragment_adapter_container.view.*
 import kotlinx.android.synthetic.main.fragment_day_view.view.*
+import timber.log.Timber
 
 class CustomAdapterFragment : Fragment() {
 
@@ -82,6 +83,9 @@ class CustomAdapterFragment : Fragment() {
         adapterBlocks = BlockListAdapter(activity!!)
         mRecyclerView.adapter = adapterBlocks
         mRecyclerView.layoutManager = LinearLayoutManager(activity!!)
+        updateBlockAdapterContent()
+        Timber.d("prepare adapter called so adapterBlocks is null: ${adapterBlocks==null}")
+
 
     }
 
@@ -100,12 +104,17 @@ class CustomAdapterFragment : Fragment() {
         adapterExercises?.setListener(listener)
     }
 
-    fun updateBlockAdapterContent(blocks: List<Block>?) {
-        adapterBlocks?.setBlocks(blocks)
+    fun updateBlockAdapterContent() {
+        Timber.d("blocks from fetchblocks: ${(activity as DayCreator).fetchBlocks()}")
+        Timber.d("is adapterBlocks null: ${adapterBlocks==null}")
+
+
+        adapterBlocks?.setBlocks((activity as DayCreator).fetchBlocks())
     }
 
     fun updateExerciseAdapterContent(exercises: List<Exercise>) {
         adapterExercises?.setExercises(exercises)
+
     }
 
 //

@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import timber.log.Timber
 
 class ExerciseListAdapter(context: Context, var deletableItems:Boolean = false) :
     RecyclerView.Adapter<EditableItemViewHolder>() {
@@ -35,6 +36,8 @@ class ExerciseListAdapter(context: Context, var deletableItems:Boolean = false) 
     internal fun setExercises(exercises: List<Exercise>) {
 
         this.exercises = exercises
+        Timber.d("blocks updated in exercise adapter: $exercises")
+
         notifyDataSetChanged()
     }
 

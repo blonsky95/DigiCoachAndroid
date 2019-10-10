@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
+import timber.log.Timber
 
 class BlockListAdapter(context: Context, var deletableItems:Boolean = false) :
     RecyclerView.Adapter<EditableItemViewHolder>() {
@@ -35,8 +36,10 @@ class BlockListAdapter(context: Context, var deletableItems:Boolean = false) :
     }
 
     internal fun setBlocks(blocks: List<Block>?) {
+
         if (blocks!=null) {
             this.blocks = blocks
+            Timber.d("blocks updated in blocklist adapter 2 : $blocks")
             notifyDataSetChanged()
         }
     }
