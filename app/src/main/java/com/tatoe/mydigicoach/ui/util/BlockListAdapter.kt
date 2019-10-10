@@ -39,7 +39,7 @@ class BlockListAdapter(context: Context, var deletableItems:Boolean = false) :
 
         if (blocks!=null) {
             this.blocks = blocks
-            Timber.d("blocks updated in blocklist adapter 2 : $blocks")
+            Timber.d("blocks updated in blocklist adapter : $blocks")
             notifyDataSetChanged()
         }
     }

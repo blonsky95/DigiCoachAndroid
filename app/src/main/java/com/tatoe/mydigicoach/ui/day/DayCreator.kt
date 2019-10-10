@@ -5,8 +5,10 @@ import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
@@ -53,7 +55,9 @@ class DayCreator : AppCompatActivity() {
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
-    private var allBlocks:List<Block> = listOf()
+    private var allBlocks: List<Block> = listOf()
+    private var allExercises: List<Exercise> = listOf()
+
 
     lateinit var activeDay: Day
     lateinit var activeDayId: String
@@ -68,58 +72,12 @@ class DayCreator : AppCompatActivity() {
         // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
-        mPagerTop = findViewById(R.id.pager_top)
-
-
-//        topBlockFragment = pagerAdapterTop.getItem(CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
-//        topExerciseFragment = pagerAdapterTop.getItem(CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
-//        mPagerBottom = findViewById(R.id.pager_bottom)
-
-//        mPagerBottom.adapter = pagerAdapterTop
-
-//        topBlockFragment.addListenerToBlockAdapter(blockSelectorListener)
-
-//        topExerciseFragment.addListenerToExerciseAdapter(exerciseSelectorListener)
-
-
-
-        DataHolder.activeDayHolder?.let { it ->
-            activeDay = it
-            currentDayBlocks = activeDay.blocks
-            currentDayExercises = activeDay.exercises
-            Timber.d("data holder: active day: $activeDay")
-        }
-
-        activeDayId = intent.getStringExtra(DAY_ID)
-
-//        DayId.text=Day.dayIDtoDashSeparator(activeDayId)
-        title = Day.dayIDtoDashSeparator(activeDayId)
-
-
-//        recyclerView = BlocksDisplay as RecyclerView
-//        recyclerViewV2 = CurrentDayDisplay as RecyclerView
-
-
-        AddDayBtn.setOnClickListener(updateDayListener)
-
-//        adapterBlocks = BlockListAdapter(this)
-//        adapterBlocks.setListener(blockSelectorListener)
-//        recyclerView.adapter = adapterBlocks
-//        recyclerView.layoutManager = LinearLayoutManager(this)
-
-        adapterDeletableBlocks = BlockListAdapter(this, true)
-//        adapterDeletableBlocks.setListener(itemDeletableListener)
-//        recyclerViewV2.adapter = adapterDeletableBlocks
-//        recyclerViewV2.layoutManager = LinearLayoutManager(this)
-        updateAdaptersDisplay()
-
         dataViewModel.allBlocks.observe(this, Observer { blocks ->
             blocks?.let {
                 Timber.d("blocks observer in day creator: $blocks")
-                    allBlocks=it
+                allBlocks = it
+                pagerAdapterTop.mBlockFragment?.updateBlockAdapterContent(it)
 
-                pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager)
-                mPagerTop.adapter = pagerAdapterTop
 //                topBlockFragment.updateBlockAdapterContent(blocks)
 
                 if (it.isNotEmpty()) {
@@ -137,20 +95,74 @@ class DayCreator : AppCompatActivity() {
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
+                //                pagerAdapterTop.getCurrentFragment()?.updateBlockAdapterContent(it)
+                allExercises = it
+                pagerAdapterTop.mExerciseFragment?.updateExerciseAdapterContent(it)
                 if (it.isNotEmpty()) {
 //                    topExerciseFragment.updateExerciseAdapterContent(it)
                 }
             }
         })
 
+        mPagerTop = findViewById(R.id.pager_top)
+        pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager)
+        mPagerTop.adapter = pagerAdapterTop
+
+        DataHolder.activeDayHolder?.let { it ->
+            activeDay = it
+            currentDayBlocks = activeDay.blocks
+            currentDayExercises = activeDay.exercises
+            Timber.d("data holder: active day: $activeDay")
+        }
+
+        activeDayId = intent.getStringExtra(DAY_ID)
+
+//        DayId.text=Day.dayIDtoDashSeparator(activeDayId)
+        title = Day.dayIDtoDashSeparator(activeDayId)
+
+        AddDayBtn.setOnClickListener(updateDayListener)
+
+
+        adapterDeletableBlocks = BlockListAdapter(this, true)
+        updateAdaptersDisplay()
+
+
     }
 
-    fun fetchBlocks() : List<Block>{
-        return allBlocks
+    override fun onAttachFragment(fragment: Fragment) {
+        super.onAttachFragment(fragment)
+        Timber.d("A fragment ${fragment.id} has been attached to me")
     }
+
+//    fun fetchBlocks() : List<Block>{
+//        return allBlocks
+//    }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
         FragmentStatePagerAdapter(fm) {
+
+        var mBlockFragment: CustomAdapterFragment? = null
+        var mExerciseFragment: CustomAdapterFragment? = null
+
+
+        fun loadBlocks() {
+            Timber.d("load Blocks called")
+
+            mBlockFragment?.updateBlockAdapterContent(allBlocks)
+            mBlockFragment?.contentUpdated = true
+        }
+
+        fun loadExercises() {
+            Timber.d("load Exercises called")
+
+            mExerciseFragment?.updateExerciseAdapterContent(allExercises)
+            mExerciseFragment?.contentUpdated = true
+        }
+
+//        fun getCurrFragment():CustomAdapterFragment? {
+//            Timber.d("get current fragment")
+//            return mBlockFragment
+//        }
 
         override fun getCount(): Int = 2
 
@@ -158,6 +170,40 @@ class DayCreator : AppCompatActivity() {
 
             return CustomAdapterFragment.newInstance(position)
         }
+
+        override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
+            val mFragment = `object` as CustomAdapterFragment
+            Timber.d("set primary item called")
+
+
+            if (mFragment.adapterType == CustomAdapterFragment.BLOCK_TYPE_ADAPTER) {
+                mBlockFragment = mFragment
+                if (mBlockFragment?.contentUpdated == false) {
+                    loadBlocks()
+                }
+            } else {
+                mExerciseFragment = mFragment
+                if ((mExerciseFragment?.contentUpdated == false)) {
+                    loadExercises()
+                }
+            }
+
+
+//            if (mFragment.adapterType == CustomAdapterFragment.EXERCISE_TYPE_ADAPTER) {
+//                mExerciseFragment = mFragment
+//            }
+//
+//            if (mBlockFragment?.adapterType == CustomAdapterFragment.EXERCISE_TYPE_ADAPTER) {
+//                loadExercises()
+//            }
+
+//            if (getCurrentFragment()!=`object`) {
+//                Timber.d("set primary item IN")
+////                mBlockFragment=`object` as CustomAdapterFragment
+//            }
+            super.setPrimaryItem(container, position, `object`)
+        }
+
 
     }
 
