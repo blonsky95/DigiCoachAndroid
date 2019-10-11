@@ -5,25 +5,18 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
-import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.gson.Gson
-import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
-import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
-import com.tatoe.mydigicoach.ui.util.DayContentAdapter
+import com.tatoe.mydigicoach.ui.util.EditableItemViewHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
-import kotlinx.android.synthetic.main.fragment_adapter_container.*
 import kotlinx.android.synthetic.main.fragment_adapter_container.view.*
-import kotlinx.android.synthetic.main.fragment_day_view.view.*
 import timber.log.Timber
 
 class CustomAdapterFragment : Fragment() {
@@ -31,27 +24,22 @@ class CustomAdapterFragment : Fragment() {
     private lateinit var fragmentView: View
 
     private lateinit var mRecyclerView: RecyclerView
-    private lateinit var exerciseRecyclerView: RecyclerView
-    private lateinit var blockRecyclerView: RecyclerView
-//    private lateinit var textView: TextView
     var adapterType = -1
 
     private var adapterBlocks: BlockListAdapter?=null
     private var adapterExercises: ExerciseListAdapter? = null
 
-    private var allBlocks: ArrayList<Block> = arrayListOf()
-    private var allExercises: ArrayList<Exercise> = arrayListOf()
-
     var contentUpdated = false
 
-//    private lateinit var model: DataViewModel
-
+    internal lateinit var callback: CustomAdapterEventsListener
 
     companion object {
 
         const val BUNDLE_ADAPTER_TYPE_KEY = "adapter_type"
         const val BLOCK_TYPE_ADAPTER = 0
         const val EXERCISE_TYPE_ADAPTER = 1
+        const val BLOCK_DELETE_TYPE_ADAPTER = 2
+        const val EXERCISE_DELETE_TYPE_ADAPTER = 3
 
         fun newInstance(adapterType: Int): CustomAdapterFragment {
             var customAdapterFragment = CustomAdapterFragment()
@@ -72,25 +60,8 @@ class CustomAdapterFragment : Fragment() {
         }
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-//        model = activity?.run {
-//            ViewModelProviders.of(this)[DataViewModel::class.java]
-//        } ?: throw Exception("Invalid Activity")
-//
-//        model.allBlocks.observe(this, Observer { blocks ->
-//            blocks?.let {
-//                Timber.d("custom fragment observed all blocks: $blocks")
-//            }
-//        })
-//
-//        model.allExercises.observe(this, Observer { exes ->
-//            exes?.let {
-//                Timber.d("custom fragment observed all exercises: $exes")
-//            }
-//        })
-
-
+    fun setCustomAdapterEventsListenerInterface(callback: CustomAdapterEventsListener){
+        this.callback=callback
     }
 
     override fun onCreateView(
@@ -100,63 +71,83 @@ class CustomAdapterFragment : Fragment() {
     ): View {
 
         fragmentView = inflater.inflate(R.layout.fragment_adapter_container, container, false)
-//        textView=fragmentView.text_view
         mRecyclerView = fragmentView.RecyclerView
 
-        when (adapterType) {
-            BLOCK_TYPE_ADAPTER -> prepareBlockAdapter()
-            EXERCISE_TYPE_ADAPTER -> prepareExerciseAdapter()
-        }
+        Timber.d("whats my type $adapterType")
 
-//        prepareAdapter()
+        when (adapterType) {
+            BLOCK_TYPE_ADAPTER -> prepareBlockAdapter(blockSelectorListener,false)
+            EXERCISE_TYPE_ADAPTER -> prepareExerciseAdapter(exerciseSelectorListener,false)
+            BLOCK_DELETE_TYPE_ADAPTER -> prepareBlockAdapter(blockDeleterListener,true)
+            EXERCISE_DELETE_TYPE_ADAPTER -> prepareExerciseAdapter(exerciseDeleterListener,true)
+        }
 
         return fragmentView
     }
 
-    private fun prepareBlockAdapter() {
-//        textView.text="IM BLOCK ADAPTER"
-//
-        adapterBlocks = BlockListAdapter(activity!!)
+//    private fun prepareAdapter (adapter:RecyclerView.Adapter<EditableItemViewHolder>,listener:ClickListenerRecyclerView, hasDelete: Boolean) {
+//        var mAdapter = adapter
+//        mRecyclerView.adapter=mAdapter
+//        mRecyclerView.layoutManager = LinearLayoutManager(activity!!)
+//    }
+
+    private fun prepareBlockAdapter(listener:ClickListenerRecyclerView,hasDelete:Boolean) {
+        adapterBlocks = BlockListAdapter(activity!!,hasDelete)
         mRecyclerView.adapter = adapterBlocks
         mRecyclerView.layoutManager = LinearLayoutManager(activity!!)
-
-//        updateBlockAdapterContent()
-//        Timber.d("prepare adapter called so adapterBlocks is null: ${adapterBlocks==null}")
-
-
-    }
-
-    private fun prepareExerciseAdapter() {
-//        textView.text="IM EXERCISE ADAPTER"
-//
-        adapterExercises = ExerciseListAdapter(activity!!)
-        mRecyclerView.adapter = adapterExercises
-        mRecyclerView.layoutManager=LinearLayoutManager(activity!!)
-    }
-
-    fun addListenerToBlockAdapter(listener: ClickListenerRecyclerView) {
         adapterBlocks?.setListener(listener)
     }
 
-    fun addListenerToExerciseAdapter(listener: ClickListenerRecyclerView) {
+    private fun prepareExerciseAdapter(listener:ClickListenerRecyclerView,hasDelete:Boolean) {
+        adapterExercises = ExerciseListAdapter(activity!!,hasDelete)
+        mRecyclerView.adapter = adapterExercises
+        mRecyclerView.layoutManager=LinearLayoutManager(activity!!)
         adapterExercises?.setListener(listener)
     }
 
     fun updateBlockAdapterContent(blocks:List<Block>) {
-//        Timber.d("blocks from fetchblocks: ${(activity as DayCreator).fetchBlocks()}")
-//        Timber.d("is adapterBlocks null: ${adapterBlocks==null}")
-
+        Timber.d("update blocks from fragment $blocks")
         adapterBlocks?.setBlocks(blocks)
     }
 
     fun updateExerciseAdapterContent(exercises: List<Exercise>) {
+        Timber.d("update exercises from fragment $exercises")
         adapterExercises?.setExercises(exercises)
-
     }
 
-//
-//    interface ExerciseAdapterInterface {
-//        fun itemSelected(position:Int)
-//    }
+    interface CustomAdapterEventsListener {
+        fun itemSelected(adapterType: Int, position:Int, deletingItem:Boolean = false)
+    }
+
+    private val blockSelectorListener = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+            callback.itemSelected(BLOCK_TYPE_ADAPTER,position)
+//            Timber.d("block creator exercise list after addition - $currentDayBlocks")
+        }
+    }
+
+    private val exerciseSelectorListener = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+            callback.itemSelected(EXERCISE_TYPE_ADAPTER,position)
+//            Timber.d("block creator exercise list after addition - $currentDayBlcks")
+        }
+    }
+    private val blockDeleterListener = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+            callback.itemSelected(BLOCK_TYPE_ADAPTER,position,true)
+//            Timber.d("block creator exercise list after addition - $currentDayBlocks")
+        }
+    }
+
+    private val exerciseDeleterListener = object : ClickListenerRecyclerView {
+        override fun onClick(view: View, position: Int) {
+            super.onClick(view, position)
+            callback.itemSelected(EXERCISE_TYPE_ADAPTER,position,true)
+//            Timber.d("block creator exercise list after addition - $currentDayBlcks")
+        }
+    }
 
 }

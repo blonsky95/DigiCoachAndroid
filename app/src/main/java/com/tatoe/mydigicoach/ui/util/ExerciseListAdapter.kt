@@ -36,7 +36,7 @@ class ExerciseListAdapter(context: Context, var deletableItems:Boolean = false) 
     internal fun setExercises(exercises: List<Exercise>) {
 
         this.exercises = exercises
-        Timber.d("blocks updated in exercise adapter: $exercises")
+        Timber.d("exercises updated in exercise adapter: $exercises , am I deletable: $deletableItems")
 
         notifyDataSetChanged()
     }
