@@ -57,21 +57,35 @@ class DayFragment : Fragment() {
         fragmentView = inflater.inflate(R.layout.fragment_day_view, container, false)
         fragmentView.weekDay.text = Day.dayIDtoDashSeparator(date)
 
-        var recyclerView = fragmentView.dayContentRecyclerView as RecyclerView
+        val recyclerViewBlocks = fragmentView.dayBlocksRecyclerView as RecyclerView
+        val recyclerViewExercises = fragmentView.dayExercisesRecyclerView as RecyclerView
+
 
         if (day == null || day!!.blocks.isEmpty()) {
             fragmentView.ifEmptyDaytext.visibility = View.VISIBLE
-            recyclerView.visibility = View.GONE
+            recyclerViewBlocks.visibility = View.GONE
+            recyclerViewExercises.visibility = View.GONE
+            fragmentView.divider.visibility=View.GONE
 
         } else {
 
             fragmentView.ifEmptyDaytext.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
+            recyclerViewBlocks.visibility = View.VISIBLE
+            recyclerViewExercises.visibility = View.VISIBLE
+            fragmentView.divider.visibility=View.VISIBLE
 
-            var dayContentAdapter = DayContentAdapter(context!!, date)
-            recyclerView.adapter = dayContentAdapter
-            recyclerView.layoutManager = LinearLayoutManager(context!!)
-            dayContentAdapter.setContent(day)
+
+            val dayContentAdapterBlocks =
+                DayContentAdapter(context!!, date, CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
+            recyclerViewBlocks.adapter = dayContentAdapterBlocks
+            recyclerViewBlocks.layoutManager = LinearLayoutManager(context!!)
+            dayContentAdapterBlocks.setContent(day)
+
+            val dayContentAdapterExercises =
+                DayContentAdapter(context!!, date, CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
+            recyclerViewExercises.adapter = dayContentAdapterExercises
+            recyclerViewExercises.layoutManager = LinearLayoutManager(context!!)
+            dayContentAdapterExercises.setContent(day)
         }
 
 

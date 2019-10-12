@@ -31,11 +31,7 @@ class DayViewer : AppCompatActivity() {
     private lateinit var activeDayId: String
     private var allDays: List<Day> = listOf()
 
-    private val dayCreatorAcitivtyRequestCode = 1
-
     val calendar: Calendar = Calendar.getInstance()
-    //    val dayLongName = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault())
-//    val monthLongName = calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
     var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
 
     //activeDay of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
@@ -85,8 +81,6 @@ class DayViewer : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
         else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
     }
@@ -97,17 +91,11 @@ class DayViewer : AppCompatActivity() {
     }
 
     private val updateDayListener = View.OnClickListener {
-        Timber.d("position clicked: ${mPager.currentItem}")
-        Timber.d("Calendar View --> Day Creator")
-
         DataHolder.activeDayHolder = activeDay
-        Timber.d("data holder calendarview : active day: ${DataHolder.activeDayHolder}")
 
         val intent = Intent(this, DayCreator::class.java)
-//        intent.putExtra(DayCreator.DAY_ACTION, DayCreator.DAY_NEW)
         intent.putExtra(DayCreator.DAY_ID, activeDayId)
         DataHolder.pagerPosition=mPager.currentItem
-//        startActivityForResult(intent, dayCreatorAcitivtyRequestCode)
         startActivity(intent)
     }
 

@@ -28,11 +28,8 @@ import kotlin.collections.ArrayList
 
 class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEventsListener {
 
-
     companion object {
         var DAY_ID = "day_id"
-        var DAY_UPDATE_RESULT_CODE = 2
-
     }
 
     private lateinit var mPagerTop: ViewPager
@@ -42,18 +39,11 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     private lateinit var pagerAdapterBottom: ScreenSlidePagerAdapter
 
     private lateinit var dataViewModel: DataViewModel
-    //    private lateinit var recyclerView: RecyclerView
-//    private lateinit var recyclerViewV2: RecyclerView
-    private lateinit var adapterBlocks: BlockListAdapter
-    private lateinit var adapterDeletableBlocks: BlockListAdapter
-
-
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
     private var allBlocks: List<Block> = listOf()
     private var allExercises: List<Exercise> = listOf()
-
 
     lateinit var activeDay: Day
     lateinit var activeDayId: String
@@ -61,14 +51,11 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     val NOT_DELETABLE = 0
     val IS_DELETABLE = 2
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_day_creator)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-
-        // add init block in classes that require variables to be initialised
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         initObservers()
@@ -92,21 +79,12 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
 
 //        DayId.text=Day.dayIDtoDashSeparator(activeDayId)
         title = Day.dayIDtoDashSeparator(activeDayId)
-
         AddDayBtn.setOnClickListener(updateDayListener)
-
-
-//        adapterDeletableBlocks = BlockListAdapter(this, true)
         updateAdaptersDisplay()
-
 
     }
 
     private fun updateBottomContent() {
-        Timber.d("update bottom content blocks $currentDayBlocks")
-        Timber.d("update bottom content exercises $currentDayExercises")
-
-        Timber.d("is mblock frag null: ${pagerAdapterBottom.mBlockFragment == null}")
         pagerAdapterBottom.mBlockFragment?.updateBlockAdapterContent(currentDayBlocks)
         pagerAdapterBottom.mExerciseFragment?.updateExerciseAdapterContent(currentDayExercises)
     }
@@ -135,7 +113,6 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     }
 
     override fun itemSelected(adapterType: Int, position: Int, deletingItem: Boolean) {
-        Timber.d("Day creator received position $position from adapter type $adapterType and it it deletable $deletingItem")
         when (adapterType) {
             CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> {
                 if (deletingItem) {
@@ -146,8 +123,6 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
                         allBlocks[position]
                     )
                 }
-                Timber.d("Day creator current blocks updated to :$currentDayBlocks")
-
             }
             CustomAdapterFragment.EXERCISE_TYPE_ADAPTER -> {
                 if (deletingItem) {
@@ -158,8 +133,6 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
                         allExercises[position]
                     )
                 }
-                Timber.d("Day creator current exercises updated to :$currentDayExercises")
-
             }
         }
         updateBottomContent()
@@ -172,17 +145,12 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
         var mBlockFragment: CustomAdapterFragment? = null
         var mExerciseFragment: CustomAdapterFragment? = null
 
-
         fun loadBlocks(blocks: List<Block>) {
-            Timber.d("load Blocks called")
-
             mBlockFragment?.updateBlockAdapterContent(blocks)
             mBlockFragment?.contentUpdated = true
         }
 
         fun loadExercises(exercises: List<Exercise>) {
-            Timber.d("load Exercises called")
-
             mExerciseFragment?.updateExerciseAdapterContent(exercises)
             mExerciseFragment?.contentUpdated = true
         }
@@ -195,7 +163,6 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
 
         override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
             val mFragment = `object` as CustomAdapterFragment
-            Timber.d("set primary item called")
             //todo clean this shit up
             if (mFragment.adapterType == CustomAdapterFragment.BLOCK_TYPE_ADAPTER || mFragment.adapterType == CustomAdapterFragment.BLOCK_DELETE_TYPE_ADAPTER) {
                 mBlockFragment = mFragment
@@ -218,7 +185,6 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
                     }
                 }
             }
-
             super.setPrimaryItem(container, position, `object`)
         }
 
@@ -236,47 +202,10 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
             super.onBackPressed()
             true
         }
-
         else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
     }
-//
-//    val blockSelectorListener = object : ClickListenerRecyclerView {
-//        override fun onClick(view: View, position: Int) {
-//            super.onClick(view, position)
-//            Toast.makeText(this@DayCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
-//            val clickedBlock = dataViewModel.allBlocks.value?.get(position)
-//            currentDayBlocks.add(currentDayBlocks.size, clickedBlock!!)
-//            updateAdaptersDisplay()
-//            Timber.d("block creator exercise list after addition - $currentDayBlocks")
-//        }
-//    }
-//
-//    val exerciseSelectorListener = object : ClickListenerRecyclerView {
-//        override fun onClick(view: View, position: Int) {
-//            super.onClick(view, position)
-////            Toast.makeText(this@DayCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
-//            val clickedExercise = dataViewModel.allExercises.value?.get(position)
-//            currentDayExercises.add(currentDayExercises.size, clickedExercise!!)
-//            updateAdaptersDisplay()
-//            Timber.d("block creator exercise list after addition - $currentDayBlocks")
-//        }
-//    }
-
-//    val itemDeletableListener = object : ClickListenerRecyclerView {
-//        override fun onClick(view: View, position: Int) {
-//            super.onClick(view, position)
-//            val clickedBlock = currentDayBlocks[position]
-//            var removedSuccess = currentDayBlocks.remove(clickedBlock)
-//            Timber.d("removal success $removedSuccess")
-//
-//            updateAdaptersDisplay()
-//            Timber.d("block creator exercise list after removal - $currentDayBlocks")
-//        }
-//    }
 
     private val updateDayListener = View.OnClickListener {
 
