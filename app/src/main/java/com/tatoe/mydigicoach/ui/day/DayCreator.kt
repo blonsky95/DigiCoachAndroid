@@ -58,8 +58,8 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     lateinit var activeDay: Day
     lateinit var activeDayId: String
 
-    val NOT_DELETABLE=0
-    val IS_DELETABLE=2
+    val NOT_DELETABLE = 0
+    val IS_DELETABLE = 2
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -74,11 +74,11 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
         initObservers()
 
         mPagerTop = findViewById(R.id.pager_top)
-        pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager,NOT_DELETABLE)
+        pagerAdapterTop = ScreenSlidePagerAdapter(supportFragmentManager, NOT_DELETABLE)
         mPagerTop.adapter = pagerAdapterTop
 
         mPagerBottom = findViewById(R.id.pager_bottom)
-        pagerAdapterBottom = ScreenSlidePagerAdapter(supportFragmentManager,IS_DELETABLE)
+        pagerAdapterBottom = ScreenSlidePagerAdapter(supportFragmentManager, IS_DELETABLE)
         mPagerBottom.adapter = pagerAdapterBottom
 
         DataHolder.activeDayHolder?.let { it ->
@@ -103,6 +103,10 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     }
 
     private fun updateBottomContent() {
+        Timber.d("update bottom content blocks $currentDayBlocks")
+        Timber.d("update bottom content exercises $currentDayExercises")
+
+        Timber.d("is mblock frag null: ${pagerAdapterBottom.mBlockFragment == null}")
         pagerAdapterBottom.mBlockFragment?.updateBlockAdapterContent(currentDayBlocks)
         pagerAdapterBottom.mExerciseFragment?.updateExerciseAdapterContent(currentDayExercises)
     }
@@ -131,7 +135,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     }
 
     override fun itemSelected(adapterType: Int, position: Int, deletingItem: Boolean) {
-        Timber.d("Day creator received position $position from adapter type $adapterType")
+        Timber.d("Day creator received position $position from adapter type $adapterType and it it deletable $deletingItem")
         when (adapterType) {
             CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> {
                 if (deletingItem) {
@@ -162,7 +166,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
 
     }
 
-    private inner class ScreenSlidePagerAdapter(fm: FragmentManager,var isDeletable:Int) :
+    private inner class ScreenSlidePagerAdapter(fm: FragmentManager, var isDeletable: Int) :
         FragmentStatePagerAdapter(fm) {
 
         var mBlockFragment: CustomAdapterFragment? = null
@@ -186,22 +190,32 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
         override fun getCount(): Int = 2
 
         override fun getItem(position: Int): CustomAdapterFragment {
-            return CustomAdapterFragment.newInstance(position+isDeletable)
+            return CustomAdapterFragment.newInstance(position + isDeletable)
         }
 
         override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
             val mFragment = `object` as CustomAdapterFragment
             Timber.d("set primary item called")
-
-            if (mFragment.adapterType == CustomAdapterFragment.BLOCK_TYPE_ADAPTER) {
+            //todo clean this shit up
+            if (mFragment.adapterType == CustomAdapterFragment.BLOCK_TYPE_ADAPTER || mFragment.adapterType == CustomAdapterFragment.BLOCK_DELETE_TYPE_ADAPTER) {
                 mBlockFragment = mFragment
                 if (mBlockFragment?.contentUpdated == false) {
-                    loadBlocks(allBlocks)
+                    when (mFragment.adapterType) {
+                        CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> loadBlocks(allBlocks)
+                        CustomAdapterFragment.BLOCK_DELETE_TYPE_ADAPTER -> loadBlocks(
+                            currentDayBlocks
+                        )
+                    }
                 }
             } else {
                 mExerciseFragment = mFragment
-                if ((mExerciseFragment?.contentUpdated == false)) {
-                    loadExercises(allExercises)
+                if (mExerciseFragment?.contentUpdated == false) {
+                    when (mFragment.adapterType) {
+                        CustomAdapterFragment.EXERCISE_TYPE_ADAPTER -> loadExercises(allExercises)
+                        CustomAdapterFragment.EXERCISE_DELETE_TYPE_ADAPTER -> loadExercises(
+                            currentDayExercises
+                        )
+                    }
                 }
             }
 
@@ -266,12 +280,15 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
 
     private val updateDayListener = View.OnClickListener {
 
+        //todo change this, find a better way of figuring out if updating or inserting
+
         if (DataHolder.activeDayHolder != null) {
             //update
-            activeDay.blocks = currentDayBlocks
+            activeDay.blocks=currentDayBlocks
+            activeDay.exercises=currentDayExercises
             dataViewModel.updateDay(activeDay)
         } else {
-            dataViewModel.insertDay(Day(activeDayId, currentDayBlocks, arrayListOf()))
+            dataViewModel.insertDay(Day(activeDayId, currentDayBlocks, currentDayExercises))
         }
         backToViewer()
     }

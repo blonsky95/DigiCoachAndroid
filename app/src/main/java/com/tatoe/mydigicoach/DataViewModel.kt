@@ -101,12 +101,12 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun insertDay(day: Day) = viewModelScope.launch{
-        Timber.d("ptg - data view model - insert day called")
+        Timber.d("ptg - data view model - insert day called $day")
         repository.insertDay(day)
     }
 
     fun updateDay(day: Day) = viewModelScope.launch {
-        Timber.d("ptg - data view model - update day called")
+        Timber.d("ptg - data view model - update day called $day")
         repository.updateDay(day)
     }
 
