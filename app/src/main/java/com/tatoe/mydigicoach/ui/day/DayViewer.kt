@@ -25,8 +25,6 @@ import java.util.*
 
 class DayViewer : AppCompatActivity() {
 
-
-
     private lateinit var mPager: ViewPager
     private lateinit var pagerAdapter: ScreenSlidePagerAdapter
     private lateinit var dataViewModel: DataViewModel
@@ -34,14 +32,14 @@ class DayViewer : AppCompatActivity() {
     private lateinit var activeDayId: String
     private var allDays: List<Day> = listOf()
 
-    val MS_IN_WEEK = 7*24*3600*1000
+    val MS_IN_WEEK:Long = 7*24*3600*1000
 
     val calendar: Calendar = Calendar.getInstance()
     private var currentWeekOfYear=calendar.get(Calendar.WEEK_OF_YEAR)
     private var tempWeekOfYear=currentWeekOfYear
 
     var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
-    var fakeTimeInMillis = System.currentTimeMillis()
+    var fakeTimeInMillis :Long= System.currentTimeMillis()
 
     //activeDay of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
     private fun filterDayOfWeek(dayWeek: Int): Int {
@@ -119,9 +117,9 @@ class DayViewer : AppCompatActivity() {
 
     private fun changeWeekContent(weekNumber: Int) {
         tempWeekOfYear=weekNumber
-        Timber.d("ptg week ${tempWeekOfYear-currentWeekOfYear}")
         fakeTimeInMillis=System.currentTimeMillis()+((tempWeekOfYear-currentWeekOfYear)*MS_IN_WEEK)
-        pagerAdapter.notifyDataSetChanged()
+//        pagerAdapter.notifyDataSetChanged()
+        //todo setting the right week working, next make the adapter update itself
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
@@ -190,6 +188,8 @@ class DayViewer : AppCompatActivity() {
 //                System.currentTimeMillis() - ((24 * 60 * 60 * 1000) * dayDiff)
             fakeCalendar.timeInMillis =
                 fakeTimeInMillis - ((24 * 60 * 60 * 1000) * dayDiff)
+            Timber.d("ptg fake calendar week of year: ${fakeCalendar.get(Calendar.WEEK_OF_YEAR)}")
+
             tempDayOfMonth = fakeCalendar.get(Calendar.DAY_OF_MONTH).toString()
             tempMonthOfYear =
                 fakeCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
@@ -203,6 +203,10 @@ class DayViewer : AppCompatActivity() {
                 fakeCalendar.get(Calendar.MONTH)+1, //month is always 1 behind despite consistent Locale.getDefault() (?)
                 fakeCalendar.get(Calendar.YEAR)
             )
+        }
+
+        override fun notifyDataSetChanged() {
+            super.notifyDataSetChanged()
         }
     }
 
