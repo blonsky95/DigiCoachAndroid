@@ -118,8 +118,8 @@ class DayViewer : AppCompatActivity() {
     private fun changeWeekContent(weekNumber: Int) {
         tempWeekOfYear=weekNumber
         fakeTimeInMillis=System.currentTimeMillis()+((tempWeekOfYear-currentWeekOfYear)*MS_IN_WEEK)
-//        pagerAdapter.notifyDataSetChanged()
-        //todo setting the right week working, next make the adapter update itself
+        mPager.adapter = pagerAdapter
+        mPager.currentItem = 0
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
