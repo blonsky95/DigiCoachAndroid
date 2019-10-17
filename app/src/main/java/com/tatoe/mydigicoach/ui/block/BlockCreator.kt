@@ -3,12 +3,14 @@ package com.tatoe.mydigicoach.ui.block
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -23,6 +25,7 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 
 import kotlinx.android.synthetic.main.activity_block_creator.*
+import kotlinx.android.synthetic.main.exercise_info_dialog_window.view.*
 import timber.log.Timber
 
 class BlockCreator : AppCompatActivity() {
@@ -78,12 +81,12 @@ class BlockCreator : AppCompatActivity() {
         deleteButton = delete_button as Button
 
         adapterExercises = ExerciseListAdapter(this)
-        adapterExercises.setListener(exerciseSelectorListener)
+        adapterExercises.setOnClickInterface(exerciseSelectorListener)
         recyclerView.adapter = adapterExercises
         recyclerView.layoutManager = LinearLayoutManager(this)
 
         adapterDeletableExercises = ExerciseListAdapter(this, true)
-        adapterDeletableExercises.setListener(itemDeletableListener)
+        adapterDeletableExercises.setOnClickInterface(itemDeletableListener)
         recyclerViewV2.adapter = adapterDeletableExercises
         recyclerViewV2.layoutManager = LinearLayoutManager(this)
 
@@ -182,6 +185,14 @@ class BlockCreator : AppCompatActivity() {
 
             updateAdaptersDisplay()
         }
+
+        override fun onLongClick(view: View, position: Int) {
+            super.onLongClick(view, position)
+            Timber.d("on long click 4")
+
+            val longClickedExercise = dataViewModel.allExercises.value?.get(position)
+            showItemInfo(longClickedExercise?.name,longClickedExercise?.description)
+        }
     }
 
     private val addButtonListener = View.OnClickListener {
@@ -208,6 +219,19 @@ class BlockCreator : AppCompatActivity() {
         dataViewModel.deleteBlock(updatingBlock!!)
 
         backToViewer()
+    }
+
+    private fun showItemInfo (title:String?,description:String?) {
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.exercise_info_dialog_window, null)
+        mDialogView.item_title.text= "Description"
+        mDialogView.item_description.text= description
+        //AlertDialogBuilder
+        val mBuilder = AlertDialog.Builder(this)
+            .setView(mDialogView)
+            .setTitle(title)
+
+        mBuilder.show()
+
     }
 
     private fun backToViewer() {

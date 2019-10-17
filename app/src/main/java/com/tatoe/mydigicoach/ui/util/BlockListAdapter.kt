@@ -13,7 +13,7 @@ class BlockListAdapter(context: Context, var deletableItems:Boolean = false) :
     RecyclerView.Adapter<EditableItemViewHolder>() {
 
     //this adapter doesnt take the listener as a parameter, instead it is set from the invoking
-    //activity with the setListener method, where do we want the listeners?
+    //activity with the setOnClickInterface method, where do we want the listeners?
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>()
