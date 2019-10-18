@@ -40,7 +40,7 @@ class ExerciseViewer : AppCompatActivity() {
 
                 Toast.makeText(this@ExerciseViewer, "$position was clicked", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@ExerciseViewer, ExerciseCreator::class.java)
-                intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_UPDATE)
+                intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_VIEW)
                 updateUpdatingExercise(position)
 
                 startActivity(intent)
