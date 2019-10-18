@@ -174,15 +174,12 @@ class BlockCreator : AppCompatActivity() {
         }
     }
 
-    val exerciseSelectorListener = object : ClickListenerRecyclerView {
+    private val exerciseSelectorListener = object : ClickListenerRecyclerView {
         override fun onClick(view: View, position: Int) {
             super.onClick(view, position)
             Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
             val clickedExercise = dataViewModel.allExercises.value?.get(position)
             currentBlockComponents!!.add(currentBlockComponents!!.size, clickedExercise!!)
-            Timber.d("current block components add : $currentBlockComponents ")
-            Timber.d("real block components add : ${DataHolder.activeBlockHolder?.components}} ")
-
             updateAdaptersDisplay()
         }
 
@@ -223,7 +220,7 @@ class BlockCreator : AppCompatActivity() {
 
     private fun showItemInfo (title:String?,description:String?) {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.exercise_info_dialog_window, null)
-        mDialogView.item_title.text= "Description"
+//        mDialogView.item_title.text= "Description"
         mDialogView.item_description.text= description
         //AlertDialogBuilder
         val mBuilder = AlertDialog.Builder(this)
