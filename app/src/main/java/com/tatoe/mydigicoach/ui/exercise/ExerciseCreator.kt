@@ -20,21 +20,21 @@ import timber.log.Timber
 
 class ExerciseCreator : AppCompatActivity() {
 
-    lateinit var exerciseName: String
-    lateinit var exerciseDesc: String
+    private lateinit var exerciseName: String
+    private lateinit var exerciseDesc: String
 
-    lateinit var nameEditText: EditText
-    lateinit var descEditText: EditText
-    lateinit var nameTextView: TextView
-    lateinit var descTextView: TextView
+    private lateinit var nameEditText: EditText
+    private lateinit var descEditText: EditText
+    private lateinit var nameTextView: TextView
+    private lateinit var descTextView: TextView
 
-    lateinit var rightButton: Button
-    lateinit var leftButton: Button
-    lateinit var centreButton: Button
+    private lateinit var rightButton: Button
+    private lateinit var leftButton: Button
+    private lateinit var centreButton: Button
 
     private lateinit var dataViewModel: DataViewModel
 
-    lateinit var updatingExercise: Exercise
+    private lateinit var updatingExercise: Exercise
 
     companion object {
         var EXERCISE_ACTION = "exercise_action"
@@ -42,7 +42,6 @@ class ExerciseCreator : AppCompatActivity() {
         var EXERCISE_UPDATE = "exercise_update"
         var EXERCISE_VIEW = "exercise_view"
     }
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
