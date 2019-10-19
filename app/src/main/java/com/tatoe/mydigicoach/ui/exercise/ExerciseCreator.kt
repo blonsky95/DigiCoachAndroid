@@ -36,10 +36,15 @@ class ExerciseCreator : AppCompatActivity() {
 
     private lateinit var updatingExercise: Exercise
 
+     var menuItemRead:MenuItem? = null
+     var menuItemEdit:MenuItem? = null
+
+    lateinit var mAction: String
+
     companion object {
         var EXERCISE_ACTION = "exercise_action"
         var EXERCISE_NEW = "exercise_new"
-        var EXERCISE_UPDATE = "exercise_update"
+        var EXERCISE_EDIT = "exercise_edit"
         var EXERCISE_VIEW = "exercise_view"
     }
 
@@ -62,21 +67,31 @@ class ExerciseCreator : AppCompatActivity() {
         centreButton = centre_button
 
         if (intent.hasExtra(EXERCISE_ACTION)) { //can only reach this with an intent extra
-            var action = intent.getStringExtra(EXERCISE_ACTION)
-            if (action == EXERCISE_UPDATE || action == EXERCISE_VIEW) {
-                if (DataHolder.activeExerciseHolder!=null) {
+            mAction = intent.getStringExtra(EXERCISE_ACTION)
+            if (mAction == EXERCISE_EDIT || mAction == EXERCISE_VIEW) {
+                if (DataHolder.activeExerciseHolder != null) {
                     updatingExercise = DataHolder.activeExerciseHolder!!
                 }
-                Timber.d("exercise creator view result exercise 4 : $updatingExercise ${updatingExercise.results}")
-
             }
-            updateButtonUI(action)
-            updateBodyUI(action)
+            updateButtonUI(mAction)
+            updateBodyUI(mAction)
         }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.creator_toolbar_menu, menu)
+       menuInflater.inflate(R.menu.exercise_creator_toolbar, menu)
+        menuItemEdit=menu?.findItem(R.id.action_edit)
+        menuItemRead=menu?.findItem(R.id.action_read)
+        when (mAction) {
+            EXERCISE_EDIT -> {
+                updateToolbarItemVisibility(menuItemEdit,false)
+                updateToolbarItemVisibility(menuItemRead,true)
+            }
+            EXERCISE_VIEW -> {
+                updateToolbarItemVisibility(menuItemEdit,true)
+                updateToolbarItemVisibility(menuItemRead,false)
+            }
+        }
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -84,6 +99,20 @@ class ExerciseCreator : AppCompatActivity() {
 
         R.id.action_back -> {
             super.onBackPressed()
+            true
+        }
+        R.id.action_edit -> {
+            updateButtonUI(EXERCISE_EDIT)
+            updateBodyUI(EXERCISE_EDIT)
+            updateToolbarItemVisibility(menuItemEdit,false)
+            updateToolbarItemVisibility(menuItemRead,true)
+            true
+        }
+        R.id.action_read -> {
+            updateButtonUI(EXERCISE_VIEW)
+            updateBodyUI(EXERCISE_VIEW)
+            updateToolbarItemVisibility(menuItemEdit,true)
+            updateToolbarItemVisibility(menuItemRead,false)
             true
         }
 
@@ -94,6 +123,10 @@ class ExerciseCreator : AppCompatActivity() {
         }
     }
 
+    private fun updateToolbarItemVisibility(menuItem: MenuItem?, isVisible:Boolean){
+        menuItem?.isVisible = isVisible
+    }
+
 
     private fun updateButtonUI(actionType: String) {
         if (actionType == EXERCISE_NEW) {
@@ -101,19 +134,19 @@ class ExerciseCreator : AppCompatActivity() {
             rightButton.text = "ADD"
             rightButton.setOnClickListener(addButtonListener)
 
-            centreButton.visibility = View.INVISIBLE
-            leftButton.visibility = View.INVISIBLE
+            centreButton.visibility = View.VISIBLE
+            leftButton.visibility = View.VISIBLE
             return
         } else {
 
-            if (actionType == EXERCISE_UPDATE) {
+            if (actionType == EXERCISE_EDIT) {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "UPDATE"
                 rightButton.setOnClickListener(updateButtonListener)
 
                 centreButton.visibility = View.VISIBLE
-                centreButton.text = "VIEW"
-                centreButton.setOnClickListener(viewButtonListener)
+                centreButton.text = "ADD FIELD"
+                centreButton.setOnClickListener(addFieldButtonListener)
 
                 leftButton.visibility = View.VISIBLE
                 leftButton.text = "DELETE"
@@ -121,12 +154,10 @@ class ExerciseCreator : AppCompatActivity() {
             }
             if (actionType == EXERCISE_VIEW) {
                 rightButton.visibility = View.VISIBLE
-                rightButton.text="HISTORY"
+                rightButton.text = "HISTORY"
                 rightButton.setOnClickListener(historyButtonListener)
 
-                centreButton.visibility = View.VISIBLE
-                centreButton.text = "EDIT"
-                centreButton.setOnClickListener(editButtonListener)
+                centreButton.visibility = View.INVISIBLE
 
                 leftButton.visibility = View.INVISIBLE
             }
@@ -141,7 +172,7 @@ class ExerciseCreator : AppCompatActivity() {
             nameEditText.visibility = View.VISIBLE
             descEditText.visibility = View.VISIBLE
         }
-        if (actionType == EXERCISE_UPDATE) {
+        if (actionType == EXERCISE_EDIT) {
             nameTextView.visibility = View.GONE
             descTextView.visibility = View.GONE
 
@@ -188,14 +219,8 @@ class ExerciseCreator : AppCompatActivity() {
         backToViewer()
     }
 
-    private val viewButtonListener = View.OnClickListener {
-        updateButtonUI(EXERCISE_VIEW)
-        updateBodyUI(EXERCISE_VIEW)
-    }
-
-    private val editButtonListener = View.OnClickListener {
-        updateButtonUI(EXERCISE_UPDATE)
-        updateBodyUI(EXERCISE_UPDATE)
+    private val addFieldButtonListener = View.OnClickListener {
+        //todo add field
     }
 
     private val historyButtonListener = View.OnClickListener {
@@ -203,7 +228,7 @@ class ExerciseCreator : AppCompatActivity() {
         Timber.d("history button pressed result exercise 5 : $updatingExercise ${updatingExercise.results}")
 
 //        DataHolder.activeExerciseHolder=updatingExercise
-        intent.putExtra(ExerciseResults.RESULTS_ACTION,ExerciseResults.RESULTS_VIEW)
+        intent.putExtra(ExerciseResults.RESULTS_ACTION, ExerciseResults.RESULTS_VIEW)
         intent.putExtra(ExerciseResults.RESULTS_EXE_ID, updatingExercise.exerciseId)
 
         startActivity(intent)
