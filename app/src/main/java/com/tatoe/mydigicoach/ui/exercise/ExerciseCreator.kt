@@ -1,13 +1,11 @@
 package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
+import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
 import android.text.SpannableStringBuilder
-import android.view.LayoutInflater
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
@@ -44,6 +42,9 @@ class ExerciseCreator : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
 
     private var updatingExercise: Exercise? = null
+    private var exerciseFieldsMap = LinkedHashMap<String, String>()
+    //todo when new exercise load linkedhashmap with name and desc
+
 
     var menuItemRead: MenuItem? = null
     var menuItemEdit: MenuItem? = null
@@ -65,12 +66,6 @@ class ExerciseCreator : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-
-        nameEditText = EditText1
-        descEditText = EditText2
-        nameTextView = TextView1
-        descTextView = TextView2
-
         linearLayout = exercise_properties as LinearLayout
 
         rightButton = right_button
@@ -81,12 +76,228 @@ class ExerciseCreator : AppCompatActivity() {
             mAction = intent.getStringExtra(EXERCISE_ACTION)
             if (mAction == EXERCISE_EDIT || mAction == EXERCISE_VIEW) {
 //                if (DataHolder.activeExerciseHolder != null) {
-                    updatingExercise = DataHolder.activeExerciseHolder
+                updatingExercise = DataHolder.activeExerciseHolder
+                if (updatingExercise != null) {
+                    exerciseFieldsMap = updatingExercise!!.getFieldsMap()
+                }
 //                }
+            } else {
+                exerciseFieldsMap["Name"] = "Exercise name"
+                exerciseFieldsMap["Description"] = "Exercise description"
             }
             updateButtonUI(mAction)
             updateBodyUI(mAction)
         }
+    }
+
+
+    private fun updateToolbarItemVisibility(menuItem: MenuItem?, isVisible: Boolean) {
+        menuItem?.isVisible = isVisible
+    }
+
+
+    private fun updateButtonUI(actionType: String) {
+        if (actionType == EXERCISE_NEW) {
+            rightButton.visibility = View.VISIBLE
+            rightButton.text = "ADD"
+            rightButton.setOnClickListener(addButtonListener)
+
+            centreButton.visibility = View.VISIBLE
+            leftButton.visibility = View.VISIBLE
+            centreButton.setOnClickListener(addFieldButtonListener)
+
+            return
+        } else {
+
+            if (actionType == EXERCISE_EDIT) {
+                rightButton.visibility = View.VISIBLE
+                rightButton.text = "UPDATE"
+                rightButton.setOnClickListener(updateButtonListener)
+
+                centreButton.visibility = View.VISIBLE
+                centreButton.text = "ADD FIELD"
+                centreButton.setOnClickListener(addFieldButtonListener)
+
+                leftButton.visibility = View.VISIBLE
+                leftButton.text = "DELETE"
+                leftButton.setOnClickListener(deleteButtonListener)
+            }
+            if (actionType == EXERCISE_VIEW) {
+                rightButton.visibility = View.VISIBLE
+                rightButton.text = "HISTORY"
+                rightButton.setOnClickListener(historyButtonListener)
+
+                centreButton.visibility = View.INVISIBLE
+
+                leftButton.visibility = View.INVISIBLE
+            }
+        }
+    }
+
+    private fun updateBodyUI(actionType: String) {
+
+        //try examining childs of layout and changing visibility of edit texts and of text views
+
+        createExerciseFieldsLayout()
+
+        if (actionType == EXERCISE_NEW) {
+            changeVisibility(linearLayout, false)
+        }
+        if (actionType == EXERCISE_EDIT) {
+            changeVisibility(linearLayout, false)
+        }
+        if (actionType == EXERCISE_VIEW) {
+            changeVisibility(linearLayout, true)
+        }
+    }
+
+    private fun createExerciseFieldsLayout() {
+
+        linearLayout.removeAllViews()
+
+        for (entry in exerciseFieldsMap.entries) {
+            var fieldTitleTextView = TextView(this)
+            fieldTitleTextView.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            fieldTitleTextView.text = entry.key
+            fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
+
+            linearLayout.addView(fieldTitleTextView)
+
+            var fieldEditText = EditText(this)
+            fieldEditText.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            fieldEditText.hint = entry.value
+
+            linearLayout.addView(fieldEditText)
+
+            var fieldInfoTextView = TextView(this)
+            fieldInfoTextView.layoutParams =
+                ViewGroup.LayoutParams(
+                    ViewGroup.LayoutParams.MATCH_PARENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+                )
+            fieldInfoTextView.text = entry.value
+
+            linearLayout.addView(fieldInfoTextView)
+        }
+
+        Timber.d("Child count: ${linearLayout.childCount}")
+    }
+
+    private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {
+
+        var editTextVisibility = View.VISIBLE
+        var textViewVisibility = View.GONE
+
+        if (isRead) {
+            editTextVisibility = View.GONE
+            textViewVisibility = View.VISIBLE
+        }
+
+
+        for (index in 0 until layout.childCount) {
+            //Here I could change checking the view type to checking if index is 0,1,2 like Im doing
+            //with title fields, in case its not edit texts or to improve performance.
+            val childView = layout.getChildAt(index)
+            if (isFieldTitle(index)) {
+                childView.visibility = View.VISIBLE
+                continue
+            }
+            if (childView is EditText) {
+                Timber.d("visibility of child $index changed to $editTextVisibility")
+
+                childView.visibility = editTextVisibility
+                continue
+
+            }
+            if (childView is TextView) {
+                Timber.d("visibility of child $index changed to $textViewVisibility")
+
+                childView.visibility = textViewVisibility
+            }
+        }
+    }
+
+    private fun isFieldTitle(index: Int): Boolean {
+        //fields go in 3s, so childs 0,3,6,9... are alwasy titles
+        return (index + 3) % 3 == 0
+    }
+
+    private val addButtonListener = View.OnClickListener {
+        //todo make this programmatic - iterate through childs and get values in edit texts
+        exerciseName = nameEditText.text.trim().toString()
+        exerciseDesc = descEditText.text.trim().toString()
+
+        var newExercise = Exercise(exerciseName, exerciseDesc)
+        dataViewModel.insertExercise(newExercise)
+        backToViewer()
+    }
+
+    private val updateButtonListener = View.OnClickListener {
+        exerciseName = nameEditText.text.trim().toString()
+        exerciseDesc = descEditText.text.trim().toString()
+
+        updatingExercise!!.name = exerciseName
+        updatingExercise!!.description = exerciseDesc
+        dataViewModel.updateExercise(updatingExercise!!)
+
+        backToViewer()
+    }
+
+    private val deleteButtonListener = View.OnClickListener {
+        dataViewModel.deleteExercise(updatingExercise!!)
+        backToViewer()
+    }
+
+    private val addFieldButtonListener = View.OnClickListener {
+        generateDialog()
+    }
+
+    private fun generateDialog() {
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
+        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
+        mDialogView.dialogEditText.hint = "New field name"
+        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
+        val mBuilder = AlertDialog.Builder(this)
+            .setView(mDialogView)
+            .setTitle("Add Field")
+        val mAlertDialog = mBuilder.show()
+        mDialogView.dialogEnterBtn.setOnClickListener {
+            mAlertDialog.dismiss()
+            newField = mDialogView.dialogEditText.text.toString().trim()
+            addFieldLayout()
+        }
+        mDialogView.dialogCancelBtn.setOnClickListener {
+            mAlertDialog.dismiss()
+        }
+    }
+
+    private fun addFieldLayout() {
+        exerciseFieldsMap[newField]="New field"
+        updateBodyUI(mAction)
+    }
+
+    private val historyButtonListener = View.OnClickListener {
+        val intent = Intent(this, ExerciseResults::class.java)
+
+//        DataHolder.activeExerciseHolder=updatingExercise
+        intent.putExtra(ExerciseResults.RESULTS_ACTION, ExerciseResults.RESULTS_VIEW)
+        intent.putExtra(ExerciseResults.RESULTS_EXE_ID, updatingExercise!!.exerciseId)
+
+        startActivity(intent)
+    }
+
+    private fun backToViewer() {
+        val intent = Intent(this, ExerciseViewer::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
@@ -136,204 +347,6 @@ class ExerciseCreator : AppCompatActivity() {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
-    }
-
-    private fun updateToolbarItemVisibility(menuItem: MenuItem?, isVisible: Boolean) {
-        menuItem?.isVisible = isVisible
-    }
-
-
-    private fun updateButtonUI(actionType: String) {
-        if (actionType == EXERCISE_NEW) {
-            rightButton.visibility = View.VISIBLE
-            rightButton.text = "ADD"
-            rightButton.setOnClickListener(addButtonListener)
-
-            centreButton.visibility = View.VISIBLE
-            leftButton.visibility = View.VISIBLE
-            centreButton.setOnClickListener(addFieldButtonListener)
-
-            return
-        } else {
-
-            if (actionType == EXERCISE_EDIT) {
-                rightButton.visibility = View.VISIBLE
-                rightButton.text = "UPDATE"
-                rightButton.setOnClickListener(updateButtonListener)
-
-                centreButton.visibility = View.VISIBLE
-                centreButton.text = "ADD FIELD"
-                centreButton.setOnClickListener(addFieldButtonListener)
-
-                leftButton.visibility = View.VISIBLE
-                leftButton.text = "DELETE"
-                leftButton.setOnClickListener(deleteButtonListener)
-            }
-            if (actionType == EXERCISE_VIEW) {
-                rightButton.visibility = View.VISIBLE
-                rightButton.text = "HISTORY"
-                rightButton.setOnClickListener(historyButtonListener)
-
-                centreButton.visibility = View.INVISIBLE
-
-                leftButton.visibility = View.INVISIBLE
-            }
-        }
-    }
-
-    private fun updateBodyUI(actionType: String) {
-
-        //try examining childs of layout and changing visibility of edit texts and of text views
-
-
-
-        if (actionType == EXERCISE_NEW) {
-            changeVisibility(linearLayout,false)
-//            isRead=View.VISIBLE
-//            nameTextView.visibility = View.GONE
-//            descTextView.visibility = View.GONE
-//
-//            nameEditText.visibility = View.VISIBLE
-//            descEditText.visibility = View.VISIBLE
-        }
-        if (actionType == EXERCISE_EDIT) {
-            changeVisibility(linearLayout,false)
-//            isRead=false
-//            nameTextView.visibility = View.GONE
-//            descTextView.visibility = View.GONE
-//
-//            nameEditText.visibility = View.VISIBLE
-//            nameEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.name)
-//            descEditText.visibility = View.VISIBLE
-//            descEditText.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.description)
-
-        }
-        if (actionType == EXERCISE_VIEW) {
-            changeVisibility(linearLayout,true)
-
-//            isRead=true
-//            nameEditText.visibility = View.GONE
-//            descEditText.visibility = View.GONE
-//
-//            nameTextView.visibility = View.VISIBLE
-//            nameTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.name)
-//            descTextView.visibility = View.VISIBLE
-//            descTextView.text = SpannableStringBuilder(DataHolder.activeExerciseHolder?.description)
-        }
-
-
-    }
-
-    private fun changeVisibility(layout:LinearLayout, isRead:Boolean){
-
-        //todo have to import the text of the fields from the updating exercise in form of array
-        //todo add a method in Exercise that returns an array with [Name, desc, extra1, extra2...]
-        // get this array and fill views correspondingly
-        var editTextVisibility = View.VISIBLE
-        var textViewVisibility = View.GONE
-
-        if (isRead) {
-            editTextVisibility=View.GONE
-            textViewVisibility=View.VISIBLE
-        }
-        for (index in 0 until layout.childCount) {
-            //Here I could change checking the view type to checking if index is 0,1,2 like Im doing
-            //with title fields, in case its not edit texts or to improve performance.
-            var childView = layout.getChildAt(index)
-            if (isFieldTitle(index)) {
-                childView.visibility=View.VISIBLE
-                continue
-            }
-            if (childView is EditText) {
-                childView.text=SpannableStringBuilder("im an edit text")
-                childView.visibility=editTextVisibility
-
-            }
-            if (childView is TextView) {
-                childView.text="im a text view"
-                childView.visibility=textViewVisibility
-            }
-        }
-    }
-
-    private fun isFieldTitle(index: Int): Boolean {
-        //fields go in 3s, so childs 0,3,6,9... are alwasy titles
-        return (index+3)%3==0
-    }
-
-    private val addButtonListener = View.OnClickListener {
-        exerciseName = nameEditText.text.trim().toString()
-        exerciseDesc = descEditText.text.trim().toString()
-
-        var newExercise = Exercise(exerciseName, exerciseDesc)
-        dataViewModel.insertExercise(newExercise)
-        backToViewer()
-    }
-
-    private val updateButtonListener = View.OnClickListener {
-        exerciseName = nameEditText.text.trim().toString()
-        exerciseDesc = descEditText.text.trim().toString()
-
-        updatingExercise!!.name = exerciseName
-        updatingExercise!!.description = exerciseDesc
-        dataViewModel.updateExercise(updatingExercise!!)
-
-        backToViewer()
-    }
-
-    private val deleteButtonListener = View.OnClickListener {
-        dataViewModel.deleteExercise(updatingExercise!!)
-
-        backToViewer()
-    }
-
-    private val addFieldButtonListener = View.OnClickListener {
-        generateDialog()
-    }
-
-    private fun generateDialog() {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
-        mDialogView.dialogEditText.hint = "New field name"
-        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
-        //AlertDialogBuilder
-        val mBuilder = AlertDialog.Builder(this)
-            .setView(mDialogView)
-            .setTitle("Add Field")
-        //show dialog
-        val mAlertDialog = mBuilder.show()
-        //login button click of custom layout
-        mDialogView.dialogEnterBtn.setOnClickListener {
-            //dismiss dialog
-            mAlertDialog.dismiss()
-            newField = mDialogView.dialogEditText.text.toString().trim()
-            addFieldLayout()
-        }
-        //cancel button click of custom layout
-        mDialogView.dialogCancelBtn.setOnClickListener {
-            //dismiss dialog
-            mAlertDialog.dismiss()
-        }
-    }
-
-    private fun addFieldLayout() {
-        //todo ok add the layout
-    }
-
-    private val historyButtonListener = View.OnClickListener {
-        val intent = Intent(this, ExerciseResults::class.java)
-
-//        DataHolder.activeExerciseHolder=updatingExercise
-        intent.putExtra(ExerciseResults.RESULTS_ACTION, ExerciseResults.RESULTS_VIEW)
-        intent.putExtra(ExerciseResults.RESULTS_EXE_ID, updatingExercise!!.exerciseId)
-
-        startActivity(intent)
-    }
-
-    private fun backToViewer() {
-        val intent = Intent(this, ExerciseViewer::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
     }
 
 
