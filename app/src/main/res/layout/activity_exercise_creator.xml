@@ -18,77 +18,97 @@
             app:menu="@menu/creator_toolbar_menu"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
 
-    <EditText
-            android:id="@+id/EditText1"
-            android:visibility="visible"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:hint="Exercise Name"
-            android:inputType="textMultiLine"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
-
-    <TextView
-            android:id="@+id/TextView1"
-            android:visibility="gone"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="32dp"
-            android:layout_marginEnd="8dp"
-            android:ems="10"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
-
-    <EditText
-            android:id="@+id/EditText2"
+    <ScrollView
+            android:id="@+id/scrollView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:ems="10"
-            android:gravity="top"
-            android:inputType="textMultiLine"
-            android:hint="Exercise Description"
-            android:padding="12dp"
-            android:visibility="visible"
+            android:background="#C9E2E6"
             app:layout_constraintBottom_toTopOf="@+id/right_button"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/EditText1"
-            app:layout_constraintVertical_bias="1.0" />
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar">
 
-    <TextView
-            android:id="@+id/TextView2"
-            android:visibility="gone"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="24dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:ems="10"
-            android:gravity="top"
-            android:padding="12dp"
-            app:layout_constraintBottom_toTopOf="@+id/right_button"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/TextView1"
-            app:layout_constraintVertical_bias="0.0" />
+        <LinearLayout
+                android:id="@+id/exercise_properties"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="#ffffff"
+                android:orientation="vertical">
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Name"
+                    android:textStyle="bold"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:ems="10"
+                    android:padding="12dp"
+                    android:visibility="visible" />
+
+            <EditText
+                    android:id="@+id/EditText1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:ems="10"
+                    android:hint="Exercise Name"
+                    android:inputType="textMultiLine"
+                    android:padding="12dp"
+                    android:visibility="gone" />
+
+            <TextView
+                    android:id="@+id/TextView1"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:ems="10"
+                    android:padding="12dp"
+                    android:visibility="visible" />
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Description"
+                    android:textStyle="bold"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:ems="10"
+                    android:padding="12dp"
+                    android:visibility="visible" />
+
+            <EditText
+                    android:id="@+id/EditText2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:hint="Exercise Description"
+                    android:inputType="textMultiLine"
+                    android:padding="12dp"
+                    android:visibility="gone" />
+
+            <TextView
+                    android:id="@+id/TextView2"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginBottom="8dp"
+                    android:ems="10"
+                    android:gravity="top"
+                    android:padding="12dp"
+                    android:visibility="visible" />
+
+        </LinearLayout>
+
+    </ScrollView>
+
 
     <Button
             android:id="@+id/right_button"
@@ -101,8 +121,8 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="1.0"
-            app:layout_constraintVertical_bias="1.0"
-            app:layout_constraintStart_toStartOf="parent" />
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintVertical_bias="1.0" />
 
     <Button
             android:id="@+id/centre_button"
@@ -113,7 +133,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/right_button"
             app:layout_constraintStart_toEndOf="@+id/left_button"
-            app:layout_constraintTop_toBottomOf="@+id/EditText2"
+            app:layout_constraintTop_toBottomOf="@+id/scrollView"
             app:layout_constraintVertical_bias="1.0" />
 
     <Button
@@ -128,6 +148,6 @@
             app:layout_constraintEnd_toStartOf="@+id/right_button"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/EditText2"
+            app:layout_constraintTop_toBottomOf="@+id/scrollView"
             app:layout_constraintVertical_bias="1.0" />
 </androidx.constraintlayout.widget.ConstraintLayout>

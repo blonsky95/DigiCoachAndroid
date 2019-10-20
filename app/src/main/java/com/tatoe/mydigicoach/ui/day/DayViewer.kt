@@ -93,7 +93,8 @@ class DayViewer : AppCompatActivity() {
 
     private fun generateDialog () {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-        mDialogView.weekNumberTv.text= "Current week: $tempWeekOfYear"
+        mDialogView.dialogTextTextView.text= "Current week: $tempWeekOfYear"
+        mDialogView.dialogEditText.hint="Enter week"
         //AlertDialogBuilder
         val mBuilder = AlertDialog.Builder(this)
             .setView(mDialogView)
@@ -105,7 +106,7 @@ class DayViewer : AppCompatActivity() {
             //dismiss dialog
             mAlertDialog.dismiss()
             //get text from EditTexts of custom layout
-            val weekNumber = mDialogView.dialogNameEt.text.toString().toInt()
+            val weekNumber = mDialogView.dialogEditText.text.toString().toInt()
             changeWeekContent(weekNumber)
         }
         //cancel button click of custom layout
