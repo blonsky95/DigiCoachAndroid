@@ -21,24 +21,27 @@ data class Exercise(
     @field: SerializedName("result")
     var results: ArrayList<ResultSet> = arrayListOf()
 
-    @ColumnInfo(name = "fields")
-    @field: SerializedName("fields")
-    var fields: LinkedHashMap<String,String> = LinkedHashMap() //only includes extra fields
+    @ColumnInfo(name = "fieldsHashMap")
+    @field: SerializedName("fieldsHashMap")
+    var fieldsHashMap: LinkedHashMap<String,String> = LinkedHashMap() //todo eventually this will get rid of saving name and description in database
+
+    //todo find a way of making the constructor, and instance data retrieval more efficient by
+    //todo finding synergy between the LinkedHashMap including name and description and having a method here
 
 
     //I only want name and description as constructors, so primary key id is outside
     // constructor and starts with 0 (initialization required).
     constructor(name: String, description: String) : this(0, name, description)
 
-    //returns linked hash map with name, description + extra fields
+    //returns linked hash map with name, description + extra fieldsHashMap
     fun getFieldsMap():LinkedHashMap<String,String> {
-        val linkedHashMap = LinkedHashMap<String,String>()
-        linkedHashMap["name"]=name
-        linkedHashMap["description"]=description
-        for (field in fields){
-            linkedHashMap[field.key]=field.value
-        }
-        return linkedHashMap
+//        val linkedHashMap = LinkedHashMap<String,String>()
+//        linkedHashMap["Name"]=name
+//        linkedHashMap["Description"]=description
+//        for (field in fieldsHashMap){
+//            linkedHashMap[field.key]=field.value
+//        }
+        return fieldsHashMap
     }
 
     fun addResult(date: String, result: String) {

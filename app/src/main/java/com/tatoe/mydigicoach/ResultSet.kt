@@ -16,6 +16,6 @@ class ResultSet (date:Date) {
         return Day.presentableDateFormat.format(sDate)
     }
 
-    //in the future add here other functions or result fields
+    //in the future add here other functions or result fieldsHashMap
 
 }

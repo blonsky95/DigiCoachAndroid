@@ -43,13 +43,14 @@ class ExerciseCreator : AppCompatActivity() {
 
     private var updatingExercise: Exercise? = null
     private var exerciseFieldsMap = LinkedHashMap<String, String>()
-    //todo when new exercise load linkedhashmap with name and desc
 
 
     var menuItemRead: MenuItem? = null
     var menuItemEdit: MenuItem? = null
 
     lateinit var mAction: String
+
+    var NEW_FIELD_VALUE = ""
 
     companion object {
         var EXERCISE_ACTION = "exercise_action"
@@ -82,11 +83,12 @@ class ExerciseCreator : AppCompatActivity() {
                 }
 //                }
             } else {
-                exerciseFieldsMap["Name"] = "Exercise name"
-                exerciseFieldsMap["Description"] = "Exercise description"
+                exerciseFieldsMap["Name"] = ""
+                exerciseFieldsMap["Description"] = ""
             }
-            updateButtonUI(mAction)
             updateBodyUI(mAction)
+            updateButtonUI(mAction)
+
         }
     }
 
@@ -174,6 +176,7 @@ class ExerciseCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             fieldEditText.hint = entry.value
+            fieldEditText.text=SpannableStringBuilder(entry.value)
 
             linearLayout.addView(fieldEditText)
 
@@ -201,10 +204,9 @@ class ExerciseCreator : AppCompatActivity() {
             textViewVisibility = View.VISIBLE
         }
 
-
         for (index in 0 until layout.childCount) {
             //Here I could change checking the view type to checking if index is 0,1,2 like Im doing
-            //with title fields, in case its not edit texts or to improve performance.
+            //with title fieldsHashMap, in case its not edit texts or to improve performance.
             val childView = layout.getChildAt(index)
             if (isFieldTitle(index)) {
                 childView.visibility = View.VISIBLE
@@ -226,26 +228,40 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private fun isFieldTitle(index: Int): Boolean {
-        //fields go in 3s, so childs 0,3,6,9... are alwasy titles
+        //fieldsHashMap go in 3s, so childs 0,3,6,9... are alwasy titles
         return (index + 3) % 3 == 0
     }
 
-    private val addButtonListener = View.OnClickListener {
-        //todo make this programmatic - iterate through childs and get values in edit texts
-        exerciseName = nameEditText.text.trim().toString()
-        exerciseDesc = descEditText.text.trim().toString()
+    private fun getFieldContents(): LinkedHashMap<String, String> {
 
-        var newExercise = Exercise(exerciseName, exerciseDesc)
+        var fieldsMap = LinkedHashMap<String, String>()
+        for (i in 0 until linearLayout.childCount step 3) {
+            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
+            var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
+            fieldsMap[keyString] =
+                (linearLayout.getChildAt(i + 1) as EditText).text.trim().toString()
+        }
+        return fieldsMap
+    }
+
+    private val addButtonListener = View.OnClickListener {
+
+        var newExerciseFields = getFieldContents()
+
+        var newExercise = Exercise(newExerciseFields["Name"]!!, newExerciseFields["Description"]!!)
+        newExercise.fieldsHashMap = newExerciseFields
+
         dataViewModel.insertExercise(newExercise)
         backToViewer()
     }
-
     private val updateButtonListener = View.OnClickListener {
-        exerciseName = nameEditText.text.trim().toString()
-        exerciseDesc = descEditText.text.trim().toString()
 
-        updatingExercise!!.name = exerciseName
-        updatingExercise!!.description = exerciseDesc
+        var updatingExerciseFields = getFieldContents()
+
+        updatingExercise!!.name = updatingExerciseFields["Name"]!!
+        updatingExercise!!.description = updatingExerciseFields["Description"]!!
+        updatingExercise!!.fieldsHashMap = updatingExerciseFields
+
         dataViewModel.updateExercise(updatingExercise!!)
 
         backToViewer()
@@ -280,8 +296,44 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private fun addFieldLayout() {
-        exerciseFieldsMap[newField]="New field"
-        updateBodyUI(mAction)
+        //todo save what was written
+        exerciseFieldsMap[newField] = ""
+
+//        updateBodyUI(EXERCISE_EDIT)
+
+        var fieldTitleTextView = TextView(this)
+        fieldTitleTextView.layoutParams =
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        fieldTitleTextView.text = newField
+        fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
+
+        linearLayout.addView(fieldTitleTextView)
+
+        var fieldEditText = EditText(this)
+        fieldEditText.layoutParams =
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        fieldEditText.hint = NEW_FIELD_VALUE
+        fieldEditText.text=SpannableStringBuilder(NEW_FIELD_VALUE)
+
+        linearLayout.addView(fieldEditText)
+
+        var fieldInfoTextView = TextView(this)
+        fieldInfoTextView.layoutParams =
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.WRAP_CONTENT
+            )
+        fieldInfoTextView.text = NEW_FIELD_VALUE
+
+        linearLayout.addView(fieldInfoTextView)
+
+        changeVisibility(linearLayout,false)
     }
 
     private val historyButtonListener = View.OnClickListener {
