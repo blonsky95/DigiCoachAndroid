@@ -16,7 +16,7 @@ import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.day.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
-import com.tatoe.mydigicoach.ui.exercise.ExerciseResults
+import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import kotlinx.android.synthetic.main.item_day_result.view.*
 import timber.log.Timber
 
@@ -125,10 +125,10 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         Timber.d("go to exercise results 1 : $exercise")
 
 //        DataHolder.activeExerciseHolder = exercise
-        val intent = Intent(context, ExerciseResults::class.java)
-        intent.putExtra(ExerciseResults.RESULTS_ACTION, ExerciseResults.RESULTS_ADD)
-        intent.putExtra(ExerciseResults.RESULTS_DATE, date)
-        intent.putExtra(ExerciseResults.RESULTS_EXE_ID, exercise.exerciseId)
+        val intent = Intent(context, ResultsViewer::class.java)
+        intent.putExtra(ResultsViewer.RESULTS_ACTION, ResultsViewer.RESULTS_ADD)
+        intent.putExtra(ResultsViewer.RESULTS_DATE, date)
+        intent.putExtra(ResultsViewer.RESULTS_EXE_ID, exercise.exerciseId)
 
 
         startActivity(context, intent, null)

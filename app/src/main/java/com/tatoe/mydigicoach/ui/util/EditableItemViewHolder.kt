@@ -9,13 +9,13 @@ import com.tatoe.mydigicoach.R
 class EditableItemViewHolder(
     v: View,
     private var listener: ClickListenerRecyclerView?,
-    deletableItem: Boolean = false
+    hasSecondaryButton: Boolean = false
 ) :
     RecyclerView.ViewHolder(v),
     View.OnClickListener, View.OnLongClickListener {
 
     val itemInfoView: TextView = v.findViewById(R.id.textView)
-    private val itemDeleteBtn: ImageView = v.findViewById(R.id.deleteButton)
+    private val secondaryBtn: ImageView = v.findViewById(R.id.secondaryButton)
 
     // 2. In a BlockCreator activity, where it is temporarily added until block saved: in this usage, delete button is the listener and there is no listener in the textview
 
@@ -32,9 +32,9 @@ class EditableItemViewHolder(
     }
 
     init {
-        if (deletableItem) {
-            itemDeleteBtn.visibility = View.VISIBLE
-            itemDeleteBtn.setOnClickListener(this)
+        if (hasSecondaryButton) {
+            secondaryBtn.visibility = View.VISIBLE
+            secondaryBtn.setOnClickListener(this)
         } else {
             v.setOnClickListener(this)
             v.setOnLongClickListener(this)

@@ -20,6 +20,8 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var results = arrayListOf<ResultSet>()
+    private var listenerRecyclerView: ClickListenerRecyclerView? = null
+
 
     override fun getItemCount(): Int {
         return results.size
@@ -28,7 +30,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollapsibleItemViewHolder {
         val itemView =
             inflater.inflate(com.tatoe.mydigicoach.R.layout.item_holder_result, parent, false)
-        return CollapsibleItemViewHolder(itemView)
+        return CollapsibleItemViewHolder(itemView,listenerRecyclerView,true)
     }
 
     override fun onBindViewHolder(holder: CollapsibleItemViewHolder, position: Int) {
@@ -51,17 +53,14 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
         }
     }
 
-//    private fun viewExerciseInCreator(exercise: Exercise) {
-//        DataHolder.activeExerciseHolder = exercise
-//        val intent = Intent(context, ExerciseCreator::class.java)
-//        intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_VIEW)
-//        ContextCompat.startActivity(context, intent, null)
-//    }
-
     internal fun setContent(exercise : Exercise) {
         Timber.d("adapter exercise results: ${exercise.results}")
 
         this.results = exercise.results
         notifyDataSetChanged()
+    }
+
+    fun setOnClickInterface (listener: ClickListenerRecyclerView) {
+        this.listenerRecyclerView=listener
     }
 }

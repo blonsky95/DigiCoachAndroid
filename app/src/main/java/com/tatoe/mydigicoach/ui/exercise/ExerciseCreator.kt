@@ -16,20 +16,13 @@ import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.custom_dialog_window.view.*
 import timber.log.Timber
 
 class ExerciseCreator : AppCompatActivity() {
-
-    private lateinit var exerciseName: String
-    private lateinit var exerciseDesc: String
-
-    private lateinit var nameEditText: EditText
-    private lateinit var descEditText: EditText
-    private lateinit var nameTextView: TextView
-    private lateinit var descTextView: TextView
 
     private lateinit var linearLayout: LinearLayout
 
@@ -91,12 +84,6 @@ class ExerciseCreator : AppCompatActivity() {
 
         }
     }
-
-
-    private fun updateToolbarItemVisibility(menuItem: MenuItem?, isVisible: Boolean) {
-        menuItem?.isVisible = isVisible
-    }
-
 
     private fun updateButtonUI(actionType: String) {
         if (actionType == EXERCISE_NEW) {
@@ -337,11 +324,11 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private val historyButtonListener = View.OnClickListener {
-        val intent = Intent(this, ExerciseResults::class.java)
+        val intent = Intent(this, ResultsViewer::class.java)
 
 //        DataHolder.activeExerciseHolder=updatingExercise
-        intent.putExtra(ExerciseResults.RESULTS_ACTION, ExerciseResults.RESULTS_VIEW)
-        intent.putExtra(ExerciseResults.RESULTS_EXE_ID, updatingExercise!!.exerciseId)
+        intent.putExtra(ResultsViewer.RESULTS_ACTION, ResultsViewer.RESULTS_VIEW)
+        intent.putExtra(ResultsViewer.RESULTS_EXE_ID, updatingExercise!!.exerciseId)
 
         startActivity(intent)
     }
@@ -399,6 +386,10 @@ class ExerciseCreator : AppCompatActivity() {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun updateToolbarItemVisibility(menuItem: MenuItem?, isVisible: Boolean) {
+        menuItem?.isVisible = isVisible
     }
 
 

@@ -38,7 +38,7 @@
                 android:name=".ui.day.DayCreator"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".ui.exercise.ExerciseResults"
+                android:name=".ui.results.ResultsViewer"
                 android:windowSoftInputMode="adjustPan" />
 
     </application>
