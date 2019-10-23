@@ -34,7 +34,7 @@ class ExerciseCreator : AppCompatActivity() {
 
     private lateinit var dataViewModel: DataViewModel
 
-    private var updatingExercise: Exercise? = null
+    private var activeExercise: Exercise? = null
     private var exerciseFieldsMap = LinkedHashMap<String, String>()
 
 
@@ -46,10 +46,10 @@ class ExerciseCreator : AppCompatActivity() {
     var NEW_FIELD_VALUE = ""
 
     companion object {
-        var EXERCISE_ACTION = "exercise_action"
-        var EXERCISE_NEW = "exercise_new"
-        var EXERCISE_EDIT = "exercise_edit"
-        var EXERCISE_VIEW = "exercise_view"
+        var OBJECT_ACTION = "exercise_action"
+        var OBJECT_NEW = "exercise_new"
+        var OBJECT_EDIT = "exercise_edit"
+        var OBJECT_VIEW = "exercise_view"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -66,13 +66,13 @@ class ExerciseCreator : AppCompatActivity() {
         leftButton = left_button
         centreButton = centre_button
 
-        if (intent.hasExtra(EXERCISE_ACTION)) { //can only reach this with an intent extra
-            mAction = intent.getStringExtra(EXERCISE_ACTION)
-            if (mAction == EXERCISE_EDIT || mAction == EXERCISE_VIEW) {
+        if (intent.hasExtra(OBJECT_ACTION)) { //can only reach this with an intent extra
+            mAction = intent.getStringExtra(OBJECT_ACTION)
+            if (mAction == OBJECT_EDIT || mAction == OBJECT_VIEW) {
 //                if (DataHolder.activeExerciseHolder != null) {
-                updatingExercise = DataHolder.activeExerciseHolder
-                if (updatingExercise != null) {
-                    exerciseFieldsMap = updatingExercise!!.getFieldsMap()
+                activeExercise = DataHolder.activeExerciseHolder
+                if (activeExercise != null) {
+                    exerciseFieldsMap = activeExercise!!.getFieldsMap()
                 }
 //                }
             } else {
@@ -86,7 +86,7 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private fun updateButtonUI(actionType: String) {
-        if (actionType == EXERCISE_NEW) {
+        if (actionType == OBJECT_NEW) {
             rightButton.visibility = View.VISIBLE
             rightButton.text = "ADD"
             rightButton.setOnClickListener(addButtonListener)
@@ -98,7 +98,7 @@ class ExerciseCreator : AppCompatActivity() {
             return
         } else {
 
-            if (actionType == EXERCISE_EDIT) {
+            if (actionType == OBJECT_EDIT) {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "UPDATE"
                 rightButton.setOnClickListener(updateButtonListener)
@@ -111,7 +111,7 @@ class ExerciseCreator : AppCompatActivity() {
                 leftButton.text = "DELETE"
                 leftButton.setOnClickListener(deleteButtonListener)
             }
-            if (actionType == EXERCISE_VIEW) {
+            if (actionType == OBJECT_VIEW) {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "HISTORY"
                 rightButton.setOnClickListener(historyButtonListener)
@@ -129,13 +129,13 @@ class ExerciseCreator : AppCompatActivity() {
 
         createExerciseFieldsLayout()
 
-        if (actionType == EXERCISE_NEW) {
+        if (actionType == OBJECT_NEW) {
             changeVisibility(linearLayout, false)
         }
-        if (actionType == EXERCISE_EDIT) {
+        if (actionType == OBJECT_EDIT) {
             changeVisibility(linearLayout, false)
         }
-        if (actionType == EXERCISE_VIEW) {
+        if (actionType == OBJECT_VIEW) {
             changeVisibility(linearLayout, true)
         }
     }
@@ -245,17 +245,17 @@ class ExerciseCreator : AppCompatActivity() {
 
         var updatingExerciseFields = getFieldContents()
 
-        updatingExercise!!.name = updatingExerciseFields["Name"]!!
-        updatingExercise!!.description = updatingExerciseFields["Description"]!!
-        updatingExercise!!.fieldsHashMap = updatingExerciseFields
+        activeExercise!!.name = updatingExerciseFields["Name"]!!
+        activeExercise!!.description = updatingExerciseFields["Description"]!!
+        activeExercise!!.fieldsHashMap = updatingExerciseFields
 
-        dataViewModel.updateExercise(updatingExercise!!)
+        dataViewModel.updateExercise(activeExercise!!)
 
         backToViewer()
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        dataViewModel.deleteExercise(updatingExercise!!)
+        dataViewModel.deleteExercise(activeExercise!!)
         backToViewer()
     }
 
@@ -286,7 +286,7 @@ class ExerciseCreator : AppCompatActivity() {
         //todo save what was written
         exerciseFieldsMap[newField] = ""
 
-//        updateBodyUI(EXERCISE_EDIT)
+//        updateBodyUI(OBJECT_EDIT)
 
         var fieldTitleTextView = TextView(this)
         fieldTitleTextView.layoutParams =
@@ -326,9 +326,9 @@ class ExerciseCreator : AppCompatActivity() {
     private val historyButtonListener = View.OnClickListener {
         val intent = Intent(this, ResultsViewer::class.java)
 
-//        DataHolder.activeExerciseHolder=updatingExercise
-        intent.putExtra(ResultsViewer.RESULTS_ACTION, ResultsViewer.RESULTS_VIEW)
-        intent.putExtra(ResultsViewer.RESULTS_EXE_ID, updatingExercise!!.exerciseId)
+        DataHolder.activeExerciseHolder=activeExercise
+        intent.putExtra(OBJECT_ACTION, OBJECT_VIEW)
+//        intent.putExtra(ResultsViewer.RESULTS_EXE_ID, activeExercise!!.exerciseId)
 
         startActivity(intent)
     }
@@ -344,15 +344,15 @@ class ExerciseCreator : AppCompatActivity() {
         menuItemEdit = menu?.findItem(R.id.action_edit)
         menuItemRead = menu?.findItem(R.id.action_read)
         when (mAction) {
-            EXERCISE_EDIT -> {
+            OBJECT_EDIT -> {
                 updateToolbarItemVisibility(menuItemEdit, false)
                 updateToolbarItemVisibility(menuItemRead, true)
             }
-            EXERCISE_VIEW -> {
+            OBJECT_VIEW -> {
                 updateToolbarItemVisibility(menuItemEdit, true)
                 updateToolbarItemVisibility(menuItemRead, false)
             }
-            EXERCISE_NEW -> {
+            OBJECT_NEW -> {
                 updateToolbarItemVisibility(menuItemEdit, false)
                 updateToolbarItemVisibility(menuItemRead, false)
             }
@@ -367,15 +367,15 @@ class ExerciseCreator : AppCompatActivity() {
             true
         }
         R.id.action_edit -> {
-            updateButtonUI(EXERCISE_EDIT)
-            updateBodyUI(EXERCISE_EDIT)
+            updateButtonUI(OBJECT_EDIT)
+            updateBodyUI(OBJECT_EDIT)
             updateToolbarItemVisibility(menuItemEdit, false)
             updateToolbarItemVisibility(menuItemRead, true)
             true
         }
         R.id.action_read -> {
-            updateButtonUI(EXERCISE_VIEW)
-            updateBodyUI(EXERCISE_VIEW)
+            updateButtonUI(OBJECT_VIEW)
+            updateBodyUI(OBJECT_VIEW)
             updateToolbarItemVisibility(menuItemEdit, true)
             updateToolbarItemVisibility(menuItemRead, false)
             true

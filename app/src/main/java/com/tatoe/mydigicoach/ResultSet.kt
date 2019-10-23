@@ -5,6 +5,8 @@ import java.util.*
 
 class ResultSet (date:Date) {
 
+    //this is the format results are saved in the exercise in the database, ArrayList of result sets which include a date and a result (String)
+
     var sDate:Date = date
     var sResult:String? = null
 

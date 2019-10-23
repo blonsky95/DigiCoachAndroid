@@ -2,20 +2,18 @@ package com.tatoe.mydigicoach.ui.results
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
+import com.tatoe.mydigicoach.ui.results.ResultsCreator.Companion.RESULTS_EXE_ID
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
@@ -30,22 +28,10 @@ class ResultsViewer : AppCompatActivity() {
     lateinit var adapter: ResultListAdapter
 
     var exerciseId = -1
-    private var intentAction:String? =null
-    private var intentDate:String? = null
-
+//    private var intentAction:String? =null
+//    private var intentDate:String? = null
 
     private var allExercises = listOf<Exercise>()
-
-
-    companion object {
-        var RESULTS_ACTION = "results_action"
-        var RESULTS_DATE = "results_date"
-        var RESULTS_EXE_ID = "results_exe_id"
-
-
-        var RESULTS_VIEW = "results_view"
-        var RESULTS_ADD = "results_add"
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,7 +46,7 @@ class ResultsViewer : AppCompatActivity() {
             override fun onClick(view: View, position: Int) {
                 super.onClick(view, position)
                 val intent = Intent(this@ResultsViewer, ResultsCreator::class.java)
-                intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_VIEW)
+                intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
                 updateUpdatingExercise(position)
 
                 startActivity(intent)

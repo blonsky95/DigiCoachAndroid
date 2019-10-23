@@ -40,6 +40,9 @@
         <activity
                 android:name=".ui.results.ResultsViewer"
                 android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.results.ResultsCreator"
+                android:windowSoftInputMode="adjustPan" />
 
     </application>
 

@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.ui.results
 
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -9,12 +10,15 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.EXERCISE_EDIT
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.EXERCISE_NEW
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.EXERCISE_VIEW
+import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_ACTION
+import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_EDIT
+import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_NEW
+import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_VIEW
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_results_creator.*
+import timber.log.Timber
 
 class ResultsCreator : AppCompatActivity() {
 
@@ -28,6 +32,14 @@ class ResultsCreator : AppCompatActivity() {
 
     lateinit var mAction: String
 
+    var activeExercise: Exercise? = null
+    lateinit var resultDate:String
+
+    companion object {
+        var RESULTS_DATE = "results_date"
+        var RESULTS_EXE_ID = "results_exe_id"
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results_creator)
@@ -40,35 +52,30 @@ class ResultsCreator : AppCompatActivity() {
         rightButton = right_button
         leftButton = left_button
 
-//        if (intent.hasExtra(EXERCISE_ACTION)) { //can only reach this with an intent extra
-//            mAction = intent.getStringExtra(EXERCISE_ACTION)
-//            if (mAction == EXERCISE_EDIT || mAction == EXERCISE_VIEW) {
-////                if (DataHolder.activeExerciseHolder != null) {
-//                updatingExercise = DataHolder.activeExerciseHolder
-//                if (updatingExercise != null) {
-//                    exerciseFieldsMap = updatingExercise!!.getFieldsMap()
-//                }
-////                }
-//            } else {
-//                exerciseFieldsMap["Name"] = ""
-//                exerciseFieldsMap["Description"] = ""
-//            }
-//            updateBodyUI(mAction)
-//            updateButtonUI(mAction)
-//
-//        }
+        if (intent.hasExtra(OBJECT_ACTION)) { //can only reach this with an intent extra
+            mAction = intent.getStringExtra(OBJECT_ACTION)
+            resultDate=intent.getStringExtra(RESULTS_DATE)
+
+            activeExercise = DataHolder.activeExerciseHolder
+            result_title_text_view.text=activeExercise!!.name
+            Timber.d("ACTION RECEIVED AT RESULTS CREATOR: $mAction $resultDate")
+
+            updateBodyUI(mAction)
+            updateButtonUI(mAction)
+
+        }
     }
 
     private fun updateButtonUI(actionType: String) {
-        if (actionType == EXERCISE_NEW) {
+        if (actionType == OBJECT_NEW) {
             rightButton.visibility = View.VISIBLE
             rightButton.text = "ADD"
-//            rightButton.setOnClickListener(addButtonListener)
+            rightButton.setOnClickListener(addButtonListener)
 
             return
         } else {
 
-            if (actionType == EXERCISE_EDIT) {
+            if (actionType == OBJECT_EDIT) {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "UPDATE"
 //                rightButton.setOnClickListener(updateButtonListener)
@@ -77,7 +84,7 @@ class ResultsCreator : AppCompatActivity() {
                 leftButton.text = "DELETE"
 //                leftButton.setOnClickListener(deleteButtonListener)
             }
-            if (actionType == EXERCISE_VIEW) {
+            if (actionType == OBJECT_VIEW) {
                 rightButton.visibility = View.INVISIBLE
                 leftButton.visibility = View.INVISIBLE
             }
@@ -86,7 +93,7 @@ class ResultsCreator : AppCompatActivity() {
 
     private fun updateBodyUI(actionType: String) {
 
-        if (actionType == EXERCISE_VIEW) {
+        if (actionType == OBJECT_VIEW) {
             result_edit_text.visibility = View.GONE
             result_text_view.visibility = View.VISIBLE
         } else {
@@ -95,16 +102,19 @@ class ResultsCreator : AppCompatActivity() {
         }
     }
 
-//    private val addButtonListener = View.OnClickListener {
-//
-//        var newExerciseFields = getFieldContents()
-//
-//        var newExercise = Exercise(newExerciseFields["Name"]!!, newExerciseFields["Description"]!!)
-//        newExercise.fieldsHashMap = newExerciseFields
-//
-//        dataViewModel.insertExercise(newExercise)
-//        backToViewer()
-//    }
+    private val addButtonListener = View.OnClickListener {
+
+//        var resultDate = TextView1.text.toString()
+        var resultString = SpannableStringBuilder(result_edit_text.text.trim().toString()).toString()
+
+        activeExercise?.addResult(Day.dayIDtoDashSeparator(resultDate), resultString)
+        if (activeExercise != null) {
+            dataViewModel.updateExerciseResult(activeExercise!!)
+        }
+        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.results!!.size}")
+        finish() //?
+    }
+
 //    private val updateButtonListener = View.OnClickListener {
 //
 //        var updatingExerciseFields = getFieldContents()
@@ -128,15 +138,15 @@ class ResultsCreator : AppCompatActivity() {
         menuItemEdit = menu?.findItem(R.id.action_edit)
         menuItemRead = menu?.findItem(R.id.action_read)
         when (mAction) {
-            EXERCISE_EDIT -> {
+            OBJECT_EDIT -> {
                 updateToolbarItemVisibility(menuItemEdit, false)
                 updateToolbarItemVisibility(menuItemRead, true)
             }
-            EXERCISE_VIEW -> {
+            OBJECT_VIEW -> {
                 updateToolbarItemVisibility(menuItemEdit, true)
                 updateToolbarItemVisibility(menuItemRead, false)
             }
-            EXERCISE_NEW -> {
+            OBJECT_NEW -> {
                 updateToolbarItemVisibility(menuItemEdit, false)
                 updateToolbarItemVisibility(menuItemRead, false)
             }
@@ -151,15 +161,15 @@ class ResultsCreator : AppCompatActivity() {
             true
         }
         R.id.action_edit -> {
-            updateButtonUI(EXERCISE_EDIT)
-            updateBodyUI(EXERCISE_EDIT)
+            updateButtonUI(OBJECT_EDIT)
+            updateBodyUI(OBJECT_EDIT)
             updateToolbarItemVisibility(menuItemEdit, false)
             updateToolbarItemVisibility(menuItemRead, true)
             true
         }
         R.id.action_read -> {
-            updateButtonUI(EXERCISE_VIEW)
-            updateBodyUI(EXERCISE_VIEW)
+            updateButtonUI(OBJECT_VIEW)
+            updateBodyUI(OBJECT_VIEW)
             updateToolbarItemVisibility(menuItemEdit, true)
             updateToolbarItemVisibility(menuItemRead, false)
             true
