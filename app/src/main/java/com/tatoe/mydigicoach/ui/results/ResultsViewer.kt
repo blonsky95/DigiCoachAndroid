@@ -83,10 +83,22 @@ class ResultsViewer : AppCompatActivity() {
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
                 allExercises = it
-                Timber.d("all exercises updated")
                 for (exercise in allExercises) {
                     if (exercise.exerciseId == exerciseId) {
                         activeExercise = exercise
+                        if (activeExercise!!.results.isEmpty()) {
+                            ifEmptyResultsText.visibility = View.VISIBLE
+                            ResultsRecyclerView.visibility=View.GONE
+
+                        } else {
+                            ifEmptyResultsText.visibility = View.GONE
+                            ResultsRecyclerView.visibility=View.VISIBLE
+                        }
+                        adapter.setContent(activeExercise!!)
+                        Timber.d("active exercise = $activeExercise")
+                        Timber.d("active exercise results ${activeExercise!!.results[0].sResult.toString()}")
+
+
                         return@let
                     }
                 }

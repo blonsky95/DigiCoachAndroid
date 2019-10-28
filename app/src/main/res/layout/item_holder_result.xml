@@ -3,12 +3,31 @@
         android:orientation="vertical" android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-    <TextView
-            android:id="@+id/result_date"
-            android:layout_height="wrap_content"
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
-            android:padding="12dp"
-            android:background="@android:color/holo_orange_light"/>
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <TextView
+                android:id="@+id/result_date"
+                android:layout_height="match_parent"
+                android:layout_width="0dp"
+                android:layout_weight="3"
+                android:padding="12dp"
+                android:background="@android:color/holo_orange_light"/>
+
+        <ImageView
+                android:id="@+id/secondaryButton"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#971212"
+                android:contentDescription="into_deep"
+                android:src="@drawable/arrow_right_white"
+                android:visibility="gone" />
+    </LinearLayout>
+
 
     <TextView
             android:id="@+id/result_result"

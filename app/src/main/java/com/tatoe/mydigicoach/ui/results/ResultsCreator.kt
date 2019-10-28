@@ -33,7 +33,7 @@ class ResultsCreator : AppCompatActivity() {
     lateinit var mAction: String
 
     var activeExercise: Exercise? = null
-    lateinit var resultDate:String
+     private var resultDate = "unknown date"
 
     companion object {
         var RESULTS_DATE = "results_date"
@@ -54,7 +54,10 @@ class ResultsCreator : AppCompatActivity() {
 
         if (intent.hasExtra(OBJECT_ACTION)) { //can only reach this with an intent extra
             mAction = intent.getStringExtra(OBJECT_ACTION)
-            resultDate=intent.getStringExtra(RESULTS_DATE)
+
+            if (intent.hasExtra(RESULTS_DATE)) {
+                resultDate = intent.getStringExtra(RESULTS_DATE)
+            }
 
             activeExercise = DataHolder.activeExerciseHolder
             result_title_text_view.text=activeExercise!!.name

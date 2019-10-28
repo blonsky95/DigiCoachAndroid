@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
@@ -328,7 +329,7 @@ class ExerciseCreator : AppCompatActivity() {
 
         DataHolder.activeExerciseHolder=activeExercise
         intent.putExtra(OBJECT_ACTION, OBJECT_VIEW)
-//        intent.putExtra(ResultsViewer.RESULTS_EXE_ID, activeExercise!!.exerciseId)
+        intent.putExtra(ResultsCreator.RESULTS_EXE_ID, activeExercise!!.exerciseId)
 
         startActivity(intent)
     }
