@@ -47,6 +47,7 @@ class ResultsViewer : AppCompatActivity() {
                 super.onClick(view, position)
                 val intent = Intent(this@ResultsViewer, ResultsCreator::class.java)
                 intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
+                intent.putExtra(ResultsCreator.RESULT_INDEX,position)
                 updateUpdatingExercise(position)
 
                 startActivity(intent)

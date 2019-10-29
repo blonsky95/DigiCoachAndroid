@@ -38,6 +38,7 @@ class ResultsCreator : AppCompatActivity() {
     companion object {
         var RESULTS_DATE = "results_date"
         var RESULTS_EXE_ID = "results_exe_id"
+        var RESULT_INDEX = "result_index"
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +52,7 @@ class ResultsCreator : AppCompatActivity() {
 
         rightButton = right_button
         leftButton = left_button
-
+        //todo receive result index and get the result information
         if (intent.hasExtra(OBJECT_ACTION)) { //can only reach this with an intent extra
             mAction = intent.getStringExtra(OBJECT_ACTION)
 
@@ -99,6 +100,7 @@ class ResultsCreator : AppCompatActivity() {
         if (actionType == OBJECT_VIEW) {
             result_edit_text.visibility = View.GONE
             result_text_view.visibility = View.VISIBLE
+            result_text_view.text="result text"
         } else {
             result_edit_text.visibility = View.VISIBLE
             result_text_view.visibility = View.GONE
