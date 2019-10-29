@@ -16,12 +16,6 @@ class MainActivity : AppCompatActivity() {
 
     //todo when basic functionalities are there - FIX FIX CLEAN WARNINGS
 
-    //todo NEXT - think about the READ/EDIT mode - keyboard in edit text doesnt have enter
-
-    //todo NEXT NEXT - section in exercises to see which days it is assigned (think of UI and content here as well as in the Calendar View) - for now just string
-
-    //todo BASICALLY check notebook
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

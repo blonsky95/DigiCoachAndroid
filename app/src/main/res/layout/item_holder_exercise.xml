@@ -20,7 +20,7 @@
                 android:padding="12dp" />
 
         <ImageView
-                android:id="@+id/deleteButton"
+                android:id="@+id/secondaryButton"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"

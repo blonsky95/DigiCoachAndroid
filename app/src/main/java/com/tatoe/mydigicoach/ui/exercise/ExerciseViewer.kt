@@ -40,7 +40,7 @@ class ExerciseViewer : AppCompatActivity() {
 
                 Toast.makeText(this@ExerciseViewer, "$position was clicked", Toast.LENGTH_SHORT).show()
                 val intent = Intent(this@ExerciseViewer, ExerciseCreator::class.java)
-                intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_UPDATE)
+                intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
                 updateUpdatingExercise(position)
 
                 startActivity(intent)
@@ -49,7 +49,7 @@ class ExerciseViewer : AppCompatActivity() {
         }
 
         adapter = ExerciseListAdapter(this)
-        adapter.setListener(myListener)
+        adapter.setOnClickInterface(myListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -74,7 +74,7 @@ class ExerciseViewer : AppCompatActivity() {
             Timber.d("Exercise Viewer --> Exercise creator")
 
             val intent = Intent(this, ExerciseCreator::class.java)
-            intent.putExtra(ExerciseCreator.EXERCISE_ACTION, ExerciseCreator.EXERCISE_NEW)
+            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
             startActivity(intent)
 
         }

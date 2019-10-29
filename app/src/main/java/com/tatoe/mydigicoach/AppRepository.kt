@@ -23,7 +23,7 @@ class AppRepository(
 
     suspend fun insertExercise(exercise: Exercise) {
         var rowId = exerciseDao.insert(exercise)
-        Timber.d("new currentExercise, row: $rowId")
+        Timber.d("new activeExercise, row: $rowId")
     }
 
 //    suspend fun getExerciseById(exeId:Int){
@@ -32,7 +32,7 @@ class AppRepository(
 
     suspend fun updateExercise(updatedExercise: Exercise) {
         exerciseDao.update(updatedExercise)
-        Timber.d("updated currentExercise: $updatedExercise)")
+        Timber.d("updated activeExercise: $updatedExercise)")
         updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
     }
 

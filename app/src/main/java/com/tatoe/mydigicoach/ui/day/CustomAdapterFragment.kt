@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -14,7 +13,6 @@ import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
-import com.tatoe.mydigicoach.ui.util.EditableItemViewHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.fragment_adapter_container.view.*
 import timber.log.Timber
@@ -102,7 +100,7 @@ class CustomAdapterFragment : Fragment() {
         adapterExercises = ExerciseListAdapter(activity!!,hasDelete)
         mRecyclerView.adapter = adapterExercises
         mRecyclerView.layoutManager=LinearLayoutManager(activity!!)
-        adapterExercises?.setListener(listener)
+        adapterExercises?.setOnClickInterface(listener)
     }
 
     fun updateBlockAdapterContent(blocks:List<Block>) {

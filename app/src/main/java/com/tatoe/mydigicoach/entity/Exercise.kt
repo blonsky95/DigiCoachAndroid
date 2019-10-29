@@ -5,7 +5,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.tatoe.mydigicoach.ResultSet
+import timber.log.Timber
 import java.util.*
+import kotlin.collections.LinkedHashMap
 
 @Entity(tableName = "exercise_table")
 
@@ -20,12 +22,35 @@ data class Exercise(
     @field: SerializedName("result")
     var results: ArrayList<ResultSet> = arrayListOf()
 
+    @ColumnInfo(name = "fieldsHashMap")
+    @field: SerializedName("fieldsHashMap")
+    var fieldsHashMap: LinkedHashMap<String,String> = LinkedHashMap() //todo eventually this will get rid of saving name and description in database
+
+    //todo find a way of making the constructor, and instance data retrieval more efficient by
+    //todo finding synergy between the LinkedHashMap including name and description and having a method here
+
+
+    //I only want name and description as constructors, so primary key id is outside
+    // constructor and starts with 0 (initialization required).
+    constructor(name: String, description: String) : this(0, name, description)
+
+    //returns linked hash map with name, description + extra fieldsHashMap
+    fun getFieldsMap():LinkedHashMap<String,String> {
+//        val linkedHashMap = LinkedHashMap<String,String>()
+//        linkedHashMap["Name"]=name
+//        linkedHashMap["Description"]=description
+//        for (field in fieldsHashMap){
+//            linkedHashMap[field.key]=field.value
+//        }
+        return fieldsHashMap
+    }
+
     fun addResult(date: String, result: String) {
 
         var newDate = Day.dashSeparatedDateFormat.parse(date)
         var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
         resultSet.addResult(result)
-
+        Timber.d("RESULT SET: ${resultSet.sResult}")
 //        results.add(resultSet)
         addToArrayByDate(resultSet)
     }
@@ -39,16 +64,11 @@ data class Exercise(
             }
             i++
         }
+
         results.add(i, newResultSet)
+        Timber.d("RESULT SET 2: ${results.size}")
 
     }
 
-//    fun getResults() : ArrayList<com.tatoe.mydigicoach.ResultSet> {
-//
-//    }
-
-    //I only want name and description as constructors, so primary key id is outside
-    // constructor and starts with 0 (initialization required).
-    constructor(name: String, description: String) : this(0, name, description)
 
 }
