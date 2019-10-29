@@ -103,6 +103,10 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     }
 
     private fun updateBottomContent() {
+        Timber.d("updating bottom content blocks $currentDayBlocks")
+        Timber.d("updating bottom content exes $currentDayExercises")
+
+
         pagerAdapterBottom.mBlockFragment?.updateBlockAdapterContent(currentDayBlocks)
         pagerAdapterBottom.mExerciseFragment?.updateExerciseAdapterContent(currentDayExercises)
     }
