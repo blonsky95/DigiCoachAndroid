@@ -54,7 +54,6 @@ class ResultsCreator : AppCompatActivity() {
 
         rightButton = right_button
         leftButton = left_button
-        //todo receive result index and get the result information
         if (intent.hasExtra(OBJECT_ACTION)) { //can only reach this with an intent extra
             mAction = intent.getStringExtra(OBJECT_ACTION)
 
@@ -67,6 +66,8 @@ class ResultsCreator : AppCompatActivity() {
             }
 
             activeExercise = DataHolder.activeExerciseHolder
+            Timber.d("ACTIVE EXERCISE IN CREATOR ${activeExercise!!}")
+
             result_title_text_view.text = activeExercise!!.name
             Timber.d("ACTION RECEIVED AT RESULTS CREATOR: $mAction $resultDate result index: $resultIndex")
 
@@ -104,10 +105,20 @@ class ResultsCreator : AppCompatActivity() {
     private fun updateBodyUI(actionType: String) {
 
         if (actionType == OBJECT_VIEW) {
+
+//            Timber.d("active exercise results 3 ${activeExercise!!.results[0].sResult.toString()}")
+//            Timber.d("active exercise results 4 ${activeExercise!!.results[1].sResult.toString()}")
             result_edit_text.visibility = View.GONE
             result_text_view.visibility = View.VISIBLE
             result_text_view.text = activeExercise!!.results[resultIndex].sResult
-        } else {
+            return
+        }
+
+        if (actionType == OBJECT_NEW) {
+            result_edit_text.visibility = View.VISIBLE
+            result_edit_text.hint = "How did it go?"
+            result_text_view.visibility = View.GONE
+        } else { //must be edit
             result_edit_text.visibility = View.VISIBLE
             result_edit_text.text =
                 SpannableStringBuilder(activeExercise!!.results[resultIndex].sResult)
@@ -132,7 +143,7 @@ class ResultsCreator : AppCompatActivity() {
         activeExercise!!.results[resultIndex].sResult =
             SpannableStringBuilder(result_edit_text.text.trim()).toString()
         dataViewModel.updateExerciseResult(activeExercise!!)
-        DataHolder.activeExerciseHolder=activeExercise
+        DataHolder.activeExerciseHolder = activeExercise
 
         backToViewer()
     }
@@ -140,13 +151,14 @@ class ResultsCreator : AppCompatActivity() {
     private val deleteButtonListener = View.OnClickListener {
         activeExercise!!.results.removeAt(resultIndex)
         dataViewModel.updateExerciseResult(activeExercise!!)
-        DataHolder.activeExerciseHolder=activeExercise
+        DataHolder.activeExerciseHolder = activeExercise
 
         backToViewer()
     }
 
     private fun backToViewer() {
         val intent = Intent(this, ResultsViewer::class.java)
+        intent.putExtra(RESULTS_EXE_ID, activeExercise!!.exerciseId)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
     }
