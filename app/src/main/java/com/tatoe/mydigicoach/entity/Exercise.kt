@@ -55,14 +55,14 @@ data class Exercise(
         addToArrayByDate(resultSet)
     }
 
-    fun updateResult(result: String, resultIndex:Int) {
-        if (resultIndex<results.size) {
-            results[resultIndex].sResult=result
-        } else {
-            Timber.d ("this result does not exist, resultindex: $resultIndex, results size ${results.size}")
-        }
-        //if you call this you still need to update the exercise
-    }
+//    fun updateResult(result: String, resultIndex:Int) {
+//        if (resultIndex<results.size) {
+//            results[resultIndex].sResult=result
+//        } else {
+//            Timber.d ("this result does not exist, resultindex: $resultIndex, results size ${results.size}")
+//        }
+//        //if you call this you still need to update the exercise
+//    }
 
     private fun addToArrayByDate(newResultSet: ResultSet) {
         var i = 0

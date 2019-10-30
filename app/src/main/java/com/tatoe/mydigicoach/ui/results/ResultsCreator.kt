@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach.ui.results
 
+import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.Menu
@@ -33,7 +34,8 @@ class ResultsCreator : AppCompatActivity() {
     lateinit var mAction: String
 
     var activeExercise: Exercise? = null
-     private var resultDate = "unknown date"
+    private var resultDate = "unknown date"
+    private var resultIndex = -1
 
     companion object {
         var RESULTS_DATE = "results_date"
@@ -60,9 +62,13 @@ class ResultsCreator : AppCompatActivity() {
                 resultDate = intent.getStringExtra(RESULTS_DATE)
             }
 
+            if (intent.hasExtra(RESULT_INDEX)) {
+                resultIndex = intent.getIntExtra(RESULT_INDEX, -1)
+            }
+
             activeExercise = DataHolder.activeExerciseHolder
-            result_title_text_view.text=activeExercise!!.name
-            Timber.d("ACTION RECEIVED AT RESULTS CREATOR: $mAction $resultDate")
+            result_title_text_view.text = activeExercise!!.name
+            Timber.d("ACTION RECEIVED AT RESULTS CREATOR: $mAction $resultDate result index: $resultIndex")
 
             updateBodyUI(mAction)
             updateButtonUI(mAction)
@@ -82,11 +88,11 @@ class ResultsCreator : AppCompatActivity() {
             if (actionType == OBJECT_EDIT) {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "UPDATE"
-//                rightButton.setOnClickListener(updateButtonListener)
+                rightButton.setOnClickListener(updateButtonListener)
 
                 leftButton.visibility = View.VISIBLE
                 leftButton.text = "DELETE"
-//                leftButton.setOnClickListener(deleteButtonListener)
+                leftButton.setOnClickListener(deleteButtonListener)
             }
             if (actionType == OBJECT_VIEW) {
                 rightButton.visibility = View.INVISIBLE
@@ -100,17 +106,19 @@ class ResultsCreator : AppCompatActivity() {
         if (actionType == OBJECT_VIEW) {
             result_edit_text.visibility = View.GONE
             result_text_view.visibility = View.VISIBLE
-            result_text_view.text="result text"
+            result_text_view.text = activeExercise!!.results[resultIndex].sResult
         } else {
             result_edit_text.visibility = View.VISIBLE
+            result_edit_text.text =
+                SpannableStringBuilder(activeExercise!!.results[resultIndex].sResult)
             result_text_view.visibility = View.GONE
         }
     }
 
     private val addButtonListener = View.OnClickListener {
 
-//        var resultDate = TextView1.text.toString()
-        var resultString = SpannableStringBuilder(result_edit_text.text.trim().toString()).toString()
+        //        var resultDate = TextView1.text.toString()
+        var resultString = SpannableStringBuilder(result_edit_text.text.trim()).toString()
 
         activeExercise?.addResult(Day.dayIDtoDashSeparator(resultDate), resultString)
         if (activeExercise != null) {
@@ -120,23 +128,28 @@ class ResultsCreator : AppCompatActivity() {
         finish() //?
     }
 
-//    private val updateButtonListener = View.OnClickListener {
-//
-//        var updatingExerciseFields = getFieldContents()
-//
-//        updatingExercise!!.name = updatingExerciseFields["Name"]!!
-//        updatingExercise!!.description = updatingExerciseFields["Description"]!!
-//        updatingExercise!!.fieldsHashMap = updatingExerciseFields
-//
-//        dataViewModel.updateExercise(updatingExercise!!)
-//
-//        backToViewer()
-//    }
-//
-//    private val deleteButtonListener = View.OnClickListener {
-//        dataViewModel.deleteExercise(updatingExercise!!)
-//        backToViewer()
-//    }
+    private val updateButtonListener = View.OnClickListener {
+        activeExercise!!.results[resultIndex].sResult =
+            SpannableStringBuilder(result_edit_text.text.trim()).toString()
+        dataViewModel.updateExerciseResult(activeExercise!!)
+        DataHolder.activeExerciseHolder=activeExercise
+
+        backToViewer()
+    }
+
+    private val deleteButtonListener = View.OnClickListener {
+        activeExercise!!.results.removeAt(resultIndex)
+        dataViewModel.updateExerciseResult(activeExercise!!)
+        DataHolder.activeExerciseHolder=activeExercise
+
+        backToViewer()
+    }
+
+    private fun backToViewer() {
+        val intent = Intent(this, ResultsViewer::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(intent)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.exercise_creator_toolbar, menu)
