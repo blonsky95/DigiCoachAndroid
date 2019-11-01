@@ -25,7 +25,7 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 
 import kotlinx.android.synthetic.main.activity_block_creator.*
-import kotlinx.android.synthetic.main.exercise_info_dialog_window.view.*
+import kotlinx.android.synthetic.main.info_dialog_window.view.*
 import timber.log.Timber
 
 class BlockCreator : AppCompatActivity() {
@@ -219,7 +219,7 @@ class BlockCreator : AppCompatActivity() {
     }
 
     private fun showItemInfo (title:String?,description:String?) {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.exercise_info_dialog_window, null)
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.info_dialog_window, null)
 //        mDialogView.item_title.text= "Description"
         mDialogView.item_description.text= description
         //AlertDialogBuilder

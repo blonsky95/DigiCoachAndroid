@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:tools="http://schemas.android.com/tools"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.exercise.ExerciseViewer">
@@ -21,36 +20,56 @@
             android:id="@+id/recyclerview"
             android:layout_width="match_parent"
             android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
             android:background="@android:color/darker_gray"
-            tools:listitem="@layout/item_holder_exercise"
-            app:layout_constraintTop_toBottomOf="@+id/my_toolbar" app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@+id/linearLayout"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginBottom="8dp" app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-            app:layout_constraintVertical_bias="0.0"/>
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/item_holder_exercise" />
 
-    <TextView android:layout_width="match_parent"
-              android:layout_height="match_parent"
-              android:gravity="center"
-              android:visibility="gone"
-              android:text="No exercises found, create new exercises to view them here"
-              android:id="@+id/ifEmptyText"/>
+    <TextView
+            android:id="@+id/ifEmptyText"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="No exercises found, create new exercises to view them here"
+            android:visibility="gone" />
 
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-                  app:layout_constraintEnd_toEndOf="parent" app:layout_constraintStart_toStartOf="parent"
-                  app:layout_constraintBottom_toBottomOf="parent"
-                  android:id="@+id/linearLayout"
-                  android:layout_marginBottom="8dp">
+    <RelativeLayout
+            android:id="@+id/linearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+
         <Button
-                android:text="Add Exercise"
+                android:id="@+id/addExerciseBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/addExerciseBtn"
-                app:layout_constraintStart_toStartOf="parent"
-                android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                android:layout_marginTop="0dp" app:layout_constraintTop_toBottomOf="@+id/recyclerview"
-                app:layout_constraintEnd_toEndOf="parent" android:layout_marginBottom="0dp"/>
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="0dp"
+                android:layout_alignParentStart="true"
+                android:text="Add Exercise" />
 
-    </LinearLayout>
+        <Button
+                android:id="@+id/exportBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="0dp"
+                android:layout_alignParentEnd="true"
+                android:text="Export"
+                tools:visibility="gone" />
+
+    </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
