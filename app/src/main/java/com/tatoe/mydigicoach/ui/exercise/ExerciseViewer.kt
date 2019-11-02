@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import androidx.appcompat.app.AlertDialog
+import com.tatoe.mydigicoach.ImportExportUtils
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
@@ -30,7 +31,7 @@ class ExerciseViewer : AppCompatActivity() {
 
     private lateinit var goToCreatorListener: ClickListenerRecyclerView
     private lateinit var itemSelectorListener: ClickListenerRecyclerView
-    private var selectedExercises = arrayListOf<Int>()
+    private var selectedIndexes = arrayListOf<Int>()
 
     private lateinit var allExercises:List<Exercise>
 
@@ -101,12 +102,12 @@ class ExerciseViewer : AppCompatActivity() {
                 super.onClick(view, position)
                 Timber.d("click registered export")
 
-                if (!selectedExercises.contains(position)) {
+                if (!selectedIndexes.contains(position)) {
                     view.alpha=0.5f
-                    selectedExercises.add(position)
+                    selectedIndexes.add(position)
                 } else {
 
-                    val iterator = selectedExercises.iterator()
+                    val iterator = selectedIndexes.iterator()
                     while (iterator.hasNext()){
                         val y = iterator.next()
                         if (y== position) {
@@ -117,7 +118,7 @@ class ExerciseViewer : AppCompatActivity() {
                     }
 
                 }
-                Timber.d("current selection: $selectedExercises")
+                Timber.d("current selection: $selectedIndexes")
 
             }
         }
@@ -168,9 +169,10 @@ class ExerciseViewer : AppCompatActivity() {
         updateAdapterListener(itemSelectorListener)
         exportBtn.visibility=View.VISIBLE
         exportBtn.setOnClickListener {
-            Timber.d("Final selection: $selectedExercises")
+            Timber.d("Final selection: $selectedIndexes")
             exportBtn.visibility=View.GONE
-            //todo here call the import export utils with the selectedExercises
+            //todo here call the import export utils with the selectedIndexes
+            ImportExportUtils.exportExercises(allExercises,selectedIndexes)
             updateAdapterListener(goToCreatorListener)
         }
 
