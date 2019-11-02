@@ -201,14 +201,14 @@ class ExerciseCreator : AppCompatActivity() {
                 continue
             }
             if (childView is EditText) {
-                Timber.d("visibility of child $index changed to $editTextVisibility")
+//                Timber.d("visibility of child $index changed to $editTextVisibility")
 
                 childView.visibility = editTextVisibility
                 continue
 
             }
             if (childView is TextView) {
-                Timber.d("visibility of child $index changed to $textViewVisibility")
+//                Timber.d("visibility of child $index changed to $textViewVisibility")
 
                 childView.visibility = textViewVisibility
             }

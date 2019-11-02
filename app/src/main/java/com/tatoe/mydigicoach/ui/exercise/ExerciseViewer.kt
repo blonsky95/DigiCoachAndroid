@@ -16,7 +16,6 @@ import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
-import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
@@ -100,13 +99,25 @@ class ExerciseViewer : AppCompatActivity() {
         itemSelectorListener = object : ClickListenerRecyclerView {
             override fun onClick(view: View, position: Int) {
                 super.onClick(view, position)
+                Timber.d("click registered export")
 
                 if (!selectedExercises.contains(position)) {
+                    view.alpha=0.5f
                     selectedExercises.add(position)
-                    Timber.d("current selection: $selectedExercises")
+                } else {
+
+                    val iterator = selectedExercises.iterator()
+                    while (iterator.hasNext()){
+                        val y = iterator.next()
+                        if (y== position) {
+                            view.alpha=1.0f
+                            iterator.remove()
+                            break
+                        }
+                    }
+
                 }
-                //updateSelectedExercises()
-//                startActivity(intent)
+                Timber.d("current selection: $selectedExercises")
 
             }
         }
@@ -159,6 +170,7 @@ class ExerciseViewer : AppCompatActivity() {
         exportBtn.setOnClickListener {
             Timber.d("Final selection: $selectedExercises")
             exportBtn.visibility=View.GONE
+            //todo here call the import export utils with the selectedExercises
             updateAdapterListener(goToCreatorListener)
         }
 
