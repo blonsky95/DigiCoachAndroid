@@ -100,7 +100,7 @@ class ExerciseViewer : AppCompatActivity() {
         itemSelectorListener = object : ClickListenerRecyclerView {
             override fun onClick(view: View, position: Int) {
                 super.onClick(view, position)
-                Timber.d("click registered export")
+//                Timber.d("click registered export")
 
                 if (!selectedIndexes.contains(position)) {
                     view.alpha=0.5f
@@ -118,7 +118,7 @@ class ExerciseViewer : AppCompatActivity() {
                     }
 
                 }
-                Timber.d("current selection: $selectedIndexes")
+//                Timber.d("current selection: $selectedIndexes")
 
             }
         }
