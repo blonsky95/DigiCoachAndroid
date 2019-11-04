@@ -1,6 +1,8 @@
 package com.tatoe.mydigicoach.ui.exercise
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.Menu
@@ -17,10 +19,14 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import androidx.appcompat.app.AlertDialog
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.tatoe.mydigicoach.ImportExportUtils
+import com.tatoe.mydigicoach.MainApplication
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.ui.util.ManagePermissions
 import kotlinx.android.synthetic.main.info_dialog_window.view.*
 
 
@@ -33,21 +39,32 @@ class ExerciseViewer : AppCompatActivity() {
     private lateinit var itemSelectorListener: ClickListenerRecyclerView
     private var selectedIndexes = arrayListOf<Int>()
 
-    private lateinit var allExercises:List<Exercise>
+    private lateinit var allExercises: List<Exercise>
+
+    private lateinit var managePermissions: ManagePermissions
+    private val PermissionsRequestCode = 123
+
+    val list = listOf(
+        Manifest.permission.READ_EXTERNAL_STORAGE,
+        Manifest.permission.WRITE_EXTERNAL_STORAGE
+    )
 
 //    private var SELECT_ITEMS_UI = "select_items_ui"
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_viewer)
         title = "Exercise Viewer"
 
+        managePermissions = ManagePermissions(this,list,PermissionsRequestCode)
+
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         recyclerView = recyclerview as RecyclerView
 
-        exportBtn.visibility=View.GONE
+        exportBtn.visibility = View.GONE
         initAdapterListeners()
 
         adapter = ExerciseListAdapter(this)
@@ -59,7 +76,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
-//                Timber.d("PTG all exercises observer triggered: $exercises")
+                //                Timber.d("PTG all exercises observer triggered: $exercises")
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
@@ -68,7 +85,7 @@ class ExerciseViewer : AppCompatActivity() {
                     ifEmptyText.visibility = View.GONE
                     recyclerView.visibility = View.VISIBLE
                     adapter.setExercises(it)
-                    allExercises=it
+                    allExercises = it
                 }
             }
         })
@@ -103,15 +120,15 @@ class ExerciseViewer : AppCompatActivity() {
 //                Timber.d("click registered export")
 
                 if (!selectedIndexes.contains(position)) {
-                    view.alpha=0.5f
+                    view.alpha = 0.5f
                     selectedIndexes.add(position)
                 } else {
 
                     val iterator = selectedIndexes.iterator()
-                    while (iterator.hasNext()){
+                    while (iterator.hasNext()) {
                         val y = iterator.next()
-                        if (y== position) {
-                            view.alpha=1.0f
+                        if (y == position) {
+                            view.alpha = 1.0f
                             iterator.remove()
                             break
                         }
@@ -139,7 +156,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         R.id.action_export -> {
             //show dialog with instructions to select
-            showImportDialog()
+            managePermissions.checkPermissions()
             true
         }
 
@@ -147,6 +164,23 @@ class ExerciseViewer : AppCompatActivity() {
             // If we got here, the user's action was not recognized.
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+                                            grantResults: IntArray) {
+        when (requestCode) {
+            PermissionsRequestCode ->{
+                val isPermissionsGranted = managePermissions
+                    .processPermissionsResult(requestCode,permissions,grantResults)
+
+                if(isPermissionsGranted){
+                    showImportDialog()
+                }else{
+                    Timber.d("Permissions denied.")
+                }
+                return
+            }
         }
     }
 
@@ -167,18 +201,18 @@ class ExerciseViewer : AppCompatActivity() {
     private fun makeListSelectable() {
 
         updateAdapterListener(itemSelectorListener)
-        exportBtn.visibility=View.VISIBLE
+        exportBtn.visibility = View.VISIBLE
         exportBtn.setOnClickListener {
             Timber.d("Final selection: $selectedIndexes")
-            exportBtn.visibility=View.GONE
+            exportBtn.visibility = View.GONE
             //todo here call the import export utils with the selectedIndexes
-            ImportExportUtils.exportExercises(allExercises,selectedIndexes)
+            ImportExportUtils.exportExercises(allExercises, selectedIndexes)
             updateAdapterListener(goToCreatorListener)
         }
 
     }
 
-    private fun updateAdapterListener(newListener:ClickListenerRecyclerView) {
+    private fun updateAdapterListener(newListener: ClickListenerRecyclerView) {
         adapter = ExerciseListAdapter(this)
         adapter.setOnClickInterface(newListener)
         recyclerView.adapter = adapter

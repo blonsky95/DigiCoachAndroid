@@ -1,9 +1,14 @@
 package com.tatoe.mydigicoach
 
+import android.Manifest
 import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Environment
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.gson.Gson
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import timber.log.Timber
 import java.io.File
 
@@ -31,6 +36,24 @@ object ImportExportUtils {
     }
 
     private fun convertExercises(selectedExercises: ArrayList<Exercise>) {
+        if (ContextCompat.checkSelfPermission(MainApplication.applicationContext(), Manifest.permission.WRITE_CALENDAR)
+            != PackageManager.PERMISSION_GRANTED) {
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(,
+//                    Manifest.permission.READ_CONTACTS)) {
+//                // Show an explanation to the user *asynchronously* -- don't block
+//                // this thread waiting for the user's response! After the user
+//                // sees the explanation, try again to request the permission.
+//            } else {
+//                // No explanation needed, we can request the permission.
+//                ActivityCompat.requestPermissions(thisActivity,
+//                    arrayOf(Manifest.permission.READ_CONTACTS),
+//                    MY_PERMISSIONS_REQUEST_READ_CONTACTS)
+//
+//                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
+//                // app-defined int constant. The callback method gets the
+//                // result of the request.
+//            }        }
+        }
         if (getPrivateAlbumStorageDir(
                 MainApplication.applicationContext(),
                 FOLDER_NAME
