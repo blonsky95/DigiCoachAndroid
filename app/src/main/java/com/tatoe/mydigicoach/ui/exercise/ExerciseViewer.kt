@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.ui.exercise
 
 import android.Manifest
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
@@ -20,13 +21,11 @@ import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import androidx.appcompat.app.AlertDialog
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.tatoe.mydigicoach.ImportExportUtils
-import com.tatoe.mydigicoach.MainApplication
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.ManagePermissions
+import com.tatoe.mydigicoach.ManagePermissions
 import kotlinx.android.synthetic.main.info_dialog_window.view.*
 
 
@@ -41,10 +40,10 @@ class ExerciseViewer : AppCompatActivity() {
 
     private lateinit var allExercises: List<Exercise>
 
-    private lateinit var managePermissions: ManagePermissions
+//    private lateinit var managePermissions: ManagePermissions
     private val PermissionsRequestCode = 123
 
-    val list = listOf(
+    val listPermissions = listOf(
         Manifest.permission.READ_EXTERNAL_STORAGE,
         Manifest.permission.WRITE_EXTERNAL_STORAGE
     )
@@ -57,7 +56,8 @@ class ExerciseViewer : AppCompatActivity() {
         setContentView(R.layout.activity_exercise_viewer)
         title = "Exercise Viewer"
 
-        managePermissions = ManagePermissions(this,list,PermissionsRequestCode)
+//        managePermissions =
+//            ManagePermissions(this, list, PermissionsRequestCode)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -156,7 +156,8 @@ class ExerciseViewer : AppCompatActivity() {
 
         R.id.action_export -> {
             //show dialog with instructions to select
-            managePermissions.checkPermissions()
+            checkPermissions()
+//            managePermissions.checkPermissions()
             true
         }
 
@@ -167,17 +168,27 @@ class ExerciseViewer : AppCompatActivity() {
         }
     }
 
+    private fun checkPermissions() {
+        if(!hasPermissions(this, listPermissions)){
+            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE), PermissionsRequestCode)
+        }
+        else {
+            showImportDialog()
+        }
+    }
+
+    private fun hasPermissions(context: Context, permissions: List<String>): Boolean = permissions.all {
+        ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+    }
+
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
                                             grantResults: IntArray) {
         when (requestCode) {
             PermissionsRequestCode ->{
-                val isPermissionsGranted = managePermissions
-                    .processPermissionsResult(requestCode,permissions,grantResults)
-
-                if(isPermissionsGranted){
+                if ((grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED ))
                     showImportDialog()
-                }else{
-                    Timber.d("Permissions denied.")
+                else {
+                    return
                 }
                 return
             }

@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach.ui.util
+package com.tatoe.mydigicoach
 
 import android.app.Activity
 import android.app.AlertDialog
