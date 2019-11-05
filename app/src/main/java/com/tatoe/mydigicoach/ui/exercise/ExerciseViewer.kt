@@ -5,10 +5,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -25,8 +27,9 @@ import com.tatoe.mydigicoach.ImportExportUtils
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ManagePermissions
-import kotlinx.android.synthetic.main.info_dialog_window.view.*
+import kotlinx.android.synthetic.main.dialog_window_export.view.*
+import kotlinx.android.synthetic.main.dialog_window_info.view.*
+import java.io.File
 
 
 class ExerciseViewer : AppCompatActivity() {
@@ -151,6 +154,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         R.id.action_import -> {
             //intent to document provider
+            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portofeo.txt"))
             true
         }
 
@@ -196,28 +200,32 @@ class ExerciseViewer : AppCompatActivity() {
     }
 
     private fun showImportDialog() {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.info_dialog_window, null)
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_export, null)
 //        mDialogView.item_title.text= "Description"
-        mDialogView.item_description.text = "Click the exercises you desire to select"
+        mDialogView.text_info.text = "Click the exercises you desire to select"
         //AlertDialogBuilder
         val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
         mBuilder.setPositiveButton("OK") { _, _ ->
-            makeListSelectable()
+            val exportFileName = mDialogView.export_name_edittext.text.trim().toString()
+            if (exportFileName.isEmpty()) {
+                Toast.makeText(this,"File name must not be empty",Toast.LENGTH_SHORT).show()
+            } else {
+                makeListSelectable(exportFileName)
+            }
         }
 //        mBuilder.setNegativeButton("CANCEL") { _, _ ->
 //        }
         mBuilder.show()
     }
 
-    private fun makeListSelectable() {
+    private fun makeListSelectable(exportFileName:String) {
 
         updateAdapterListener(itemSelectorListener)
         exportBtn.visibility = View.VISIBLE
         exportBtn.setOnClickListener {
             Timber.d("Final selection: $selectedIndexes")
             exportBtn.visibility = View.GONE
-            //todo here call the import export utils with the selectedIndexes
-            ImportExportUtils.exportExercises(allExercises, selectedIndexes)
+            ImportExportUtils.exportExercises(allExercises, selectedIndexes, exportFileName)
             updateAdapterListener(goToCreatorListener)
         }
 

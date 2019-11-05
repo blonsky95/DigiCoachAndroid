@@ -1,23 +1,21 @@
 package com.tatoe.mydigicoach
 
-import android.Manifest
 import android.content.Context
-import android.content.pm.PackageManager
 import android.os.Environment
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import timber.log.Timber
+import java.io.BufferedWriter
 import java.io.File
+import java.io.FileWriter
 
 object ImportExportUtils {
 
-    const val FOLDER_NAME = "Digi Coach"
+    const val DIGICOACH_FOLDER_NAME = "DigiCoach"
 //    const val FOLDER_DIR =
 
-    fun exportExercises(allExercises: List<Exercise>, selectedIndexes: ArrayList<Int>) {
+    fun exportExercises(allExercises: List<Exercise>, selectedIndexes: ArrayList<Int>, exportFileName:String) {
         val selectedExercises = arrayListOf<Exercise>()
 
         if (selectedIndexes.isNotEmpty()) {
@@ -28,99 +26,50 @@ object ImportExportUtils {
             Timber.d("Exercises to be exported: $selectedExercises")
 
 
-            convertExercises(selectedExercises)
+            convertExercises(selectedExercises,exportFileName)
         } else {
             Timber.d("no exercises selected")
         }
 
     }
 
-    private fun convertExercises(selectedExercises: ArrayList<Exercise>) {
-        if (ContextCompat.checkSelfPermission(MainApplication.applicationContext(), Manifest.permission.WRITE_CALENDAR)
-            != PackageManager.PERMISSION_GRANTED) {
-//            if (ActivityCompat.shouldShowRequestPermissionRationale(,
-//                    Manifest.permission.READ_CONTACTS)) {
-//                // Show an explanation to the user *asynchronously* -- don't block
-//                // this thread waiting for the user's response! After the user
-//                // sees the explanation, try again to request the permission.
-//            } else {
-//                // No explanation needed, we can request the permission.
-//                ActivityCompat.requestPermissions(thisActivity,
-//                    arrayOf(Manifest.permission.READ_CONTACTS),
-//                    MY_PERMISSIONS_REQUEST_READ_CONTACTS)
-//
-//                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-//                // app-defined int constant. The callback method gets the
-//                // result of the request.
-//            }        }
+    private fun convertExercises(selectedExercises: ArrayList<Exercise>,exportFileName:String) {
+
+        val sd_main = File("${Environment.getExternalStorageDirectory()}/$DIGICOACH_FOLDER_NAME")
+        var success = true
+        if (!sd_main.exists()) {
+            success = sd_main.mkdir()
         }
-        if (getPrivateAlbumStorageDir(
-                MainApplication.applicationContext(),
-                FOLDER_NAME
-            ) != null && getPrivateAlbumStorageDir(
-                MainApplication.applicationContext(),
-                FOLDER_NAME
-            )!!.exists()
-        ) {
-            var fileDestination = File(
-                " ${getPrivateAlbumStorageDir(
-                    MainApplication.applicationContext(),
-                    FOLDER_NAME
-                ).toString()}/exp_exes.txt"
-            )
-            if (fileDestination.exists()){
-                fileDestination.writeText("hey im a file")
-                Timber.d("wrote text to file")
+        if (success) {
+            val sd = File(sd_main,"$exportFileName.txt")
+            //todo check if overwriting
+            if (!sd.exists()) {
+                success = sd.createNewFile()
+            } else {
+                Timber.d("Will override file or append")
+            }
+            if (success) {
+                val writer = BufferedWriter(FileWriter(sd,true)) //im using this to be able to jump to new lines
+                // directory exists or already created
+                for (exercise in selectedExercises){
+                    exercise.clearResults()
+                }
+                writer.write(Gson().toJson(selectedExercises))
+
+                writer.close()
+
 
             } else {
-                fileDestination.createNewFile()
-                Timber.d("File has been created")
-
+                // directory creation is not successful
+                Timber.d("NO")
             }
-        } else {
-            File(getPrivateAlbumStorageDir(
-                MainApplication.applicationContext(),
-                FOLDER_NAME
-            )!!.toURI()).mkdirs()
-            convertExercises(selectedExercises)
-            Timber.d("New directory created")
-
         }
-
-//        Timber.d("File destination for exporting: ${fileDestination.toString()}")
-
-
     }
 
-    private fun folderExists(): Boolean {
-        if (getPrivateAlbumStorageDir(
-                MainApplication.applicationContext(),
-                FOLDER_NAME
-            )!!.exists()
-        ) {
-            return true
-        }
-        return false
+    fun importExercises (importExercisesFile:File) : ArrayList<Exercise>{
+        var fullTextInFile = importExercisesFile.readText(Charsets.UTF_8)
+        var exercises = Gson().fromJson<ArrayList<Exercise>>(fullTextInFile, object : TypeToken<ArrayList<Exercise>>() {}.type)
+        Timber.d("IMPORTED EXERCISES: $exercises")
+        return exercises
     }
-
-    fun isExternalStorageWritable(): Boolean {
-        return Environment.getExternalStorageState() == Environment.MEDIA_MOUNTED
-    }
-
-    fun getPrivateAlbumStorageDir(context: Context, dataFolder: String): File? {
-        val file = File(
-            context.getExternalFilesDir(
-                Environment.DIRECTORY_DOCUMENTS
-            ), dataFolder
-        )
-        if (!file.mkdirs()) {
-            Timber.d("Directory not created")
-        }
-        return file
-    }
-
-    //todo see whats happening with results
-
-    //1. given an exercise array list, all exercises. And an array of Ints, select exercises, take
-    //results out and write them to file
 }
