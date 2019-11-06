@@ -34,14 +34,12 @@ data class Exercise(
     // constructor and starts with 0 (initialization required).
     constructor(name: String, description: String) : this(0, name, description)
 
+    constructor(mFieldsHashMap:LinkedHashMap<String,String>) : this (0,mFieldsHashMap["Name"]!!,mFieldsHashMap["Description"]!!) {
+        fieldsHashMap=mFieldsHashMap
+    }
+
     //returns linked hash map with name, description + extra fieldsHashMap
     fun getFieldsMap():LinkedHashMap<String,String> {
-//        val linkedHashMap = LinkedHashMap<String,String>()
-//        linkedHashMap["Name"]=name
-//        linkedHashMap["Description"]=description
-//        for (field in fieldsHashMap){
-//            linkedHashMap[field.key]=field.value
-//        }
         return fieldsHashMap
     }
 

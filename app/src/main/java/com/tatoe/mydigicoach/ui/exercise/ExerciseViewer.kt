@@ -79,7 +79,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
-                //                Timber.d("PTG all exercises observer triggered: $exercises")
+                                Timber.d("I WANNA SEE THIS: $exercises")
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
@@ -154,7 +154,10 @@ class ExerciseViewer : AppCompatActivity() {
 
         R.id.action_import -> {
             //intent to document provider
-            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portofeo.txt"))
+            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portogud.txt"))
+            for (exercise in exercises){
+                dataViewModel.insertExercise(exercise)
+            }
             true
         }
 

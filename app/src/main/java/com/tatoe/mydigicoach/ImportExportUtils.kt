@@ -51,10 +51,14 @@ object ImportExportUtils {
             if (success) {
                 val writer = BufferedWriter(FileWriter(sd,true)) //im using this to be able to jump to new lines
                 // directory exists or already created
+                var fieldsArray = ArrayList<LinkedHashMap<String,String>>()
                 for (exercise in selectedExercises){
-                    exercise.clearResults()
+//                   exercise.clearResults()
+                    fieldsArray.add(exercise.fieldsHashMap)
                 }
-                writer.write(Gson().toJson(selectedExercises))
+
+//                writer.write(Gson().toJson(selectedExercises))
+                writer.write(Gson().toJson(fieldsArray))
 
                 writer.close()
 
@@ -66,9 +70,14 @@ object ImportExportUtils {
         }
     }
 
+    //gets the field Linked hash map and converts it into an array list of exercises ready to be inserted as new exercises
     fun importExercises (importExercisesFile:File) : ArrayList<Exercise>{
+        var exercises = arrayListOf<Exercise>()
         var fullTextInFile = importExercisesFile.readText(Charsets.UTF_8)
-        var exercises = Gson().fromJson<ArrayList<Exercise>>(fullTextInFile, object : TypeToken<ArrayList<Exercise>>() {}.type)
+        var exercisesFieldsHashMap = Gson().fromJson<ArrayList<LinkedHashMap<String,String>>>(fullTextInFile, object : TypeToken<ArrayList<LinkedHashMap<String,String>>>() {}.type)
+        for (exerciseFields in exercisesFieldsHashMap){
+            exercises.add(Exercise(exerciseFields))
+        }
         Timber.d("IMPORTED EXERCISES: $exercises")
         return exercises
     }
