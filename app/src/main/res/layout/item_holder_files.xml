@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <TextView
+                android:id="@+id/file_name"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="5"
+                android:background="@android:color/holo_orange_light"
+                android:padding="12dp" />
+
+        <ImageView
+                android:id="@+id/import_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#971212"
+                android:contentDescription="import_sticker"
+                android:src="@drawable/cross_white"
+                android:visibility="gone" />
+
+        <ImageView
+                android:id="@+id/export_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#971212"
+                android:contentDescription="export_sticker"
+                android:src="@drawable/cross_white"
+                android:visibility="gone" />
+
+        <ImageView
+                android:id="@+id/delete_btn"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="#971212"
+                android:contentDescription="delete_sticker"
+                android:src="@drawable/cross_white"
+                android:visibility="gone" />
+    </LinearLayout>
+
+    <View
+            android:id="@+id/divider"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@android:color/darker_gray" />
+
+</LinearLayout>

@@ -1,6 +1,5 @@
 package com.tatoe.mydigicoach
 
-import android.content.Context
 import android.os.Environment
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -13,9 +12,23 @@ import java.io.FileWriter
 object ImportExportUtils {
 
     const val DIGICOACH_FOLDER_NAME = "DigiCoach"
+
+    private val digicoachFolder =
+        File("${Environment.getExternalStorageDirectory()}/$DIGICOACH_FOLDER_NAME")
+
 //    const val FOLDER_DIR =
 
-    fun exportExercises(allExercises: List<Exercise>, selectedIndexes: ArrayList<Int>, exportFileName:String) {
+    init {
+        if (!digicoachFolder.exists()) {
+            digicoachFolder.mkdir()
+        }
+    }
+
+    fun exportExercises(
+        allExercises: List<Exercise>,
+        selectedIndexes: ArrayList<Int>,
+        exportFileName: String
+    ) {
         val selectedExercises = arrayListOf<Exercise>()
 
         if (selectedIndexes.isNotEmpty()) {
@@ -26,22 +39,22 @@ object ImportExportUtils {
             Timber.d("Exercises to be exported: $selectedExercises")
 
 
-            convertExercises(selectedExercises,exportFileName)
+            convertExercises(selectedExercises, exportFileName)
         } else {
             Timber.d("no exercises selected")
         }
 
     }
 
-    private fun convertExercises(selectedExercises: ArrayList<Exercise>,exportFileName:String) {
+    private fun convertExercises(selectedExercises: ArrayList<Exercise>, exportFileName: String) {
 
-        val sd_main = File("${Environment.getExternalStorageDirectory()}/$DIGICOACH_FOLDER_NAME")
+
         var success = true
-        if (!sd_main.exists()) {
-            success = sd_main.mkdir()
+        if (!digicoachFolder.exists()) {
+            success = digicoachFolder.mkdir()
         }
         if (success) {
-            val sd = File(sd_main,"$exportFileName.txt")
+            val sd = File(digicoachFolder, "$exportFileName.txt")
             //todo check if overwriting
             if (!sd.exists()) {
                 success = sd.createNewFile()
@@ -49,10 +62,15 @@ object ImportExportUtils {
                 Timber.d("Will override file or append")
             }
             if (success) {
-                val writer = BufferedWriter(FileWriter(sd,true)) //im using this to be able to jump to new lines
+                val writer = BufferedWriter(
+                    FileWriter(
+                        sd,
+                        true
+                    )
+                ) //im using this to be able to jump to new lines
                 // directory exists or already created
-                var fieldsArray = ArrayList<LinkedHashMap<String,String>>()
-                for (exercise in selectedExercises){
+                var fieldsArray = ArrayList<LinkedHashMap<String, String>>()
+                for (exercise in selectedExercises) {
 //                   exercise.clearResults()
                     fieldsArray.add(exercise.fieldsHashMap)
                 }
@@ -71,14 +89,27 @@ object ImportExportUtils {
     }
 
     //gets the field Linked hash map and converts it into an array list of exercises ready to be inserted as new exercises
-    fun importExercises (importExercisesFile:File) : ArrayList<Exercise>{
+    fun importExercises(importExercisesFile: File): ArrayList<Exercise> {
         var exercises = arrayListOf<Exercise>()
         var fullTextInFile = importExercisesFile.readText(Charsets.UTF_8)
-        var exercisesFieldsHashMap = Gson().fromJson<ArrayList<LinkedHashMap<String,String>>>(fullTextInFile, object : TypeToken<ArrayList<LinkedHashMap<String,String>>>() {}.type)
-        for (exerciseFields in exercisesFieldsHashMap){
+        var exercisesFieldsHashMap = Gson().fromJson<ArrayList<LinkedHashMap<String, String>>>(
+            fullTextInFile,
+            object : TypeToken<ArrayList<LinkedHashMap<String, String>>>() {}.type
+        )
+        for (exerciseFields in exercisesFieldsHashMap) {
             exercises.add(Exercise(exerciseFields))
         }
         Timber.d("IMPORTED EXERCISES: $exercises")
         return exercises
+    }
+
+    fun getFilesList(): ArrayList<File> {
+        var filesList = arrayListOf<File>()
+
+        if (!digicoachFolder.exists()) {
+
+        }
+
+        return filesList
     }
 }
