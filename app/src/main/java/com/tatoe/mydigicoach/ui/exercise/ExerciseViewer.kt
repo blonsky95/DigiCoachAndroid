@@ -154,10 +154,10 @@ class ExerciseViewer : AppCompatActivity() {
 
         R.id.action_import -> {
             //intent to document provider
-            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portogud.txt"))
-            for (exercise in exercises){
-                dataViewModel.insertExercise(exercise)
-            }
+//            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portogud.txt"))
+//            for (exercise in exercises){
+//                dataViewModel.insertExercise(exercise)
+//            }
             true
         }
 

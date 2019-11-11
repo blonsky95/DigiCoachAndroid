@@ -90,9 +90,9 @@ object ImportExportUtils {
 
     //gets the field Linked hash map and converts it into an array list of exercises ready to be inserted as new exercises
     fun importExercises(importExercisesFile: File): ArrayList<Exercise> {
-        var exercises = arrayListOf<Exercise>()
-        var fullTextInFile = importExercisesFile.readText(Charsets.UTF_8)
-        var exercisesFieldsHashMap = Gson().fromJson<ArrayList<LinkedHashMap<String, String>>>(
+        val exercises = arrayListOf<Exercise>()
+        val fullTextInFile = importExercisesFile.readText(Charsets.UTF_8)
+        val exercisesFieldsHashMap = Gson().fromJson<ArrayList<LinkedHashMap<String, String>>>(
             fullTextInFile,
             object : TypeToken<ArrayList<LinkedHashMap<String, String>>>() {}.type
         )
@@ -103,13 +103,28 @@ object ImportExportUtils {
         return exercises
     }
 
-    fun getFilesList(): ArrayList<File> {
-        var filesList = arrayListOf<File>()
+    fun getFilesList(): List<File> {
+        var filesList = listOf<File>()
 
         if (!digicoachFolder.exists()) {
-
+            Timber.d("files in Digicoach: ${digicoachFolder.listFiles()}")
+            filesList= digicoachFolder.listFiles().toList()
         }
 
+//        val filesArrayList = arrayListOf<File>()
+//        filesArrayList.addAll(filesList)
+
+        Timber.d("files in Digicoach 2: $filesList")
+
         return filesList
+    }
+
+    fun moveToPrivateFolder(fileToMove:File):Boolean {
+        //when importing into library, user selects a file they want in Library, which
+        //has to be moved to digicoach folder.
+
+        //todo move fileToMove to folder
+
+        return false
     }
 }

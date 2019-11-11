@@ -14,8 +14,6 @@ import timber.log.Timber
 
 class MainActivity : AppCompatActivity() {
 
-    //todo when basic functionalities are there - FIX FIX CLEAN WARNINGS
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -39,6 +37,11 @@ class MainActivity : AppCompatActivity() {
 
         exercisesBtn.setOnClickListener {
             var intent = Intent(this, ExerciseViewer::class.java)
+            startActivity(intent)
+        }
+
+        libraryBtn.setOnClickListener {
+            var intent = Intent(this, Library::class.java)
             startActivity(intent)
         }
     }

@@ -14,9 +14,9 @@ class FileViewHolder(
     RecyclerView.ViewHolder(v),
     View.OnClickListener {
 
-    val importBtn: ImageView = v.findViewById(R.id.import_btn)
-    val exportBtn: ImageView = v.findViewById(R.id.export_btn)
-    val deleteBtn: ImageView = v.findViewById(R.id.delete_btn)
+    private val importBtn: ImageView = v.findViewById(R.id.import_btn)
+    private val exportBtn: ImageView = v.findViewById(R.id.export_btn)
+    private val deleteBtn: ImageView = v.findViewById(R.id.delete_btn)
     val fileNameTextView: TextView = v.findViewById(R.id.file_name)
 
     override fun onClick(v: View) {
