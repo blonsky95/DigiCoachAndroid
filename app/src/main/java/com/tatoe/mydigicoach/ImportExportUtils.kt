@@ -20,7 +20,7 @@ object ImportExportUtils {
 
     init {
         if (!digicoachFolder.exists()) {
-            digicoachFolder.mkdir()
+          digicoachFolder.mkdir()
         }
     }
 
@@ -105,11 +105,26 @@ object ImportExportUtils {
 
     fun getFilesList(): List<File> {
         var filesList = listOf<File>()
+        Timber.d("getFilesList called, directory: $digicoachFolder")
 
         if (!digicoachFolder.exists()) {
+            if (digicoachFolder.mkdir()) {
+                return getFilesList()
+            } else {
+                Timber.d("Failed creating directory")
+            }
+        } else {
             Timber.d("files in Digicoach: ${digicoachFolder.listFiles()}")
+            Timber.d("is directory: ${digicoachFolder.isDirectory}")
+            //todo catch error, if is directory and returns null then this shit has no permission
             filesList= digicoachFolder.listFiles().toList()
         }
+
+//        Timber.d("getFilesList called")
+//        if (!digicoachFolder.exists()) {
+//            Timber.d("files in Digicoach: ${digicoachFolder.listFiles()}")
+//            filesList= digicoachFolder.listFiles().toList()
+//        }
 
 //        val filesArrayList = arrayListOf<File>()
 //        filesArrayList.addAll(filesList)

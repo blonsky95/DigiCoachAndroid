@@ -6,6 +6,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import timber.log.Timber
 import java.io.File
 
 class FileListAdapter(context: Context) :
@@ -26,6 +27,8 @@ class FileListAdapter(context: Context) :
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
         val current = filesList[position]
+        //todo I LEFT IT HERE - check this timber when running - check fileslist size?
+        Timber.d("current file being added to adapter: $current")
         holder.fileNameTextView.text=current.name
     }
 
