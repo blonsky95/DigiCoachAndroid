@@ -152,14 +152,14 @@ class ExerciseViewer : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-        R.id.action_import -> {
-            //intent to document provider
-//            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portogud.txt"))
-//            for (exercise in exercises){
-//                dataViewModel.insertExercise(exercise)
-//            }
-            true
-        }
+//        R.id.action_import -> {
+//            //intent to document provider
+////            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portogud.txt"))
+////            for (exercise in exercises){
+////                dataViewModel.insertExercise(exercise)
+////            }
+//            true
+//        }
 
         R.id.action_export -> {
             //show dialog with instructions to select

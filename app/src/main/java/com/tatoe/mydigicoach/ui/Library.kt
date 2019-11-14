@@ -1,10 +1,10 @@
 package com.tatoe.mydigicoach.ui
 
 import android.os.Bundle
-import android.os.PersistableBundle
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.DataViewModel
@@ -23,7 +23,7 @@ class Library : AppCompatActivity() {
 
     private lateinit var fileActionHandler: ClickListenerRecyclerView
 
-    private var filesArray = listOf<File>()
+    private var filesList = mutableListOf<File>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,6 +32,8 @@ class Library : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         recyclerView = recyclerview as RecyclerView
 
@@ -58,8 +60,8 @@ class Library : AppCompatActivity() {
     private fun loadFileArray() {
         //so this is going to scan through the Digicoach whatever folder and load the files
         //need to check library/methods that can do this
-        filesArray=ImportExportUtils.getFilesList()
-        adapter.loadFiles(filesArray)
+        filesList=ImportExportUtils.getFilesList().toMutableList()
+        adapter.loadFiles(filesList)
 
     }
 
@@ -79,19 +81,29 @@ class Library : AppCompatActivity() {
     }
 
     private fun mDeleteFile(position: Int) {
-        if (filesArray[position].delete()) {
+        if (filesList[position].delete()) {
             Timber.d("Succesfully deleted")
+//            recyclerView.removeViewAt(position)
+//            adapter.notifyItemRemoved(position)
+            filesList.removeAt(position)
+            adapter.notifyDataSetChanged()
         } else {
             Timber.d("Couldn't delete")
         }
+        //reload adapter
+
     }
 
     private fun mSendFile(position: Int) {
         //open intent to share a file
+        Timber.d("Trying to export ${filesList[position].name}")
+
     }
 
     private fun mGetFile(position: Int) {
-        var exercises = ImportExportUtils.importExercises(filesArray[position])
+        var exercises = ImportExportUtils.importExercises(filesList[position])
+        Timber.d("Trying to import: $exercises from ${filesList[position].name}")
+
         for (exercise in exercises) {
             dataViewModel.insertExercise(exercise)
         }

@@ -67,15 +67,12 @@ object ImportExportUtils {
                         sd,
                         true
                     )
-                ) //im using this to be able to jump to new lines
-                // directory exists or already created
-                var fieldsArray = ArrayList<LinkedHashMap<String, String>>()
+                )
+                val fieldsArray = ArrayList<LinkedHashMap<String, String>>()
                 for (exercise in selectedExercises) {
 //                   exercise.clearResults()
                     fieldsArray.add(exercise.fieldsHashMap)
                 }
-
-//                writer.write(Gson().toJson(selectedExercises))
                 writer.write(Gson().toJson(fieldsArray))
 
                 writer.close()

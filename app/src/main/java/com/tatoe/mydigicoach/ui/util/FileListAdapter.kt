@@ -27,7 +27,6 @@ class FileListAdapter(context: Context) :
 
     override fun onBindViewHolder(holder: FileViewHolder, position: Int) {
         val current = filesList[position]
-        //todo I LEFT IT HERE - check this timber when running - check fileslist size?
         Timber.d("current file being added to adapter: $current")
         holder.fileNameTextView.text=current.name
     }

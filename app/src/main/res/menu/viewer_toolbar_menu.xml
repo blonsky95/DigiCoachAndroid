@@ -8,9 +8,9 @@
             android:title="More opts"
             app:showAsAction="ifRoom">
         <menu>
-            <item
-                    android:id="@+id/action_import"
-                    android:title="Import Exercises" />
+<!--            <item-->
+<!--                    android:id="@+id/action_import"-->
+<!--                    android:title="Import Exercises" />-->
             <item
                     android:id="@+id/action_export"
                     android:title="Export Exercises" />
