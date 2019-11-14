@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach
 
 import android.os.Environment
+import android.widget.Toast
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.tatoe.mydigicoach.entity.Exercise
@@ -16,11 +17,13 @@ object ImportExportUtils {
     private val digicoachFolder =
         File("${Environment.getExternalStorageDirectory()}/$DIGICOACH_FOLDER_NAME")
 
-//    const val FOLDER_DIR =
-
     init {
         if (!digicoachFolder.exists()) {
-          digicoachFolder.mkdir()
+            digicoachFolder.mkdir()
+            Timber.d("Directory has been created")
+
+        } else {
+            Timber.d("Directory exists")
         }
     }
 
@@ -34,54 +37,43 @@ object ImportExportUtils {
         if (selectedIndexes.isNotEmpty()) {
             for (index in selectedIndexes) {
                 selectedExercises.add(allExercises[index])
-//            Gson().toJson(exerciseList)
             }
-            Timber.d("Exercises to be exported: $selectedExercises")
-
-
             convertExercises(selectedExercises, exportFileName)
         } else {
-            Timber.d("no exercises selected")
+            Timber.d("selected exercises array is empty, no file was created")
         }
 
     }
 
     private fun convertExercises(selectedExercises: ArrayList<Exercise>, exportFileName: String) {
 
-
-        var success = true
-        if (!digicoachFolder.exists()) {
-            success = digicoachFolder.mkdir()
-        }
-        if (success) {
-            val sd = File(digicoachFolder, "$exportFileName.txt")
-            //todo check if overwriting
-            if (!sd.exists()) {
-                success = sd.createNewFile()
-            } else {
-                Timber.d("Will override file or append")
-            }
-            if (success) {
+        if (digicoachFolder.exists()) {
+            val exportFile = File(digicoachFolder, "$exportFileName.txt")
+            //overwrites files with the same name, creates file if non existing
+            if (exportFile.exists() || exportFile.createNewFile()) {
                 val writer = BufferedWriter(
                     FileWriter(
-                        sd,
-                        true
+                        exportFile,
+                        false
                     )
                 )
                 val fieldsArray = ArrayList<LinkedHashMap<String, String>>()
                 for (exercise in selectedExercises) {
-//                   exercise.clearResults()
                     fieldsArray.add(exercise.fieldsHashMap)
                 }
+
                 writer.write(Gson().toJson(fieldsArray))
-
                 writer.close()
-
+                Timber.d("File ${exportFile.name} was succesfully created and added")
 
             } else {
-                // directory creation is not successful
-                Timber.d("NO")
+                Timber.d("export file was not created - something went wrong")
             }
+
+
+        } else {
+            Timber.d("Directory doesn't exist (and hasn't been created)")
+
         }
     }
 
@@ -100,7 +92,7 @@ object ImportExportUtils {
         return exercises
     }
 
-    fun getFilesList(): List<File> {
+    fun getFilesList(): List<File>? {
         var filesList = listOf<File>()
         Timber.d("getFilesList called, directory: $digicoachFolder")
 
@@ -111,27 +103,19 @@ object ImportExportUtils {
                 Timber.d("Failed creating directory")
             }
         } else {
-            Timber.d("files in Digicoach: ${digicoachFolder.listFiles()}")
-            Timber.d("is directory: ${digicoachFolder.isDirectory}")
-            //todo catch error, if is directory and returns null then this shit has no permission
-            filesList= digicoachFolder.listFiles().toList()
+            //if no storage write permission - listFiles will return null so filesList will be empty - if empty show in adapter why
+            if (digicoachFolder.listFiles()!=null) {
+                filesList = digicoachFolder.listFiles().toList()
+            } else {
+                return null
+            }
         }
-
-//        Timber.d("getFilesList called")
-//        if (!digicoachFolder.exists()) {
-//            Timber.d("files in Digicoach: ${digicoachFolder.listFiles()}")
-//            filesList= digicoachFolder.listFiles().toList()
-//        }
-
-//        val filesArrayList = arrayListOf<File>()
-//        filesArrayList.addAll(filesList)
-
         Timber.d("files in Digicoach 2: $filesList")
 
         return filesList
     }
 
-    fun moveToPrivateFolder(fileToMove:File):Boolean {
+    fun moveToPrivateFolder(fileToMove: File): Boolean {
         //when importing into library, user selects a file they want in Library, which
         //has to be moved to digicoach folder.
 

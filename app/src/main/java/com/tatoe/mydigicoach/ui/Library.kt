@@ -60,8 +60,14 @@ class Library : AppCompatActivity() {
     private fun loadFileArray() {
         //so this is going to scan through the Digicoach whatever folder and load the files
         //need to check library/methods that can do this
-        filesList=ImportExportUtils.getFilesList().toMutableList()
-        adapter.loadFiles(filesList)
+        if (ImportExportUtils.getFilesList()!=null) {
+            filesList=ImportExportUtils.getFilesList()!!.toMutableList()
+            adapter.loadFiles(filesList)
+        } else {
+            //todo switch visibility so instead of adapter text says no permission is granted
+            //todo or if empty say there is nothing
+        }
+
 
     }
 
