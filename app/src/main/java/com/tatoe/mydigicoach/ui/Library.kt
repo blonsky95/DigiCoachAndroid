@@ -1,6 +1,9 @@
 package com.tatoe.mydigicoach.ui
 
+import android.os.Build
 import android.os.Bundle
+import android.text.Html
+import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -58,17 +61,34 @@ class Library : AppCompatActivity() {
     }
 
     private fun loadFileArray() {
-        //so this is going to scan through the Digicoach whatever folder and load the files
-        //need to check library/methods that can do this
+        //if files returned is null --> no permission granted
+        //if files empty --> no files found
+        // if files not empty --> display files
         if (ImportExportUtils.getFilesList()!=null) {
             filesList=ImportExportUtils.getFilesList()!!.toMutableList()
+            if (filesList.isEmpty()) {
+                showToUser("No files were found in the app's folder, if they are in " +
+                        "the phone use the <b>move file</b> button or export your" +
+                        " own exercises in <b>Exercises</b>")
+                return
+            }
             adapter.loadFiles(filesList)
         } else {
-            //todo switch visibility so instead of adapter text says no permission is granted
-            //todo or if empty say there is nothing
+            showToUser("Permission to access storage hasn't been granted, go to " +
+                    "Settings, Apps and enable the permission for Digicoach or use the button below")
         }
 
+    }
 
+    private fun showToUser(textDisplay:String) {
+        ifEmptyText.visibility=View.VISIBLE
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            ifEmptyText.text=Html.fromHtml(textDisplay,Html.FROM_HTML_MODE_COMPACT)
+        } else {
+            ifEmptyText.text=Html.fromHtml(textDisplay)
+        }
+        recyclerView.visibility=View.GONE
     }
 
     private fun initAdapterListeners() {
@@ -115,5 +135,26 @@ class Library : AppCompatActivity() {
         }
         Toast.makeText(this,"Exercises have been imported",Toast.LENGTH_SHORT).show()
         //or has it failed to insert?
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+
+        android.R.id.home -> {
+            onBackPressed()
+            true
+        }
+
+//        R.id.action_export -> {
+//            //show dialog with instructions to select
+//            checkPermissions()
+////            managePermissions.checkPermissions()
+//            true
+//        }
+
+        else -> {
+            // If we got here, the user's action was not recognized.
+            // Invoke the superclass to handle it.
+            super.onOptionsItemSelected(item)
+        }
     }
 }

@@ -120,7 +120,7 @@ class ExerciseViewer : AppCompatActivity() {
         itemSelectorListener = object : ClickListenerRecyclerView {
             override fun onClick(view: View, position: Int) {
                 super.onClick(view, position)
-//                Timber.d("click registered export")
+                Timber.d("$position was clicked, selected before: $selectedIndexes")
 
                 if (!selectedIndexes.contains(position)) {
                     view.alpha = 0.5f
@@ -138,6 +138,8 @@ class ExerciseViewer : AppCompatActivity() {
                     }
 
                 }
+                Timber.d("$position was clicked, selected after: $selectedIndexes")
+
 //                Timber.d("current selection: $selectedIndexes")
 
             }
@@ -152,14 +154,10 @@ class ExerciseViewer : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-//        R.id.action_import -> {
-//            //intent to document provider
-////            var exercises = ImportExportUtils.importExercises(File("${Environment.getExternalStorageDirectory()}/${ImportExportUtils.DIGICOACH_FOLDER_NAME}/portogud.txt"))
-////            for (exercise in exercises){
-////                dataViewModel.insertExercise(exercise)
-////            }
-//            true
-//        }
+        android.R.id.home -> {
+            onBackPressed()
+            true
+        }
 
         R.id.action_export -> {
             //show dialog with instructions to select
@@ -222,6 +220,10 @@ class ExerciseViewer : AppCompatActivity() {
     }
 
     private fun makeListSelectable(exportFileName:String) {
+        selectedIndexes.clear()
+        addExerciseBtn.visibility=View.GONE
+        title = "Select Exercises"
+
 
         updateAdapterListener(itemSelectorListener)
         exportBtn.visibility = View.VISIBLE
@@ -229,6 +231,8 @@ class ExerciseViewer : AppCompatActivity() {
             Timber.d("Final selection: $selectedIndexes")
             exportBtn.visibility = View.GONE
             ImportExportUtils.exportExercises(allExercises, selectedIndexes, exportFileName)
+            addExerciseBtn.visibility=View.VISIBLE
+            title = "Exercise Viewer"
             updateAdapterListener(goToCreatorListener)
         }
 

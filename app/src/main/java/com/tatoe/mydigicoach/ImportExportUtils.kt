@@ -21,6 +21,7 @@ object ImportExportUtils {
         if (!digicoachFolder.exists()) {
             digicoachFolder.mkdir()
             Timber.d("Directory has been created")
+            //todo seems like files in folder get deleted when uninstalling installing? hmm unsure
 
         } else {
             Timber.d("Directory exists")
