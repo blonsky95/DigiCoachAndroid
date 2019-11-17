@@ -26,6 +26,8 @@ import androidx.core.app.ActivityCompat
 import com.tatoe.mydigicoach.ImportExportUtils
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.Library
+import com.tatoe.mydigicoach.ui.Library.Companion.PermissionsRequestCode
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.dialog_window_export.view.*
 import kotlinx.android.synthetic.main.dialog_window_info.view.*
@@ -44,12 +46,12 @@ class ExerciseViewer : AppCompatActivity() {
     private lateinit var allExercises: List<Exercise>
 
 //    private lateinit var managePermissions: ManagePermissions
-    private val PermissionsRequestCode = 123
-
-    val listPermissions = listOf(
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
-    )
+//    private
+//
+//    val listPermissions = listOf(
+//        Manifest.permission.READ_EXTERNAL_STORAGE,
+//        Manifest.permission.WRITE_EXTERNAL_STORAGE
+//    )
 
 //    private var SELECT_ITEMS_UI = "select_items_ui"
 
@@ -174,7 +176,7 @@ class ExerciseViewer : AppCompatActivity() {
     }
 
     private fun checkPermissions() {
-        if(!hasPermissions(this, listPermissions)){
+        if(!hasPermissions(this, Library.listPermissions)){
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE), PermissionsRequestCode)
         }
         else {

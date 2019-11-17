@@ -1,5 +1,8 @@
 package com.tatoe.mydigicoach.ui
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
@@ -7,6 +10,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -16,6 +20,9 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.FileListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*
+import kotlinx.android.synthetic.main.activity_exercise_viewer.ifEmptyText
+import kotlinx.android.synthetic.main.activity_exercise_viewer.recyclerview
+import kotlinx.android.synthetic.main.activity_library.*
 import timber.log.Timber
 import java.io.File
 
@@ -27,6 +34,15 @@ class Library : AppCompatActivity() {
     private lateinit var fileActionHandler: ClickListenerRecyclerView
 
     private var filesList = mutableListOf<File>()
+
+    companion object {
+        val listPermissions = listOf(
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
+        )
+        val PermissionsRequestCode = 123
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -42,7 +58,8 @@ class Library : AppCompatActivity() {
 
         initAdapterListeners()
 
-        adapter = FileListAdapter(this) //will have to change this to a FileListAdapter and change the set content parameters
+        adapter =
+            FileListAdapter(this) //will have to change this to a FileListAdapter and change the set content parameters
         adapter.setOnClickInterface(fileActionHandler)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
@@ -54,7 +71,7 @@ class Library : AppCompatActivity() {
         //so this is probably going to open the Document Provider (use a startactivityforresult or similar)
         // by Android so user selects file, when selected it returns it's File address, if it's a Digicoach
         //file it will be moved to the internal Digicoach folder.
-        var selectedFile:File
+        var selectedFile: File
         //provide value with Doc provider intent
 
 //        ImportExportUtils.moveToPrivateFolder(selectedFile)
@@ -64,32 +81,84 @@ class Library : AppCompatActivity() {
         //if files returned is null --> no permission granted
         //if files empty --> no files found
         // if files not empty --> display files
-        if (ImportExportUtils.getFilesList()!=null) {
-            filesList=ImportExportUtils.getFilesList()!!.toMutableList()
+        if (ImportExportUtils.getFilesList() != null) {
+            filesList = ImportExportUtils.getFilesList()!!.toMutableList()
             if (filesList.isEmpty()) {
-                showToUser("No files were found in the app's folder, if they are in " +
-                        "the phone use the <b>move file</b> button or export your" +
-                        " own exercises in <b>Exercises</b>")
+                showToUser(
+                    "No files were found in the app's folder, if they are in " +
+                            "the phone use the <b>move file</b> button or export your" +
+                            " own exercises in <b>Exercises</b>"
+                )
                 return
             }
-            adapter.loadFiles(filesList)
+            displayAdapter()
         } else {
-            showToUser("Permission to access storage hasn't been granted, go to " +
-                    "Settings, Apps and enable the permission for Digicoach or use the button below")
+            showToUser(
+                "Permission to access storage hasn't been granted, go to " +
+                        "Settings, Apps and enable the permission for Digicoach or use the button below"
+            )
+            showPermissionButton()
         }
 
     }
 
-    private fun showToUser(textDisplay:String) {
-        ifEmptyText.visibility=View.VISIBLE
+    private fun displayAdapter() {
+        ifEmptyText.visibility=View.GONE
+        permissionBtn.visibility=View.GONE
+        recyclerView.visibility=View.VISIBLE
+        adapter.loadFiles(filesList)
+    }
+
+    private fun showToUser(textDisplay: String) {
+        ifEmptyText.visibility = View.VISIBLE
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            ifEmptyText.text=Html.fromHtml(textDisplay,Html.FROM_HTML_MODE_COMPACT)
+            ifEmptyText.text = Html.fromHtml(textDisplay, Html.FROM_HTML_MODE_COMPACT)
         } else {
-            ifEmptyText.text=Html.fromHtml(textDisplay)
+            ifEmptyText.text = Html.fromHtml(textDisplay)
         }
-        recyclerView.visibility=View.GONE
+        recyclerView.visibility = View.GONE
     }
+
+    private fun showPermissionButton() {
+        permissionBtn.visibility = View.VISIBLE
+        permissionBtn.setOnClickListener {
+            checkPermissions()
+        }
+    }
+
+    private fun checkPermissions() {
+        ActivityCompat.requestPermissions(
+            this, arrayOf(
+                Manifest.permission.READ_EXTERNAL_STORAGE,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE
+            ), PermissionsRequestCode
+        )
+
+    }
+
+//    private fun hasPermissions(context: Context, permissions: List<String>): Boolean =
+//        permissions.all {
+//            ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+//        }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int, permissions: Array<String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            PermissionsRequestCode -> {
+                if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED))
+                    loadFileArray()
+                else {
+                    return
+                }
+                return
+            }
+        }
+    }
+
+
 
     private fun initAdapterListeners() {
         fileActionHandler = object : ClickListenerRecyclerView {
@@ -133,7 +202,7 @@ class Library : AppCompatActivity() {
         for (exercise in exercises) {
             dataViewModel.insertExercise(exercise)
         }
-        Toast.makeText(this,"Exercises have been imported",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Exercises have been imported", Toast.LENGTH_SHORT).show()
         //or has it failed to insert?
     }
 
