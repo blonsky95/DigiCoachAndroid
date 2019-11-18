@@ -1,11 +1,14 @@
 package com.tatoe.mydigicoach.ui
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.text.Html
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -34,13 +37,15 @@ class Library : AppCompatActivity() {
     private lateinit var fileActionHandler: ClickListenerRecyclerView
 
     private var filesList = mutableListOf<File>()
+    private val READ_REQUEST_CODE: Int = 42
+
 
     companion object {
         val listPermissions = listOf(
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
         )
-        val PermissionsRequestCode = 123
+        const val PermissionsRequestCode = 123
     }
 
 
@@ -206,6 +211,12 @@ class Library : AppCompatActivity() {
         //or has it failed to insert?
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.library_toolbar_menu, menu)
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
         android.R.id.home -> {
@@ -213,12 +224,10 @@ class Library : AppCompatActivity() {
             true
         }
 
-//        R.id.action_export -> {
-//            //show dialog with instructions to select
-//            checkPermissions()
-////            managePermissions.checkPermissions()
-//            true
-//        }
+        R.id.action_send -> {
+            //will send a file to a given userId - after first release (?)
+            true
+        }
 
         else -> {
             // If we got here, the user's action was not recognized.
@@ -226,4 +235,5 @@ class Library : AppCompatActivity() {
             super.onOptionsItemSelected(item)
         }
     }
+
 }

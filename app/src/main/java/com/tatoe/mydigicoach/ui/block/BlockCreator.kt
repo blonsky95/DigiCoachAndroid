@@ -198,7 +198,7 @@ class BlockCreator : AppCompatActivity() {
         } else {
             "Unnamed Block"
         }
-        block = Block(blockTitle, currentBlockComponents!!)
+        block = Block(blockTitle, currentBlockComponents!!,Block.USER_GENERATED)
         dataViewModel.insertBlock(block)
         backToViewer()
     }
