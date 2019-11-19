@@ -6,10 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.runBlocking
-import kotlinx.coroutines.withContext
-import java.util.concurrent.Executors
+import com.tatoe.mydigicoach.ioThread
 
 @Database(
     entities = [Exercise::class, Block::class, Day::class],
@@ -39,23 +36,28 @@ abstract class AppRoomDatabase : RoomDatabase() {
             instance ?: buildDatabase(context).also { instance = it }
         }
 
+        fun getInstance(context: Context): AppRoomDatabase =
+            instance ?: synchronized(this) {
+                instance ?: buildDatabase(context).also { instance = it }
+            }
+
         fun buildDatabase(context: Context) = Room.databaseBuilder(
             context,
             AppRoomDatabase::class.java, "digital_coach.db"
-        ).addCallback(DatabaseCreationCallback).fallbackToDestructiveMigration().build()
-
-        object DatabaseCreationCallback : RoomDatabase.Callback() {
+        ).addCallback(object : Callback() {
             override fun onCreate(db: SupportSQLiteDatabase) {
                 super.onCreate(db)
-                //todo check this coroutine thing
-                runBlocking {
-                    for (block in Block.getPremadeBlocks()) {
-                        instance!!.blockDao().addBlock(block)
+                val appBlocks = Block.getPremadeBlocks()
+
+                //todo should be replaced with coroutines
+                ioThread {
+                    for (block in appBlocks) {
+                        getInstance(context).blockDao().addInitialBlock(block)
                     }
                 }
-
             }
-        }
+        }).fallbackToDestructiveMigration().build()
+
     }
 
 

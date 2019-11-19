@@ -24,6 +24,10 @@ interface BlockDao {
     @Insert
     suspend fun addBlock(block: Block): Long
 
+    //no need for suspend as I know this is being called from a IO thread in AppRoomDatabase
+    @Insert
+    fun addInitialBlock(block: Block): Long
+
     @Delete
     suspend fun delete(block: Block)
 }

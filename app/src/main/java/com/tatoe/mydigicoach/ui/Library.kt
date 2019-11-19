@@ -70,7 +70,15 @@ class Library : AppCompatActivity() {
         })
         dataViewModel.allAppBlocks.observe(this, Observer { blocks ->
             blocks?.let {
+                Timber.d("app blocks has been updated")
+                //todo check this block of comment
+                //when data viewmodel is first initialized it loads the intiial blocks, but the
+                //observers don't seem to pick it up, perhaps because it is done from another thread
+                //maybe coroutines fixes this. but basically dataviewmodel needs to be initialized
+                //once before the intial blocks are seen in Library app blocks list.
                 appBlockList = it
+                Timber.d("app blocks observer updated to: $appBlockList")
+
             }
         })
         dataViewModel.allImportExportBlocks.observe(this, Observer { blocks ->
@@ -160,6 +168,8 @@ class Library : AppCompatActivity() {
             true
         }
         R.id.app_blocks -> {
+            Timber.d("app blocks pressed menu: $appBlockList")
+
             displayAdapter(appBlockList, "You broke the system")
             true
         }

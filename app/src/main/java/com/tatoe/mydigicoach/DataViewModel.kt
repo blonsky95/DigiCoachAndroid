@@ -32,6 +32,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     init {
 
         val appDB=AppRoomDatabase.buildDatabase(application)
+        Timber.d("Database has been created")
         val exerciseDao = appDB.exercisesDao()
         val blockDao = appDB.blockDao()
         val dayDao = appDB.dayDao()
