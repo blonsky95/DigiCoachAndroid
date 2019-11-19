@@ -25,7 +25,7 @@ class BlockViewer : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: BlockListAdapter
-    private lateinit var allBlocks:ArrayList<Block>
+    private lateinit var allUserBlocks:ArrayList<Block>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -58,10 +58,10 @@ class BlockViewer : AppCompatActivity() {
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
-        dataViewModel.allBlocks.observe(this, Observer { blocks ->
+        dataViewModel.allUserBlocks.observe(this, Observer { blocks ->
             blocks?.let {
                 Timber.d("PTG all blocks observer triggered: $blocks")
-                allBlocks= ArrayList(it)
+                allUserBlocks= ArrayList(it)
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
@@ -94,8 +94,8 @@ class BlockViewer : AppCompatActivity() {
 
     private fun updateUpdatingBlock(position: Int) {
 
-        if (allBlocks.isNotEmpty()) {
-            val clickedBlock = allBlocks[position]
+        if (allUserBlocks.isNotEmpty()) {
+            val clickedBlock = allUserBlocks[position]
 
             DataHolder.activeBlockHolder = clickedBlock
             Timber.d("active block: $clickedBlock ")

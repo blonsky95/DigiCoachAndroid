@@ -3,7 +3,6 @@ package com.tatoe.mydigicoach
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 
 import com.tatoe.mydigicoach.database.AppRoomDatabase
@@ -25,7 +24,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
 
     val allExercises: LiveData<List<Exercise>>
-    val allBlocks: LiveData<List<Block>>
+    val allUserBlocks: LiveData<List<Block>>
     val allDays: LiveData<List<Day>>
 
     init {
@@ -39,7 +38,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
         repository = AppRepository(exerciseDao,blockDao,dayDao)
         allExercises = repository.allExercises
-        allBlocks = repository.allBlocks
+        allUserBlocks = repository.allUserBlocks
         allDays = repository.allDays
     }
 

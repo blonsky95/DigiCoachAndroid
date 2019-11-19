@@ -15,7 +15,7 @@ class AppRepository(
 ) {
 
     val allExercises: androidx.lifecycle.LiveData<List<Exercise>> = exerciseDao.getAll()
-    val allBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getAll()
+    val allUserBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getUserMadeLive()
     val allDays: androidx.lifecycle.LiveData<List<Day>> = dayDao.getAll()
 
     private val ACTION_UPDATE = 1
@@ -52,7 +52,7 @@ class AppRepository(
     private suspend fun updateBlocksContainingExercise(actionCode:Int, exercise: Exercise) {
         Timber.d("updating blocks containing exercise: $exercise)")
 
-        val blocks = blockDao.getBlocks()
+        val blocks = blockDao.getUserMadeBlocks()
 
         if (blocks.isNotEmpty()) {
             for (block in blocks) { //todo make here a contains function in block class, and return position

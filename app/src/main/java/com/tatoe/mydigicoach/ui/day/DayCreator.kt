@@ -6,7 +6,6 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -19,8 +18,6 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.util.BlockListAdapter
-import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_day_creator.*
 import timber.log.Timber
@@ -42,7 +39,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
-    private var allBlocks: List<Block> = listOf()
+    private var allUserBlocks: List<Block> = listOf()
     private var allExercises: List<Exercise> = listOf()
 
     lateinit var activeDay: Day
@@ -94,9 +91,9 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     }
 
     private fun initObservers() {
-        dataViewModel.allBlocks.observe(this, Observer { blocks ->
+        dataViewModel.allUserBlocks.observe(this, Observer { blocks ->
             blocks?.let {
-                allBlocks = it
+                allUserBlocks = it
                 pagerAdapterTop.mBlockFragment?.updateBlockAdapterContent(it)
             }
         })
@@ -124,7 +121,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
                 } else {
                     currentDayBlocks.add(
                         currentDayBlocks.size,
-                        allBlocks[position]
+                        allUserBlocks[position]
                     )
                 }
             }
@@ -172,7 +169,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
                 mBlockFragment = mFragment
                 if (mBlockFragment?.contentUpdated == false) {
                     when (mFragment.adapterType) {
-                        CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> loadBlocks(allBlocks)
+                        CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> loadBlocks(allUserBlocks)
                         CustomAdapterFragment.BLOCK_DELETE_TYPE_ADAPTER -> loadBlocks(
                             currentDayBlocks
                         )
