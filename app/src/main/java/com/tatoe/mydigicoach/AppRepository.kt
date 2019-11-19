@@ -16,6 +16,8 @@ class AppRepository(
 
     val allExercises: androidx.lifecycle.LiveData<List<Exercise>> = exerciseDao.getAll()
     val allUserBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getUserMadeLive()
+    val allAppBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getPremadeBlocksLive()
+    val allImportExportBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getImportExportBlocksLive()
     val allDays: androidx.lifecycle.LiveData<List<Day>> = dayDao.getAll()
 
     private val ACTION_UPDATE = 1

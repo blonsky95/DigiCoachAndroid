@@ -13,16 +13,16 @@ interface BlockDao {
     suspend fun getUserMadeBlocks(): List<Block>
 
     @Query("SELECT * FROM block_table WHERE type=1 ORDER BY name ASC")
-    suspend fun getPremadeBlocks(): List<Block>
+    fun getPremadeBlocksLive(): androidx.lifecycle.LiveData<List<Block>>
 
     @Query("SELECT * FROM block_table WHERE type=2 ORDER BY name ASC")
-    suspend fun getImportExportBlocks(): List<Block>
+    fun getImportExportBlocksLive(): androidx.lifecycle.LiveData<List<Block>>
 
     @Update
-    suspend fun update(block : Block)
+    suspend fun update(block: Block)
 
     @Insert
-    suspend fun addBlock(block: Block) : Long
+    suspend fun addBlock(block: Block): Long
 
     @Delete
     suspend fun delete(block: Block)

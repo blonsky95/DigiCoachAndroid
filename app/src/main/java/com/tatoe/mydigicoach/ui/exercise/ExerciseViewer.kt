@@ -27,7 +27,6 @@ import com.tatoe.mydigicoach.ImportExportUtils
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.Library
-import com.tatoe.mydigicoach.ui.Library.Companion.PermissionsRequestCode
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.dialog_window_export.view.*
 import kotlinx.android.synthetic.main.dialog_window_info.view.*
@@ -163,8 +162,9 @@ class ExerciseViewer : AppCompatActivity() {
 
         R.id.action_export -> {
             //show dialog with instructions to select
-            checkPermissions()
+//            checkPermissions()
 //            managePermissions.checkPermissions()
+            showImportDialog()
             true
         }
 
@@ -175,32 +175,32 @@ class ExerciseViewer : AppCompatActivity() {
         }
     }
 
-    private fun checkPermissions() {
-        if(!hasPermissions(this, Library.listPermissions)){
-            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE), PermissionsRequestCode)
-        }
-        else {
-            showImportDialog()
-        }
-    }
-
-    private fun hasPermissions(context: Context, permissions: List<String>): Boolean = permissions.all {
-        ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
-    }
-
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grantResults: IntArray) {
-        when (requestCode) {
-            PermissionsRequestCode ->{
-                if ((grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED ))
-                    showImportDialog()
-                else {
-                    return
-                }
-                return
-            }
-        }
-    }
+//    private fun checkPermissions() {
+//        if(!hasPermissions(this, Library.listPermissions)){
+//            ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE,Manifest.permission.WRITE_EXTERNAL_STORAGE), PermissionsRequestCode)
+//        }
+//        else {
+//            showImportDialog()
+//        }
+//    }
+//
+//    private fun hasPermissions(context: Context, permissions: List<String>): Boolean = permissions.all {
+//        ActivityCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+//    }
+//
+//    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
+//                                            grantResults: IntArray) {
+//        when (requestCode) {
+//            PermissionsRequestCode ->{
+//                if ((grantResults.isNotEmpty() && grantResults[0]==PackageManager.PERMISSION_GRANTED && grantResults[1]==PackageManager.PERMISSION_GRANTED ))
+//                    showImportDialog()
+//                else {
+//                    return
+//                }
+//                return
+//            }
+//        }
+//    }
 
     private fun showImportDialog() {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_export, null)
@@ -232,7 +232,8 @@ class ExerciseViewer : AppCompatActivity() {
         exportBtn.setOnClickListener {
             Timber.d("Final selection: $selectedIndexes")
             exportBtn.visibility = View.GONE
-            ImportExportUtils.exportExercises(allExercises, selectedIndexes, exportFileName)
+            //todo change the text file to a block of type import export creation
+//            ImportExportUtils.exportExercises(allExercises, selectedIndexes, exportFileName)
             addExerciseBtn.visibility=View.VISIBLE
             title = "Exercise Viewer"
             updateAdapterListener(goToCreatorListener)

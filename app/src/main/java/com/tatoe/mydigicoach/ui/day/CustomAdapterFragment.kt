@@ -93,7 +93,7 @@ class CustomAdapterFragment : Fragment() {
         adapterBlocks = BlockListAdapter(activity!!,hasDelete)
         mRecyclerView.adapter = adapterBlocks
         mRecyclerView.layoutManager = LinearLayoutManager(activity!!)
-        adapterBlocks?.setListener(listener)
+        adapterBlocks?.setOnClickInterface(listener)
     }
 
     private fun prepareExerciseAdapter(listener:ClickListenerRecyclerView,hasDelete:Boolean) {

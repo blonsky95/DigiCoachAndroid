@@ -27,16 +27,16 @@
             android:text="No exercises found, create new exercises to view them here"
             android:visibility="gone" />
 
-    <Button
-            android:id="@+id/permissionBtn"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Request permissions"
-            android:layout_marginTop="16dp"
-            app:layout_constraintTop_toBottomOf="@id/ifEmptyText"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            tools:visibility="gone" />
+<!--    <Button-->
+<!--            android:id="@+id/permissionBtn"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:text="Request permissions"-->
+<!--            android:layout_marginTop="16dp"-->
+<!--            app:layout_constraintTop_toBottomOf="@id/ifEmptyText"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            tools:visibility="gone" />-->
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerview"
@@ -49,7 +49,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
-            tools:listitem="@layout/item_holder_files" />
+            tools:listitem="@layout/item_holder_block_V2" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

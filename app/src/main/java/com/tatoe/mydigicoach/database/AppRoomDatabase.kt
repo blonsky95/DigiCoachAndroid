@@ -2,11 +2,14 @@ package com.tatoe.mydigicoach.database
 
 import android.content.Context
 import androidx.room.*
-import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
+import java.util.concurrent.Executors
 
 @Database(
     entities = [Exercise::class, Block::class, Day::class],
@@ -39,6 +42,21 @@ abstract class AppRoomDatabase : RoomDatabase() {
         fun buildDatabase(context: Context) = Room.databaseBuilder(
             context,
             AppRoomDatabase::class.java, "digital_coach.db"
-        ).fallbackToDestructiveMigration().build()
+        ).addCallback(DatabaseCreationCallback).fallbackToDestructiveMigration().build()
+
+        object DatabaseCreationCallback : RoomDatabase.Callback() {
+            override fun onCreate(db: SupportSQLiteDatabase) {
+                super.onCreate(db)
+                //todo check this coroutine thing
+                runBlocking {
+                    for (block in Block.getPremadeBlocks()) {
+                        instance!!.blockDao().addBlock(block)
+                    }
+                }
+
+            }
+        }
     }
+
+
 }

@@ -44,7 +44,7 @@ class BlockListAdapter(context: Context, var deletableItems:Boolean = false) :
         }
     }
 
-    fun setListener (listener: ClickListenerRecyclerView) {
+    fun setOnClickInterface (listener: ClickListenerRecyclerView) {
         this.listenerRecyclerView=listener
     }
 

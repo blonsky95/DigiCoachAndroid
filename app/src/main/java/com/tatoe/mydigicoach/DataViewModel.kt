@@ -25,6 +25,8 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
     val allExercises: LiveData<List<Exercise>>
     val allUserBlocks: LiveData<List<Block>>
+    val allAppBlocks: LiveData<List<Block>>
+    val allImportExportBlocks: LiveData<List<Block>>
     val allDays: LiveData<List<Day>>
 
     init {
@@ -39,6 +41,8 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository = AppRepository(exerciseDao,blockDao,dayDao)
         allExercises = repository.allExercises
         allUserBlocks = repository.allUserBlocks
+        allAppBlocks = repository.allAppBlocks
+        allImportExportBlocks=repository.allImportExportBlocks
         allDays = repository.allDays
     }
 
