@@ -16,7 +16,10 @@ interface BlockDao {
     fun getPremadeBlocksLive(): androidx.lifecycle.LiveData<List<Block>>
 
     @Query("SELECT * FROM block_table WHERE type=2 ORDER BY name ASC")
-    fun getImportExportBlocksLive(): androidx.lifecycle.LiveData<List<Block>>
+    fun getImportBlocksLive(): androidx.lifecycle.LiveData<List<Block>>
+
+    @Query("SELECT * FROM block_table WHERE type=3 ORDER BY name ASC")
+    fun getExportBlocksLive(): androidx.lifecycle.LiveData<List<Block>>
 
     @Update
     suspend fun update(block: Block)

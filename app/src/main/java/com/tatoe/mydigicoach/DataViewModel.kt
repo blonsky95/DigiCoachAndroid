@@ -24,14 +24,17 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
 
     val allExercises: LiveData<List<Exercise>>
+
     val allUserBlocks: LiveData<List<Block>>
     val allAppBlocks: LiveData<List<Block>>
-    val allImportExportBlocks: LiveData<List<Block>>
+    val allImportBlocks: LiveData<List<Block>>
+    val allExportBlocks: LiveData<List<Block>>
+
     val allDays: LiveData<List<Day>>
 
     init {
 
-        val appDB=AppRoomDatabase.buildDatabase(application)
+        val appDB=AppRoomDatabase.getInstance(application)
         Timber.d("Database has been created")
         val exerciseDao = appDB.exercisesDao()
         val blockDao = appDB.blockDao()
@@ -40,10 +43,14 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         Timber.d("Dataviewmodel initialised")
 
         repository = AppRepository(exerciseDao,blockDao,dayDao)
+
         allExercises = repository.allExercises
+
         allUserBlocks = repository.allUserBlocks
         allAppBlocks = repository.allAppBlocks
-        allImportExportBlocks=repository.allImportExportBlocks
+        allImportBlocks=repository.allImportBlocks
+        allExportBlocks=repository.allExportBlocks
+
         allDays = repository.allDays
     }
 

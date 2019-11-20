@@ -1,6 +1,5 @@
 package com.tatoe.mydigicoach.ui
 
-import android.Manifest
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -12,10 +11,8 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.DataViewModel
-import com.tatoe.mydigicoach.ImportExportUtils
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
-import com.tatoe.mydigicoach.ui.util.BlockListAdapter
 import com.tatoe.mydigicoach.ui.util.BlockV2ListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import kotlinx.android.synthetic.main.activity_exercise_viewer.ifEmptyText
@@ -31,7 +28,12 @@ class Library : AppCompatActivity() {
 
     private var userBlockList: List<Block> = listOf()
     private var appBlockList: List<Block> = listOf()
-    private var imexportBlockList: List<Block> = listOf()
+    private var importBlockList: List<Block> = listOf()
+    private var exportBlockList: List<Block> = listOf()
+
+    private var activeBlockList: List<Block> = mutableListOf()
+
+    private var loadDefaultBlockList = true //so display user blocks
 
 //    companion object {
 //
@@ -56,6 +58,8 @@ class Library : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+//        activeBlockList = userBlockList
+
         initObservers()
 
     }
@@ -64,7 +68,12 @@ class Library : AppCompatActivity() {
         dataViewModel.allUserBlocks.observe(this, Observer { blocks ->
             blocks?.let {
                 userBlockList = it
-                displayAdapter(userBlockList,"You haven't created any blocks")
+                if (loadDefaultBlockList) {
+                    activeBlockList=userBlockList
+                    displayAdapter(activeBlockList, "You haven't created any blocks")
+                    loadDefaultBlockList = false
+                }
+
                 //use this for first time into app, might have to be placed somewhere else
             }
         })
@@ -81,9 +90,14 @@ class Library : AppCompatActivity() {
 
             }
         })
-        dataViewModel.allImportExportBlocks.observe(this, Observer { blocks ->
+        dataViewModel.allImportBlocks.observe(this, Observer { blocks ->
             blocks?.let {
-                imexportBlockList = it
+                importBlockList = it
+            }
+        })
+        dataViewModel.allExportBlocks.observe(this, Observer { blocks ->
+            blocks?.let {
+                exportBlockList = it
             }
         })
     }
@@ -115,9 +129,43 @@ class Library : AppCompatActivity() {
         }
     }
 
+    private fun importBlock(position: Int) {
+        Timber.d("import at position: $position")
+        var blockToImport = activeBlockList[position]
+        if (blockToImport.type != Block.USER_GENERATED || blockToImport.type != Block.EXPORT) {
+            for (exercise in blockToImport.components) {
+                dataViewModel.insertExercise(exercise)
+            }
+            dataViewModel.insertBlock(Block(blockToImport, Block.USER_GENERATED))
+            Toast.makeText(
+                this,
+                "${blockToImport.name} has been added to your blocks",
+                Toast.LENGTH_SHORT
+            ).show()
+            Toast.makeText(
+                this,
+                "${blockToImport.components.size} new exercises have been added",
+                Toast.LENGTH_SHORT
+            ).show()
+
+        } else {
+            Toast.makeText(this, "You already have this block", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     private fun deleteBlock(position: Int) {
+        val blockToDelete = activeBlockList[position]
+
+        if (blockToDelete.type != Block.APP_PREMADE) {
+            dataViewModel.deleteBlock(blockToDelete)
+            (activeBlockList as MutableList).removeAt(position)
+            displayAdapter(activeBlockList)
+        } else {
+            Toast.makeText(this, "Pre made blocks cant be deleted", Toast.LENGTH_SHORT).show()
+        }
+
 //        if (filesList[position].delete()) {
-            Timber.d("delete at position: $position")
+        Timber.d("delete at position: $position")
 ////            recyclerView.removeViewAt(position)
 ////            adapter.notifyItemRemoved(position)
 //            filesList.removeAt(position)
@@ -131,24 +179,8 @@ class Library : AppCompatActivity() {
 
     private fun sendBlock(position: Int) {
         Timber.d("send at position: $position")
-
-        //open intent to share a file
-//        Timber.d("Trying to export ${filesList[position].name}")
-
     }
 
-    private fun importBlock(position: Int) {
-        Timber.d("import at position: $position")
-
-//        var exercises = ImportExportUtils.importExercises(filesList[position])
-//        Timber.d("Trying to import: $exercises from ${filesList[position].name}")
-//
-//        for (exercise in exercises) {
-//            dataViewModel.insertExercise(exercise)
-//        }
-//        Toast.makeText(this, "Exercises have been imported", Toast.LENGTH_SHORT).show()
-        //or has it failed to insert?
-    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.library_toolbar_menu, menu)
@@ -165,16 +197,22 @@ class Library : AppCompatActivity() {
 
         R.id.user_blocks -> {
             displayAdapter(userBlockList, "You haven't created any blocks")
+            activeBlockList = userBlockList
             true
         }
         R.id.app_blocks -> {
-            Timber.d("app blocks pressed menu: $appBlockList")
-
             displayAdapter(appBlockList, "You broke the system")
+            activeBlockList = appBlockList
             true
         }
-        R.id.import_export_blocks -> {
-            displayAdapter(imexportBlockList, "Import or export blocks/exercises to see them here")
+        R.id.import_blocks -> {
+            displayAdapter(importBlockList, "Import blocks/exercises to see them here")
+            activeBlockList = importBlockList
+            true
+        }
+        R.id.export_blocks -> {
+            displayAdapter(exportBlockList, "Export blocks/exercises to see them here")
+            activeBlockList = exportBlockList
             true
         }
 

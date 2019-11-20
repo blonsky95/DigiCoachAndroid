@@ -26,10 +26,13 @@ data class Block(
         type
     )
 
+    constructor(block: Block, newType: Int) : this(0, block.name, block.components, newType)
+
     companion object {
         const val USER_GENERATED = 0
         const val APP_PREMADE = 1
-        const val IMPORT_EXPORT = 2
+        const val IMPORT = 2
+        const val EXPORT = 3
 
         fun getPremadeBlocks(): List<Block> {
 
@@ -47,14 +50,15 @@ data class Block(
             )
             var block1 = Block("Calisthenics", exe1array, APP_PREMADE)
 
-            var exe2array = arrayListOf(Exercise("150s", "Try 2x4x150 with 3' and 6' or 3x3x150 with 3' and 6'"),
+            var exe2array = arrayListOf(
+                Exercise("150s", "Try 2x4x150 with 3' and 6' or 3x3x150 with 3' and 6'"),
                 Exercise("Pyramid", "200 - 250 - 300 - 350 - 300 - 250 - 200 R=4-6'"),
-                Exercise("300s","Classic 4-6 * 300 with 3-6'"),
-                        Exercise("Joni Killer", "3*300 - 3*200 - 3*100 recu 3' y 6'")
+                Exercise("300s", "Classic 4-6 * 300 with 3-6'"),
+                Exercise("Joni Killer", "3*300 - 3*200 - 3*100 recu 3' y 6'")
             )
             var block2 = Block("Lactic Runs", exe2array, APP_PREMADE)
 
-            return listOf(block1,block2)
+            return listOf(block1, block2)
         }
 
     }

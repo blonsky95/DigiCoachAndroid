@@ -15,9 +15,12 @@ class AppRepository(
 ) {
 
     val allExercises: androidx.lifecycle.LiveData<List<Exercise>> = exerciseDao.getAll()
+
     val allUserBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getUserMadeLive()
     val allAppBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getPremadeBlocksLive()
-    val allImportExportBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getImportExportBlocksLive()
+    val allImportBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getImportBlocksLive()
+    val allExportBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getExportBlocksLive()
+
     val allDays: androidx.lifecycle.LiveData<List<Day>> = dayDao.getAll()
 
     private val ACTION_UPDATE = 1
@@ -27,10 +30,6 @@ class AppRepository(
         var rowId = exerciseDao.insert(exercise)
         Timber.d("new activeExercise, row: $rowId")
     }
-
-//    suspend fun getExerciseById(exeId:Int){
-//        exerciseDao.findByName(exeId)
-//    }
 
     suspend fun updateExercise(updatedExercise: Exercise) {
         exerciseDao.update(updatedExercise)
