@@ -93,8 +93,13 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository.updateBlock(block)
     }
 
-    fun deleteBlock(block: Block) = viewModelScope.launch {
+    fun deleteBlock(block: Block, deleteExercises:Boolean = false) = viewModelScope.launch {
         Timber.d("ptg - data view model - delete block called")
+        if (deleteExercises) {
+            for (exercise in block.components) {
+                deleteExercise(exercise)
+            }
+        }
         repository.deleteBlock(block)
     }
 

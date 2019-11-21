@@ -1,10 +1,12 @@
 package com.tatoe.mydigicoach.ui
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -17,6 +19,7 @@ import com.tatoe.mydigicoach.ui.util.BlockV2ListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import kotlinx.android.synthetic.main.activity_exercise_viewer.ifEmptyText
 import kotlinx.android.synthetic.main.activity_exercise_viewer.recyclerview
+import kotlinx.android.synthetic.main.dialog_window_info.view.*
 import timber.log.Timber
 
 class Library : AppCompatActivity() {
@@ -130,10 +133,11 @@ class Library : AppCompatActivity() {
     }
 
     private fun importBlock(position: Int) {
-        Timber.d("import at position: $position")
         var blockToImport = activeBlockList[position]
         if (blockToImport.type != Block.USER_GENERATED || blockToImport.type != Block.EXPORT) {
             for (exercise in blockToImport.components) {
+                Timber.d("about to insert $exercise")
+
                 dataViewModel.insertExercise(exercise)
             }
             dataViewModel.insertBlock(Block(blockToImport, Block.USER_GENERATED))
@@ -157,24 +161,30 @@ class Library : AppCompatActivity() {
         val blockToDelete = activeBlockList[position]
 
         if (blockToDelete.type != Block.APP_PREMADE) {
-            dataViewModel.deleteBlock(blockToDelete)
+            askExerciseDeletion(blockToDelete)
+//            dataViewModel.deleteBlock(blockToDelete)
             (activeBlockList as MutableList).removeAt(position)
             displayAdapter(activeBlockList)
         } else {
             Toast.makeText(this, "Pre made blocks cant be deleted", Toast.LENGTH_SHORT).show()
         }
 
-//        if (filesList[position].delete()) {
-        Timber.d("delete at position: $position")
-////            recyclerView.removeViewAt(position)
-////            adapter.notifyItemRemoved(position)
-//            filesList.removeAt(position)
-//            adapter.notifyDataSetChanged()
-//        } else {
-//            Timber.d("Couldn't delete")
-//        }
-        //reload adapter
+    }
 
+    private fun askExerciseDeletion(blockToDelete:Block){
+        var deleteExercises = false
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_info, null)
+//        mDialogView.item_title.text= "Description"
+        mDialogView.item_description.text="Do you want to delete the exercises in this block too?"
+        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
+        mBuilder.setPositiveButton("Yes") { _, _ ->
+            deleteExercises=true
+        }
+        mBuilder.setNegativeButton("No") { _, _ ->
+            deleteExercises=false
+        }
+        mBuilder.show()
+        dataViewModel.deleteBlock(blockToDelete,deleteExercises)
     }
 
     private fun sendBlock(position: Int) {

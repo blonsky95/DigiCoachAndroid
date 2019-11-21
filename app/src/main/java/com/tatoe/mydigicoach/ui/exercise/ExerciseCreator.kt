@@ -72,8 +72,12 @@ class ExerciseCreator : AppCompatActivity() {
             if (mAction == OBJECT_EDIT || mAction == OBJECT_VIEW) {
 //                if (DataHolder.activeExerciseHolder != null) {
                 activeExercise = DataHolder.activeExerciseHolder
+                Timber.d("about to open $activeExercise")
+
                 if (activeExercise != null) {
                     exerciseFieldsMap = activeExercise!!.getFieldsMap()
+                    Timber.d("field map $exerciseFieldsMap")
+
                 }
 //                }
             } else {
@@ -179,7 +183,7 @@ class ExerciseCreator : AppCompatActivity() {
             linearLayout.addView(fieldInfoTextView)
         }
 
-        Timber.d("Child count: ${linearLayout.childCount}")
+//        Timber.d("Child count: ${linearLayout.childCount}")
     }
 
     private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {

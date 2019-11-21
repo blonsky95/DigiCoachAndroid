@@ -37,7 +37,7 @@ data class Block(
         fun getPremadeBlocks(): List<Block> {
 
             var exe1array = arrayListOf(
-                Exercise("Pull ups", "Change grip to use different muscles"),
+                Exercise(LinkedHashMap(mutableMapOf("Name" to "pull ups", "Description" to "Change grip to use different muscles"))),
                 Exercise("L holds", "Hold L position for as long as possible with straight arms"),
                 Exercise(
                     "Pistol squat",
