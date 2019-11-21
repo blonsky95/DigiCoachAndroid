@@ -29,6 +29,8 @@ data class Exercise(
     //todo find a way of making the constructor, and instance data retrieval more efficient by
     //todo finding synergy between the LinkedHashMap including name and description and having a method here
 
+    //todo think about constructor, should I always use the LinkedHashMap, and not the other one?
+
 
     //I only want name and description as constructors, so primary key id is outside
     // constructor and starts with 0 (initialization required).
