@@ -7,6 +7,11 @@ import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ioThread
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import timber.log.Timber
 
 @Database(
     entities = [Exercise::class, Block::class, Day::class],
@@ -49,12 +54,23 @@ abstract class AppRoomDatabase : RoomDatabase() {
                 super.onCreate(db)
                 val appBlocks = Block.getPremadeBlocks()
 
-                //todo should be replaced with coroutines
-                ioThread {
-                    for (block in appBlocks) {
-                        getInstance(context).blockDao().addInitialBlock(block)
+                // should be replaced with coroutines
+//                ioThread {
+//                    for (block in appBlocks) {
+//                        getInstance(context).blockDao().addInitialBlock(block)
+//                    }
+//                }
+                //coroutine
+                runBlocking{
+                    GlobalScope.launch{
+                        Timber.d("Running coroutine")
+                        for (block in appBlocks) {
+                            getInstance(context).blockDao().addInitialBlock(block)
+                        }
                     }
                 }
+
+
             }
         }).fallbackToDestructiveMigration().build()
 
