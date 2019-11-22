@@ -72,7 +72,7 @@ class Library : AppCompatActivity() {
             blocks?.let {
                 userBlockList = it
                 if (loadDefaultBlockList) {
-                    activeBlockList=userBlockList
+                    activeBlockList = userBlockList
                     displayAdapter(activeBlockList, "You haven't created any blocks")
                     loadDefaultBlockList = false
                 }
@@ -140,6 +140,9 @@ class Library : AppCompatActivity() {
 
                 dataViewModel.insertExercise(exercise)
             }
+            //todo ok so exercises will be imported separately (will be in exercises and not in blocks)
+            //it will call import Exercises, and then it will call import Block, block will use the already in db exercises
+
             dataViewModel.insertBlock(Block(blockToImport, Block.USER_GENERATED))
             Toast.makeText(
                 this,
@@ -161,31 +164,32 @@ class Library : AppCompatActivity() {
         val blockToDelete = activeBlockList[position]
 
         if (blockToDelete.type != Block.APP_PREMADE) {
-            askExerciseDeletion(blockToDelete)
+            askExerciseDeletion(blockToDelete,position)
 //            dataViewModel.deleteBlock(blockToDelete)
-            (activeBlockList as MutableList).removeAt(position)
-            displayAdapter(activeBlockList)
+
         } else {
             Toast.makeText(this, "Pre made blocks cant be deleted", Toast.LENGTH_SHORT).show()
         }
 
     }
 
-    private fun askExerciseDeletion(blockToDelete:Block){
-        var deleteExercises = false
+    private fun askExerciseDeletion(blockToDelete: Block, position: Int) {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_info, null)
-//        mDialogView.item_title.text= "Description"
-        mDialogView.item_description.text="Do you want to delete the exercises in this block too?"
+        mDialogView.item_description.text = "Do you want to delete the exercises in this block too?"
         val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
         mBuilder.setPositiveButton("Yes") { _, _ ->
-            deleteExercises=true
+            dataViewModel.deleteBlock(blockToDelete, true)
+            (activeBlockList as MutableList).removeAt(position)
+            displayAdapter(activeBlockList)
         }
         mBuilder.setNegativeButton("No") { _, _ ->
-            deleteExercises=false
+            dataViewModel.deleteBlock(blockToDelete, false)
+            (activeBlockList as MutableList).removeAt(position)
+            displayAdapter(activeBlockList)
         }
         mBuilder.show()
-        dataViewModel.deleteBlock(blockToDelete,deleteExercises)
     }
+
 
     private fun sendBlock(position: Int) {
         Timber.d("send at position: $position")

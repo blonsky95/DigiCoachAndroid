@@ -12,12 +12,14 @@ import kotlin.collections.LinkedHashMap
 @Entity(tableName = "exercise_table")
 
 data class Exercise(
-    @PrimaryKey(autoGenerate = true)
-    @field: SerializedName("id")
-    var exerciseId: Int = 0,
     @ColumnInfo(name = "name") @field: SerializedName("name") var name: String,
     @ColumnInfo(name = "description") @field: SerializedName("description") var description: String
 ) {
+
+    @PrimaryKey(autoGenerate = true)
+    @field: SerializedName("id")
+    var exerciseId: Int = 0
+
     @ColumnInfo(name = "result")
     @field: SerializedName("result")
     var results: ArrayList<ResultSet> = arrayListOf()
@@ -34,9 +36,9 @@ data class Exercise(
 
     //I only want name and description as constructors, so primary key id is outside
     // constructor and starts with 0 (initialization required).
-    constructor(name: String, description: String) : this(0, name, description)
+//    constructor(name: String, description: String) : this(name, description)
 
-    constructor(mFieldsHashMap:LinkedHashMap<String,String>) : this (0,mFieldsHashMap["Name"]!!,mFieldsHashMap["Description"]!!) {
+    constructor(mFieldsHashMap:LinkedHashMap<String,String>) : this (mFieldsHashMap["Name"]!!,mFieldsHashMap["Description"]!!) {
         fieldsHashMap=mFieldsHashMap
     }
 

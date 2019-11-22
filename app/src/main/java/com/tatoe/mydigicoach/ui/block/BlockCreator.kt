@@ -213,10 +213,26 @@ class BlockCreator : AppCompatActivity() {
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        dataViewModel.deleteBlock(updatingBlock!!)
+        askExerciseDeletion(updatingBlock!!)
+//        dataViewModel.deleteBlock(updatingBlock!!)
 
-        backToViewer()
     }
+
+    private fun askExerciseDeletion(blockToDelete:Block){
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_info, null)
+        mDialogView.item_description.text="Do you want to delete the exercises in this block too?"
+        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
+        mBuilder.setPositiveButton("Yes") { _, _ ->
+            dataViewModel.deleteBlock(blockToDelete,true)
+            backToViewer()
+        }
+        mBuilder.setNegativeButton("No") { _, _ ->
+            dataViewModel.deleteBlock(blockToDelete,false)
+            backToViewer()
+        }
+        mBuilder.show()
+    }
+
 
     private fun showItemInfo (title:String?,description:String?) {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_info, null)

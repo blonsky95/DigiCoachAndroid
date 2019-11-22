@@ -79,7 +79,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 //    }
 
     fun deleteExercise(exercise: Exercise) = viewModelScope.launch {
-        Timber.d("ptg - data view model - delete called")
+        Timber.d("ptg - data view model - delete $exercise")
         repository.deleteExercise(exercise)
     }
 
@@ -93,6 +93,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
         repository.updateBlock(block)
     }
 
+    //todo if I use foreign keys, so when exercise deleted, dissapears from everywhere(?)
     fun deleteBlock(block: Block, deleteExercises:Boolean = false) = viewModelScope.launch {
         Timber.d("ptg - data view model - delete block called")
         if (deleteExercises) {
