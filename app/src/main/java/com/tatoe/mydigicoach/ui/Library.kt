@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
+import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.BlockV2ListAdapter
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import kotlinx.android.synthetic.main.activity_exercise_viewer.ifEmptyText
@@ -37,7 +38,9 @@ class Library : AppCompatActivity() {
     private var activeBlockList: List<Block> = mutableListOf()
 
     private var loadDefaultBlockList = true //so display user blocks
-
+    private var blockNeedsInserting = false
+    lateinit var blockToBeUpdated: Block
+    private var allExercises = listOf<Exercise>()
 //    companion object {
 //
 //    }
@@ -68,6 +71,16 @@ class Library : AppCompatActivity() {
     }
 
     private fun initObservers() {
+        dataViewModel.allExercises.observe(this, Observer { exercises ->
+            exercises.let {
+                allExercises = it
+                //the following is run when a premade block has been inserted and needs non-IDied
+                //exercises to be swapped for exercises with ID
+                if (blockNeedsInserting){
+                    insertBlockReExercises()
+                }
+            }
+        })
         dataViewModel.allUserBlocks.observe(this, Observer { blocks ->
             blocks?.let {
                 userBlockList = it
@@ -84,10 +97,7 @@ class Library : AppCompatActivity() {
             blocks?.let {
                 Timber.d("app blocks has been updated")
                 //todo check this block of comment
-                //when data viewmodel is first initialized it loads the intiial blocks, but the
-                //observers don't seem to pick it up, perhaps because it is done from another thread
-                //maybe coroutines fixes this. but basically dataviewmodel needs to be initialized
-                //once before the intial blocks are seen in Library app blocks list.
+                //when you delete the last user made block the adapter doesnt load the ifemptytext, but an empty adapter until you reopen Library
                 appBlockList = it
                 Timber.d("app blocks observer updated to: $appBlockList")
 
@@ -103,6 +113,25 @@ class Library : AppCompatActivity() {
                 exportBlockList = it
             }
         })
+    }
+
+    private fun insertBlockReExercises() {
+        for (i in 0 until blockToBeUpdated.components.size) {
+            //match it with list of all exercises and swap it round
+            for (existingExercise in allExercises) {
+                if (blockToBeUpdated.components[i].name==existingExercise.name&&blockToBeUpdated.components[i].description==existingExercise.description){
+                    Timber.d("HAS BEEN SWAPPED ${blockToBeUpdated.components[i]} for $existingExercise")
+                    blockToBeUpdated.components[i]=existingExercise
+                }
+
+            }
+        }
+        dataViewModel.insertBlock(Block(blockToBeUpdated, Block.USER_GENERATED))
+        Toast.makeText(
+            this,
+            "${blockToBeUpdated.name} has been added to your blocks",
+            Toast.LENGTH_SHORT
+        ).show()
     }
 
     private fun displayAdapter(blocks: List<Block>, ifEmptyString: String = "") {
@@ -134,21 +163,22 @@ class Library : AppCompatActivity() {
 
     private fun importBlock(position: Int) {
         var blockToImport = activeBlockList[position]
+        blockToBeUpdated = activeBlockList[position]
         if (blockToImport.type != Block.USER_GENERATED || blockToImport.type != Block.EXPORT) {
+
+            //import exercises of the block
+            var i =1
             for (exercise in blockToImport.components) {
                 Timber.d("about to insert $exercise")
-
                 dataViewModel.insertExercise(exercise)
-            }
-            //todo ok so exercises will be imported separately (will be in exercises and not in blocks)
-            //it will call import Exercises, and then it will call import Block, block will use the already in db exercises
+                //this is some dirty shit
+                if (i==blockToImport.components.size) {
+                    blockNeedsInserting = true
+                } else {
+                    i++
+                }
 
-            dataViewModel.insertBlock(Block(blockToImport, Block.USER_GENERATED))
-            Toast.makeText(
-                this,
-                "${blockToImport.name} has been added to your blocks",
-                Toast.LENGTH_SHORT
-            ).show()
+            }
             Toast.makeText(
                 this,
                 "${blockToImport.components.size} new exercises have been added",
@@ -164,7 +194,7 @@ class Library : AppCompatActivity() {
         val blockToDelete = activeBlockList[position]
 
         if (blockToDelete.type != Block.APP_PREMADE) {
-            askExerciseDeletion(blockToDelete,position)
+            askExerciseDeletion(blockToDelete, position)
 //            dataViewModel.deleteBlock(blockToDelete)
 
         } else {
