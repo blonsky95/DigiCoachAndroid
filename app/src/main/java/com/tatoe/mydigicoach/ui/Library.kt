@@ -76,7 +76,7 @@ class Library : AppCompatActivity() {
                 allExercises = it
                 //the following is run when a premade block has been inserted and needs non-IDied
                 //exercises to be swapped for exercises with ID
-                if (blockNeedsInserting){
+                if (blockNeedsInserting) {
                     insertBlockReExercises()
                 }
             }
@@ -119,9 +119,9 @@ class Library : AppCompatActivity() {
         for (i in 0 until blockToBeUpdated.components.size) {
             //match it with list of all exercises and swap it round
             for (existingExercise in allExercises) {
-                if (blockToBeUpdated.components[i].name==existingExercise.name&&blockToBeUpdated.components[i].description==existingExercise.description){
+                if (blockToBeUpdated.components[i].name == existingExercise.name && blockToBeUpdated.components[i].description == existingExercise.description) {
                     Timber.d("HAS BEEN SWAPPED ${blockToBeUpdated.components[i]} for $existingExercise")
-                    blockToBeUpdated.components[i]=existingExercise
+                    blockToBeUpdated.components[i] = existingExercise
                 }
 
             }
@@ -164,15 +164,15 @@ class Library : AppCompatActivity() {
     private fun importBlock(position: Int) {
         var blockToImport = activeBlockList[position]
         blockToBeUpdated = activeBlockList[position]
-        if (blockToImport.type != Block.USER_GENERATED || blockToImport.type != Block.EXPORT) {
+        if (blockToImport.type != Block.USER_GENERATED) {
 
             //import exercises of the block
-            var i =1
+            var i = 1
             for (exercise in blockToImport.components) {
                 Timber.d("about to insert $exercise")
                 dataViewModel.insertExercise(exercise)
                 //this is some dirty shit
-                if (i==blockToImport.components.size) {
+                if (i == blockToImport.components.size) {
                     blockNeedsInserting = true
                 } else {
                     i++
@@ -194,8 +194,12 @@ class Library : AppCompatActivity() {
         val blockToDelete = activeBlockList[position]
 
         if (blockToDelete.type != Block.APP_PREMADE) {
-            askExerciseDeletion(blockToDelete, position)
-//            dataViewModel.deleteBlock(blockToDelete)
+            if (blockToDelete.type == Block.EXPORT) {
+                dataViewModel.deleteBlock(blockToDelete)
+
+            } else {
+                askExerciseDeletion(blockToDelete, position)
+            }
 
         } else {
             Toast.makeText(this, "Pre made blocks cant be deleted", Toast.LENGTH_SHORT).show()

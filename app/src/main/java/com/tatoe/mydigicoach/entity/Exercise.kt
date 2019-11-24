@@ -20,6 +20,9 @@ data class Exercise(
     @field: SerializedName("id")
     var exerciseId: Int = 0
 
+    //ROOM and PRIMARY KEY - If you set the id to 0, Room will assume this class instance hasn't been
+    //inserted into the db. So if it's 0 and you insert, it will assign a new ID (autogenerate).
+
     @ColumnInfo(name = "result")
     @field: SerializedName("result")
     var results: ArrayList<ResultSet> = arrayListOf()
