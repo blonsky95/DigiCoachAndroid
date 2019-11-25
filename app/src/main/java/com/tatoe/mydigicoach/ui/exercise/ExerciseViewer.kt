@@ -12,14 +12,12 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import androidx.appcompat.app.AlertDialog
-import com.tatoe.mydigicoach.ImportExportUtils
-import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.dialog_window_export.view.*
@@ -154,19 +152,39 @@ class ExerciseViewer : AppCompatActivity() {
     }
 
     private fun showImportDialog() {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_export, null)
-        mDialogView.text_info.text = "Click the exercises you desire to select"
 
-        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
-        mBuilder.setPositiveButton("OK") { _, _ ->
-            val exportFileName = mDialogView.export_name_edittext.text.trim().toString()
-            if (exportFileName.isEmpty()) {
-                Toast.makeText(this, "Block name must not be empty", Toast.LENGTH_SHORT).show()
-            } else {
-                makeListSelectable(exportFileName)
-            }
-        }
-        mBuilder.show()
+        Utils.getDialogViewWithEditText(
+            this,
+            title.toString(),
+            "Click the exercises you desire to select",
+            object :
+                DialogPositiveNegativeHandler {
+                override fun onPositiveButton(editTextText: String) {
+                    super.onPositiveButton(editTextText)
+                    if (editTextText.isEmpty()) {
+                        Toast.makeText(
+                            this@ExerciseViewer,
+                            "Block name must not be empty",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    } else {
+                        makeListSelectable(editTextText)
+                    }
+                }
+            })
+//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_export, null)
+//        mDialogView.text_info.text = "Click the exercises you desire to select"
+//
+//        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
+//        mBuilder.setPositiveButton("OK") { _, _ ->
+//            val exportFileName = mDialogView.export_name_edittext.text.trim().toString()
+//            if (exportFileName.isEmpty()) {
+//                Toast.makeText(this, "Block name must not be empty", Toast.LENGTH_SHORT).show()
+//            } else {
+//                makeListSelectable(exportFileName)
+//            }
+//        }
+//        mBuilder.show()
     }
 
     private fun makeListSelectable(exportBlockName: String) {
@@ -180,7 +198,13 @@ class ExerciseViewer : AppCompatActivity() {
         exportBtn.setOnClickListener {
             Timber.d("Final selection: $selectedIndexes")
             exportBtn.visibility = View.GONE
-            dataViewModel.insertBlock(ImportExportUtils.makeExportBlock(allExercises,selectedIndexes,exportBlockName))
+            dataViewModel.insertBlock(
+                ImportExportUtils.makeExportBlock(
+                    allExercises,
+                    selectedIndexes,
+                    exportBlockName
+                )
+            )
             addExerciseBtn.visibility = View.VISIBLE
             title = "Exercise Viewer"
             updateAdapterListener(goToCreatorListener)

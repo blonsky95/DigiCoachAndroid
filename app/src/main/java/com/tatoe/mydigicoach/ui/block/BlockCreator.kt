@@ -1,23 +1,23 @@
 package com.tatoe.mydigicoach.ui.block
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.DataViewModel
+import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
@@ -25,7 +25,6 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 
 import kotlinx.android.synthetic.main.activity_block_creator.*
-import kotlinx.android.synthetic.main.dialog_window_info.view.*
 import timber.log.Timber
 
 class BlockCreator : AppCompatActivity() {
@@ -39,17 +38,16 @@ class BlockCreator : AppCompatActivity() {
     private lateinit var adapterDeletableExercises: ExerciseListAdapter
 
     private lateinit var block: Block
-    //    private lateinit var blockPreviewText: TextView
     private lateinit var blockNameText: EditText
 
     lateinit var saveBlockButton: Button
     lateinit var deleteButton: Button
 
-    //    private var blockString = ""
     private var currentBlockComponents: ArrayList<Exercise>? = arrayListOf()
     private lateinit var allExercises: List<Exercise>
 
     private var updatingBlock: Block? = null
+    private lateinit var mContext:Context
 
     private var BUTTON_ADD = "ADD"
     private var BUTTON_UPDATE = "UPDATE"
@@ -65,6 +63,8 @@ class BlockCreator : AppCompatActivity() {
         setContentView(R.layout.activity_block_creator)
         title = "Block Creator"
 
+        mContext=this
+
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
         // add init block in classes that require variables to be initialised
@@ -72,10 +72,9 @@ class BlockCreator : AppCompatActivity() {
 
         allExercises = listOf()
 
-//        currentBlockComponents = arrayListOf()
         recyclerView = recyclerview as RecyclerView
         recyclerViewV2 = CurrentBlockDisplay as RecyclerView
-//        blockPreviewText = BlockPreviewText as TextView
+
         blockNameText = BlockNameText as EditText
         saveBlockButton = AddBlockBtn as Button
         deleteButton = delete_button as Button
@@ -128,8 +127,6 @@ class BlockCreator : AppCompatActivity() {
         }
 
         else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
     }
@@ -177,7 +174,6 @@ class BlockCreator : AppCompatActivity() {
     private val exerciseSelectorListener = object : ClickListenerRecyclerView {
         override fun onClick(view: View, position: Int) {
             super.onClick(view, position)
-            Toast.makeText(this@BlockCreator, "$position was clicked", Toast.LENGTH_SHORT).show()
             val clickedExercise = dataViewModel.allExercises.value?.get(position)
             currentBlockComponents!!.add(currentBlockComponents!!.size, clickedExercise!!)
             updateAdaptersDisplay()
@@ -185,10 +181,13 @@ class BlockCreator : AppCompatActivity() {
 
         override fun onLongClick(view: View, position: Int) {
             super.onLongClick(view, position)
-            Timber.d("on long click 4")
 
             val longClickedExercise = dataViewModel.allExercises.value?.get(position)
-            showItemInfo(longClickedExercise?.name,longClickedExercise?.description)
+
+            if (longClickedExercise!=null){
+                Utils.getInfoDialogView(mContext,dialogTitle = longClickedExercise.name,dialogText = longClickedExercise.description)
+            }
+
         }
     }
 
@@ -214,38 +213,27 @@ class BlockCreator : AppCompatActivity() {
 
     private val deleteButtonListener = View.OnClickListener {
         askExerciseDeletion(updatingBlock!!)
-//        dataViewModel.deleteBlock(updatingBlock!!)
-
     }
 
     private fun askExerciseDeletion(blockToDelete:Block){
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_info, null)
-        mDialogView.item_description.text="Do you want to delete the exercises in this block too?"
-        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
-        mBuilder.setPositiveButton("Yes") { _, _ ->
-            dataViewModel.deleteBlock(blockToDelete,true)
-            backToViewer()
-        }
-        mBuilder.setNegativeButton("No") { _, _ ->
-            dataViewModel.deleteBlock(blockToDelete,false)
-            backToViewer()
-        }
-        mBuilder.show()
-    }
 
+        Utils.getInfoDialogView(this,title.toString(),"Do you want to delete the exercises in this block too?",object:DialogPositiveNegativeHandler{
 
-    private fun showItemInfo (title:String?,description:String?) {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_info, null)
-//        mDialogView.item_title.text= "Description"
-        mDialogView.item_description.text= description
-        //AlertDialogBuilder
-        val mBuilder = AlertDialog.Builder(this)
-            .setView(mDialogView)
-            .setTitle(title)
+            override fun onPositiveButton(editTextText:String) {
+                super.onPositiveButton(editTextText)
+                dataViewModel.deleteBlock(blockToDelete,true)
+                backToViewer()
+            }
 
-        mBuilder.show()
+            override fun onNegativeButton() {
+                super.onNegativeButton()
+                dataViewModel.deleteBlock(blockToDelete,false)
+                backToViewer()
+            }
+        })
 
     }
+
 
     private fun backToViewer() {
         val intent = Intent(this, BlockViewer::class.java)
