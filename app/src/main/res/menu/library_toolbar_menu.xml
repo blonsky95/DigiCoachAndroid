@@ -9,9 +9,9 @@
             app:showAsAction="ifRoom">
         <menu>
 
-            <item
-                    android:id="@+id/user_blocks"
-                    android:title="My Blocks" />
+<!--            <item-->
+<!--                    android:id="@+id/user_blocks"-->
+<!--                    android:title="My Blocks" />-->
             <item
                     android:id="@+id/app_blocks"
                     android:title="Premade Blocks" />

@@ -29,7 +29,7 @@ class Library : AppCompatActivity() {
 
     private lateinit var blockActionHandler: ClickListenerRecyclerView
 
-    private var userBlockList: List<Block> = listOf()
+    //    private var userBlockList: List<Block> = listOf()
     private var appBlockList: List<Block> = listOf()
     private var importBlockList: List<Block> = listOf()
     private var exportBlockList: List<Block> = listOf()
@@ -80,21 +80,15 @@ class Library : AppCompatActivity() {
                 }
             }
         })
-        dataViewModel.allUserBlocks.observe(this, Observer { blocks ->
-            blocks?.let {
-                userBlockList = it
-                if (loadDefaultBlockList) {
-                    activeBlockList = userBlockList
-                    displayAdapter(activeBlockList, "You haven't created any blocks")
-                    loadDefaultBlockList = false
-                }
 
-                //use this for first time into app, might have to be placed somewhere else
-            }
-        })
         dataViewModel.allAppBlocks.observe(this, Observer { blocks ->
             blocks?.let {
                 Timber.d("app blocks has been updated")
+                if (loadDefaultBlockList) {
+                    activeBlockList = appBlockList
+                    displayAdapter(activeBlockList, "you broke the system")
+                    loadDefaultBlockList = false
+                }
                 //todo check this block of comment
                 //when you delete the last user made block the adapter doesnt load the ifemptytext, but an empty adapter until you reopen Library
                 appBlockList = it
@@ -161,32 +155,42 @@ class Library : AppCompatActivity() {
     }
 
     private fun importBlock(position: Int) {
-        var blockToImport = activeBlockList[position]
-        blockToBeUpdated = activeBlockList[position]
-        if (blockToImport.type != Block.USER_GENERATED) {
 
-            //import exercises of the block
-            var i = 1
-            for (exercise in blockToImport.components) {
-                Timber.d("about to insert $exercise")
-                dataViewModel.insertExercise(exercise)
-                //this is some dirty shit
-                if (i == blockToImport.components.size) {
-                    blockNeedsInserting = true
-                } else {
-                    i++
+        Utils.getInfoDialogView(
+            this,
+            "Import Block",
+            "Are you sure you want to import this block?",
+            object :
+                DialogPositiveNegativeHandler {
+
+                override fun onPositiveButton(editTextText: String) {
+                    super.onPositiveButton(editTextText)
+                    val blockToImport = activeBlockList[position]
+                    blockToBeUpdated = activeBlockList[position]
+
+                    //import exercises of the block
+                    var i = 1
+                    for (exercise in blockToImport.components) {
+                        Timber.d("about to insert $exercise")
+                        dataViewModel.insertExercise(exercise)
+                        //this is some dirty shit
+                        if (i == blockToImport.components.size) {
+                            blockNeedsInserting = true
+                        } else {
+                            i++
+                        }
+
+                    }
+                    Toast.makeText(
+                        this@Library,
+                        "${blockToImport.components.size} new exercises have been added",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
                 }
+            })
 
-            }
-            Toast.makeText(
-                this,
-                "${blockToImport.components.size} new exercises have been added",
-                Toast.LENGTH_SHORT
-            ).show()
 
-        } else {
-            Toast.makeText(this, "You already have this block", Toast.LENGTH_SHORT).show()
-        }
     }
 
     private fun deleteBlock(position: Int) {
@@ -207,38 +211,27 @@ class Library : AppCompatActivity() {
     }
 
     private fun askExerciseDeletion(blockToDelete: Block, position: Int) {
-        Utils.getInfoDialogView(this,title.toString(),"Do you want to delete the exercises in this block too?",object:
-            DialogPositiveNegativeHandler {
+        Utils.getInfoDialogView(
+            this,
+            title.toString(),
+            "Do you want to delete the exercises in this block too?",
+            object :
+                DialogPositiveNegativeHandler {
 
-            override fun onPositiveButton(editTextText:String) {
-                super.onPositiveButton(editTextText)
-                dataViewModel.deleteBlock(blockToDelete, true)
-                (activeBlockList as MutableList).removeAt(position)
-                displayAdapter(activeBlockList)
-            }
+                override fun onPositiveButton(editTextText: String) {
+                    super.onPositiveButton(editTextText)
+                    dataViewModel.deleteBlock(blockToDelete, true)
+                    (activeBlockList as MutableList).removeAt(position)
+                    displayAdapter(activeBlockList)
+                }
 
-            override fun onNegativeButton() {
-                super.onNegativeButton()
-                dataViewModel.deleteBlock(blockToDelete, false)
-                (activeBlockList as MutableList).removeAt(position)
-                displayAdapter(activeBlockList)
-            }
-        })
-
-//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_info, null)
-//        mDialogView.dialog_text.text = "Do you want to delete the exercises in this block too?"
-//        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
-//        mBuilder.setPositiveButton("Yes") { _, _ ->
-//            dataViewModel.deleteBlock(blockToDelete, true)
-//            (activeBlockList as MutableList).removeAt(position)
-//            displayAdapter(activeBlockList)
-//        }
-//        mBuilder.setNegativeButton("No") { _, _ ->
-//            dataViewModel.deleteBlock(blockToDelete, false)
-//            (activeBlockList as MutableList).removeAt(position)
-//            displayAdapter(activeBlockList)
-//        }
-//        mBuilder.show()
+                override fun onNegativeButton() {
+                    super.onNegativeButton()
+                    dataViewModel.deleteBlock(blockToDelete, false)
+                    (activeBlockList as MutableList).removeAt(position)
+                    displayAdapter(activeBlockList)
+                }
+            })
     }
 
 
@@ -260,11 +253,11 @@ class Library : AppCompatActivity() {
             true
         }
 
-        R.id.user_blocks -> {
-            displayAdapter(userBlockList, "You haven't created any blocks")
-            activeBlockList = userBlockList
-            true
-        }
+//        R.id.user_blocks -> {
+//            displayAdapter(userBlockList, "You haven't created any blocks")
+//            activeBlockList = userBlockList
+//            true
+//        }
         R.id.app_blocks -> {
             displayAdapter(appBlockList, "You broke the system")
             activeBlockList = appBlockList
