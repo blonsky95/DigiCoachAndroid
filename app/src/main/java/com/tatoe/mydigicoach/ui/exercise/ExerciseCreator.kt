@@ -14,7 +14,9 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
+import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import com.tatoe.mydigicoach.ui.results.ResultsViewer
@@ -260,8 +262,16 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        dataViewModel.deleteExercise(activeExercise!!)
-        backToViewer()
+        Utils.getInfoDialogView(this,title.toString(),"Are you sure you want to delete this exercise?",object:
+            DialogPositiveNegativeHandler {
+
+            override fun onPositiveButton(editTextText:String) {
+                super.onPositiveButton(editTextText)
+                dataViewModel.deleteExercise(activeExercise!!)
+                backToViewer()
+            }
+        })
+
     }
 
     private val addFieldButtonListener = View.OnClickListener {
