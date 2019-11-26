@@ -32,7 +32,10 @@ class BlockV2ListAdapter(var context: Context) :
 
         val exercises = currentBlock.components
 
-
+        //reset collapsible layout views and expanded state
+        holder.collapsibleLayout.removeAllViews()
+        holder.collapsibleLayout.visibility=View.GONE
+        holder.expanded=false
 
         if (exercises.isNotEmpty()) {
             for (exercise in exercises) {

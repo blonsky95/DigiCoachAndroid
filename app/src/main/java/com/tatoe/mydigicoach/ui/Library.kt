@@ -83,7 +83,8 @@ class Library : AppCompatActivity() {
 
         dataViewModel.allAppBlocks.observe(this, Observer { blocks ->
             blocks?.let {
-                Timber.d("app blocks has been updated")
+                appBlockList = it
+
                 if (loadDefaultBlockList) {
                     activeBlockList = appBlockList
                     displayAdapter(activeBlockList, "you broke the system")
@@ -91,7 +92,6 @@ class Library : AppCompatActivity() {
                 }
                 //todo check this block of comment
                 //when you delete the last user made block the adapter doesnt load the ifemptytext, but an empty adapter until you reopen Library
-                appBlockList = it
                 Timber.d("app blocks observer updated to: $appBlockList")
 
             }
@@ -128,6 +128,7 @@ class Library : AppCompatActivity() {
     }
 
     private fun displayAdapter(blocks: List<Block>, ifEmptyString: String = "") {
+        Timber.d("Display adapter empty: ${blocks.isEmpty()} - blocks to display: $blocks")
         if (blocks.isEmpty()) {
             ifEmptyText.visibility = View.VISIBLE
             ifEmptyText.text = ifEmptyString
@@ -197,32 +198,26 @@ class Library : AppCompatActivity() {
         val blockToDelete = activeBlockList[position]
 
         if (blockToDelete.type != Block.APP_PREMADE) {
-            if (blockToDelete.type == Block.EXPORT) {
-                dataViewModel.deleteBlock(blockToDelete)
-
-            } else {
-                askExerciseDeletion(blockToDelete, position)
-            }
-
+            confirmExerciseDeletion(blockToDelete, position)
         } else {
             Toast.makeText(this, "Pre made blocks cant be deleted", Toast.LENGTH_SHORT).show()
         }
 
     }
 
-    private fun askExerciseDeletion(blockToDelete: Block, position: Int) {
+    private fun confirmExerciseDeletion(blockToDelete: Block, position: Int) {
         Utils.getInfoDialogView(
             this,
             title.toString(),
-            "Do you want to delete the exercises in this block too?",
+            "Are you sure you want to delete this block?",
             object :
                 DialogPositiveNegativeHandler {
 
                 override fun onPositiveButton(editTextText: String) {
                     super.onPositiveButton(editTextText)
-                    dataViewModel.deleteBlock(blockToDelete, true)
+                    dataViewModel.deleteBlock(blockToDelete, false)
                     (activeBlockList as MutableList).removeAt(position)
-                    displayAdapter(activeBlockList)
+                    displayAdapter(activeBlockList,"No blocks have been imported or exported")
                 }
 
                 override fun onNegativeButton() {
@@ -253,11 +248,6 @@ class Library : AppCompatActivity() {
             true
         }
 
-//        R.id.user_blocks -> {
-//            displayAdapter(userBlockList, "You haven't created any blocks")
-//            activeBlockList = userBlockList
-//            true
-//        }
         R.id.app_blocks -> {
             displayAdapter(appBlockList, "You broke the system")
             activeBlockList = appBlockList
