@@ -23,35 +23,27 @@ class MainActivity : AppCompatActivity() {
         } else {
         }
 
-        setSupportActionBar(findViewById(R.id.my_toolbar))
+//        setSupportActionBar(findViewById(R.id.my_toolbar))
 
-        calendarBtn.setOnClickListener {
+        calendar_button.setOnClickListener {
             var intent = Intent(this, DayViewer::class.java)
             startActivity(intent)
         }
 
-        blocksBtn.setOnClickListener {
+        block_button.setOnClickListener {
             var intent = Intent(this, BlockViewer::class.java)
             startActivity(intent)
         }
 
-        exercisesBtn.setOnClickListener {
+        exercise_button.setOnClickListener {
             var intent = Intent(this, ExerciseViewer::class.java)
             startActivity(intent)
         }
 
-        libraryBtn.setOnClickListener {
+        library_button.setOnClickListener {
             var intent = Intent(this, Library::class.java)
             startActivity(intent)
         }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
 }
