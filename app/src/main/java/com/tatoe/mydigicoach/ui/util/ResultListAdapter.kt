@@ -1,19 +1,12 @@
 package com.tatoe.mydigicoach.ui.util
 
 import android.content.Context
-import android.content.Intent
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ResultSet
-import com.tatoe.mydigicoach.entity.Block
-import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import timber.log.Timber
 
 class ResultListAdapter(var context: Context) : RecyclerView.Adapter<CollapsibleItemViewHolder>() {
@@ -54,9 +47,9 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
     }
 
     internal fun setContent(exercise : Exercise) {
-        Timber.d("adapter exercise results: ${exercise.results}")
+        Timber.d("adapter exercise results: ${exercise.exerciseResults}")
 
-        this.results = exercise.results
+        this.results = exercise.exerciseResults.resultsArrayList
         notifyDataSetChanged()
     }
 

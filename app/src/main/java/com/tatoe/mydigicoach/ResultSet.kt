@@ -9,9 +9,14 @@ class ResultSet (date:Date) {
 
     var sDate:Date = date
     var sResult:String? = null
+    var sPlottableResult:Double?=null
 
     fun addResult(result:String) {
         sResult= result
+    }
+
+    fun addPlottableResult(plottableResult: Double) {
+        sPlottableResult=plottableResult
     }
 
     fun getReadableDate():String {

@@ -110,10 +110,10 @@ class ResultsCreator : AppCompatActivity() {
 //            Timber.d("active exercise results 4 ${activeExercise!!.results[1].sResult.toString()}")
             result_edit_text.visibility = View.GONE
             result_text_view.visibility = View.VISIBLE
-            result_text_view.text = activeExercise!!.results[resultIndex].sResult
+            result_text_view.text = activeExercise!!.exerciseResults.resultsArrayList[resultIndex].sResult
             return
         }
-
+        //todo generate the layout like in ExerciseCreator
         if (actionType == OBJECT_NEW) {
             result_edit_text.visibility = View.VISIBLE
             result_edit_text.hint = "How did it go?"
@@ -121,7 +121,7 @@ class ResultsCreator : AppCompatActivity() {
         } else { //must be edit
             result_edit_text.visibility = View.VISIBLE
             result_edit_text.text =
-                SpannableStringBuilder(activeExercise!!.results[resultIndex].sResult)
+                SpannableStringBuilder(activeExercise!!.exerciseResults.resultsArrayList[resultIndex].sResult)
             result_text_view.visibility = View.GONE
         }
     }
@@ -131,16 +131,17 @@ class ResultsCreator : AppCompatActivity() {
         //        var resultDate = TextView1.text.toString()
         var resultString = SpannableStringBuilder(result_edit_text.text.trim()).toString()
 
-        activeExercise?.addResult(Day.dayIDtoDashSeparator(resultDate), resultString)
+        activeExercise?.exerciseResults!!.addResult(Day.dayIDtoDashSeparator(resultDate), resultString)
+        //todo add plotabble fields if any
         if (activeExercise != null) {
             dataViewModel.updateExerciseResult(activeExercise!!)
         }
-        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.results!!.size}")
+        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.exerciseResults!!.resultsArrayList.size}")
         finish() //?
     }
 
     private val updateButtonListener = View.OnClickListener {
-        activeExercise!!.results[resultIndex].sResult =
+        activeExercise!!.exerciseResults.resultsArrayList[resultIndex].sResult =
             SpannableStringBuilder(result_edit_text.text.trim()).toString()
         dataViewModel.updateExerciseResult(activeExercise!!)
         DataHolder.activeExerciseHolder = activeExercise
@@ -149,7 +150,7 @@ class ResultsCreator : AppCompatActivity() {
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        activeExercise!!.results.removeAt(resultIndex)
+        activeExercise!!.exerciseResults.resultsArrayList.removeAt(resultIndex)
         dataViewModel.updateExerciseResult(activeExercise!!)
         DataHolder.activeExerciseHolder = activeExercise
 

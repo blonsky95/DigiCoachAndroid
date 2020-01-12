@@ -1,14 +1,8 @@
 package com.tatoe.mydigicoach
 
-import android.os.Environment
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
-import java.io.BufferedWriter
-import java.io.File
-import java.io.FileWriter
 
 object ImportExportUtils {
 
@@ -37,7 +31,7 @@ object ImportExportUtils {
             for (index in selectedIndexes) {
                 allExercises[index].exerciseId =
                     0 //when imported + inserted, exercises will be assigned a new id
-                allExercises[index].results= arrayListOf()
+                allExercises[index].exerciseResults.resultsArrayList= arrayListOf()
                 selectedExercises.add(allExercises[index])
             }
             exportBlock.components = selectedExercises

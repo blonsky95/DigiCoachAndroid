@@ -4,6 +4,7 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.ResultSet
 import timber.log.Timber
 import java.util.*
@@ -25,7 +26,9 @@ data class Exercise(
 
     @ColumnInfo(name = "result")
     @field: SerializedName("result")
-    var results: ArrayList<ResultSet> = arrayListOf()
+//    var results: ArrayList<ResultSet> = arrayListOf()
+    var exerciseResults: ExerciseResults = ExerciseResults()
+
 
     @ColumnInfo(name = "fieldsHashMap")
     @field: SerializedName("fieldsHashMap")
@@ -50,34 +53,34 @@ data class Exercise(
         return fieldsHashMap
     }
 
-    fun addResult(date: String, result: String) {
-
-        var newDate = Day.dashSeparatedDateFormat.parse(date)
-        var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
-        resultSet.addResult(result)
-        Timber.d("RESULT SET: ${resultSet.sResult}")
-//        results.add(resultSet)
-        addToArrayByDate(resultSet)
-    }
-
-    fun clearResults() {
-        results= arrayListOf()
-    }
-
-    private fun addToArrayByDate(newResultSet: ResultSet) {
-        var i = 0
-        while (i<results.size) {
-            if (newResultSet.sDate.after(results[i].sDate)) {
-                results.add(i, newResultSet)
-                return
-            }
-            i++
-        }
-
-        results.add(i, newResultSet)
-        Timber.d("RESULT SET 2: ${results.size}")
-
-    }
+//    fun addResult(date: String, result: String) {
+//
+//        var newDate = Day.dashSeparatedDateFormat.parse(date)
+//        var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
+//        resultSet.addResult(result)
+//        Timber.d("RESULT SET: ${resultSet.sResult}")
+////        results.add(resultSet)
+//        addToArrayByDate(resultSet)
+//    }
+//
+//    fun clearResults() {
+//        results= arrayListOf()
+//    }
+//
+//    private fun addToArrayByDate(newResultSet: ResultSet) {
+//        var i = 0
+//        while (i<results.size) {
+//            if (newResultSet.sDate.after(results[i].sDate)) {
+//                results.add(i, newResultSet)
+//                return
+//            }
+//            i++
+//        }
+//
+//        results.add(i, newResultSet)
+//        Timber.d("RESULT SET 2: ${results.size}")
+//
+//    }
 
 
 }
