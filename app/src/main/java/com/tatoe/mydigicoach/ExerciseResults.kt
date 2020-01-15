@@ -10,16 +10,20 @@ class ExerciseResults {
 
     var plottableVariable:String?=null
 
-    fun addResult(date: String, result: String, isPlottable:Boolean = false) {
+    private var resultFieldsMap = LinkedHashMap<String, String>()
+
+
+    fun addResult(date: String, result: String = "", plottableResult:String = "") {
 
         var newDate = Day.dashSeparatedDateFormat.parse(date)
         var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
-        if (isPlottable) {
-            //todo check if valid to double here
+        if (plottableResult.isNotEmpty()) {
             resultSet.addPlottableResult(result.toDouble())
-        } else {
+        }
+        if (result.isNotEmpty()){
             resultSet.addResult(result)
         }
+
         Timber.d("RESULT SET: ${resultSet.sResult}")
 //        results.add(resultSet)
         addToArrayByDate(resultSet)
