@@ -29,7 +29,6 @@ data class Exercise(
 //    var results: ArrayList<ResultSet> = arrayListOf()
     var exerciseResults: ExerciseResults = ExerciseResults()
 
-
     @ColumnInfo(name = "fieldsHashMap")
     @field: SerializedName("fieldsHashMap")
     var fieldsHashMap: LinkedHashMap<String,String> = LinkedHashMap() //todo eventually this will get rid of saving name and description in database

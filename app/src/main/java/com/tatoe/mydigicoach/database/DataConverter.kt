@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.database
 import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
+import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.ResultSet
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
@@ -19,15 +20,34 @@ class DataConverter {
         return Gson().toJson(exerciseList)
     }
 
+//    @TypeConverter
+//    fun stringToArrayExerciseResults(data: String?) : ArrayList<ExerciseResults> {
+//        return Gson().fromJson(data, object :TypeToken<ExerciseResults>() {}.type)
+//    }
+//
+//    @TypeConverter
+//    fun arrayExerciseResultsToString(exerciseResults: ArrayList<ExerciseResults>) :String? {
+//        return Gson().toJson(exerciseResults)
+//    }
+
     @TypeConverter
-    fun stringToResultSetList(data: String?) : ArrayList<ResultSet> {
-        return Gson().fromJson(data, object :TypeToken<ArrayList<ResultSet>>() {}.type)
+    fun stringToExerciseResults(data: String?) : ExerciseResults {
+        return Gson().fromJson(data, object :TypeToken<ExerciseResults>() {}.type)
     }
 
     @TypeConverter
-    fun resultSetListToString(resultsList: ArrayList<ResultSet>) :String? {
-        return Gson().toJson(resultsList)
+    fun exerciseResultsToString(exerciseResults: ExerciseResults) :String? {
+        return Gson().toJson(exerciseResults)
     }
+//    @TypeConverter
+//    fun stringToResultSetList(data: String?) : ArrayList<ResultSet> {
+//        return Gson().fromJson(data, object :TypeToken<ArrayList<ResultSet>>() {}.type)
+//    }
+//
+//    @TypeConverter
+//    fun resultSetListToString(resultsList: ArrayList<ResultSet>) :String? {
+//        return Gson().toJson(resultsList)
+//    }
 
     @TypeConverter
     fun stringToLinkedHashMap(data: String?) : LinkedHashMap<String,String> {

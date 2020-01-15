@@ -177,7 +177,7 @@ class ResultsCreator : AppCompatActivity() {
 
         linearLayout.removeAllViews()
 
-        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
+//        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
 
         resultFieldsMap["Basic note"] = "value of basic note"
         resultFieldsMap["Basic plotabble number"] = "123"
@@ -326,7 +326,8 @@ class ResultsCreator : AppCompatActivity() {
 
         var newResultFields = getFieldContents()
 
-
+        //todo essentially the results fields are being forced here but they should be user created
+        //todo for now if default to basic naming then ok
 
 //        dataViewModel.insertExercise(newExercise)
 
@@ -335,8 +336,8 @@ class ResultsCreator : AppCompatActivity() {
 
         activeExercise?.exerciseResults!!.addResult(
             Day.dayIDtoDashSeparator(resultDate),
-            newResultFields["Basic note"]!!,
-            newResultFields["Basic plotabble number"]!!
+            result = newResultFields["Basic note"]!!,
+            plottableResult = newResultFields["Basic plotabble number"]!!
         )
 
         if (activeExercise != null) {
