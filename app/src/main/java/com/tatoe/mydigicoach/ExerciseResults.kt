@@ -10,7 +10,22 @@ class ExerciseResults {
 
     var plottableVariable:String?=null
 
-    private var resultFieldsMap = LinkedHashMap<String, String>()
+    var resultFieldsMap = LinkedHashMap<String, String>()
+
+    companion object {
+
+        const val NOTE_KEY = "Note"
+        const val PLOTTABLE_KEY = "Plottable value"
+
+        fun getGenericFields() : LinkedHashMap<String, String> {
+            val genericResultFields = LinkedHashMap<String, String>()
+
+            genericResultFields[NOTE_KEY]="Type a note here"
+            genericResultFields[PLOTTABLE_KEY]="1000"
+            return genericResultFields
+        }
+    }
+
 
 
     fun addResult(date: String, result: String = "", plottableResult:String = "") {
@@ -18,7 +33,7 @@ class ExerciseResults {
         var newDate = Day.dashSeparatedDateFormat.parse(date)
         var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
         if (plottableResult.isNotEmpty()) {
-            resultSet.addPlottableResult(result.toDouble())
+            resultSet.addPlottableResult(plottableResult.toDouble())
         }
         if (result.isNotEmpty()){
             resultSet.addResult(result)

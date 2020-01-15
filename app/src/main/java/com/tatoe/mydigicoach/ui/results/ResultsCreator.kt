@@ -14,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
+import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
@@ -65,6 +66,7 @@ class ResultsCreator : AppCompatActivity() {
         setContentView(R.layout.activity_exercise_creator)
         title = "Exercise Result"
 
+
         setSupportActionBar(findViewById(R.id.my_toolbar))
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
@@ -73,6 +75,7 @@ class ResultsCreator : AppCompatActivity() {
         rightButton = right_button
         leftButton = left_button
         centreButton = centre_button
+        centreButton.visibility = View.INVISIBLE
 
         if (intent.hasExtra(OBJECT_ACTION)) { //can only reach this with an intent extra
             mAction = intent.getStringExtra(OBJECT_ACTION)
@@ -86,6 +89,13 @@ class ResultsCreator : AppCompatActivity() {
             }
 
             activeExercise = DataHolder.activeExerciseHolder
+
+            resultFieldsMap = if (activeExercise?.exerciseResults!!.resultFieldsMap.isNotEmpty()) {
+                activeExercise?.exerciseResults!!.resultFieldsMap
+            } else {
+                ExerciseResults.getGenericFields()
+            }
+
             Timber.d("ACTIVE EXERCISE IN CREATOR ${activeExercise!!}")
 
 //            result_title_text_view.text = activeExercise!!.name
@@ -103,9 +113,9 @@ class ResultsCreator : AppCompatActivity() {
             rightButton.text = "ADD"
             rightButton.setOnClickListener(addButtonListener)
 
-            centreButton.visibility = View.VISIBLE
-            centreButton.text = "ADD FIELD"
-            centreButton.setOnClickListener(addFieldButtonListener)
+//            centreButton.visibility = View.VISIBLE
+//            centreButton.text = "ADD FIELD"
+//            centreButton.setOnClickListener(addFieldButtonListener)
             return
         } else {
 
@@ -113,10 +123,10 @@ class ResultsCreator : AppCompatActivity() {
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "UPDATE"
                 rightButton.setOnClickListener(updateButtonListener)
-
-                centreButton.visibility = View.VISIBLE
-                centreButton.text = "ADD FIELD"
-                centreButton.setOnClickListener(addFieldButtonListener)
+//
+//                centreButton.visibility = View.VISIBLE
+//                centreButton.text = "ADD FIELD"
+//                centreButton.setOnClickListener(addFieldButtonListener)
 
                 leftButton.visibility = View.VISIBLE
                 leftButton.text = "DELETE"
@@ -125,7 +135,7 @@ class ResultsCreator : AppCompatActivity() {
             if (actionType == OBJECT_VIEW) {
                 rightButton.visibility = View.INVISIBLE
                 leftButton.visibility = View.INVISIBLE
-                centreButton.visibility = View.INVISIBLE
+//                centreButton.visibility = View.INVISIBLE
             }
         }
     }
@@ -179,9 +189,6 @@ class ResultsCreator : AppCompatActivity() {
 
 //        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
 
-        resultFieldsMap["Basic note"] = "value of basic note"
-        resultFieldsMap["Basic plotabble number"] = "123"
-
         for (entry in resultFieldsMap.entries) {
             var fieldTitleTextView = TextView(this)
             fieldTitleTextView.layoutParams =
@@ -219,69 +226,69 @@ class ResultsCreator : AppCompatActivity() {
 //        Timber.d("Child count: ${linearLayout.childCount}")
     }
 
-    private val addFieldButtonListener = View.OnClickListener {
-        generateDialog()
-    }
+//    private val addFieldButtonListener = View.OnClickListener {
+//        generateDialog()
+//    }
+//
+//    private fun generateDialog() {
+//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
+//        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
+//        mDialogView.dialogEditText.hint = "New field name"
+//        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
+//        val mBuilder = AlertDialog.Builder(this)
+//            .setView(mDialogView)
+//            .setTitle("Add Field")
+//        val mAlertDialog = mBuilder.show()
+//        mDialogView.dialogEnterBtn.setOnClickListener {
+//            mAlertDialog.dismiss()
+//            newField = mDialogView.dialogEditText.text.toString().trim()
+//            addFieldLayout()
+//        }
+//        mDialogView.dialogCancelBtn.setOnClickListener {
+//            mAlertDialog.dismiss()
+//        }
+//    }
 
-    private fun generateDialog() {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
-        mDialogView.dialogEditText.hint = "New field name"
-        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
-        val mBuilder = AlertDialog.Builder(this)
-            .setView(mDialogView)
-            .setTitle("Add Field")
-        val mAlertDialog = mBuilder.show()
-        mDialogView.dialogEnterBtn.setOnClickListener {
-            mAlertDialog.dismiss()
-            newField = mDialogView.dialogEditText.text.toString().trim()
-            addFieldLayout()
-        }
-        mDialogView.dialogCancelBtn.setOnClickListener {
-            mAlertDialog.dismiss()
-        }
-    }
-
-    private fun addFieldLayout() {
-        //todo save what was written
-//        exerciseFieldsMap[newField] = ""
-
-//        updateBodyUI(OBJECT_EDIT)
-
-        var fieldTitleTextView = TextView(this)
-        fieldTitleTextView.layoutParams =
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        fieldTitleTextView.text = newField
-        fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
-
-        linearLayout.addView(fieldTitleTextView)
-
-        var fieldEditText = EditText(this)
-        fieldEditText.layoutParams =
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        fieldEditText.hint = NEW_FIELD_VALUE
-        fieldEditText.text = SpannableStringBuilder(NEW_FIELD_VALUE)
-
-        linearLayout.addView(fieldEditText)
-
-        var fieldInfoTextView = TextView(this)
-        fieldInfoTextView.layoutParams =
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        fieldInfoTextView.text = NEW_FIELD_VALUE
-
-        linearLayout.addView(fieldInfoTextView)
-
-        changeVisibility(linearLayout, false)
-    }
+//    private fun addFieldLayout() {
+//        //todo save what was written
+////        exerciseFieldsMap[newField] = ""
+//
+////        updateBodyUI(OBJECT_EDIT)
+//
+//        var fieldTitleTextView = TextView(this)
+//        fieldTitleTextView.layoutParams =
+//            ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT
+//            )
+//        fieldTitleTextView.text = newField
+//        fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
+//
+//        linearLayout.addView(fieldTitleTextView)
+//
+//        var fieldEditText = EditText(this)
+//        fieldEditText.layoutParams =
+//            ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT
+//            )
+//        fieldEditText.hint = NEW_FIELD_VALUE
+//        fieldEditText.text = SpannableStringBuilder(NEW_FIELD_VALUE)
+//
+//        linearLayout.addView(fieldEditText)
+//
+//        var fieldInfoTextView = TextView(this)
+//        fieldInfoTextView.layoutParams =
+//            ViewGroup.LayoutParams(
+//                ViewGroup.LayoutParams.MATCH_PARENT,
+//                ViewGroup.LayoutParams.WRAP_CONTENT
+//            )
+//        fieldInfoTextView.text = NEW_FIELD_VALUE
+//
+//        linearLayout.addView(fieldInfoTextView)
+//
+//        changeVisibility(linearLayout, false)
+//    }
 
     private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {
 
@@ -326,6 +333,7 @@ class ResultsCreator : AppCompatActivity() {
 
         var newResultFields = getFieldContents()
 
+
         //todo essentially the results fields are being forced here but they should be user created
         //todo for now if default to basic naming then ok
 
@@ -336,14 +344,15 @@ class ResultsCreator : AppCompatActivity() {
 
         activeExercise?.exerciseResults!!.addResult(
             Day.dayIDtoDashSeparator(resultDate),
-            result = newResultFields["Basic note"]!!,
-            plottableResult = newResultFields["Basic plotabble number"]!!
+            result = newResultFields[ExerciseResults.NOTE_KEY]!!,
+            plottableResult = newResultFields[ExerciseResults.PLOTTABLE_KEY]!!
         )
+        activeExercise?.exerciseResults!!.resultFieldsMap=newResultFields
 
         if (activeExercise != null) {
             dataViewModel.updateExerciseResult(activeExercise!!)
         }
-        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.exerciseResults!!.resultsArrayList.size}")
+        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.exerciseResults!!.resultsArrayList}")
         finish() //?
     }
 
