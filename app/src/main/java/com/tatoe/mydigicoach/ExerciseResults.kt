@@ -8,7 +8,7 @@ class ExerciseResults {
 
     var resultsArrayList: ArrayList<ResultSet> = arrayListOf()
 
-    var plottableVariable:String?=null
+//    var plottableVariable:String?=null
 
     var resultFieldsMap = LinkedHashMap<String, String>()
 

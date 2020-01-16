@@ -15,6 +15,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.results.ResultsCreator.Companion.RESULTS_EXE_ID
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import kotlinx.android.synthetic.main.activity_results_viewer.*
 import timber.log.Timber
@@ -63,7 +64,18 @@ class ResultsViewer : AppCompatActivity() {
             Timber.d("exerciseId received")
         }
 
-        initObserver()
+        activeExercise = DataHolder.activeExerciseHolder
+        if (activeExercise!!.exerciseResults.resultsArrayList.isEmpty()) {
+            ifEmptyResultsText.visibility = View.VISIBLE
+            ResultsRecyclerView.visibility=View.GONE
+
+        } else {
+            ifEmptyResultsText.visibility = View.GONE
+            ResultsRecyclerView.visibility=View.VISIBLE
+            adapter.setContent(activeExercise!!)
+        }
+
+//        initObserver()
     }
 
     private fun initObserver() {

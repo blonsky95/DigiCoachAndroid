@@ -35,18 +35,21 @@ class AppRepository(
         exerciseDao.update(updatedExercise)
         Timber.d("updated activeExercise: $updatedExercise)")
         updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
+        updateDaysContainingExercise(ACTION_UPDATE,updatedExercise)
     }
 
     suspend fun updateExerciseResult(updatedExercise: Exercise) {
         exerciseDao.update(updatedExercise)
         Timber.d("updated currentExerciseResult: $updatedExercise)")
-//        updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
+        updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
+        updateDaysContainingExercise(ACTION_UPDATE,updatedExercise)
     }
 
     suspend fun deleteExercise(exercise: Exercise) {
         exerciseDao.delete(exercise)
         Timber.d("deleted: ${exercise.name}")
         updateBlocksContainingExercise(ACTION_DELETE,exercise)
+        updateDaysContainingExercise(ACTION_DELETE,exercise)
 
     }
 
@@ -69,6 +72,28 @@ class AppRepository(
                         if (actionCode==ACTION_DELETE) {
                             block.components.removeAt(block.components.indexOf(tmpExercise))
                             updateBlock(block)
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private suspend fun updateDaysContainingExercise(actionCode:Int, exercise: Exercise) {
+        val days = dayDao.getDays()
+
+        if (days.isNotEmpty()) {
+            for (day in days) {
+                for (tmpExercise in day.exercises) {
+                    if (tmpExercise.exerciseId == exercise.exerciseId) {
+
+                        if (actionCode==ACTION_UPDATE) {
+                            day.exercises[day.exercises.indexOf(tmpExercise)] = exercise
+                            updateDay(day)
+                        }
+                        if (actionCode==ACTION_DELETE) {
+                            day.exercises.removeAt(day.exercises.indexOf(tmpExercise))
+                            updateDay(day)
                         }
                     }
                 }
