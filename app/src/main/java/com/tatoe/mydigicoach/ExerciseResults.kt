@@ -7,10 +7,13 @@ import java.util.ArrayList
 class ExerciseResults {
 
     var resultsArrayList: ArrayList<ResultSet> = arrayListOf()
-
-//    var plottableVariable:String?=null
+    //contains all the results
 
     var resultFieldsMap = LinkedHashMap<String, String>()
+    //contains all the names of fields and the first time text/hints
+
+    //todo ResultSet should be based on the resultFieldsMap
+    //so result set should be modified to accord the LinkedHashMap - think about this - make an array of linked hash maps?
 
     companion object {
 
@@ -21,7 +24,7 @@ class ExerciseResults {
             val genericResultFields = LinkedHashMap<String, String>()
 
             genericResultFields[NOTE_KEY]="Type a note here"
-            genericResultFields[PLOTTABLE_KEY]="1000"
+            genericResultFields[PLOTTABLE_KEY]="e.g. 1000"
             return genericResultFields
         }
     }

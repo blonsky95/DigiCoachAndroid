@@ -16,6 +16,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.ResultSet
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_ACTION
@@ -29,6 +30,7 @@ import kotlinx.android.synthetic.main.activity_results_creator.left_button
 import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import kotlinx.android.synthetic.main.custom_dialog_window.view.*
 import timber.log.Timber
+import java.util.ArrayList
 
 class ResultsCreator : AppCompatActivity() {
 
@@ -41,6 +43,8 @@ class ResultsCreator : AppCompatActivity() {
     private lateinit var newField: String
 
     private var resultFieldsMap = LinkedHashMap<String, String>()
+    private var resultsArrayList: ArrayList<ResultSet> = arrayListOf()
+
 
     private lateinit var dataViewModel: DataViewModel
 
@@ -94,6 +98,10 @@ class ResultsCreator : AppCompatActivity() {
                 activeExercise?.exerciseResults!!.resultFieldsMap
             } else {
                 ExerciseResults.getGenericFields()
+            }
+
+            if (activeExercise?.exerciseResults!!.resultsArrayList.isNotEmpty()) {
+                resultsArrayList = activeExercise?.exerciseResults!!.resultsArrayList
             }
 
             Timber.d("ACTIVE EXERCISE IN CREATOR ${activeExercise!!}")
@@ -190,6 +198,22 @@ class ResultsCreator : AppCompatActivity() {
 //        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
 
         for (entry in resultFieldsMap.entries) {
+
+            //temporary
+            //****************************
+            var text = "empty"
+            text = if (resultIndex > 0) {
+                if (entry.key == ExerciseResults.NOTE_KEY) {
+                    resultsArrayList[resultIndex].sResult!!
+
+                } else {
+                    resultsArrayList[resultIndex].sPlottableResult.toString()
+                }
+            } else {
+                entry.value
+            }
+
+            //*****************************
             var fieldTitleTextView = TextView(this)
             fieldTitleTextView.layoutParams =
                 ViewGroup.LayoutParams(
@@ -208,7 +232,7 @@ class ResultsCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             fieldEditText.hint = entry.value
-            fieldEditText.text=SpannableStringBuilder(entry.value)
+            fieldEditText.text = SpannableStringBuilder(text)
 
             linearLayout.addView(fieldEditText)
 
@@ -218,7 +242,7 @@ class ResultsCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldInfoTextView.text = entry.value
+            fieldInfoTextView.text = text
 
             linearLayout.addView(fieldInfoTextView)
         }
@@ -347,10 +371,11 @@ class ResultsCreator : AppCompatActivity() {
             result = newResultFields[ExerciseResults.NOTE_KEY]!!,
             plottableResult = newResultFields[ExerciseResults.PLOTTABLE_KEY]!!
         )
-        activeExercise?.exerciseResults!!.resultFieldsMap=newResultFields
+        activeExercise?.exerciseResults!!.resultFieldsMap = newResultFields
 
         if (activeExercise != null) {
             dataViewModel.updateExerciseResult(activeExercise!!)
+            DataHolder.activeExerciseHolder = activeExercise
         }
         Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.exerciseResults!!.resultsArrayList}")
         finish() //?
