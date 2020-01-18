@@ -1,13 +1,18 @@
 package com.tatoe.mydigicoach
 
-import com.tatoe.mydigicoach.entity.Day
-import timber.log.Timber
-import java.util.ArrayList
+import java.text.ParseException
+import java.text.SimpleDateFormat
+import java.util.*
+import kotlin.collections.LinkedHashMap
+import kotlin.collections.arrayListOf
+import kotlin.collections.set
 
 class ExerciseResults {
 
-    var resultsArrayList: ArrayList<ResultSet> = arrayListOf()
+//    var resultsArrayList: ArrayList<ResultSet> = arrayListOf()
     //contains all the results
+
+    var resultsArrayList: ArrayList<LinkedHashMap<String, String>> = arrayListOf()
 
     var resultFieldsMap = LinkedHashMap<String, String>()
     //contains all the names of fields and the first time text/hints
@@ -19,47 +24,73 @@ class ExerciseResults {
 
         const val NOTE_KEY = "Note"
         const val PLOTTABLE_KEY = "Plottable value"
+        const val PLOTTABLE_VALUE = "true"
+        const val DATE_KEY = "Date"
+
 
         fun getGenericFields() : LinkedHashMap<String, String> {
             val genericResultFields = LinkedHashMap<String, String>()
 
-            genericResultFields[NOTE_KEY]="Type a note here"
-            genericResultFields[PLOTTABLE_KEY]="e.g. 1000"
+            genericResultFields[NOTE_KEY]="String"
+            genericResultFields[PLOTTABLE_KEY]=PLOTTABLE_VALUE
             return genericResultFields
         }
     }
 
-
-
-    fun addResult(date: String, result: String = "", plottableResult:String = "") {
-
-        var newDate = Day.dashSeparatedDateFormat.parse(date)
-        var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
-        if (plottableResult.isNotEmpty()) {
-            resultSet.addPlottableResult(plottableResult.toDouble())
-        }
-        if (result.isNotEmpty()){
-            resultSet.addResult(result)
-        }
-
-        Timber.d("RESULT SET: ${resultSet.sResult}")
-//        results.add(resultSet)
-        addToArrayByDate(resultSet)
+    fun addResult(date: String, resultFieldsMap:LinkedHashMap<String, String>) {
+        resultFieldsMap[DATE_KEY]=date
+        addToArrayByDate(resultFieldsMap)
     }
 
-    private fun addToArrayByDate(newResultSet: ResultSet) {
+//    fun addResult(date: String, result: String = "", plottableResult:String = "") {
+//
+//        var newDate = Day.dashSeparatedDateFormat.parse(date)
+//        var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
+//        if (plottableResult.isNotEmpty()) {
+//            resultSet.addPlottableResult(plottableResult.toDouble())
+//        }
+//        if (result.isNotEmpty()){
+//            resultSet.addResult(result)
+//        }
+//
+//        Timber.d("RESULT SET: ${resultSet.sResult}")
+////        results.add(resultSet)
+//        addToArrayByDate(resultSet)
+//    }
+
+//    private fun addToArrayByDate(newResultSet: ResultSet) {
+//        var i = 0
+//        while (i<resultsArrayList.size) {
+//            if (newResultSet.sDate.after(resultsArrayList[i].sDate)) {
+//                resultsArrayList.add(i, newResultSet)
+//                return
+//            }
+//            i++
+//        }
+//
+//        resultsArrayList.add(i, newResultSet)
+//        Timber.d("RESULT SET 2: ${resultsArrayList.size}")
+//
+//    }
+
+    private fun addToArrayByDate(newResultMap: LinkedHashMap<String, String>) {
+        val format = SimpleDateFormat("dd-MM-yy")
+
         var i = 0
         while (i<resultsArrayList.size) {
-            if (newResultSet.sDate.after(resultsArrayList[i].sDate)) {
-                resultsArrayList.add(i, newResultSet)
-                return
+            try {
+                val newDate = format.parse(newResultMap[DATE_KEY]) as Date
+                val oldDate = format.parse(resultsArrayList[i][DATE_KEY]) as Date
+                if (newDate.after(oldDate)) {
+                    resultsArrayList.add(i, newResultMap)
+                    return
+                }
+                i++
+            } catch (e: ParseException) {
+                e.printStackTrace()
             }
-            i++
         }
-
-        resultsArrayList.add(i, newResultSet)
-        Timber.d("RESULT SET 2: ${resultsArrayList.size}")
+        resultsArrayList.add(i, newResultMap)
 
     }
-
 }
