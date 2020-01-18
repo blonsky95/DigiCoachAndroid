@@ -3,20 +3,17 @@ package com.tatoe.mydigicoach.ui.results
 import android.content.Intent
 import android.graphics.Typeface
 import android.os.Bundle
-import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.ResultSet
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_ACTION
@@ -25,10 +22,8 @@ import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_NEW
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_VIEW
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
-import kotlinx.android.synthetic.main.activity_results_creator.*
 import kotlinx.android.synthetic.main.activity_results_creator.left_button
 import kotlinx.android.synthetic.main.activity_results_creator.right_button
-import kotlinx.android.synthetic.main.custom_dialog_window.view.*
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -121,6 +116,8 @@ class ResultsCreator : AppCompatActivity() {
             rightButton.text = "ADD"
             rightButton.setOnClickListener(addButtonListener)
 
+            leftButton.visibility = View.INVISIBLE
+
 //            centreButton.visibility = View.VISIBLE
 //            centreButton.text = "ADD FIELD"
 //            centreButton.setOnClickListener(addFieldButtonListener)
@@ -195,25 +192,20 @@ class ResultsCreator : AppCompatActivity() {
 
         linearLayout.removeAllViews()
 
+        var uiFieldsValues: LinkedHashMap<String, String> = if (mAction == OBJECT_NEW) {
+            resultFieldsMap
+        } else {
+            resultsArrayList[resultIndex]
+        }
+        Timber.d(" MY TIMBER uiFieldValues: ${uiFieldsValues.values}")
 //        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
 
-        for (entry in resultFieldsMap.entries) {
+        for (entry in uiFieldsValues.entries) {
+            if (entry.key==ExerciseResults.DATE_KEY){
+                break
+            }
+            Timber.d(" MY TIMBER entry key: ${entry.key} value: ${entry.value}")
 
-            //temporary
-            //****************************
-//            var text = "empty"
-//            text = if (resultIndex > 0) {
-//                if (entry.key == ExerciseResults.NOTE_KEY) {
-//                    resultsArrayList[resultIndex].sResult!!
-//
-//                } else {
-//                    resultsArrayList[resultIndex].sPlottableResult.toString()
-//                }
-//            } else {
-//                entry.value
-//            }
-
-            //*****************************
             var fieldTitleTextView = TextView(this)
             fieldTitleTextView.layoutParams =
                 ViewGroup.LayoutParams(
@@ -231,8 +223,14 @@ class ResultsCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldEditText.hint = resultsArrayList[resultIndex][entry.value]
-            fieldEditText.text = SpannableStringBuilder(resultsArrayList[resultIndex][entry.key])
+
+            var entryValueTextString = ""
+            var entryHintString = "Type here"
+            if (mAction != OBJECT_NEW) {
+                entryValueTextString = entry.value
+            }
+            fieldEditText.hint = entryHintString
+            fieldEditText.text = SpannableStringBuilder(entryValueTextString)
 
             linearLayout.addView(fieldEditText)
 
@@ -242,12 +240,10 @@ class ResultsCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldInfoTextView.text = resultsArrayList[resultIndex][entry.key]
+            fieldInfoTextView.text = entryValueTextString
 
             linearLayout.addView(fieldInfoTextView)
         }
-
-//        Timber.d("Child count: ${linearLayout.childCount}")
     }
 
 //    private val addFieldButtonListener = View.OnClickListener {
@@ -372,11 +368,13 @@ class ResultsCreator : AppCompatActivity() {
 //            plottableResult = newResultFields[ExerciseResults.PLOTTABLE_KEY]!!
 //        )
         activeExercise?.exerciseResults!!.resultFieldsMap = newResultFields
+        //this updates the new field skeleton of the result (if new fields per e.g.)
 
         activeExercise?.exerciseResults!!.addResult(
             Day.dayIDtoDashSeparator(resultDate),
             newResultFields
         )
+        //this adds the result with a date to the list of results in form of hashmaps
 
         if (activeExercise != null) {
             dataViewModel.updateExerciseResult(activeExercise!!)
@@ -402,18 +400,16 @@ class ResultsCreator : AppCompatActivity() {
         var newResultFields = getFieldContents()
 
         activeExercise?.exerciseResults!!.resultFieldsMap = newResultFields
+        //todo update fields map or create fields map will be functions in ExerciseResults which later update all the elements in array
+        //this updates the new field skeleton of the result (if new fields per e.g.)
 
-        activeExercise?.exerciseResults!!.resultsArrayList[resultIndex]=newResultFields
+        activeExercise?.exerciseResults!!.updateResult(newResultFields,resultIndex)
+        //this adds the result with a date to the list of results in form of hashmaps
 
         if (activeExercise != null) {
             dataViewModel.updateExerciseResult(activeExercise!!)
             DataHolder.activeExerciseHolder = activeExercise
         }
-        //todo add and update the same?
-//        activeExercise!!.exerciseResults.resultsArrayList[resultIndex].sResult =
-//            SpannableStringBuilder(result_edit_text.text.trim()).toString()
-//        dataViewModel.updateExerciseResult(activeExercise!!)
-//        DataHolder.activeExerciseHolder = activeExercise
 
         backToViewer()
     }

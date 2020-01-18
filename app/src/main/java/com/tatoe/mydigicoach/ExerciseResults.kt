@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach
 
+import com.tatoe.mydigicoach.entity.Day
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -24,9 +25,8 @@ class ExerciseResults {
 
         const val NOTE_KEY = "Note"
         const val PLOTTABLE_KEY = "Plottable value"
-        const val PLOTTABLE_VALUE = "true"
+        const val PLOTTABLE_VALUE = "plottable"
         const val DATE_KEY = "Date"
-
 
         fun getGenericFields() : LinkedHashMap<String, String> {
             val genericResultFields = LinkedHashMap<String, String>()
@@ -35,11 +35,25 @@ class ExerciseResults {
             genericResultFields[PLOTTABLE_KEY]=PLOTTABLE_VALUE
             return genericResultFields
         }
+
+        fun getReadableDate(sDate : Date):String {
+            return Day.presentableDateFormat.format(sDate)
+        }
+
+        fun stringToDate(sString:String) :Date {
+            val format = SimpleDateFormat("dd-MM-yy")
+            return format.parse(sString) as Date
+        }
     }
 
     fun addResult(date: String, resultFieldsMap:LinkedHashMap<String, String>) {
         resultFieldsMap[DATE_KEY]=date
         addToArrayByDate(resultFieldsMap)
+    }
+
+    fun updateResult(resultFieldsMap:LinkedHashMap<String, String>,position :Int) {
+        resultFieldsMap[DATE_KEY] = resultsArrayList[position][DATE_KEY]!!
+        resultsArrayList[position]=resultFieldsMap
     }
 
 //    fun addResult(date: String, result: String = "", plottableResult:String = "") {
@@ -74,13 +88,12 @@ class ExerciseResults {
 //    }
 
     private fun addToArrayByDate(newResultMap: LinkedHashMap<String, String>) {
-        val format = SimpleDateFormat("dd-MM-yy")
 
         var i = 0
         while (i<resultsArrayList.size) {
             try {
-                val newDate = format.parse(newResultMap[DATE_KEY]) as Date
-                val oldDate = format.parse(resultsArrayList[i][DATE_KEY]) as Date
+                val newDate = stringToDate(newResultMap[DATE_KEY]!!)
+                val oldDate = stringToDate(resultsArrayList[i][DATE_KEY]!!)
                 if (newDate.after(oldDate)) {
                     resultsArrayList.add(i, newResultMap)
                     return

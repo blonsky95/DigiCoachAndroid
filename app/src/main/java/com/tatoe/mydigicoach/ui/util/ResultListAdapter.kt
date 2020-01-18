@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.ResultSet
 import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
@@ -12,7 +13,7 @@ import timber.log.Timber
 class ResultListAdapter(var context: Context) : RecyclerView.Adapter<CollapsibleItemViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var results = arrayListOf<ResultSet>()
+    private var results = arrayListOf<LinkedHashMap<String,String>>()
     private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
 
@@ -30,9 +31,9 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
 
 
         if (results.isNotEmpty()) {
-                holder.resultDate.text=results[position].getReadableDate()
-                if (results[position].sResult!=null) {
-                    holder.resultResult.text=results[position].sResult
+                holder.resultDate.text=ExerciseResults.getReadableDate(ExerciseResults.stringToDate(results[position][ExerciseResults.DATE_KEY]!!))
+                if (results[position][ExerciseResults.NOTE_KEY]!=null) {
+                    holder.resultResult.text=results[position][ExerciseResults.NOTE_KEY]
                     holder.resultResult.visibility=View.GONE
                 } else {
                     holder.resultResult.text="nothing written here"
