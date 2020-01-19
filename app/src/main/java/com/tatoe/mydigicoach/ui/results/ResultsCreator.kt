@@ -1,14 +1,18 @@
 package com.tatoe.mydigicoach.ui.results
 
 import android.content.Intent
+import android.graphics.Color
+import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.os.Bundle
+import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DataViewModel
@@ -24,6 +28,7 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.activity_results_creator.left_button
 import kotlinx.android.synthetic.main.activity_results_creator.right_button
+import kotlinx.android.synthetic.main.plottable_dialog_window.view.*
 import timber.log.Timber
 import java.util.ArrayList
 
@@ -118,9 +123,9 @@ class ResultsCreator : AppCompatActivity() {
 
             leftButton.visibility = View.INVISIBLE
 
-//            centreButton.visibility = View.VISIBLE
-//            centreButton.text = "ADD FIELD"
-//            centreButton.setOnClickListener(addFieldButtonListener)
+            centreButton.visibility = View.VISIBLE
+            centreButton.text = "ADD FIELD"
+            centreButton.setOnClickListener(addFieldButtonListener)
             return
         } else {
 
@@ -129,9 +134,9 @@ class ResultsCreator : AppCompatActivity() {
                 rightButton.text = "UPDATE"
                 rightButton.setOnClickListener(updateButtonListener)
 //
-//                centreButton.visibility = View.VISIBLE
-//                centreButton.text = "ADD FIELD"
-//                centreButton.setOnClickListener(addFieldButtonListener)
+                centreButton.visibility = View.VISIBLE
+                centreButton.text = "ADD FIELD"
+                centreButton.setOnClickListener(addFieldButtonListener)
 
                 leftButton.visibility = View.VISIBLE
                 leftButton.text = "DELETE"
@@ -140,7 +145,7 @@ class ResultsCreator : AppCompatActivity() {
             if (actionType == OBJECT_VIEW) {
                 rightButton.visibility = View.INVISIBLE
                 leftButton.visibility = View.INVISIBLE
-//                centreButton.visibility = View.INVISIBLE
+                centreButton.visibility = View.INVISIBLE
             }
         }
     }
@@ -163,22 +168,34 @@ class ResultsCreator : AppCompatActivity() {
     }
 
     private fun createExerciseFieldsLayout() {
-
+//todo change input of edit texts - if it si a plottable make it only numbers
         linearLayout.removeAllViews()
 
-        var uiFieldsValues: LinkedHashMap<String, String> = if (mAction == OBJECT_NEW) {
-            sResultFieldsMap
-        } else {
-            sResultsArrayList[resultIndex]
-        }
+//        var uiFieldsValues: LinkedHashMap<String, String> = if (mAction == OBJECT_NEW) {
+//            sResultFieldsMap
+//        } else {
+//            sResultsArrayList[resultIndex]
+//        }
+
+        var uiFieldsValues = sResultFieldsMap
+
+
         Timber.d(" MY TIMBER uiFieldValues: ${uiFieldsValues.values}")
 //        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
 
         for (entry in uiFieldsValues.entries) {
-            if (entry.key==ExerciseResults.DATE_KEY){
-                break
+            if (entry.key == ExerciseResults.DATE_KEY) {
+                continue
             }
-            Timber.d(" MY TIMBER entry key: ${entry.key} value: ${entry.value}")
+
+            var entryValueTextString = ""
+            var entryHintString = "Type here"
+            if (mAction != OBJECT_NEW) {
+                //if new field added, there will be no value, so just leave empty
+                sResultsArrayList[resultIndex][entry.key]?.let {
+                    entryValueTextString = it
+                }
+            }
 
             var fieldTitleTextView = TextView(this)
             fieldTitleTextView.layoutParams =
@@ -189,24 +206,15 @@ class ResultsCreator : AppCompatActivity() {
             fieldTitleTextView.text = entry.key
             fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
 
-            linearLayout.addView(fieldTitleTextView)
-
             var fieldEditText = EditText(this)
             fieldEditText.layoutParams =
                 ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-
-            var entryValueTextString = ""
-            var entryHintString = "Type here"
-            if (mAction != OBJECT_NEW) {
-                entryValueTextString = entry.value
-            }
             fieldEditText.hint = entryHintString
             fieldEditText.text = SpannableStringBuilder(entryValueTextString)
 
-            linearLayout.addView(fieldEditText)
 
             var fieldInfoTextView = TextView(this)
             fieldInfoTextView.layoutParams =
@@ -216,39 +224,57 @@ class ResultsCreator : AppCompatActivity() {
                 )
             fieldInfoTextView.text = entryValueTextString
 
+            if (entry.value==ExerciseResults.PLOTTABLE_VALUE){
+                fieldEditText.inputType=InputType.TYPE_CLASS_NUMBER
+                fieldEditText.setBackgroundColor(resources.getColor(R.color.lightBlue))
+                fieldInfoTextView.setBackgroundColor(resources.getColor(R.color.lightBlue))
+                fieldTitleTextView.setBackgroundColor(resources.getColor(R.color.lightBlue))
+            }
+
+            linearLayout.addView(fieldTitleTextView)
+            linearLayout.addView(fieldEditText)
             linearLayout.addView(fieldInfoTextView)
         }
     }
 
-//    private val addFieldButtonListener = View.OnClickListener {
-//        generateDialog()
-//    }
-//
-//    private fun generateDialog() {
-//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-//        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
-//        mDialogView.dialogEditText.hint = "New field name"
-//        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
-//        val mBuilder = AlertDialog.Builder(this)
-//            .setView(mDialogView)
-//            .setTitle("Add Field")
-//        val mAlertDialog = mBuilder.show()
-//        mDialogView.dialogEnterBtn.setOnClickListener {
-//            mAlertDialog.dismiss()
-//            newField = mDialogView.dialogEditText.text.toString().trim()
-//            addFieldLayout()
-//        }
-//        mDialogView.dialogCancelBtn.setOnClickListener {
-//            mAlertDialog.dismiss()
-//        }
-//    }
+    private val addFieldButtonListener = View.OnClickListener {
+        generateDialog()
+    }
 
-//    private fun addFieldLayout() {
-//        //todo save what was written
-////        exerciseFieldsMap[newField] = ""
-//
-////        updateBodyUI(OBJECT_EDIT)
-//
+    private fun generateDialog() {
+        val mDialogView = LayoutInflater.from(this).inflate(R.layout.plottable_dialog_window, null)
+        mDialogView.dialogTextTextView.visibility = View.GONE
+        mDialogView.dialogEditText.hint = "New field name"
+        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
+//        mDialogView.checkBox.text="Measurable parameter"
+//        mDialogView.checkBox.isChecked=false
+        val mBuilder = AlertDialog.Builder(this)
+            .setView(mDialogView)
+            .setTitle("Add Field")
+        val mAlertDialog = mBuilder.show()
+        mDialogView.dialogEnterBtn.setOnClickListener {
+            mAlertDialog.dismiss()
+            addFieldLayout(
+                mDialogView.dialogEditText.text.toString().trim(),
+                mDialogView.checkBox.isChecked
+            )
+        }
+        mDialogView.dialogCancelBtn.setOnClickListener {
+            mAlertDialog.dismiss()
+        }
+    }
+
+    private fun addFieldLayout(fieldName: String, isPlottable: Boolean) {
+        //todo save what was written
+//        exerciseFieldsMap[newField] = ""
+
+//        updateBodyUI(OBJECT_EDIT)
+        var newFieldValue = "String"
+        if (isPlottable) {
+            newFieldValue = ExerciseResults.PLOTTABLE_VALUE
+        }
+        sResultFieldsMap[fieldName] = newFieldValue
+        updateBodyUI(mAction)
 //        var fieldTitleTextView = TextView(this)
 //        fieldTitleTextView.layoutParams =
 //            ViewGroup.LayoutParams(
@@ -282,7 +308,7 @@ class ResultsCreator : AppCompatActivity() {
 //        linearLayout.addView(fieldInfoTextView)
 //
 //        changeVisibility(linearLayout, false)
-//    }
+    }
 
     private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {
 
@@ -364,7 +390,7 @@ class ResultsCreator : AppCompatActivity() {
         //todo update fields map or create fields map will be functions in ExerciseResults which later update all the elements in array
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
-        activeExercise?.exerciseResults!!.updateResult(newResultFields,resultIndex)
+        activeExercise?.exerciseResults!!.updateResult(newResultFields, resultIndex)
         //this adds the result with a date to the list of results in form of hashmaps
 
         if (activeExercise != null) {
