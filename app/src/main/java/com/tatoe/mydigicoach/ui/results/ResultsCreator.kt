@@ -37,8 +37,8 @@ class ResultsCreator : AppCompatActivity() {
 
     private lateinit var newField: String
 
-    private var resultFieldsMap = LinkedHashMap<String, String>()
-    private var resultsArrayList: ArrayList<LinkedHashMap<String, String>> = arrayListOf()
+    private var sResultFieldsMap = LinkedHashMap<String, String>()
+    private var sResultsArrayList: ArrayList<LinkedHashMap<String, String>> = arrayListOf()
 
 
     private lateinit var dataViewModel: DataViewModel
@@ -89,14 +89,14 @@ class ResultsCreator : AppCompatActivity() {
 
             activeExercise = DataHolder.activeExerciseHolder
 
-            resultFieldsMap = if (activeExercise?.exerciseResults!!.resultFieldsMap.isNotEmpty()) {
+            sResultFieldsMap = if (activeExercise?.exerciseResults!!.resultFieldsMap.isNotEmpty()) {
                 activeExercise?.exerciseResults!!.resultFieldsMap
             } else {
                 ExerciseResults.getGenericFields()
             }
 
             if (activeExercise?.exerciseResults!!.resultsArrayList.isNotEmpty()) {
-                resultsArrayList = activeExercise?.exerciseResults!!.resultsArrayList
+                sResultsArrayList = activeExercise?.exerciseResults!!.resultsArrayList
             }
 
             Timber.d("ACTIVE EXERCISE IN CREATOR ${activeExercise!!}")
@@ -145,32 +145,6 @@ class ResultsCreator : AppCompatActivity() {
         }
     }
 
-
-//    private fun updateBodyUI(actionType: String) {
-//
-//        if (actionType == OBJECT_VIEW) {
-//
-////            Timber.d("active exercise results 3 ${activeExercise!!.results[0].sResult.toString()}")
-////            Timber.d("active exercise results 4 ${activeExercise!!.results[1].sResult.toString()}")
-//            result_edit_text.visibility = View.GONE
-//            result_text_view.visibility = View.VISIBLE
-//            result_text_view.text =
-//                activeExercise!!.exerciseResults.resultsArrayList[resultIndex].sResult
-//            return
-//        }
-//        //todo generate the layout like in ExerciseCreator
-//        if (actionType == OBJECT_NEW) {
-//            result_edit_text.visibility = View.VISIBLE
-//            result_edit_text.hint = "How did it go?"
-//            result_text_view.visibility = View.GONE
-//        } else { //must be edit
-//            result_edit_text.visibility = View.VISIBLE
-//            result_edit_text.text =
-//                SpannableStringBuilder(activeExercise!!.exerciseResults.resultsArrayList[resultIndex].sResult)
-//            result_text_view.visibility = View.GONE
-//        }
-//    }
-
     private fun updateBodyUI(actionType: String) {
 
         //try examining childs of layout and changing visibility of edit texts and of text views
@@ -193,9 +167,9 @@ class ResultsCreator : AppCompatActivity() {
         linearLayout.removeAllViews()
 
         var uiFieldsValues: LinkedHashMap<String, String> = if (mAction == OBJECT_NEW) {
-            resultFieldsMap
+            sResultFieldsMap
         } else {
-            resultsArrayList[resultIndex]
+            sResultsArrayList[resultIndex]
         }
         Timber.d(" MY TIMBER uiFieldValues: ${uiFieldsValues.values}")
 //        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
@@ -353,21 +327,8 @@ class ResultsCreator : AppCompatActivity() {
 
         var newResultFields = getFieldContents()
 
-
-        //todo essentially the results fields are being forced here but they should be user created
-        //todo for now if default to basic naming then ok
-
-//        dataViewModel.insertExercise(newExercise)
-
-        //        var resultDate = TextView1.text.toString()
-//        var resultString = SpannableStringBuilder(result_edit_text.text.trim()).toString()
-
-//        activeExercise?.exerciseResults!!.addResult(
-//            Day.dayIDtoDashSeparator(resultDate),
-//            result = newResultFields[ExerciseResults.NOTE_KEY]!!,
-//            plottableResult = newResultFields[ExerciseResults.PLOTTABLE_KEY]!!
-//        )
-        activeExercise?.exerciseResults!!.resultFieldsMap = newResultFields
+        //todo when field added, modify directly the structure of sResultsFieldsMap
+        activeExercise?.exerciseResults!!.resultFieldsMap = sResultFieldsMap
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         activeExercise?.exerciseResults!!.addResult(
@@ -399,7 +360,7 @@ class ResultsCreator : AppCompatActivity() {
     private val updateButtonListener = View.OnClickListener {
         var newResultFields = getFieldContents()
 
-        activeExercise?.exerciseResults!!.resultFieldsMap = newResultFields
+        activeExercise?.exerciseResults!!.resultFieldsMap = sResultFieldsMap
         //todo update fields map or create fields map will be functions in ExerciseResults which later update all the elements in array
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
