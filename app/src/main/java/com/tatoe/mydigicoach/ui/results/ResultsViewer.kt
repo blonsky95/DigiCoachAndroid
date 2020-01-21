@@ -81,7 +81,8 @@ class ResultsViewer : AppCompatActivity() {
 
     private fun displayPlottableParameters() {
         var xxx = activeExercise!!.exerciseResults.getPlottableArrays()
-        //todo continue here
+        Timber.d("ARRAYS TO PLOT: $xxx")
+        //todo now can use this to plot graphs
     }
 
     private fun initObserver() {

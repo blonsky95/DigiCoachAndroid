@@ -63,12 +63,14 @@ class ExerciseResults {
         var arrayX = arrayListOf<Date>()
         var arrayY = arrayListOf<Double>()
         var nameVariable = ""
-        //todo continue here
 
         for (entry in resultFieldsMap) {
             if (entry.value==PLOTTABLE_VALUE) {
                 nameVariable=entry.key
-
+                for (result in resultsArrayList) {
+                    arrayX.add(stringToDate(result[DATE_KEY]!!))
+                    arrayY.add(result[entry.key]!!.toDouble())
+                }
                 plottableBundleArray.add(PlottableBundle(nameVariable,arrayX,arrayY))
             }
         }
