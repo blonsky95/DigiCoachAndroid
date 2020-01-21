@@ -70,12 +70,18 @@ class ResultsViewer : AppCompatActivity() {
             ResultsRecyclerView.visibility=View.GONE
 
         } else {
+            displayPlottableParameters()
             ifEmptyResultsText.visibility = View.GONE
             ResultsRecyclerView.visibility=View.VISIBLE
             adapter.setContent(activeExercise!!)
         }
 
 //        initObserver()
+    }
+
+    private fun displayPlottableParameters() {
+        var xxx = activeExercise!!.exerciseResults.getPlottableArrays()
+        //todo continue here
     }
 
     private fun initObserver() {

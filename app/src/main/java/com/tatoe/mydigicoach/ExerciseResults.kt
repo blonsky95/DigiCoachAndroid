@@ -4,6 +4,7 @@ import com.tatoe.mydigicoach.entity.Day
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.collections.LinkedHashMap
 import kotlin.collections.arrayListOf
 import kotlin.collections.set
@@ -54,6 +55,25 @@ class ExerciseResults {
     fun updateResult(resultFieldsMap:LinkedHashMap<String, String>,position :Int) {
         resultFieldsMap[DATE_KEY] = resultsArrayList[position][DATE_KEY]!!
         resultsArrayList[position]=resultFieldsMap
+    }
+
+    fun getPlottableArrays():ArrayList<PlottableBundle> {
+        var plottableBundleArray = arrayListOf<PlottableBundle>()
+
+        var arrayX = arrayListOf<Date>()
+        var arrayY = arrayListOf<Double>()
+        var nameVariable = ""
+        //todo continue here
+
+        for (entry in resultFieldsMap) {
+            if (entry.value==PLOTTABLE_VALUE) {
+                nameVariable=entry.key
+
+                plottableBundleArray.add(PlottableBundle(nameVariable,arrayX,arrayY))
+            }
+        }
+
+        return plottableBundleArray
     }
 
 //    fun addResult(date: String, result: String = "", plottableResult:String = "") {
