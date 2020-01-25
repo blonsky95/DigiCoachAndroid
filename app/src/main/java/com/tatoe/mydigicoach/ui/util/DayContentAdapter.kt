@@ -8,6 +8,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
@@ -83,6 +84,9 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
                 exerciseView.exercise_name.setOnClickListener {
                     viewExerciseInCreator(exercise)
                 }
+
+                setResultButtonState(holder, exercise)
+
                 exerciseView.result_button.setOnClickListener {
                     goToExerciseResults(exercise)
                 }
@@ -110,6 +114,9 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         holder.exerciseTextView.setOnClickListener {
             viewExerciseInCreator(bindingExercise)
         }
+
+        setResultButtonState(holder, bindingExercise)
+
         holder.exerciseResultButton!!.setOnClickListener {
             goToExerciseResults(bindingExercise)
         }
@@ -127,10 +134,15 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
 
         DataHolder.activeExerciseHolder = exercise
         val intent = Intent(context, ResultsCreator::class.java)
-        intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
-        intent.putExtra(ResultsCreator.RESULTS_DATE, date)
-//        intent.putExtra(ResultsCreator.RESULTS_EXE_ID, exercise.exerciseId)
 
+        if (exercise.exerciseResults.containsResult(date)){
+            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
+            intent.putExtra(ResultsCreator.RESULT_INDEX,exercise.exerciseResults.getResultPosition(date))
+
+        } else {
+            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
+            intent.putExtra(ResultsCreator.RESULTS_DATE, date)
+        }
 
         startActivity(context, intent, null)
     }
@@ -141,5 +153,13 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
             this.exercises = day.exercises
             notifyDataSetChanged()
         }
+    }
+
+    private fun setResultButtonState(holder: CollapsibleItemViewHolderDay, exercise: Exercise) {
+        var colourInt = R.color.lightBlue
+        if (exercise.exerciseResults.containsResult(date)) {
+            colourInt = R.color.darkBlue
+        }
+        holder.setButtonColour(ContextCompat.getColor(context, colourInt))
     }
 }

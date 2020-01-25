@@ -1,12 +1,12 @@
 package com.tatoe.mydigicoach.ui.util
 
+import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.ui.day.CustomAdapterFragment
 
 class CollapsibleItemViewHolderDay (v: View, itemHolderType:Int) :
     RecyclerView.ViewHolder(v) {
@@ -24,5 +24,9 @@ class CollapsibleItemViewHolderDay (v: View, itemHolderType:Int) :
 
     val exerciseTextView:TextView? = v.findViewById(R.id.exercise_name)
     val exerciseResultButton:ImageView? = v.findViewById(R.id.result_button)
+
+    fun setButtonColour(colour:Int){
+        exerciseResultButton?.setBackgroundColor(colour)
+    }
 
 }

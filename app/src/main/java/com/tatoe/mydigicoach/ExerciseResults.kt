@@ -1,6 +1,8 @@
 package com.tatoe.mydigicoach
 
+import android.widget.Toast
 import com.tatoe.mydigicoach.entity.Day
+import java.lang.NumberFormatException
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -29,35 +31,35 @@ class ExerciseResults {
         const val PLOTTABLE_VALUE = "plottable"
         const val DATE_KEY = "Date"
 
-        fun getGenericFields() : LinkedHashMap<String, String> {
+        fun getGenericFields(): LinkedHashMap<String, String> {
             val genericResultFields = LinkedHashMap<String, String>()
 
-            genericResultFields[NOTE_KEY]="String"
-            genericResultFields[PLOTTABLE_KEY]=PLOTTABLE_VALUE
+            genericResultFields[NOTE_KEY] = "String"
+            genericResultFields[PLOTTABLE_KEY] = PLOTTABLE_VALUE
             return genericResultFields
         }
 
-        fun getReadableDate(sDate : Date):String {
+        fun getReadableDate(sDate: Date): String {
             return Day.presentableDateFormat.format(sDate)
         }
 
-        fun stringToDate(sString:String) :Date {
+        fun stringToDate(sString: String): Date {
             val format = SimpleDateFormat("dd-MM-yy")
             return format.parse(sString) as Date
         }
     }
 
-    fun addResult(date: String, resultFieldsMap:LinkedHashMap<String, String>) {
-        resultFieldsMap[DATE_KEY]=date
+    fun addResult(date: String, resultFieldsMap: LinkedHashMap<String, String>) {
+        resultFieldsMap[DATE_KEY] = date
         addToArrayByDate(resultFieldsMap)
     }
 
-    fun updateResult(resultFieldsMap:LinkedHashMap<String, String>,position :Int) {
+    fun updateResult(resultFieldsMap: LinkedHashMap<String, String>, position: Int) {
         resultFieldsMap[DATE_KEY] = resultsArrayList[position][DATE_KEY]!!
-        resultsArrayList[position]=resultFieldsMap
+        resultsArrayList[position] = resultFieldsMap
     }
 
-    fun getPlottableArrays():ArrayList<PlottableBundle> {
+    fun getPlottableArrays(): ArrayList<PlottableBundle> {
         var plottableBundleArray = arrayListOf<PlottableBundle>()
 
         var arrayX = arrayListOf<Date>()
@@ -65,54 +67,30 @@ class ExerciseResults {
         var nameVariable = ""
 
         for (entry in resultFieldsMap) {
-            if (entry.value==PLOTTABLE_VALUE) {
-                nameVariable=entry.key
+            if (entry.value == PLOTTABLE_VALUE) {
+                nameVariable = entry.key
+                var containsEmptyValues = false
                 for (result in resultsArrayList) {
-                    arrayX.add(stringToDate(result[DATE_KEY]!!))
-                    arrayY.add(result[entry.key]!!.toDouble())
+                    try {
+                        arrayX.add(stringToDate(result[DATE_KEY]!!))
+                        arrayY.add(result[entry.key]!!.toDouble())
+                    } catch (e: NumberFormatException) {
+                        arrayY.add(0.toDouble())
+                        containsEmptyValues=true
+                    }
+
                 }
-                plottableBundleArray.add(PlottableBundle(nameVariable,arrayX,arrayY))
+                plottableBundleArray.add(PlottableBundle(nameVariable, arrayX, arrayY,containsEmptyValues))
             }
         }
 
         return plottableBundleArray
     }
 
-//    fun addResult(date: String, result: String = "", plottableResult:String = "") {
-//
-//        var newDate = Day.dashSeparatedDateFormat.parse(date)
-//        var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
-//        if (plottableResult.isNotEmpty()) {
-//            resultSet.addPlottableResult(plottableResult.toDouble())
-//        }
-//        if (result.isNotEmpty()){
-//            resultSet.addResult(result)
-//        }
-//
-//        Timber.d("RESULT SET: ${resultSet.sResult}")
-////        results.add(resultSet)
-//        addToArrayByDate(resultSet)
-//    }
-
-//    private fun addToArrayByDate(newResultSet: ResultSet) {
-//        var i = 0
-//        while (i<resultsArrayList.size) {
-//            if (newResultSet.sDate.after(resultsArrayList[i].sDate)) {
-//                resultsArrayList.add(i, newResultSet)
-//                return
-//            }
-//            i++
-//        }
-//
-//        resultsArrayList.add(i, newResultSet)
-//        Timber.d("RESULT SET 2: ${resultsArrayList.size}")
-//
-//    }
-
     private fun addToArrayByDate(newResultMap: LinkedHashMap<String, String>) {
 
         var i = 0
-        while (i<resultsArrayList.size) {
+        while (i < resultsArrayList.size) {
             try {
                 val newDate = stringToDate(newResultMap[DATE_KEY]!!)
                 val oldDate = stringToDate(resultsArrayList[i][DATE_KEY]!!)
@@ -127,5 +105,32 @@ class ExerciseResults {
         }
         resultsArrayList.add(i, newResultMap)
 
+    }
+
+    fun containsResult(date: String): Boolean {
+        //todo make date unique + this returns boolean
+//        var linkedHashMap = LinkedHashMap<String, String>()
+//        linkedHashMap[DATE_KEY] = Day.dayIDtoDashSeparator(date)
+//        resultsArrayList.contains(linkedHashMap)
+        for (result in resultsArrayList){
+            if (result[DATE_KEY]==Day.dayIDtoDashSeparator(date)){
+                return true
+            }
+        }
+//        var ccc = resultsArrayList.contains(linkedHashMap)
+        return false
+    }
+
+    fun getResultPosition(date: String): Int {
+//        var linkedHashMap = LinkedHashMap<String, String>()
+//        linkedHashMap[DATE_KEY] = Day.dayIDtoDashSeparator(date)
+
+        for (result in resultsArrayList){
+            if (result[DATE_KEY]==Day.dayIDtoDashSeparator(date)){
+                return resultsArrayList.indexOf(result)
+            }
+        }
+
+        return -1
     }
 }

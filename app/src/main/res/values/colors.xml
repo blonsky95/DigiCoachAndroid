@@ -5,5 +5,11 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="lightBlue">#9500BCD4</color>
+    <color name="darkBlue">#95264DB4</color>
+
+    <color name="lightRed">#95FC3E3E</color>
+    <color name="darkRed">#95F80404</color>
+
+
 
 </resources>

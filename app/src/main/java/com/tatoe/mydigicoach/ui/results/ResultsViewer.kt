@@ -85,35 +85,35 @@ class ResultsViewer : AppCompatActivity() {
         //todo now can use this to plot graphs
     }
 
-    private fun initObserver() {
-        dataViewModel.allExercises.observe(this, Observer { exercises ->
-            exercises?.let {
-                allExercises = it
-                for (exercise in allExercises) {
-                    if (exercise.exerciseId == exerciseId) {
-                        activeExercise = exercise
-                        if (activeExercise!!.exerciseResults.resultsArrayList.isEmpty()) {
-                            ifEmptyResultsText.visibility = View.VISIBLE
-                            ResultsRecyclerView.visibility=View.GONE
-
-                        } else {
-                            ifEmptyResultsText.visibility = View.GONE
-                            ResultsRecyclerView.visibility=View.VISIBLE
-                        }
-                        adapter.setContent(activeExercise!!)
-                        Timber.d("active exercise = $activeExercise")
-//                        Timber.d("active exercise results 1 ${activeExercise!!.results[0].sResult.toString()}")
-//                        Timber.d("active exercise results 2 ${activeExercise!!.results[1].sResult.toString()}")
-
-
-
-                        return@let
-                    }
-                }
-
-            }
-        })
-    }
+//    private fun initObserver() {
+//        dataViewModel.allExercises.observe(this, Observer { exercises ->
+//            exercises?.let {
+//                allExercises = it
+//                for (exercise in allExercises) {
+//                    if (exercise.exerciseId == exerciseId) {
+//                        activeExercise = exercise
+//                        if (activeExercise!!.exerciseResults.resultsArrayList.isEmpty()) {
+//                            ifEmptyResultsText.visibility = View.VISIBLE
+//                            ResultsRecyclerView.visibility=View.GONE
+//
+//                        } else {
+//                            ifEmptyResultsText.visibility = View.GONE
+//                            ResultsRecyclerView.visibility=View.VISIBLE
+//                        }
+//                        adapter.setContent(activeExercise!!)
+//                        Timber.d("active exercise = $activeExercise")
+////                        Timber.d("active exercise results 1 ${activeExercise!!.results[0].sResult.toString()}")
+////                        Timber.d("active exercise results 2 ${activeExercise!!.results[1].sResult.toString()}")
+//
+//
+//
+//                        return@let
+//                    }
+//                }
+//
+//            }
+//        })
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.creator_toolbar_menu, menu)
