@@ -31,4 +31,6 @@ data class Day(
 
     }
 
+    //todo create a function which returns how many times an exercise is present (exercises + blocks)
+
 }

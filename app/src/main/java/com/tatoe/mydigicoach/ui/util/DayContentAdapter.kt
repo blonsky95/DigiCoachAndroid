@@ -164,6 +164,7 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
     }
 
     internal fun setContent(day: Day?) {
+        //todo here save the day instance - and use it to get exercises
         if (day != null) {
             this.blocks = day.blocks
             this.exercises = day.exercises
