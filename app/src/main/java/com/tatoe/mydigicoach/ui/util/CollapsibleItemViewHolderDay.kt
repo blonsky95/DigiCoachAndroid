@@ -8,7 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 
-class CollapsibleItemViewHolderDay (v: View, itemHolderType:Int) :
+class CollapsibleItemViewHolderDay (v: View) :
     RecyclerView.ViewHolder(v) {
 
 //    companion object {
