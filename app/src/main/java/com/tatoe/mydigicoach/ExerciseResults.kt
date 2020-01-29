@@ -106,6 +106,15 @@ class ExerciseResults {
         resultsArrayList.add(i, newResultMap)
 
     }
+    fun resultsPerDate(date: String): Int {
+        var counter = 0
+        for (result in resultsArrayList){
+            if (result[DATE_KEY]==Day.dayIDtoDashSeparator(date)){
+                counter++
+            }
+        }
+        return counter
+    }
 
     fun containsResult(date: String): Boolean {
         //todo make date unique + this returns boolean

@@ -28,6 +28,7 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>()
     private var exercises = emptyList<Exercise>()
+    private var sDay:Day? = null
 
     private var exerciseTextSize: Float = 14.toFloat()
 
@@ -148,7 +149,18 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         DataHolder.activeExerciseHolder = exercise
         val intent = Intent(context, ResultsCreator::class.java)
 
-        if (exercise.exerciseResults.containsResult(date)) {
+//        if (exercise.exerciseResults.containsResult(date)) {
+//            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
+//            intent.putExtra(
+//                ResultsCreator.RESULT_INDEX,
+//                exercise.exerciseResults.getResultPosition(date)
+//            )
+//
+//        } else {
+//            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
+//            intent.putExtra(ResultsCreator.RESULTS_DATE, date)
+//        }
+        if (sDay!!.checkExistingResult(exercise)) {
             intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
             intent.putExtra(
                 ResultsCreator.RESULT_INDEX,
@@ -168,6 +180,7 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         if (day != null) {
             this.blocks = day.blocks
             this.exercises = day.exercises
+            this.sDay = day
             notifyDataSetChanged()
         }
     }
@@ -177,11 +190,14 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         var colourInt = R.color.lightBlue
         Timber.d("LIGHT BLUE: $colourInt")
 
-        if (exercise.exerciseResults.containsResult(date)) {
+//        if (exercise.exerciseResults.containsResult(date)) {
+//            colourInt = R.color.darkBlue
+//            Timber.d("DARK BLUE: $colourInt")
+//        }
+        if (sDay!!.checkExistingResult(exercise)) {
             colourInt = R.color.darkBlue
             Timber.d("DARK BLUE: $colourInt")
         }
-
         return ContextCompat.getColor(context, colourInt)
     }
 }

@@ -8,6 +8,7 @@ import java.text.DecimalFormat
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+import kotlin.collections.LinkedHashMap
 
 @Entity(tableName = "day_table")
 data class Day(
@@ -31,6 +32,36 @@ data class Day(
 
     }
 
-    //todo create a function which returns how many times an exercise is present (exercises + blocks)
+    private var exerciseOccurencesMap = LinkedHashMap<Exercise,Int?>()
+
+    fun checkExistingResult(exercise: Exercise) : Boolean {
+        iterateExes(exercises)
+        for (block in blocks) {
+            iterateExes(block.components)
+        }
+
+        return if (exerciseOccurencesMap[exercise]!!<exercise.exerciseResults.resultsPerDate(dayIDtoDashSeparator(dayId))) {
+            exerciseOccurencesMap[exercise]=exerciseOccurencesMap[exercise]!!.plus(1)
+            true
+        } else {
+            false
+        }
+    }
+
+    fun iterateExes(exercisesArrayList: ArrayList<Exercise>) {
+        for (exe in exercisesArrayList) {
+            if (!exerciseOccurencesMap.containsKey(exe)) {
+                exerciseOccurencesMap[exe] = 0
+            }
+        }
+    }
+
+//    private fun modifyCounter(exe: Exercise) {
+//        if (exerciseOccurencesMap.containsKey(exe)) {
+//            exerciseOccurencesMap[exe] = exerciseOccurencesMap[exe]?.plus(1)
+//        } else {
+//            exerciseOccurencesMap[exe]=0
+//        }
+//    }
 
 }
