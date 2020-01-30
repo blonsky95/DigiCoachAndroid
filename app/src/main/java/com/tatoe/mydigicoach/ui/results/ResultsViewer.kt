@@ -6,9 +6,17 @@ import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.anychart.AnyChart
+import com.anychart.chart.common.dataentry.DataEntry
+import com.anychart.chart.common.dataentry.ValueDataEntry
+import com.anychart.core.cartesian.series.Line
+import com.anychart.data.Mapping
+import com.anychart.data.Set
+import com.anychart.enums.MarkerType
+import com.anychart.enums.TooltipPositionMode
+import com.anychart.graphics.vector.Stroke
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
@@ -19,6 +27,7 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import kotlinx.android.synthetic.main.activity_results_viewer.*
 import timber.log.Timber
+
 
 class ResultsViewer : AppCompatActivity() {
 
@@ -45,7 +54,7 @@ class ResultsViewer : AppCompatActivity() {
                 super.onClick(view, position)
                 val intent = Intent(this@ResultsViewer, ResultsCreator::class.java)
                 intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
-                intent.putExtra(ResultsCreator.RESULT_INDEX,position)
+                intent.putExtra(ResultsCreator.RESULT_INDEX, position)
 //                updateUpdatingExercise(position)
 
                 startActivity(intent)
@@ -67,12 +76,12 @@ class ResultsViewer : AppCompatActivity() {
         activeExercise = DataHolder.activeExerciseHolder
         if (activeExercise!!.exerciseResults.resultsArrayList.isEmpty()) {
             ifEmptyResultsText.visibility = View.VISIBLE
-            ResultsRecyclerView.visibility=View.GONE
+            ResultsRecyclerView.visibility = View.GONE
 
         } else {
             displayPlottableParameters()
             ifEmptyResultsText.visibility = View.GONE
-            ResultsRecyclerView.visibility=View.VISIBLE
+            ResultsRecyclerView.visibility = View.VISIBLE
             adapter.setContent(activeExercise!!)
         }
 
@@ -82,7 +91,70 @@ class ResultsViewer : AppCompatActivity() {
     private fun displayPlottableParameters() {
         var xxx = activeExercise!!.exerciseResults.getPlottableArrays()
         Timber.d("ARRAYS TO PLOT: $xxx")
-        //todo now can use this to plot graphs
+        //todo user can change what they are looking in graph, so data series will change,
+        //create graph class
+        // - one block is the basic generation of graph + line generation
+        // - simply changes the line that is added to graph
+        // - add spinner to layout with plottable values
+
+        var randomGraphData = xxx[0]
+
+        var anyChartView = graph_chart_view
+        var cartesian = AnyChart.line()
+        cartesian.animation(true)
+
+        cartesian.padding(10.0, 20.0, 5.0, 20.0)
+
+        cartesian.crosshair().enabled(true)
+        cartesian.crosshair()
+            .yLabel(true)
+            .yStroke(null as Stroke?, null, null, null as String?, null as String?)
+
+        cartesian.tooltip().positionMode(TooltipPositionMode.POINT)
+
+        cartesian.title("TITLE GOES HERE")
+
+        cartesian.yAxis(0).title("Y units")
+        cartesian.xAxis(0).labels().padding(5.0, 5.0, 5.0, 5.0)
+
+        val seriesData: MutableList<DataEntry> = ArrayList()
+        for (i in 0..randomGraphData.sValuesX.size)
+        seriesData.add(ValueDataEntry(randomGraphData.sValuesX[i].time, randomGraphData.sValuesy[i]))
+
+        val set = Set.instantiate()
+        set.data(seriesData)
+        val series1Mapping: Mapping = set.mapAs("{ x: 'x', value: 'value' }")
+
+        val series1: Line = cartesian.line(series1Mapping)
+        series1.name("Param 1")
+        series1.hovered().markers().enabled(true)
+        series1.hovered().markers()
+            .type(MarkerType.CIRCLE)
+            .size(4.0)
+        series1.tooltip()
+            .position("right")
+            .anchor(com.anychart.enums.Anchor.LEFT_CENTER)
+            .offsetX(5.0)
+            .offsetY(5.0)
+
+//        cartesian.legend().enabled(true)
+//        cartesian.legend().fontSize(13.0)
+//        cartesian.legend().padding(0.0, 0.0, 10.0, 0.0)
+
+        anyChartView.setChart(cartesian)
+    }
+
+    private class CustomDataEntry internal constructor(
+        x: String?,
+        value: Number?,
+        value2: Number?,
+        value3: Number?
+    ) :
+        ValueDataEntry(x, value) {
+        init {
+            setValue("value2", value2)
+            setValue("value3", value3)
+        }
     }
 
 //    private fun initObserver() {
