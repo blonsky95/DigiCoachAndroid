@@ -32,7 +32,7 @@ data class Day(
 
     }
 
-    private var exerciseOccurencesMap = LinkedHashMap<Exercise,Int?>()
+    var exerciseOccurencesMap = LinkedHashMap<Exercise,Int?>()
 
     fun checkExistingResult(exercise: Exercise) : Boolean {
         iterateExes(exercises)

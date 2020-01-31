@@ -59,6 +59,16 @@ class DataConverter {
         return Gson().toJson(linkedHashMap)
     }
 
+    @TypeConverter
+    fun stringToLinkedHashMapExeInt(data: String?) : LinkedHashMap<Exercise,Int> {
+        return Gson().fromJson(data, object :TypeToken<LinkedHashMap<Exercise,Int>>() {}.type)
+    }
+
+    @TypeConverter
+    fun linkedHashMapExeIntToString(linkedHashMap: LinkedHashMap<Exercise,Int>) :String? {
+        return Gson().toJson(linkedHashMap)
+    }
+
 
     @TypeConverter
     fun stringToBlockList(data: String?): ArrayList<Block> {

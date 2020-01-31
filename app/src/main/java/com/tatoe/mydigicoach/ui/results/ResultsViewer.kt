@@ -118,9 +118,14 @@ class ResultsViewer : AppCompatActivity() {
         cartesian.xAxis(0).labels().padding(5.0, 5.0, 5.0, 5.0)
 
         val seriesData: MutableList<DataEntry> = ArrayList()
-        for (i in 0..randomGraphData.sValuesX.size)
-        seriesData.add(ValueDataEntry(randomGraphData.sValuesX[i].time, randomGraphData.sValuesy[i]))
-
+        for (i in 0 until randomGraphData.sValuesX.size) {
+            seriesData.add(
+                ValueDataEntry(
+                    randomGraphData.sValuesX[i].time,
+                    randomGraphData.sValuesy[i]
+                )
+            )
+        }
         val set = Set.instantiate()
         set.data(seriesData)
         val series1Mapping: Mapping = set.mapAs("{ x: 'x', value: 'value' }")
