@@ -275,39 +275,7 @@ class ResultsCreator : AppCompatActivity() {
         }
         sResultFieldsMap[fieldName] = newFieldValue
         updateBodyUI(mAction)
-//        var fieldTitleTextView = TextView(this)
-//        fieldTitleTextView.layoutParams =
-//            ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT
-//            )
-//        fieldTitleTextView.text = newField
-//        fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
-//
-//        linearLayout.addView(fieldTitleTextView)
-//
-//        var fieldEditText = EditText(this)
-//        fieldEditText.layoutParams =
-//            ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT
-//            )
-//        fieldEditText.hint = NEW_FIELD_VALUE
-//        fieldEditText.text = SpannableStringBuilder(NEW_FIELD_VALUE)
-//
-//        linearLayout.addView(fieldEditText)
-//
-//        var fieldInfoTextView = TextView(this)
-//        fieldInfoTextView.layoutParams =
-//            ViewGroup.LayoutParams(
-//                ViewGroup.LayoutParams.MATCH_PARENT,
-//                ViewGroup.LayoutParams.WRAP_CONTENT
-//            )
-//        fieldInfoTextView.text = NEW_FIELD_VALUE
-//
-//        linearLayout.addView(fieldInfoTextView)
-//
-//        changeVisibility(linearLayout, false)
+
     }
 
     private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {

@@ -83,15 +83,16 @@
 <!--            app:layout_constraintEnd_toEndOf="parent"-->
 <!--            app:layout_constraintStart_toStartOf="parent" />-->
 
-    <com.anychart.AnyChartView
-            android:id="@+id/graph_chart_view"
+    <com.github.mikephil.charting.charts.LineChart
+            android:id="@+id/chart1"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:visibility="visible"
-            app:layout_constraintTop_toBottomOf="@+id/my_toolbar"
+            android:layout_height="250dp"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            />
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ResultsRecyclerView"
@@ -104,7 +105,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/ifEmptyResultsText"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/graph_chart_view"
+            app:layout_constraintTop_toBottomOf="@+id/chart1"
             tools:listitem="@layout/item_holder_result" />
 
     <TextView

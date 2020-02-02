@@ -32,29 +32,30 @@ data class Day(
 
     }
 
-    var exerciseOccurencesMap = LinkedHashMap<Exercise,Int?>()
+//    var exerciseOccurencesMap = LinkedHashMap<Exercise,Int?>()
 
-    fun checkExistingResult(exercise: Exercise) : Boolean {
-        iterateExes(exercises)
-        for (block in blocks) {
-            iterateExes(block.components)
-        }
+//    fun checkExistingResult(exercise: Exercise) : Boolean {
+//        iterateExes(exercises)
+//        for (block in blocks) {
+//            iterateExes(block.components)
+//        }
+//
+//        return if (exerciseOccurencesMap[exercise]!!<exercise.exerciseResults.numberResultsPerDate(dayIDtoDashSeparator(dayId))) {
+//            exerciseOccurencesMap[exercise]=exerciseOccurencesMap[exercise]!!.plus(1)
+//            true
+//        } else {
+//            false
+//        }
+//    }
+//
+//    fun iterateExes(exercisesArrayList: ArrayList<Exercise>) {
+//        for (exe in exercisesArrayList) {
+//            if (!exerciseOccurencesMap.containsKey(exe)) {
+//                exerciseOccurencesMap[exe] = 0
+//            }
+//        }
+//    }
 
-        return if (exerciseOccurencesMap[exercise]!!<exercise.exerciseResults.resultsPerDate(dayIDtoDashSeparator(dayId))) {
-            exerciseOccurencesMap[exercise]=exerciseOccurencesMap[exercise]!!.plus(1)
-            true
-        } else {
-            false
-        }
-    }
-
-    fun iterateExes(exercisesArrayList: ArrayList<Exercise>) {
-        for (exe in exercisesArrayList) {
-            if (!exerciseOccurencesMap.containsKey(exe)) {
-                exerciseOccurencesMap[exe] = 0
-            }
-        }
-    }
 
 //    private fun modifyCounter(exe: Exercise) {
 //        if (exerciseOccurencesMap.containsKey(exe)) {

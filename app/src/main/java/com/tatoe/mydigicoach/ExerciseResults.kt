@@ -1,6 +1,5 @@
 package com.tatoe.mydigicoach
 
-import android.widget.Toast
 import com.tatoe.mydigicoach.entity.Day
 import java.lang.NumberFormatException
 import java.text.ParseException
@@ -106,18 +105,27 @@ class ExerciseResults {
         resultsArrayList.add(i, newResultMap)
 
     }
-    fun resultsPerDate(date: String): Int {
+    fun numberResultsPerDate(date: String): Int {
         var counter = 0
         for (result in resultsArrayList){
-            if (result[DATE_KEY]==Day.dayIDtoDashSeparator(date)){
+            if (result[DATE_KEY]==date){
                 counter++
             }
         }
         return counter
     }
 
+    fun getResultsPerDate(date: String) : ArrayList<LinkedHashMap<String,String>> {
+        var output = arrayListOf<LinkedHashMap<String,String>>()
+        var datePositionInResults = getResultPosition(date)
+        var resultsPerDate=numberResultsPerDate(date)
+        for (i in 0 until resultsPerDate) {
+            output.add(resultsArrayList[datePositionInResults+i])
+        }
+        return output
+    }
+
     fun containsResult(date: String): Boolean {
-        //todo make date unique + this returns boolean
 //        var linkedHashMap = LinkedHashMap<String, String>()
 //        linkedHashMap[DATE_KEY] = Day.dayIDtoDashSeparator(date)
 //        resultsArrayList.contains(linkedHashMap)

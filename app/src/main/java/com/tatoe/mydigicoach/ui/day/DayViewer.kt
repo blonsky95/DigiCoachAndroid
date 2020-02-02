@@ -2,10 +2,7 @@ package com.tatoe.mydigicoach.ui.day
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.MenuItem
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -15,6 +12,7 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.DataViewModel
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_day_viewer.*
@@ -123,13 +121,6 @@ class DayViewer : AppCompatActivity() {
         mPager.currentItem = 0
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        else -> {
-            super.onOptionsItemSelected(item)
-        }
-    }
-
     override fun onDestroy() {
         DataHolder.pagerPosition=-1
         super.onDestroy()
@@ -206,9 +197,6 @@ class DayViewer : AppCompatActivity() {
             )
         }
 
-        override fun notifyDataSetChanged() {
-            super.notifyDataSetChanged()
-        }
     }
 
     private fun getDayById(activeDayId: String): Day? {
@@ -220,5 +208,19 @@ class DayViewer : AppCompatActivity() {
         return null
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.day_viewer_menu, menu)
 
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+        R.id.action_info -> {
+            Utils.getInfoDialogView(this,"Duplicate exercises","There can only be one result per exercise per date")
+            true
+        }
+        else -> {
+            super.onOptionsItemSelected(item)
+        }
+    }
 }

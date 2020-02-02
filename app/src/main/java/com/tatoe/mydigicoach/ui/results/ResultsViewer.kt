@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.ui.results
 
 import android.content.Intent
+import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
@@ -8,25 +9,25 @@ import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.anychart.AnyChart
-import com.anychart.chart.common.dataentry.DataEntry
-import com.anychart.chart.common.dataentry.ValueDataEntry
-import com.anychart.core.cartesian.series.Line
-import com.anychart.data.Mapping
-import com.anychart.data.Set
-import com.anychart.enums.MarkerType
-import com.anychart.enums.TooltipPositionMode
-import com.anychart.graphics.vector.Stroke
+import com.github.mikephil.charting.components.XAxis
+import com.github.mikephil.charting.components.YAxis
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.LineData
+import com.github.mikephil.charting.data.LineDataSet
+import com.github.mikephil.charting.formatter.ValueFormatter
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.tatoe.mydigicoach.DataViewModel
+import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
-import com.tatoe.mydigicoach.ui.results.ResultsCreator.Companion.RESULTS_EXE_ID
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import kotlinx.android.synthetic.main.activity_results_viewer.*
 import timber.log.Timber
+import java.sql.Time
+import java.util.concurrent.TimeUnit
 
 
 class ResultsViewer : AppCompatActivity() {
@@ -35,6 +36,8 @@ class ResultsViewer : AppCompatActivity() {
 
     private var activeExercise: Exercise? = null
     lateinit var adapter: ResultListAdapter
+    private var sResults = arrayListOf<LinkedHashMap<String,String>>()
+
 
     var exerciseId = -1
 
@@ -67,28 +70,39 @@ class ResultsViewer : AppCompatActivity() {
         ResultsRecyclerView.adapter = adapter
         ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
 
-
-        if (intent.hasExtra(RESULTS_EXE_ID)) {
-            exerciseId = intent.getIntExtra(RESULTS_EXE_ID, -1)
-            Timber.d("exerciseId received")
-        }
-
         activeExercise = DataHolder.activeExerciseHolder
-        if (activeExercise!!.exerciseResults.resultsArrayList.isEmpty()) {
+
+        //        if (intent.hasExtra(ResultsCreator.RESULTS_DATE)) {
+//             sResults=activeExercise!!.exerciseResults.getResultsPerDate(intent.getStringExtra(ResultsCreator.RESULTS_DATE))
+//             enoughInfo = false
+//        } else {
+           sResults = activeExercise!!.exerciseResults.resultsArrayList
+//        }
+
+
+        val enoughInfo: Boolean = true
+
+        if (sResults.isEmpty()) {
             ifEmptyResultsText.visibility = View.VISIBLE
             ResultsRecyclerView.visibility = View.GONE
 
         } else {
-            displayPlottableParameters()
+            displayPlottableParameters(enoughInfo)
             ifEmptyResultsText.visibility = View.GONE
             ResultsRecyclerView.visibility = View.VISIBLE
-            adapter.setContent(activeExercise!!)
+
+            adapter.setContent(sResults)
         }
 
 //        initObserver()
     }
 
-    private fun displayPlottableParameters() {
+    private fun displayPlottableParameters(enoughInfo:Boolean) {
+
+        if (!enoughInfo) {
+            return
+        }
+
         var xxx = activeExercise!!.exerciseResults.getPlottableArrays()
         Timber.d("ARRAYS TO PLOT: $xxx")
         //todo user can change what they are looking in graph, so data series will change,
@@ -98,69 +112,76 @@ class ResultsViewer : AppCompatActivity() {
         // - add spinner to layout with plottable values
 
         var randomGraphData = xxx[0]
+        var xAxisDates = randomGraphData.sValuesX
+        Timber.d("X AXIS DATES: $xAxisDates")
+        var yAxisDouble = randomGraphData.sValuesy
 
-        var anyChartView = graph_chart_view
-        var cartesian = AnyChart.line()
-        cartesian.animation(true)
-
-        cartesian.padding(10.0, 20.0, 5.0, 20.0)
-
-        cartesian.crosshair().enabled(true)
-        cartesian.crosshair()
-            .yLabel(true)
-            .yStroke(null as Stroke?, null, null, null as String?, null as String?)
-
-        cartesian.tooltip().positionMode(TooltipPositionMode.POINT)
-
-        cartesian.title("TITLE GOES HERE")
-
-        cartesian.yAxis(0).title("Y units")
-        cartesian.xAxis(0).labels().padding(5.0, 5.0, 5.0, 5.0)
-
-        val seriesData: MutableList<DataEntry> = ArrayList()
-        for (i in 0 until randomGraphData.sValuesX.size) {
-            seriesData.add(
-                ValueDataEntry(
-                    randomGraphData.sValuesX[i].time,
-                    randomGraphData.sValuesy[i]
-                )
-            )
+        var values = arrayListOf<Entry>()
+        for (i in xAxisDates.size-1 downTo 0) {
+            values.add(Entry(xAxisDates[i].time.toFloat(), yAxisDouble[i].toFloat()))
         }
-        val set = Set.instantiate()
-        set.data(seriesData)
-        val series1Mapping: Mapping = set.mapAs("{ x: 'x', value: 'value' }")
 
-        val series1: Line = cartesian.line(series1Mapping)
-        series1.name("Param 1")
-        series1.hovered().markers().enabled(true)
-        series1.hovered().markers()
-            .type(MarkerType.CIRCLE)
-            .size(4.0)
-        series1.tooltip()
-            .position("right")
-            .anchor(com.anychart.enums.Anchor.LEFT_CENTER)
-            .offsetX(5.0)
-            .offsetY(5.0)
+        var chart = chart1
 
-//        cartesian.legend().enabled(true)
-//        cartesian.legend().fontSize(13.0)
-//        cartesian.legend().padding(0.0, 0.0, 10.0, 0.0)
+        chart.setBackgroundColor(Color.WHITE)
+        chart.description.isEnabled = false
+//        chart.setVisibleXRangeMaximum(5f)
+//        chart.moveViewToX()
+        chart.setTouchEnabled(true)
+        chart.setDrawGridBackground(false)
+        chart.isDragEnabled = true
+        chart.setScaleEnabled(true)
+        chart.setPinchZoom(true)
 
-        anyChartView.setChart(cartesian)
+        var xAxis = chart.xAxis
+        xAxis.position=XAxis.XAxisPosition.TOP
+        xAxis.textSize=10f
+//        xAxis.setCenterAxisLabels(true)
+//        xAxis.granularity = TimeUnit.DAYS.toMillis(1).toFloat()
+//        xAxis.isGranularityEnabled=true
+        xAxis.setLabelCount(7,true)
+        xAxis.axisMinimum=values[0].x-TimeUnit.MINUTES.toMillis(5)
+        xAxis.axisMaximum=values[values.size-1].x+TimeUnit.MINUTES.toMillis(5)
+
+
+        xAxis.valueFormatter = object: ValueFormatter() {
+            var mFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
+            override fun getFormattedValue(value: Float) :String {
+                Timber.d("DATE FORMAT from $value to ${mFormat.format(value)}")
+                return mFormat.format(value)
+            }
+        }
+
+        var yAxis = chart.axisLeft
+        yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+        yAxis.textSize=10f
+        yAxis.granularity = 1f
+        yAxis.isGranularityEnabled=false
+
+        var lineDataSet = LineDataSet(values, randomGraphData.sName)
+        lineDataSet.setDrawIcons(false)
+        lineDataSet.setDrawValues(false)
+        lineDataSet.setCircleColor(Color.BLUE)
+        lineDataSet.color = Color.BLUE
+        lineDataSet.lineWidth=3f
+        lineDataSet.circleRadius=3f
+//        lineDataSet.setDrawCircleHole(true)
+//        lineDataSet.valueTextSize=9f
+//        lineDataSet.label=""
+        lineDataSet.setDrawFilled(true)
+        lineDataSet.fillColor = Color.BLUE
+
+        var dataSets = arrayListOf<ILineDataSet>()
+        dataSets.add(lineDataSet)
+
+        var lineData = LineData(dataSets)
+
+        chart.data=lineData
+
+
     }
 
-    private class CustomDataEntry internal constructor(
-        x: String?,
-        value: Number?,
-        value2: Number?,
-        value3: Number?
-    ) :
-        ValueDataEntry(x, value) {
-        init {
-            setValue("value2", value2)
-            setValue("value3", value3)
-        }
-    }
+
 
 //    private fun initObserver() {
 //        dataViewModel.allExercises.observe(this, Observer { exercises ->

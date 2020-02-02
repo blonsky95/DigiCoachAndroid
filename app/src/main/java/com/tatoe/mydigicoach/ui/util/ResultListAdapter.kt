@@ -6,19 +6,17 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ExerciseResults
-import com.tatoe.mydigicoach.ResultSet
-import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
 
 class ResultListAdapter(var context: Context) : RecyclerView.Adapter<CollapsibleItemViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var results = arrayListOf<LinkedHashMap<String,String>>()
+    private var sResults = arrayListOf<LinkedHashMap<String,String>>()
     private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
 
     override fun getItemCount(): Int {
-        return results.size
+        return sResults.size
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CollapsibleItemViewHolder {
@@ -30,10 +28,10 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
     override fun onBindViewHolder(holder: CollapsibleItemViewHolder, position: Int) {
 
 
-        if (results.isNotEmpty()) {
-                holder.resultDate.text=ExerciseResults.getReadableDate(ExerciseResults.stringToDate(results[position][ExerciseResults.DATE_KEY]!!))
-                if (results[position][ExerciseResults.NOTE_KEY]!=null) {
-                    holder.resultResult.text=results[position][ExerciseResults.NOTE_KEY]
+        if (sResults.isNotEmpty()) {
+                holder.resultDate.text=ExerciseResults.getReadableDate(ExerciseResults.stringToDate(sResults[position][ExerciseResults.DATE_KEY]!!))
+                if (sResults[position][ExerciseResults.NOTE_KEY]!=null) {
+                    holder.resultResult.text=sResults[position][ExerciseResults.NOTE_KEY]
                     holder.resultResult.visibility=View.GONE
                 } else {
                     holder.resultResult.text="nothing written here"
@@ -47,10 +45,8 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
         }
     }
 
-    internal fun setContent(exercise : Exercise) {
-        Timber.d("adapter exercise results: ${exercise.exerciseResults}")
-
-        this.results = exercise.exerciseResults.resultsArrayList
+    internal fun setContent(results : ArrayList<LinkedHashMap<String,String>>) {
+        this.sResults = results
         notifyDataSetChanged()
     }
 
