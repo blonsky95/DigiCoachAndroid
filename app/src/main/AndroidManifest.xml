@@ -3,8 +3,8 @@
         xmlns:tools="http://schemas.android.com/tools"
         package="com.tatoe.mydigicoach">
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
             android:name=".MainApplication"
@@ -15,28 +15,32 @@
             android:supportsRtl="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             tools:ignore="GoogleAppIndexingWarning">
-
-
-
-        <activity android:name=".ui.MainActivity">
+        <activity android:name=".ui.LoginScreen">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.HomeScreen">
+<!--            <intent-filter>-->
+<!--                <action android:name="android.intent.action.MAIN" />-->
 
+<!--                <category android:name="android.intent.category.LAUNCHER" />-->
+<!--            </intent-filter>-->
+        </activity>
         <activity
                 android:name=".ui.Library"
-                android:parentActivityName=".ui.MainActivity" />
+                android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseViewer"
-                android:parentActivityName=".ui.MainActivity" />
+                android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.block.BlockViewer"
-                android:parentActivityName=".ui.MainActivity" />
+                android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.day.DayViewer"
-                android:parentActivityName=".ui.MainActivity" />
+                android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseCreator"
                 android:windowSoftInputMode="adjustPan" />
@@ -52,7 +56,6 @@
         <activity
                 android:name=".ui.results.ResultsCreator"
                 android:windowSoftInputMode="adjustPan" />
-
     </application>
 
 </manifest>

@@ -12,7 +12,7 @@ import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import kotlinx.android.synthetic.main.activity_main.*
 import timber.log.Timber
 
-class MainActivity : AppCompatActivity() {
+class HomeScreen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
