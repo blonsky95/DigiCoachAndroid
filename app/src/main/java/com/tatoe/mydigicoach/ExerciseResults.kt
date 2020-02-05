@@ -150,4 +150,14 @@ class ExerciseResults {
 
         return -1
     }
+
+    fun getPlottableNames(): ArrayList<String> {
+        var array = arrayListOf<String>()
+        for (entry in resultFieldsMap) {
+            if (entry.value == PLOTTABLE_VALUE) {
+                array.add(entry.key)
+            }
+        }
+        return array
+    }
 }

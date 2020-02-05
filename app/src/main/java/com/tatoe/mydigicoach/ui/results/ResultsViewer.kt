@@ -1,23 +1,17 @@
 package com.tatoe.mydigicoach.ui.results
 
 import android.content.Intent
-import android.graphics.Color
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.github.mikephil.charting.components.XAxis
-import com.github.mikephil.charting.components.YAxis
-import com.github.mikephil.charting.data.Entry
-import com.github.mikephil.charting.data.LineData
-import com.github.mikephil.charting.data.LineDataSet
-import com.github.mikephil.charting.formatter.ValueFormatter
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.tatoe.mydigicoach.DataViewModel
-import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
@@ -25,9 +19,6 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import kotlinx.android.synthetic.main.activity_results_viewer.*
-import timber.log.Timber
-import java.sql.Time
-import java.util.concurrent.TimeUnit
 
 
 class ResultsViewer : AppCompatActivity() {
@@ -97,86 +88,115 @@ class ResultsViewer : AppCompatActivity() {
 //        initObserver()
     }
 
+    var spinnerListener = object : AdapterView.OnItemSelectedListener{
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        }
+
+    }
     private fun displayPlottableParameters(enoughInfo:Boolean) {
 
         if (!enoughInfo) {
             return
         }
 
-        var xxx = activeExercise!!.exerciseResults.getPlottableArrays()
-        Timber.d("ARRAYS TO PLOT: $xxx")
-        //todo user can change what they are looking in graph, so data series will change,
-        //create graph class
-        // - one block is the basic generation of graph + line generation
-        // - simply changes the line that is added to graph
-        // - add spinner to layout with plottable values
+        val spinner: Spinner = findViewById(R.id.spinner)
+// Create an ArrayAdapter using the string array and a default spinner layout
+        var arrayList = activeExercise!!.exerciseResults.getPlottableNames()
+        val arrayAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item, arrayList)
+        arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = arrayAdapter
+        spinner.onItemSelectedListener = spinnerListener
 
-        var randomGraphData = xxx[0]
-        var xAxisDates = randomGraphData.sValuesX
-        Timber.d("X AXIS DATES: $xAxisDates")
-        var yAxisDouble = randomGraphData.sValuesy
+//        ArrayAdapter.createFromResource(
+//            this,
+//            R.array.planets_array,
+//            android.R.layout.simple_spinner_item
+//        ).also { adapter ->
+//            // Specify the layout to use when the list of choices appears
+//            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+//            // Apply the adapter to the spinner
+//            spinner.adapter = adapter
+//        }
 
-        var values = arrayListOf<Entry>()
-        for (i in xAxisDates.size-1 downTo 0) {
-            values.add(Entry(xAxisDates[i].time.toFloat(), yAxisDouble[i].toFloat()))
-        }
-
-        var chart = chart1
-
-        chart.setBackgroundColor(Color.WHITE)
-        chart.description.isEnabled = false
-//        chart.setVisibleXRangeMaximum(5f)
-//        chart.moveViewToX()
-        chart.setTouchEnabled(true)
-        chart.setDrawGridBackground(false)
-        chart.isDragEnabled = true
-        chart.setScaleEnabled(true)
-        chart.setPinchZoom(true)
-
-        var xAxis = chart.xAxis
-        xAxis.position=XAxis.XAxisPosition.TOP
-        xAxis.textSize=10f
-//        xAxis.setCenterAxisLabels(true)
-//        xAxis.granularity = TimeUnit.DAYS.toMillis(1).toFloat()
-//        xAxis.isGranularityEnabled=true
-        xAxis.setLabelCount(7,true)
-        xAxis.axisMinimum=values[0].x-TimeUnit.MINUTES.toMillis(5)
-        xAxis.axisMaximum=values[values.size-1].x+TimeUnit.MINUTES.toMillis(5)
+//        var chartManager = ChartManager(chart1,getPlottableBundle(selectedVariable))
 
 
-        xAxis.valueFormatter = object: ValueFormatter() {
-            var mFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
-            override fun getFormattedValue(value: Float) :String {
-                Timber.d("DATE FORMAT from $value to ${mFormat.format(value)}")
-                return mFormat.format(value)
-            }
-        }
-
-        var yAxis = chart.axisLeft
-        yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
-        yAxis.textSize=10f
-        yAxis.granularity = 1f
-        yAxis.isGranularityEnabled=false
-
-        var lineDataSet = LineDataSet(values, randomGraphData.sName)
-        lineDataSet.setDrawIcons(false)
-        lineDataSet.setDrawValues(false)
-        lineDataSet.setCircleColor(Color.BLUE)
-        lineDataSet.color = Color.BLUE
-        lineDataSet.lineWidth=3f
-        lineDataSet.circleRadius=3f
-//        lineDataSet.setDrawCircleHole(true)
-//        lineDataSet.valueTextSize=9f
-//        lineDataSet.label=""
-        lineDataSet.setDrawFilled(true)
-        lineDataSet.fillColor = Color.BLUE
-
-        var dataSets = arrayListOf<ILineDataSet>()
-        dataSets.add(lineDataSet)
-
-        var lineData = LineData(dataSets)
-
-        chart.data=lineData
+//        var xxx = activeExercise!!.exerciseResults.getPlottableArrays()
+//        Timber.d("ARRAYS TO PLOT: $xxx")
+//        //todo user can change what they are looking in graph, so data series will change,
+//        //create graph class
+//        // - one block is the basic generation of graph + line generation
+//        // - simply changes the line that is added to graph
+//        // - add spinner to layout with plottable values
+//
+//
+//
+//        //generate datasets
+//        chartManager.loadDataSets(xxx)
+//
+//
+//
+//
+//        var chart = chart1
+//
+//        chart.setBackgroundColor(Color.WHITE)
+//        chart.description.isEnabled = false
+////        chart.setVisibleXRangeMaximum(5f)
+////        chart.moveViewToX()
+//        chart.setTouchEnabled(true)
+//        chart.setDrawGridBackground(false)
+//        chart.isDragEnabled = true
+//        chart.setScaleEnabled(true)
+//        chart.setPinchZoom(true)
+//
+//        var xAxis = chart.xAxis
+//        xAxis.position=XAxis.XAxisPosition.TOP
+//        xAxis.textSize=10f
+////        xAxis.setCenterAxisLabels(true)
+////        xAxis.granularity = TimeUnit.DAYS.toMillis(1).toFloat()
+////        xAxis.isGranularityEnabled=true
+//        xAxis.setLabelCount(7,true)
+//        xAxis.axisMinimum=values[0].x-TimeUnit.MINUTES.toMillis(5)
+//        xAxis.axisMaximum=values[values.size-1].x+TimeUnit.MINUTES.toMillis(5)
+//
+//
+//        xAxis.valueFormatter = object: ValueFormatter() {
+//            var mFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
+//            override fun getFormattedValue(value: Float) :String {
+//                Timber.d("DATE FORMAT from $value to ${mFormat.format(value)}")
+//                return mFormat.format(value)
+//            }
+//        }
+//
+//        var yAxis = chart.axisLeft
+//        yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
+//        yAxis.textSize=10f
+//        yAxis.granularity = 1f
+//        yAxis.isGranularityEnabled=false
+//
+//        var lineDataSet = LineDataSet(values, randomGraphData.sName)
+//        lineDataSet.setDrawIcons(false)
+//        lineDataSet.setDrawValues(false)
+//        lineDataSet.setCircleColor(Color.BLUE)
+//        lineDataSet.color = Color.BLUE
+//        lineDataSet.lineWidth=3f
+//        lineDataSet.circleRadius=3f
+////        lineDataSet.setDrawCircleHole(true)
+////        lineDataSet.valueTextSize=9f
+////        lineDataSet.label=""
+//        lineDataSet.setDrawFilled(true)
+//        lineDataSet.fillColor = Color.BLUE
+//
+//        var dataSets = arrayListOf<ILineDataSet>()
+//        dataSets.add(lineDataSet)
+//
+//        var lineData = LineData(dataSets)
+//
+//        chart.data=lineData
 
 
     }
