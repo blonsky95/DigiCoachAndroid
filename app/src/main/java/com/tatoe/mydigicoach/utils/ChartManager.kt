@@ -24,20 +24,23 @@ class ChartManager (lineChartView:LineChart, plottableBundle: PlottableBundle) {
     }
 
     private fun setupChart() {
+        configureChartFeatures()
 
-        sChartView.data=createLineDataSet()
-
-        configureXAxis()
-        configureYAxis()
+        setLineDataSet(sPlottableBundle)
+//        sChartView.data=createLineDataSet()
+//        configureXAxis()
+//        configureYAxis()
 
     }
 
-    fun changeLineDataSet(plottableBundle:PlottableBundle) {
-        sPlottableBundle=plottableBundle
+    fun setLineDataSet(plottableBundle:PlottableBundle) {
+        sChartView.invalidate()
 
+        sPlottableBundle=plottableBundle
         sChartView.data=createLineDataSet()
         configureXAxis()
         configureYAxis()
+        sChartView.refreshDrawableState()
     }
 
     private fun createLineDataSet() :LineData{

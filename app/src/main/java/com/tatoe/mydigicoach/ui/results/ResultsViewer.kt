@@ -22,6 +22,7 @@ import com.github.mikephil.charting.charts.LineChart
 import com.tatoe.mydigicoach.PlottableBundle
 import com.tatoe.mydigicoach.utils.ChartManager
 import kotlinx.android.synthetic.main.activity_results_viewer.*
+import timber.log.Timber
 
 
 class ResultsViewer : AppCompatActivity() {
@@ -73,7 +74,7 @@ class ResultsViewer : AppCompatActivity() {
         sSpinner = spinner
         configureSpinner()
 
-        displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
+//        displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
 
         if (sResults.isEmpty()) {
             ifEmptyResultsText.visibility = View.VISIBLE
@@ -108,13 +109,14 @@ class ResultsViewer : AppCompatActivity() {
         arrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         sSpinner.adapter = arrayAdapter
         sSpinner.onItemSelectedListener = spinnerListener
+        sSpinner.setSelection(0)
     }
 
 
     private fun displayPlottableParameter(plottableBundle: PlottableBundle?) {
         if (plottableBundle != null) {
             if (chartManager!=null) {
-                chartManager!!.changeLineDataSet(plottableBundle)
+                chartManager!!.setLineDataSet(plottableBundle)
             } else {
                 chartManager=ChartManager(chart1,plottableBundle)
             }
@@ -132,6 +134,7 @@ class ResultsViewer : AppCompatActivity() {
         }
 
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            Timber.d("SPINNER - ITEM SELECTED: ${sSpinner.selectedItem}")
             displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
         }
 
