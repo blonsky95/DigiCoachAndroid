@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach
 
 import com.tatoe.mydigicoach.entity.Day
+import timber.log.Timber
 import java.lang.NumberFormatException
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -61,18 +62,22 @@ class ExerciseResults {
     fun getPlottableArrays(): ArrayList<PlottableBundle> {
         var plottableBundleArray = arrayListOf<PlottableBundle>()
 
-        var arrayX = arrayListOf<Date>()
-        var arrayY = arrayListOf<Double>()
-        var nameVariable = ""
+
 
         for (entry in resultFieldsMap) {
+            var arrayX = arrayListOf<Date>()
+            var arrayY = arrayListOf<Double>()
+            var nameVariable = ""
             if (entry.value == PLOTTABLE_VALUE) {
                 nameVariable = entry.key
                 var containsEmptyValues = false
                 for (result in resultsArrayList) {
                     try {
-                        arrayX.add(stringToDate(result[DATE_KEY]!!))
-                        arrayY.add(result[entry.key]!!.toDouble())
+                        Timber.d("NUTS: $result")
+                        if (result[nameVariable]!=null) {
+                            arrayX.add(stringToDate(result[DATE_KEY]!!))
+                            arrayY.add(result[nameVariable]!!.toDouble())
+                        }
                     } catch (e: NumberFormatException) {
                         arrayY.add(0.toDouble())
                         containsEmptyValues=true

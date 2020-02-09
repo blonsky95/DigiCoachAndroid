@@ -79,6 +79,7 @@ class ResultsViewer : AppCompatActivity() {
         if (sResults.isEmpty()) {
             ifEmptyResultsText.visibility = View.VISIBLE
             ResultsRecyclerView.visibility = View.GONE
+            sSpinner.visibility=View.GONE
 
         } else {
 //            displayPlottableParameter()

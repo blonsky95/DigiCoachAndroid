@@ -20,6 +20,7 @@ import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_ACTION
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_EDIT
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_NEW
@@ -274,7 +275,7 @@ class ResultsCreator : AppCompatActivity() {
             newFieldValue = ExerciseResults.PLOTTABLE_VALUE
         }
         sResultFieldsMap[fieldName] = newFieldValue
-        updateBodyUI(mAction)
+        updateBodyUI(OBJECT_EDIT)
 
     }
 

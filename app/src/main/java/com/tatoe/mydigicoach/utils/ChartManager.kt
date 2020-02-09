@@ -13,10 +13,10 @@ import com.tatoe.mydigicoach.PlottableBundle
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class ChartManager (lineChartView:LineChart, plottableBundle: PlottableBundle) {
+class ChartManager(lineChartView: LineChart, plottableBundle: PlottableBundle) {
 
     var sPlottableBundle = plottableBundle
-    var sChartView= lineChartView
+    var sChartView = lineChartView
     var values = arrayListOf<Entry>()
 
     init {
@@ -33,17 +33,25 @@ class ChartManager (lineChartView:LineChart, plottableBundle: PlottableBundle) {
 
     }
 
-    fun setLineDataSet(plottableBundle:PlottableBundle) {
-        sChartView.invalidate()
+    fun setLineDataSet(plottableBundle: PlottableBundle) {
 
-        sPlottableBundle=plottableBundle
-        sChartView.data=createLineDataSet()
+//        sChartView.clear()
+//        sChartView.data?.clearValues()
+        sChartView.invalidate()
+//        Timber.d("CHART MANAGER DATASET 1: ${sChartView.data.dataSets.toString()}")
+
+        sPlottableBundle = plottableBundle
+        sChartView.data = createLineDataSet()
         configureXAxis()
         configureYAxis()
-        sChartView.refreshDrawableState()
+//        Timber.d("CHART MANAGER DATASET 2: ${sChartView.data.dataSets.toString()}")
+
+//        Timber.d("CHART MANAGER PLOTTABLE BUNDLE: ${sPlottableBundle.sValuesy.toString()}")
+//        sChartView.refreshDrawableState()
     }
 
-    private fun createLineDataSet() :LineData{
+    private fun createLineDataSet(): LineData {
+        values= arrayListOf()
 
         var xAxisDates = sPlottableBundle.sValuesX
         var yAxisDouble = sPlottableBundle.sValuesy
@@ -81,14 +89,16 @@ class ChartManager (lineChartView:LineChart, plottableBundle: PlottableBundle) {
         sChartView.setDrawGridBackground(false)
         sChartView.isDragEnabled = true
         sChartView.setScaleEnabled(true)
-        sChartView.setPinchZoom(true)    }
+        sChartView.setPinchZoom(true)
+    }
 
     private fun configureYAxis() {
         var yAxis = sChartView.axisLeft
         yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
         yAxis.textSize = 10f
         yAxis.granularity = 1f
-        yAxis.isGranularityEnabled = false    }
+        yAxis.isGranularityEnabled = false
+    }
 
     private fun configureXAxis() {
         var xAxis = sChartView.xAxis
@@ -105,9 +115,10 @@ class ChartManager (lineChartView:LineChart, plottableBundle: PlottableBundle) {
         xAxis.valueFormatter = object : ValueFormatter() {
             var mFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
             override fun getFormattedValue(value: Float): String {
-                Timber.d("DATE FORMAT from $value to ${mFormat.format(value)}")
+//                Timber.d("DATE FORMAT from $value to ${mFormat.format(value)}")
                 return mFormat.format(value)
             }
-        }    }
+        }
+    }
 
 }
