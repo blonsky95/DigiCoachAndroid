@@ -36,7 +36,7 @@ class LoginScreen : AppCompatActivity() {
         registerButton = register_button
         registerButton.setOnClickListener(registerNewUser)
 
-        progress=progressBar_cyclic
+        progress = progressBar_cyclic
 
         userEditText = username_field
         passwordEditText = password_field
@@ -44,67 +44,87 @@ class LoginScreen : AppCompatActivity() {
     }
 
     private val checkValidUser = View.OnClickListener {
-        progress.visibility=View.VISIBLE
+        progress.visibility = View.VISIBLE
 
-        auth.signInWithEmailAndPassword( userEditText.text.toString(),
-            passwordEditText.text.toString())
-            .addOnCompleteListener(this) { task ->
-                progress.visibility=View.GONE
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Timber.d( "signInWithEmail:success")
-                    val user = auth.currentUser
-                    Toast.makeText(
-                        baseContext, " Welcome back ${user?.email}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Timber.w("signInWithEmail:failure exception: ${task.exception}")
-                    Toast.makeText(baseContext, "Authentication login failed.",
-                        Toast.LENGTH_SHORT).show()
-                    updateUI(null)
+        if (userEditText.text.toString().isNotEmpty() && passwordEditText.text.toString().isNotEmpty()) {
+            auth.signInWithEmailAndPassword(
+                userEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
+                .addOnCompleteListener(this) { task ->
+                    progress.visibility = View.GONE
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Timber.d("signInWithEmail:success")
+                        val user = auth.currentUser
+                        Toast.makeText(
+                            baseContext, " Welcome back ${user?.email}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        updateUI(user)
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Timber.w("signInWithEmail:failure exception: ${task.exception}")
+                        Toast.makeText(
+                            baseContext, "Authentication login failed.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        updateUI(null)
+                    }
+
+                    // ...
                 }
-
-                // ...
-            }
+        } else {
+            progress.visibility = View.GONE
+            Toast.makeText(
+                baseContext, "Empty field",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
 
 
     }
 
     private val registerNewUser = View.OnClickListener {
-        progress.visibility=View.VISIBLE
+        progress.visibility = View.VISIBLE
 
-        auth.createUserWithEmailAndPassword(
-            userEditText.text.toString(),
-            passwordEditText.text.toString()
-        )
-            .addOnCompleteListener(this) { task ->
-                progress.visibility=View.GONE
+        if (userEditText.text.toString().isNotEmpty() && passwordEditText.text.toString().isNotEmpty()) {
 
-                if (task.isSuccessful) {
-                    // Sign in success, update UI with the signed-in user's information
-                    Timber.d("createUserWithEmail:success")
-                    val user = auth.currentUser
-                    Toast.makeText(
-                        baseContext, "New user registered! Welcome: ${user?.email}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    updateUI(user)
-                } else {
-                    // If sign in fails, display a message to the user.
-                    Timber.w("createUserWithEmail:failure exception: ${task.exception}")
-                    Toast.makeText(
-                        baseContext, "Authentication register failed.",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    updateUI(null)
+            auth.createUserWithEmailAndPassword(
+                userEditText.text.toString(),
+                passwordEditText.text.toString()
+            )
+                .addOnCompleteListener(this) { task ->
+                    progress.visibility = View.GONE
+
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with the signed-in user's information
+                        Timber.d("createUserWithEmail:success")
+                        val user = auth.currentUser
+                        Toast.makeText(
+                            baseContext, "New user registered! Welcome: ${user?.email}",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        updateUI(user)
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Timber.w("createUserWithEmail:failure exception: ${task.exception}")
+                        Toast.makeText(
+                            baseContext, "Authentication register failed.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        updateUI(null)
+                    }
+
+                    // ...
                 }
-
-                // ...
-            }
-
+        } else {
+            progress.visibility = View.GONE
+            Toast.makeText(
+                baseContext, "Empty field",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
 
     }
 
