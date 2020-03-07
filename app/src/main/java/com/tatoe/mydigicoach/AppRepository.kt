@@ -86,6 +86,8 @@ class AppRepository(
             for (day in days) {
                 for (tmpExercise in day.exercises) {
                     if (tmpExercise.exerciseId == exercise.exerciseId) {
+                        Timber.d("EXERCISE DELETE day: ${day.dayId}")
+                        Timber.d("EXERCISE DELETE exercise: ${exercise.name}")
 
                         if (actionCode==ACTION_UPDATE) {
                             day.exercises[day.exercises.indexOf(tmpExercise)] = exercise
