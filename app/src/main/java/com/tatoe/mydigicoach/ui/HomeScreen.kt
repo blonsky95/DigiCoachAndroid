@@ -66,7 +66,7 @@ class HomeScreen : AppCompatActivity() {
 
         R.id.action_logout -> {
             FirebaseAuth.getInstance().signOut()
-            val intent=Intent(this,LoginScreen::class.java)
+            val intent = Intent(this, LoginScreen::class.java)
             startActivity(intent)
             true
         }

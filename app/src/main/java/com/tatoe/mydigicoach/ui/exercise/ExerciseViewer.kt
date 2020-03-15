@@ -78,6 +78,14 @@ class ExerciseViewer : AppCompatActivity() {
             startActivity(intent)
 
         }
+
+        getButton.setOnClickListener {
+            //get stuff from firestore
+        }
+
+        postButton.setOnClickListener {
+            //post stuff to firestore
+        }
     }
 
     private fun initAdapterListeners() {

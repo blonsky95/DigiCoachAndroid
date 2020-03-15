@@ -70,6 +70,26 @@
                 android:text="Export"
                 tools:visibility="gone" />
 
+        <Button
+                android:id="@+id/getButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_alignParentEnd="true"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="8dp"
+                android:text="get" />
+
+        <Button
+                android:id="@+id/postButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentTop="true"
+                android:layout_marginTop="0dp"
+                android:layout_marginEnd="8dp"
+                android:layout_toStartOf="@+id/getButton"
+                android:text="post" />
+
     </RelativeLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
