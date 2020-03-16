@@ -8,6 +8,7 @@ import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 //import com.google.firebase.iid.FirebaseInstanceId
 import com.tatoe.mydigicoach.BuildConfig
@@ -73,14 +74,14 @@ class HomeScreen : AppCompatActivity() {
 
 // Add a new document with a generated ID
 
-//        addUser(user1)
+        addUser(user1)
 
-        val user2 = hashMapOf(
-            "username" to "${firebaseUser?.displayName}",
-            "email" to "${firebaseUser?.email}",
-            "last_contact" to Calendar.getInstance().time.toString(),
-            "android_version" to android.os.Build.VERSION.SDK_INT
-        )
+//        val user2 = hashMapOf(
+//            "username" to "${firebaseUser?.displayName}",
+//            "email" to "${firebaseUser?.email}",
+//            "last_contact" to Calendar.getInstance().time.toString(),
+//            "android_version" to android.os.Build.VERSION.SDK_INT
+//        )
 
 //        addUser(user2)
 
@@ -118,14 +119,28 @@ class HomeScreen : AppCompatActivity() {
     }
 
     private fun addUser(user: HashMap<String, Any>) {
-        db.collection("users")
-            .add(user)
-            .addOnSuccessListener { documentReference ->
-                Timber.d("DocumentSnapshot added with ID: ${documentReference.id} and path: ${documentReference.path}")
-            }
-            .addOnFailureListener { e ->
-                Timber.d( "Error adding document: $e")
-            }
+        //todo run this in non UI thread
+        if (userInCollection(user["email"] as String)!=true) {
+            db.collection("users").document(user["email"] as String)
+                .set(user)
+                .addOnSuccessListener {
+                    Timber.d("DocumentSnapshot added!")
+                }
+                .addOnFailureListener { e ->
+                    Timber.d("Error adding document: $e")
+                }
+        }
+        Timber.d("we gucci no need to add")
+
+    }
+
+    private fun userInCollection(userEmail: String): Boolean {
+        // check if in users there is document
+        val docRef : DocumentReference = db.collection("users").document(userEmail)
+//        Timber.d("is docref succesfull: ${docRef.get().result?.exists()}")
+
+        return docRef.get().isSuccessful
+
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
