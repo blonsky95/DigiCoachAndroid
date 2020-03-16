@@ -2,17 +2,16 @@ package com.tatoe.mydigicoach.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
+import com.tatoe.mydigicoach.*
 //import com.google.firebase.iid.FirebaseInstanceId
-import com.tatoe.mydigicoach.BuildConfig
-import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.ui.block.BlockViewer
 import com.tatoe.mydigicoach.ui.day.DayViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
@@ -23,7 +22,11 @@ import java.util.*
 class HomeScreen : AppCompatActivity() {
 
     private var firebaseUser:FirebaseUser? = null
-    private lateinit var db:FirebaseFirestore
+    private var db = FirebaseFirestore.getInstance()
+
+
+    private lateinit var homeScreenViewModel: HomeScreenViewModel
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,6 +36,9 @@ class HomeScreen : AppCompatActivity() {
             Timber.plant(Timber.DebugTree())
         } else {
         }
+
+//        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        homeScreenViewModel = ViewModelProviders.of(this, MyHomeScreenViewModelFactory(db)).get(HomeScreenViewModel::class.java)
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser != null) {
@@ -64,7 +70,6 @@ class HomeScreen : AppCompatActivity() {
             startActivity(intent)
         }
 
-        db = FirebaseFirestore.getInstance()
 
         val user1 = hashMapOf(
             "username" to "${firebaseUser?.displayName}",
@@ -74,7 +79,8 @@ class HomeScreen : AppCompatActivity() {
 
 // Add a new document with a generated ID
 
-        addUser(user1)
+//        addUser(user1)
+        homeScreenViewModel.checkInUserFirestore(user1)
 
 //        val user2 = hashMapOf(
 //            "username" to "${firebaseUser?.displayName}",
@@ -120,7 +126,7 @@ class HomeScreen : AppCompatActivity() {
 
     private fun addUser(user: HashMap<String, Any>) {
         //todo run this in non UI thread
-        if (userInCollection(user["email"] as String)!=true) {
+        if (!userInCollection(user["email"] as String)) {
             db.collection("users").document(user["email"] as String)
                 .set(user)
                 .addOnSuccessListener {
