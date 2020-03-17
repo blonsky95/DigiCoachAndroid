@@ -10,10 +10,11 @@ import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class ExerciseViewerViewModel(application: Application, db: FirebaseFirestore) :
+class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestore) :
     AndroidViewModel(application) {
 
     private val repository: AppRepository
@@ -37,16 +38,62 @@ class ExerciseViewerViewModel(application: Application, db: FirebaseFirestore) :
         allExercises = repository.allExercises
     }
 
-    fun getExercisesFromFirestore(exercises:List<Exercise>) = viewModelScope.launch {
-        withContext(Dispatchers.Default) {
+    fun getExercisesFromFirestore() = viewModelScope.launch {
+
+        val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                if (documents != null && !documents.isEmpty) {
+                    for (document in documents) {
+                        Timber.d("DocumentSnapshot data: ${document.data}")
+                    }
+                } else {
+                    Timber.d ("documents is empty or null")
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+
+        //collect exercises from here
+
+        withContext(Dispatchers.Default)
+        {
             Timber.d("About to delete exercises table")
             repository.deleteExercisesTable()
         }
         Timber.d("About to insert firestore exercises")
-        repository.insertExercises(exercises)
+//        repository.insertExercises(exercises)
     }
 
-    fun insertBlock(block: Block) = viewModelScope.launch{
+    fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
+        val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    document.reference.delete()
+                }
+
+                for (exercise in listExercises) {
+                    docRef.add(exercise)
+                }
+//                if (documents == null || documents.isEmpty) {
+//                    db.collection("users").document(DataHolder.userEmail!!).collection("exercises").
+//                }
+//                for (document in documents) {
+//                    if (document != null) {
+//                        Timber.d("DocumentSnapshot data: ${document.data}")
+//                    }
+//                }
+
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+    fun insertBlock(block: Block) = viewModelScope.launch {
         Timber.d("ptg - data view model - insert block called")
         repository.insertBlock(block)
     }
@@ -55,4 +102,6 @@ class ExerciseViewerViewModel(application: Application, db: FirebaseFirestore) :
         super.onCleared()
         viewModelJob.cancel()
     }
+
+
 }

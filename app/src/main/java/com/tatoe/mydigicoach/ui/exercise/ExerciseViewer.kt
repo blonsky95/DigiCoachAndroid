@@ -85,9 +85,9 @@ class ExerciseViewer : AppCompatActivity() {
 
         getButton.setOnClickListener {
             //get stuff from firestore
-            var exercises = mutableListOf<Exercise>()
-            exercises.add(Exercise(LinkedHashMap(mutableMapOf("Name" to "150s", "Description" to "Try 2x4x150 with 3' and 6' or 3x3x150 with 3' and 6'"))))
-            exercises.add(Exercise(LinkedHashMap(mutableMapOf("Name" to "Pyramid", "Description" to "200 - 250 - 300 - 350 - 300 - 250 - 200 R=4-6'"))))
+//            var exercises = mutableListOf<Exercise>()
+//            exercises.add(Exercise(LinkedHashMap(mutableMapOf("Name" to "150s", "Description" to "Try 2x4x150 with 3' and 6' or 3x3x150 with 3' and 6'"))))
+//            exercises.add(Exercise(LinkedHashMap(mutableMapOf("Name" to "Pyramid", "Description" to "200 - 250 - 300 - 350 - 300 - 250 - 200 R=4-6'"))))
 
             //get exercises from firestore
             //create a androidviewmodel for exerciseviewer, which will need the repository, the allexercises LiveData and the firebase firestore (probs factory too)
@@ -97,12 +97,13 @@ class ExerciseViewer : AppCompatActivity() {
             //add in this model a function that allows you to update your online exercises + creates document + completion toast
 
             //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
-            exerciseViewerViewModel.getExercisesFromFirestore(exercises)
+            exerciseViewerViewModel.getExercisesFromFirestore()
             //todo test this and then firestore this shit
         }
 
         postButton.setOnClickListener {
             //post stuff to firestore
+            exerciseViewerViewModel.postExercisesToFirestore(allExercises)
         }
     }
 

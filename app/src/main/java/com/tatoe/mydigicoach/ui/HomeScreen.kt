@@ -15,6 +15,7 @@ import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.ui.block.BlockViewer
 import com.tatoe.mydigicoach.ui.day.DayViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.HomeScreenViewModel
 import com.tatoe.mydigicoach.viewmodels.MyHomeScreenViewModelFactory
 import kotlinx.android.synthetic.main.activity_home.*
@@ -48,6 +49,7 @@ class HomeScreen : AppCompatActivity() {
         firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser != null) {
             welcome_text.text = firebaseUser!!.email
+            DataHolder.userEmail=firebaseUser!!.email
         } else {
             // No user is signed in
         }

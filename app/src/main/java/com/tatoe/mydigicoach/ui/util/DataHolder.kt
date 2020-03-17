@@ -12,6 +12,8 @@ object DataHolder {
 
     var activeDayHolder: Day? = null
 
+    var userEmail: String? = null
+
 //    lateinit var updatedDayHolder: Day
 
     var pagerPosition: Int =
