@@ -13,7 +13,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.tatoe.mydigicoach.DataViewModel
+import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils

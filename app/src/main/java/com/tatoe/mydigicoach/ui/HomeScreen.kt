@@ -15,6 +15,8 @@ import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.ui.block.BlockViewer
 import com.tatoe.mydigicoach.ui.day.DayViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
+import com.tatoe.mydigicoach.viewmodels.HomeScreenViewModel
+import com.tatoe.mydigicoach.viewmodels.MyHomeScreenViewModelFactory
 import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
 import java.util.*
@@ -38,7 +40,10 @@ class HomeScreen : AppCompatActivity() {
         }
 
 //        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-        homeScreenViewModel = ViewModelProviders.of(this, MyHomeScreenViewModelFactory(db)).get(HomeScreenViewModel::class.java)
+        homeScreenViewModel = ViewModelProviders.of(this,
+            MyHomeScreenViewModelFactory(db)
+        ).get(
+            HomeScreenViewModel::class.java)
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
         if (firebaseUser != null) {

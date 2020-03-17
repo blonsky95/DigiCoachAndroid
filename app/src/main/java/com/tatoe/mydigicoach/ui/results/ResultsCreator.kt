@@ -1,8 +1,6 @@
 package com.tatoe.mydigicoach.ui.results
 
 import android.content.Intent
-import android.graphics.Color
-import android.graphics.PorterDuff
 import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
@@ -15,12 +13,11 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.tatoe.mydigicoach.DataViewModel
+import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_ACTION
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_EDIT
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_NEW

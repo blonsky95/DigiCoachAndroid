@@ -10,7 +10,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.tatoe.mydigicoach.DataViewModel
+import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils

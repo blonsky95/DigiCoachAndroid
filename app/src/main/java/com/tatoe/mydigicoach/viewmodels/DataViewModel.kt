@@ -1,9 +1,10 @@
-package com.tatoe.mydigicoach
+package com.tatoe.mydigicoach.viewmodels
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.viewModelScope
+import com.tatoe.mydigicoach.AppRepository
 
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
@@ -39,7 +40,8 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 
         Timber.d("Dataviewmodel initialised")
 
-        repository = AppRepository(exerciseDao,blockDao,dayDao)
+        repository =
+            AppRepository(exerciseDao, blockDao, dayDao)
 
         allExercises = repository.allExercises
 
@@ -81,14 +83,14 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     }
 
 
-    fun getExercisesFromFirestore(exercises:List<Exercise>) = viewModelScope.launch {
-        withContext(Dispatchers.Default) {
-            Timber.d("About to delete exercises table")
-            repository.deleteExercisesTable()
-        }
-        Timber.d("About to insert firestore exercises")
-        repository.insertExercises(exercises)
-    }
+//    fun getExercisesFromFirestore(exercises:List<Exercise>) = viewModelScope.launch {
+//        withContext(Dispatchers.Default) {
+//            Timber.d("About to delete exercises table")
+//            repository.deleteExercisesTable()
+//        }
+//        Timber.d("About to insert firestore exercises")
+//        repository.insertExercises(exercises)
+//    }
 
     fun insertBlock(block: Block) = viewModelScope.launch{
         Timber.d("ptg - data view model - insert block called")

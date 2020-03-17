@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach
+package com.tatoe.mydigicoach.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

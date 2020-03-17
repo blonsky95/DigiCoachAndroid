@@ -2,7 +2,6 @@ package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -12,19 +11,21 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
-import androidx.appcompat.app.AlertDialog
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import kotlinx.android.synthetic.main.dialog_window_export.view.*
+import com.tatoe.mydigicoach.viewmodels.DataViewModel
+import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
+import com.tatoe.mydigicoach.viewmodels.MyExerciseViewerViewModelFactory
 
 
 class ExerciseViewer : AppCompatActivity() {
-    private lateinit var dataViewModel: DataViewModel
+    private lateinit var exerciseViewerViewModel: ExerciseViewerViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
 
@@ -33,6 +34,9 @@ class ExerciseViewer : AppCompatActivity() {
     private var selectedIndexes = arrayListOf<Int>()
 
     private lateinit var allExercises: List<Exercise>
+
+    private var db = FirebaseFirestore.getInstance()
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,9 +56,9 @@ class ExerciseViewer : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        exerciseViewerViewModel = ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application,db)).get(ExerciseViewerViewModel::class.java)
 
-        dataViewModel.allExercises.observe(this, Observer { exercises ->
+        exerciseViewerViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
                 Timber.d("I WANNA SEE THIS: $exercises")
 
@@ -93,8 +97,8 @@ class ExerciseViewer : AppCompatActivity() {
             //add in this model a function that allows you to update your online exercises + creates document + completion toast
 
             //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
-            dataViewModel.getExercisesFromFirestore(exercises)
-            //todo
+            exerciseViewerViewModel.getExercisesFromFirestore(exercises)
+            //todo test this and then firestore this shit
         }
 
         postButton.setOnClickListener {
@@ -220,7 +224,7 @@ class ExerciseViewer : AppCompatActivity() {
         exportBtn.setOnClickListener {
             Timber.d("Final selection: $selectedIndexes")
             exportBtn.visibility = View.GONE
-            dataViewModel.insertBlock(
+            exerciseViewerViewModel.insertBlock(
                 ImportExportUtils.makeExportBlock(
                     allExercises,
                     selectedIndexes,
@@ -243,7 +247,7 @@ class ExerciseViewer : AppCompatActivity() {
 
     private fun updateUpdatingExercise(position: Int) {
 
-        var clickedExercise = dataViewModel.allExercises.value?.get(position)
+        var clickedExercise = exerciseViewerViewModel.allExercises.value?.get(position)
 
         if (clickedExercise != null) {
             DataHolder.activeExerciseHolder = clickedExercise
