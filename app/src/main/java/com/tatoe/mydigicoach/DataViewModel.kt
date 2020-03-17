@@ -9,10 +9,7 @@ import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import timber.log.Timber
 
 class DataViewModel(application: Application) : AndroidViewModel(application) {
@@ -35,7 +32,7 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     init {
 
         val appDB=AppRoomDatabase.getInstance(application)
-        Timber.d("Database has been created")
+//        Timber.d("Database has been created")
         val exerciseDao = appDB.exercisesDao()
         val blockDao = appDB.blockDao()
         val dayDao = appDB.dayDao()
@@ -81,6 +78,16 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
     fun deleteExercise(exercise: Exercise) = viewModelScope.launch {
         Timber.d("ptg - data view model - delete $exercise")
         repository.deleteExercise(exercise)
+    }
+
+
+    fun getExercisesFromFirestore(exercises:List<Exercise>) = viewModelScope.launch {
+        withContext(Dispatchers.Default) {
+            Timber.d("About to delete exercises table")
+            repository.deleteExercisesTable()
+        }
+        Timber.d("About to insert firestore exercises")
+        repository.insertExercises(exercises)
     }
 
     fun insertBlock(block: Block) = viewModelScope.launch{

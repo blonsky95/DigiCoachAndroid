@@ -8,14 +8,17 @@ interface ExerciseDao {
     @Query("SELECT * FROM exercise_table ORDER BY name ASC")
     fun getAll(): androidx.lifecycle.LiveData<List<Exercise>>
 
+    @Query("DELETE FROM exercise_table")
+    suspend fun deleteTable()
+
 //    @Query("SELECT * FROM exercise_table WHERE exerciseId LIKE :exeId")
 //    suspend fun findByName(exeId: Int): Exercise
 
     @Update
     suspend fun update(exercise: Exercise)
 
-    @Insert
-    fun insertAll(vararg exercise: Exercise)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll( exercises: List<Exercise>)
 
     @Insert
     suspend fun insert(exercise: Exercise) : Long

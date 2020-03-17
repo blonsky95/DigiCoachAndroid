@@ -53,6 +53,14 @@ class AppRepository(
 
     }
 
+    suspend fun deleteExercisesTable(){
+        exerciseDao.deleteTable()
+    }
+
+    suspend fun insertExercises(exercises:List<Exercise>){
+        exerciseDao.insertAll(exercises)
+    }
+
     private suspend fun updateBlocksContainingExercise(actionCode:Int, exercise: Exercise) {
         Timber.d("updating blocks containing exercise: $exercise)")
 
