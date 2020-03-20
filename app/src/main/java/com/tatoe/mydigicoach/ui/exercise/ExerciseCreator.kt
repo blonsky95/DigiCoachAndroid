@@ -24,6 +24,7 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.custom_dialog_window.view.*
 import timber.log.Timber
+import java.util.HashMap
 
 class ExerciseCreator : AppCompatActivity() {
 
@@ -38,7 +39,7 @@ class ExerciseCreator : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
 
     private var activeExercise: Exercise? = null
-    private var exerciseFieldsMap = HashMap<String, String>()
+    private var exerciseFieldsMap = HashMap<Int, Pair<String,String>>()
 
 
     var menuItemRead: MenuItem? = null
@@ -83,8 +84,11 @@ class ExerciseCreator : AppCompatActivity() {
                 }
 //                }
             } else {
-                exerciseFieldsMap["Name"] = ""
-                exerciseFieldsMap["Description"] = ""
+//                exerciseFieldsMap[0]!!["Name"] = ""
+                exerciseFieldsMap[0]=Pair("Name","")
+
+//                exerciseFieldsMap[1]!!["Description"] = ""
+                exerciseFieldsMap[1]=Pair("Description","")
             }
             updateBodyUI(mAction)
             updateButtonUI(mAction)
@@ -150,8 +154,9 @@ class ExerciseCreator : AppCompatActivity() {
     private fun createExerciseFieldsLayout() {
 
         linearLayout.removeAllViews()
+        var linkedHashMap = Exercise.pairHashMapToLinked(exerciseFieldsMap)
 
-        for (entry in exerciseFieldsMap.entries) {
+        for (entry in linkedHashMap.entries) {
             var fieldTitleTextView = TextView(this)
             fieldTitleTextView.layoutParams =
                 ViewGroup.LayoutParams(
@@ -226,7 +231,7 @@ class ExerciseCreator : AppCompatActivity() {
         return (index + 3) % 3 == 0
     }
 
-    private fun getFieldContents(): LinkedHashMap<String, String> {
+    private fun getFieldContents(): HashMap<Int,Pair<String,String>> {
 
         var fieldsMap = LinkedHashMap<String, String>()
         for (i in 0 until linearLayout.childCount step 3) {
@@ -235,14 +240,16 @@ class ExerciseCreator : AppCompatActivity() {
             fieldsMap[keyString] =
                 (linearLayout.getChildAt(i + 1) as EditText).text.trim().toString()
         }
-        return fieldsMap
+        return Exercise.linkedToPairHashMap(fieldsMap)
     }
 
     private val addButtonListener = View.OnClickListener {
 
         var newExerciseFields = getFieldContents()
 
-        var newExercise = Exercise(newExerciseFields["Name"]!!, newExerciseFields["Description"]!!)
+//        var newExercise = Exercise(newExerciseFields["Name"]!!, newExerciseFields["Description"]!!)
+        var newExercise = Exercise(newExerciseFields)
+
         newExercise.fieldsHashMap = newExerciseFields
 
         dataViewModel.insertExercise(newExercise)
@@ -252,8 +259,10 @@ class ExerciseCreator : AppCompatActivity() {
 
         var updatingExerciseFields = getFieldContents()
 
-        activeExercise!!.name = updatingExerciseFields["Name"]!!
-        activeExercise!!.description = updatingExerciseFields["Description"]!!
+        activeExercise!!.name = updatingExerciseFields[0]!!.second
+//        activeExercise!!.name = updatingExerciseFields["Name"]!!
+        activeExercise!!.description = updatingExerciseFields[1]!!.second
+//        activeExercise!!.description = updatingExerciseFields["Description"]!!
         activeExercise!!.fieldsHashMap = updatingExerciseFields
 
         dataViewModel.updateExercise(activeExercise!!)
@@ -299,7 +308,7 @@ class ExerciseCreator : AppCompatActivity() {
 
     private fun addFieldLayout() {
         //todo save what was written
-        exerciseFieldsMap[newField] = ""
+        exerciseFieldsMap[exerciseFieldsMap.size] = Pair("","")
 
 //        updateBodyUI(OBJECT_EDIT)
 

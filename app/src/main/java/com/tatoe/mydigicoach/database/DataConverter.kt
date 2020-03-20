@@ -39,6 +39,16 @@ class DataConverter {
     fun exerciseResultsToString(exerciseResults: ExerciseResults) :String? {
         return Gson().toJson(exerciseResults)
     }
+
+    @TypeConverter
+    fun stringToPairHashMap(data: String?) : HashMap<Int,Pair<String,String>> {
+        return Gson().fromJson(data, object :TypeToken<HashMap<Int,Pair<String,String>>>() {}.type)
+    }
+
+    @TypeConverter
+    fun pairHashMapToString(pairHashMap: HashMap<Int,Pair<String,String>>) :String? {
+        return Gson().toJson(pairHashMap)
+    }
 //    @TypeConverter
 //    fun stringToResultSetList(data: String?) : ArrayList<ResultSet> {
 //        return Gson().fromJson(data, object :TypeToken<ArrayList<ResultSet>>() {}.type)

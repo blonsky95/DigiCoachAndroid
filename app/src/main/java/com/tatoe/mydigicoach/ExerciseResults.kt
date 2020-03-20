@@ -61,9 +61,6 @@ class ExerciseResults {
 
     fun getPlottableArrays(): ArrayList<PlottableBundle> {
         var plottableBundleArray = arrayListOf<PlottableBundle>()
-
-
-
         for (entry in resultFieldsMap) {
             var arrayX = arrayListOf<Date>()
             var arrayY = arrayListOf<Double>()

@@ -37,18 +37,18 @@ data class Block(
         fun getPremadeBlocks(): List<Block> {
 
             var exe1array = arrayListOf(
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "pull ups", "Description" to "Change grip to use different muscles"))),
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "L holds", "Description" to "Hold L position for as long as possible with straight arms"))),
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "Pistol squat", "Description" to "One legged squats, better if in elevation so the free leg's hip flexor doesnt seize up"))),
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "Muscle ups", "Description" to "Pull yourself above the bar, try and synchronize both arms together")))
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "pull ups", "Description" to "Change grip to use different muscles")))),
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "L holds", "Description" to "Hold L position for as long as possible with straight arms")))),
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "Pistol squat", "Description" to "One legged squats, better if in elevation so the free leg's hip flexor doesnt seize up")))),
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "Muscle ups", "Description" to "Pull yourself above the bar, try and synchronize both arms together"))))
             )
             var block1 = Block("Calisthenics", exe1array, APP_PREMADE)
 
             var exe2array = arrayListOf(
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "150s", "Description" to "Try 2x4x150 with 3' and 6' or 3x3x150 with 3' and 6'"))),
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "Pyramid", "Description" to "200 - 250 - 300 - 350 - 300 - 250 - 200 R=4-6'"))),
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "300s", "Description" to "Classic 4-6 * 300 with 3-6'"))),
-                Exercise(LinkedHashMap(mutableMapOf("Name" to "Joni killer", "Description" to "3*300 - 3*200 - 3*100 recu 3' y 6'")))
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "150s", "Description" to "Try 2x4x150 with 3' and 6' or 3x3x150 with 3' and 6'")))),
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "Pyramid", "Description" to "200 - 250 - 300 - 350 - 300 - 250 - 200 R=4-6'")))),
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "300s", "Description" to "Classic 4-6 * 300 with 3-6'")))),
+                Exercise(Exercise.linkedToPairHashMap(LinkedHashMap(mutableMapOf("Name" to "Joni killer", "Description" to "3*300 - 3*200 - 3*100 recu 3' y 6'"))))
             )
             var block2 = Block("Lactic Runs", exe2array, APP_PREMADE)
 

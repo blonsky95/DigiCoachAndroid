@@ -98,7 +98,6 @@ class ExerciseViewer : AppCompatActivity() {
 
             //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
             exerciseViewerViewModel.getExercisesFromFirestore()
-            //todo test this and then firestore this shit
         }
 
         postButton.setOnClickListener {
