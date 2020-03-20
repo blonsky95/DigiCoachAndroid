@@ -13,8 +13,8 @@ import kotlin.collections.LinkedHashMap
 @Entity(tableName = "exercise_table")
 
 data class Exercise(
-    @ColumnInfo(name = "name") @field: SerializedName("name") var name: String,
-    @ColumnInfo(name = "description") @field: SerializedName("description") var description: String
+    @ColumnInfo(name = "name") @field: SerializedName("name") var name: String="",
+    @ColumnInfo(name = "description") @field: SerializedName("description") var description: String=""
 ) {
 
     @PrimaryKey(autoGenerate = true)
@@ -31,7 +31,7 @@ data class Exercise(
 
     @ColumnInfo(name = "fieldsHashMap")
     @field: SerializedName("fieldsHashMap")
-    var fieldsHashMap: LinkedHashMap<String,String> = LinkedHashMap() //todo eventually this will get rid of saving name and description in database
+    var fieldsHashMap: HashMap<String,String> = HashMap() //todo eventually this will get rid of saving name and description in database
 
     //todo find a way of making the constructor, and instance data retrieval more efficient by
     //todo finding synergy between the LinkedHashMap including name and description and having a method here
@@ -42,44 +42,20 @@ data class Exercise(
     //I only want name and description as constructors, so primary key id is outside
     // constructor and starts with 0 (initialization required).
 //    constructor(name: String, description: String) : this(name, description)
+    constructor() :this("","") {
+//        fieldsHashMap= HashMap()
+//        exerciseResults = ExerciseResults()
+    }
 
-    constructor(mFieldsHashMap:LinkedHashMap<String,String>) : this (mFieldsHashMap["Name"]!!,mFieldsHashMap["Description"]!!) {
+    constructor(mFieldsHashMap:HashMap<String,String>) : this (mFieldsHashMap["Name"]!!,mFieldsHashMap["Description"]!!) {
         fieldsHashMap=mFieldsHashMap
     }
 
+
     //returns linked hash map with name, description + extra fieldsHashMap
-    fun getFieldsMap():LinkedHashMap<String,String> {
+    fun getFieldsMap():HashMap<String,String> {
         return fieldsHashMap
     }
-
-//    fun addResult(date: String, result: String) {
-//
-//        var newDate = Day.dashSeparatedDateFormat.parse(date)
-//        var resultSet = ResultSet(newDate) //check if there is a resultset with this date already(?)
-//        resultSet.addResult(result)
-//        Timber.d("RESULT SET: ${resultSet.sResult}")
-////        results.add(resultSet)
-//        addToArrayByDate(resultSet)
-//    }
-//
-//    fun clearResults() {
-//        results= arrayListOf()
-//    }
-//
-//    private fun addToArrayByDate(newResultSet: ResultSet) {
-//        var i = 0
-//        while (i<results.size) {
-//            if (newResultSet.sDate.after(results[i].sDate)) {
-//                results.add(i, newResultSet)
-//                return
-//            }
-//            i++
-//        }
-//
-//        results.add(i, newResultSet)
-//        Timber.d("RESULT SET 2: ${results.size}")
-//
-//    }
 
 
 }

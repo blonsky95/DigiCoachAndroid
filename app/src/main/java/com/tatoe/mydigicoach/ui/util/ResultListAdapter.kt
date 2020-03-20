@@ -11,7 +11,7 @@ import timber.log.Timber
 class ResultListAdapter(var context: Context) : RecyclerView.Adapter<CollapsibleItemViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var sResults = arrayListOf<LinkedHashMap<String,String>>()
+    private var sResults = arrayListOf<HashMap<String,String>>()
     private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
 
@@ -45,7 +45,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
         }
     }
 
-    internal fun setContent(results : ArrayList<LinkedHashMap<String,String>>) {
+    internal fun setContent(results : ArrayList<HashMap<String,String>>) {
         this.sResults = results
         notifyDataSetChanged()
     }

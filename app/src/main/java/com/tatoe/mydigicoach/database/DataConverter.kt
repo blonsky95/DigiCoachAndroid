@@ -50,24 +50,24 @@ class DataConverter {
 //    }
 
     @TypeConverter
-    fun stringToLinkedHashMap(data: String?) : LinkedHashMap<String,String> {
-        return Gson().fromJson(data, object :TypeToken<LinkedHashMap<String,String>>() {}.type)
+    fun stringToHashMap(data: String?) : HashMap<String,String> {
+        return Gson().fromJson(data, object :TypeToken<HashMap<String,String>>() {}.type)
     }
 
     @TypeConverter
-    fun linkedHashMapToString(linkedHashMap: LinkedHashMap<String,String>) :String? {
-        return Gson().toJson(linkedHashMap)
+    fun linkedHashMapToString(HashMap: HashMap<String,String>) :String? {
+        return Gson().toJson(HashMap)
     }
 
-    @TypeConverter
-    fun stringToLinkedHashMapExeInt(data: String?) : LinkedHashMap<Exercise,Int> {
-        return Gson().fromJson(data, object :TypeToken<LinkedHashMap<Exercise,Int>>() {}.type)
-    }
-
-    @TypeConverter
-    fun linkedHashMapExeIntToString(linkedHashMap: LinkedHashMap<Exercise,Int>) :String? {
-        return Gson().toJson(linkedHashMap)
-    }
+//    @TypeConverter
+//    fun stringToLinkedHashMapExeInt(data: String?) : LinkedHashMap<Exercise,Int> {
+//        return Gson().fromJson(data, object :TypeToken<LinkedHashMap<Exercise,Int>>() {}.type)
+//    }
+//
+//    @TypeConverter
+//    fun linkedHashMapExeIntToString(linkedHashMap: LinkedHashMap<Exercise,Int>) :String? {
+//        return Gson().toJson(linkedHashMap)
+//    }
 
 
     @TypeConverter

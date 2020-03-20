@@ -40,8 +40,8 @@ class ResultsCreator : AppCompatActivity() {
 
     private lateinit var newField: String
 
-    private var sResultFieldsMap = LinkedHashMap<String, String>()
-    private var sResultsArrayList: ArrayList<LinkedHashMap<String, String>> = arrayListOf()
+    private var sResultFieldsMap = HashMap<String, String>()
+    private var sResultsArrayList: ArrayList<HashMap<String, String>> = arrayListOf()
 
 
     private lateinit var dataViewModel: DataViewModel

@@ -16,9 +16,9 @@ class ExerciseResults {
 //    var resultsArrayList: ArrayList<ResultSet> = arrayListOf()
     //contains all the results
 
-    var resultsArrayList: ArrayList<LinkedHashMap<String, String>> = arrayListOf()
+    var resultsArrayList: ArrayList<HashMap<String, String>> = arrayListOf()
 
-    var resultFieldsMap = LinkedHashMap<String, String>()
+    var resultFieldsMap = HashMap<String, String>()
     //contains all the names of fields and the first time text/hints
 
     //todo ResultSet should be based on the resultFieldsMap
@@ -31,7 +31,7 @@ class ExerciseResults {
         const val PLOTTABLE_VALUE = "plottable"
         const val DATE_KEY = "Date"
 
-        fun getGenericFields(): LinkedHashMap<String, String> {
+        fun getGenericFields(): HashMap<String, String> {
             val genericResultFields = LinkedHashMap<String, String>()
 
             genericResultFields[NOTE_KEY] = "String"
@@ -49,12 +49,12 @@ class ExerciseResults {
         }
     }
 
-    fun addResult(date: String, resultFieldsMap: LinkedHashMap<String, String>) {
+    fun addResult(date: String, resultFieldsMap: HashMap<String, String>) {
         resultFieldsMap[DATE_KEY] = date
         addToArrayByDate(resultFieldsMap)
     }
 
-    fun updateResult(resultFieldsMap: LinkedHashMap<String, String>, position: Int) {
+    fun updateResult(resultFieldsMap: HashMap<String, String>, position: Int) {
         resultFieldsMap[DATE_KEY] = resultsArrayList[position][DATE_KEY]!!
         resultsArrayList[position] = resultFieldsMap
     }
@@ -91,7 +91,7 @@ class ExerciseResults {
         return plottableBundleArray
     }
 
-    private fun addToArrayByDate(newResultMap: LinkedHashMap<String, String>) {
+    private fun addToArrayByDate(newResultMap: HashMap<String, String>) {
 
         var i = 0
         while (i < resultsArrayList.size) {
@@ -110,25 +110,25 @@ class ExerciseResults {
         resultsArrayList.add(i, newResultMap)
 
     }
-    fun numberResultsPerDate(date: String): Int {
-        var counter = 0
-        for (result in resultsArrayList){
-            if (result[DATE_KEY]==date){
-                counter++
-            }
-        }
-        return counter
-    }
+//    fun numberResultsPerDate(date: String): Int {
+//        var counter = 0
+//        for (result in resultsArrayList){
+//            if (result[DATE_KEY]==date){
+//                counter++
+//            }
+//        }
+//        return counter
+//    }
 
-    fun getResultsPerDate(date: String) : ArrayList<LinkedHashMap<String,String>> {
-        var output = arrayListOf<LinkedHashMap<String,String>>()
-        var datePositionInResults = getResultPosition(date)
-        var resultsPerDate=numberResultsPerDate(date)
-        for (i in 0 until resultsPerDate) {
-            output.add(resultsArrayList[datePositionInResults+i])
-        }
-        return output
-    }
+//    fun getResultsPerDate(date: String) : ArrayList<LinkedHashMap<String,String>> {
+//        var output = arrayListOf<LinkedHashMap<String,String>>()
+//        var datePositionInResults = getResultPosition(date)
+//        var resultsPerDate=numberResultsPerDate(date)
+//        for (i in 0 until resultsPerDate) {
+//            output.add(resultsArrayList[datePositionInResults+i])
+//        }
+//        return output
+//    }
 
     fun containsResult(date: String): Boolean {
 //        var linkedHashMap = LinkedHashMap<String, String>()

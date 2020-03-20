@@ -41,30 +41,37 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
     fun getExercisesFromFirestore() = viewModelScope.launch {
 
         val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
+        var exercises = mutableListOf<Exercise>()
         docRef.get()
             .addOnSuccessListener { documents ->
                 if (documents != null && !documents.isEmpty) {
                     for (document in documents) {
                         Timber.d("DocumentSnapshot data: ${document.data}")
+                        exercises.add(document.toObject(Exercise::class.java))
                     }
                 } else {
                     Timber.d ("documents is empty or null")
                 }
-
+                modifyLocalTable(exercises)
             }
             .addOnFailureListener { exception ->
                 Timber.d("get failed with: $exception ")
             }
 
+
+    }
+
+    private fun modifyLocalTable(exercises: MutableList<Exercise>)= viewModelScope.launch {
         //collect exercises from here
 
         withContext(Dispatchers.Default)
         {
             Timber.d("About to delete exercises table")
             repository.deleteExercisesTable()
+            Timber.d("About to insert firestore exercises")
+            repository.insertExercises(exercises)
         }
-        Timber.d("About to insert firestore exercises")
-//        repository.insertExercises(exercises)
+
     }
 
     fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {

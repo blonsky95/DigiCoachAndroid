@@ -38,7 +38,7 @@ class ExerciseCreator : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
 
     private var activeExercise: Exercise? = null
-    private var exerciseFieldsMap = LinkedHashMap<String, String>()
+    private var exerciseFieldsMap = HashMap<String, String>()
 
 
     var menuItemRead: MenuItem? = null
