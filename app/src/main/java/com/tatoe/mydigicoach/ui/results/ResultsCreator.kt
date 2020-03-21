@@ -40,8 +40,8 @@ class ResultsCreator : AppCompatActivity() {
 
     private lateinit var newField: String
 
-    private var sResultFieldsMap = HashMap<String, String>()
-    private var sResultsArrayList: ArrayList<HashMap<String, String>> = arrayListOf()
+    private var sResultFieldsMap = HashMap<Int, Pair<String, String>>()
+    private var sResultsArrayList: ArrayList<HashMap<Int, Pair<String, String>>> = arrayListOf()
 
 
     private lateinit var dataViewModel: DataViewModel
@@ -175,7 +175,7 @@ class ResultsCreator : AppCompatActivity() {
 //            sResultsArrayList[resultIndex]
 //        }
 
-        var uiFieldsValues = sResultFieldsMap
+        var uiFieldsValues = Exercise.pairHashMapToLinked(sResultFieldsMap)
 
 
         Timber.d(" MY TIMBER uiFieldValues: ${uiFieldsValues.values}")
@@ -190,9 +190,10 @@ class ResultsCreator : AppCompatActivity() {
             var entryHintString = "Type here"
             if (mAction != OBJECT_NEW) {
                 //if new field added, there will be no value, so just leave empty
-                sResultsArrayList[resultIndex][entry.key]?.let {
-                    entryValueTextString = it
-                }
+//                sResultsArrayList[resultIndex][entry.key]?.let {
+//                    entryValueTextString = it.first
+                entryValueTextString = "whats going on here"
+//                }
             }
 
             var fieldTitleTextView = TextView(this)
@@ -271,7 +272,8 @@ class ResultsCreator : AppCompatActivity() {
         if (isPlottable) {
             newFieldValue = ExerciseResults.PLOTTABLE_VALUE
         }
-        sResultFieldsMap[fieldName] = newFieldValue
+//        sResultFieldsMap[fieldName] = newFieldValue
+        sResultFieldsMap[sResultFieldsMap.size]=Pair(fieldName,newFieldValue)
         updateBodyUI(OBJECT_EDIT)
 
     }
