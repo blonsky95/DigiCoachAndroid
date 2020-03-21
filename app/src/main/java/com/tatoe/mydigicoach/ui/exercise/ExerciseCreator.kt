@@ -154,16 +154,23 @@ class ExerciseCreator : AppCompatActivity() {
     private fun createExerciseFieldsLayout() {
 
         linearLayout.removeAllViews()
-        var linkedHashMap = Exercise.pairHashMapToLinked(exerciseFieldsMap)
+        var pairsHashMap = exerciseFieldsMap
 
-        for (entry in linkedHashMap.entries) {
+        for (i in 0 until pairsHashMap.size) {
+
+            var currentField = pairsHashMap[i]
+
+            var fieldEntryKey = currentField!!.first //first of pair - title of entry
+            var fieldEntryValue = currentField.second //second of pair - value of entry
+            var entryHintString = "Type here"
+
             var fieldTitleTextView = TextView(this)
             fieldTitleTextView.layoutParams =
                 ViewGroup.LayoutParams(
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldTitleTextView.text = entry.key
+            fieldTitleTextView.text = fieldEntryKey
             fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
 
             linearLayout.addView(fieldTitleTextView)
@@ -174,8 +181,8 @@ class ExerciseCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldEditText.hint = entry.value
-            fieldEditText.text=SpannableStringBuilder(entry.value)
+            fieldEditText.hint = fieldEntryValue
+            fieldEditText.text=SpannableStringBuilder(fieldEntryValue)
 
             linearLayout.addView(fieldEditText)
 
@@ -185,7 +192,7 @@ class ExerciseCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldInfoTextView.text = entry.value
+            fieldInfoTextView.text = fieldEntryValue
 
             linearLayout.addView(fieldInfoTextView)
         }
@@ -391,15 +398,17 @@ class ExerciseCreator : AppCompatActivity() {
             true
         }
         R.id.action_edit -> {
-            updateButtonUI(OBJECT_EDIT)
-            updateBodyUI(OBJECT_EDIT)
+            mAction= OBJECT_EDIT
+            updateButtonUI(mAction)
+            updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, false)
             updateToolbarItemVisibility(menuItemRead, true)
             true
         }
         R.id.action_read -> {
-            updateButtonUI(OBJECT_VIEW)
-            updateBodyUI(OBJECT_VIEW)
+            mAction= OBJECT_VIEW
+            updateButtonUI(mAction)
+            updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, true)
             updateToolbarItemVisibility(menuItemRead, false)
             true

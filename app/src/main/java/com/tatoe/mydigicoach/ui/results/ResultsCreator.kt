@@ -166,34 +166,35 @@ class ResultsCreator : AppCompatActivity() {
     }
 
     private fun createExerciseFieldsLayout() {
-//todo change input of edit texts - if it si a plottable make it only numbers
+
+        //todo change input of edit texts - if it si a plottable make it only numbers
         linearLayout.removeAllViews()
 
-//        var uiFieldsValues: LinkedHashMap<String, String> = if (mAction == OBJECT_NEW) {
-//            sResultFieldsMap
-//        } else {
-//            sResultsArrayList[resultIndex]
-//        }
-
-        var uiFieldsValues = Exercise.pairHashMapToLinked(sResultFieldsMap)
-
+//        var uiFieldsValues = Exercise.pairHashMapToLinked(sResultFieldsMap)
+        var uiFieldsValues = sResultFieldsMap
 
         Timber.d(" MY TIMBER uiFieldValues: ${uiFieldsValues.values}")
-//        var currentResultSet = activeExercise!!.exerciseResults.resultsArrayList[0]
 
-        for (entry in uiFieldsValues.entries) {
-            if (entry.key == ExerciseResults.DATE_KEY) {
-                continue
-            }
+//        for (entry in uiFieldsValues.entries) {
+        for (i in 1 until uiFieldsValues.size) {
 
-            var entryValueTextString = ""
+//            if (entry.key == ExerciseResults.DATE_KEY) {
+//                continue
+//            }
+            //the current hashmap with the int for order and the key and value for this field
+            var currentField = uiFieldsValues[i]
+
+            var fieldEntryKey = currentField!!.first //first of pair - title of entry
+            var fieldEntryValue = "" //second of pair - value of entry
             var entryHintString = "Type here"
             if (mAction != OBJECT_NEW) {
-                //if new field added, there will be no value, so just leave empty
-//                sResultsArrayList[resultIndex][entry.key]?.let {
-//                    entryValueTextString = it.first
-                entryValueTextString = "whats going on here"
+//                currentField = sResultsArrayList[resultIndex][i]
+                sResultsArrayList[resultIndex][i]?.let {
+                    fieldEntryKey = it.first
+                    fieldEntryValue = it.second
+//                entryValueTextString = "whats going on here"
 //                }
+                }
             }
 
             var fieldTitleTextView = TextView(this)
@@ -202,7 +203,7 @@ class ResultsCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldTitleTextView.text = entry.key
+            fieldTitleTextView.text = fieldEntryKey
             fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
 
             var fieldEditText = EditText(this)
@@ -212,7 +213,7 @@ class ResultsCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
             fieldEditText.hint = entryHintString
-            fieldEditText.text = SpannableStringBuilder(entryValueTextString)
+            fieldEditText.text = SpannableStringBuilder(fieldEntryValue)
 
 
             var fieldInfoTextView = TextView(this)
@@ -221,10 +222,10 @@ class ResultsCreator : AppCompatActivity() {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.WRAP_CONTENT
                 )
-            fieldInfoTextView.text = entryValueTextString
+            fieldInfoTextView.text = fieldEntryValue
 
-            if (entry.value==ExerciseResults.PLOTTABLE_VALUE){
-                fieldEditText.inputType=InputType.TYPE_CLASS_NUMBER
+            if (currentField.second == ExerciseResults.PLOTTABLE_VALUE) {
+                fieldEditText.inputType = InputType.TYPE_CLASS_NUMBER
                 fieldEditText.setBackgroundColor(resources.getColor(R.color.lightBlue))
                 fieldInfoTextView.setBackgroundColor(resources.getColor(R.color.lightBlue))
                 fieldTitleTextView.setBackgroundColor(resources.getColor(R.color.lightBlue))
@@ -236,12 +237,14 @@ class ResultsCreator : AppCompatActivity() {
         }
     }
 
+
     private val addFieldButtonListener = View.OnClickListener {
         generateDialog()
     }
 
     private fun generateDialog() {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.plottable_dialog_window, null)
+        val mDialogView =
+            LayoutInflater.from(this).inflate(R.layout.plottable_dialog_window, null)
         mDialogView.dialogTextTextView.visibility = View.GONE
         mDialogView.dialogEditText.hint = "New field name"
         mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
@@ -273,7 +276,7 @@ class ResultsCreator : AppCompatActivity() {
             newFieldValue = ExerciseResults.PLOTTABLE_VALUE
         }
 //        sResultFieldsMap[fieldName] = newFieldValue
-        sResultFieldsMap[sResultFieldsMap.size]=Pair(fieldName,newFieldValue)
+        sResultFieldsMap[sResultFieldsMap.size] = Pair(fieldName, newFieldValue)
         updateBodyUI(OBJECT_EDIT)
 
     }
@@ -326,7 +329,6 @@ class ResultsCreator : AppCompatActivity() {
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         activeExercise?.exerciseResults!!.addResult(
-            Day.dayIDtoDashSeparator(resultDate),
             newResultFields
         )
         //this adds the result with a date to the list of results in form of hashmaps
@@ -335,13 +337,17 @@ class ResultsCreator : AppCompatActivity() {
             dataViewModel.updateExerciseResult(activeExercise!!)
             DataHolder.activeExerciseHolder = activeExercise
         }
-//        Timber.d("after adding result exercise 3 :$activeExercise ${activeExercise?.exerciseResults!!.resultsArrayList}")
         finish() //?
     }
 
     private fun getFieldContents(): LinkedHashMap<String, String> {
 
         var fieldsMap = LinkedHashMap<String, String>()
+        if (mAction== OBJECT_NEW) {
+            fieldsMap[ExerciseResults.DATE_KEY] = Day.dayIDtoDashSeparator(resultDate)
+        } else {
+            fieldsMap[ExerciseResults.DATE_KEY] = activeExercise!!.exerciseResults.getResultDate(resultIndex)
+        }
         for (i in 0 until linearLayout.childCount step 3) {
             Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
             var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
@@ -412,15 +418,17 @@ class ResultsCreator : AppCompatActivity() {
             true
         }
         R.id.action_edit -> {
-            updateButtonUI(OBJECT_EDIT)
-            updateBodyUI(OBJECT_EDIT)
+            mAction= OBJECT_EDIT
+            updateButtonUI(mAction)
+            updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, false)
             updateToolbarItemVisibility(menuItemRead, true)
             true
         }
         R.id.action_read -> {
-            updateButtonUI(OBJECT_VIEW)
-            updateBodyUI(OBJECT_VIEW)
+            mAction= OBJECT_VIEW
+            updateButtonUI(mAction)
+            updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, true)
             updateToolbarItemVisibility(menuItemRead, false)
             true
