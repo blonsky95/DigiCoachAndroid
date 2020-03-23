@@ -38,8 +38,6 @@ class ResultsCreator : AppCompatActivity() {
 
     private lateinit var linearLayout: LinearLayout
 
-    private lateinit var newField: String
-
     private var sResultFieldsMap = HashMap<Int, Pair<String, String>>()
     private var sResultsArrayList: ArrayList<HashMap<Int, Pair<String, String>>> = arrayListOf()
 
@@ -54,8 +52,6 @@ class ResultsCreator : AppCompatActivity() {
     var activeExercise: Exercise? = null
     private var resultDate = "unknown date"
     private var resultIndex = -1
-
-    var NEW_FIELD_VALUE = ""
 
     companion object {
         var RESULTS_DATE = "results_date"
@@ -92,14 +88,14 @@ class ResultsCreator : AppCompatActivity() {
 
             activeExercise = DataHolder.activeExerciseHolder
 
-            sResultFieldsMap = if (activeExercise?.exerciseResults!!.resultFieldsMap.isNotEmpty()) {
-                activeExercise?.exerciseResults!!.resultFieldsMap
+            sResultFieldsMap = if (activeExercise?.exerciseResults!!.getFieldsMap().isNotEmpty()) {
+                activeExercise?.exerciseResults!!.getFieldsMap()
             } else {
                 ExerciseResults.getGenericFields()
             }
 
-            if (activeExercise?.exerciseResults!!.resultsArrayList.isNotEmpty()) {
-                sResultsArrayList = activeExercise?.exerciseResults!!.resultsArrayList
+            if (activeExercise?.exerciseResults!!.getArrayListOfResults().isNotEmpty()) {
+                sResultsArrayList = activeExercise?.exerciseResults!!.getArrayListOfResults()
             }
 
             Timber.d("ACTIVE EXERCISE IN CREATOR ${activeExercise!!}")
@@ -170,7 +166,6 @@ class ResultsCreator : AppCompatActivity() {
         //todo change input of edit texts - if it si a plottable make it only numbers
         linearLayout.removeAllViews()
 
-//        var uiFieldsValues = Exercise.pairHashMapToLinked(sResultFieldsMap)
         var uiFieldsValues = sResultFieldsMap
 
         Timber.d(" MY TIMBER uiFieldValues: ${uiFieldsValues.values}")
@@ -325,7 +320,7 @@ class ResultsCreator : AppCompatActivity() {
         var newResultFields = getFieldContents()
 
         //todo when field added, modify directly the structure of sResultsFieldsMap
-        activeExercise?.exerciseResults!!.resultFieldsMap = sResultFieldsMap
+        activeExercise?.exerciseResults!!.setFieldsMap(sResultFieldsMap)
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         activeExercise?.exerciseResults!!.addResult(
@@ -340,28 +335,10 @@ class ResultsCreator : AppCompatActivity() {
         finish() //?
     }
 
-    private fun getFieldContents(): LinkedHashMap<String, String> {
-
-        var fieldsMap = LinkedHashMap<String, String>()
-        if (mAction== OBJECT_NEW) {
-            fieldsMap[ExerciseResults.DATE_KEY] = Day.dayIDtoDashSeparator(resultDate)
-        } else {
-            fieldsMap[ExerciseResults.DATE_KEY] = activeExercise!!.exerciseResults.getResultDate(resultIndex)
-        }
-        for (i in 0 until linearLayout.childCount step 3) {
-            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
-            var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
-            fieldsMap[keyString] =
-                (linearLayout.getChildAt(i + 1) as EditText).text.trim().toString()
-        }
-        return fieldsMap
-    }
-
     private val updateButtonListener = View.OnClickListener {
         var newResultFields = getFieldContents()
 
-        activeExercise?.exerciseResults!!.resultFieldsMap = sResultFieldsMap
-        //todo update fields map or create fields map will be functions in ExerciseResults which later update all the elements in array
+        activeExercise?.exerciseResults!!.setFieldsMap(sResultFieldsMap)
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         activeExercise?.exerciseResults!!.updateResult(newResultFields, resultIndex)
@@ -376,11 +353,31 @@ class ResultsCreator : AppCompatActivity() {
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        activeExercise!!.exerciseResults.resultsArrayList.removeAt(resultIndex)
+//        activeExercise!!.exerciseResults.getArrayListOfResults().removeAt(resultIndex)
+        activeExercise!!.exerciseResults.removeResult(resultIndex)
         dataViewModel.updateExerciseResult(activeExercise!!)
         DataHolder.activeExerciseHolder = activeExercise
 
         backToViewer()
+    }
+
+    private fun getFieldContents(): HashMap<Int, Pair<String, String>> {
+
+        var fieldsMap = HashMap<Int, Pair<String, String>>()
+        if (mAction== OBJECT_NEW) {
+            fieldsMap[0] = Pair(ExerciseResults.DATE_KEY,Day.dayIDtoDashSeparator(resultDate))
+        } else {
+            fieldsMap[0] =Pair(ExerciseResults.DATE_KEY,activeExercise!!.exerciseResults.getResultDate(resultIndex))
+        }
+        for (i in 0 until linearLayout.childCount/3) {
+//            var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
+
+            var fieldName = (linearLayout.getChildAt(3*i) as TextView).text.toString()
+            var fieldValue = (linearLayout.getChildAt(3*i + 1) as EditText).text.trim().toString()
+
+            fieldsMap[i+1] =   Pair(fieldName,fieldValue)
+        }
+        return fieldsMap
     }
 
     private fun backToViewer() {

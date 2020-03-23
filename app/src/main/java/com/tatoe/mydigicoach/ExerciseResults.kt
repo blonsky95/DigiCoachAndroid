@@ -17,10 +17,12 @@ class ExerciseResults {
 //    var resultsArrayList: ArrayList<ResultSet> = arrayListOf()
     //contains all the results
 
-    var resultsArrayList: ArrayList<HashMap<Int, Pair<String, String>>> = arrayListOf()
+    //when you want to access this use the getter, as this data type is string and not int - to store in firestore
+    var resultsArrayList: ArrayList<HashMap<String, Pair<String, String>>> = arrayListOf()
 
-    var resultFieldsMap = HashMap<Int, Pair<String, String>>()
+    //when you want to access this use the getter, as this data type is string and not int - to store in firestore
     //contains all the names of fields and the first time text/hints
+    var resultFieldsMap = HashMap<String, Pair<String, String>>()
 
     //todo ResultSet should be based on the resultFieldsMap
     //so result set should be modified to accord the LinkedHashMap - think about this - make an array of linked hash maps?
@@ -52,25 +54,55 @@ class ExerciseResults {
         }
     }
 
-    fun addResult(resultFieldsMap: LinkedHashMap<String, String>) {
+    fun getFieldsMap(): HashMap<Int, Pair<String, String>> {
+        return Exercise.stringMapToIntMap(resultFieldsMap)
+    }
+
+    fun setFieldsMap(mFieldsHashMap: HashMap<Int, Pair<String, String>>) {
+        resultFieldsMap = Exercise.intMapToStringMap(mFieldsHashMap)
+    }
+
+    fun getArrayListOfResults(): ArrayList<HashMap<Int, Pair<String, String>>> {
+        var arrayList = ArrayList<HashMap<Int, Pair<String, String>>>()
+        resultsArrayList.forEach{
+            arrayList.add(Exercise.stringMapToIntMap(it))
+        }
+        return arrayList
+    }
+
+    fun setArrayListOfResults( arrayList: ArrayList<HashMap<Int, Pair<String, String>>>) {
+        var stringArrayList = ArrayList<HashMap<String, Pair<String, String>>>()
+        arrayList.forEach{
+            stringArrayList.add(Exercise.intMapToStringMap(it))
+        }
+        resultsArrayList=stringArrayList
+    }
+
+    fun addResult(resultFieldsMap: HashMap<Int, Pair<String, String>>) {
         addToArrayByDate(resultFieldsMap)
     }
 
-    fun updateResult(resultFieldsMap: LinkedHashMap<String, String>, position: Int) {
+    fun updateResult(resultFieldsMap: HashMap<Int, Pair<String, String>>, position: Int) {
 //        resultFieldsMap[DATE_KEY] = resultsArrayList[position][0]!!.second //getting the date (index 0), and the value of the pair (second)
-        resultsArrayList[position] = Exercise.linkedToPairHashMap(resultFieldsMap)
+        resultsArrayList[position] = Exercise.intMapToStringMap(resultFieldsMap)
+    }
+
+    fun removeResult(resultIndex: Int) {
+        resultsArrayList.removeAt(resultIndex)
     }
 
     fun getPlottableArrays(): ArrayList<PlottableBundle> {
         var plottableBundleArray = arrayListOf<PlottableBundle>()
-        for (i in 0 until resultFieldsMap.size) {
+        var intResultsFieldsMap = Exercise.stringMapToIntMap(resultFieldsMap)
+        var intResultsArrayList = getArrayListOfResults()
+        for (i in 0 until intResultsFieldsMap.size) {
             var arrayX = arrayListOf<Date>()
             var arrayY = arrayListOf<Double>()
             var nameVariable = ""
-            if (resultFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
-                nameVariable = resultFieldsMap[i]!!.first
+            if (intResultsFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
+                nameVariable = intResultsFieldsMap[i]!!.first
                 var containsEmptyValues = false
-                for (result in resultsArrayList) {
+                for (result in intResultsArrayList) {
                     try {
                         Timber.d("NUTS: $result")
                         if (result[i] != null) {
@@ -97,16 +129,18 @@ class ExerciseResults {
         return plottableBundleArray
     }
 
-    private fun addToArrayByDate(newResultMap: LinkedHashMap<String, String>) {
+    private fun addToArrayByDate(newResultMap: HashMap<Int, Pair<String, String>>) {
+
+        var intResultsArrayList = getArrayListOfResults()
 
         var i = 0
-        while (i < resultsArrayList.size) {
+        while (i < intResultsArrayList.size) {
             try {
-                val newDate = stringToDate(newResultMap[DATE_KEY]!!)
+                val newDate = stringToDate(newResultMap[0]!!.second)
                 val oldDate =
-                    stringToDate(resultsArrayList[i][0]!!.second) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
+                    stringToDate(intResultsArrayList[i][0]!!.second) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
                 if (newDate.after(oldDate)) {
-                    resultsArrayList.add(i, Exercise.linkedToPairHashMap(newResultMap))
+                    intResultsArrayList.add(i, newResultMap)
                     return
                 }
                 i++
@@ -114,12 +148,13 @@ class ExerciseResults {
                 e.printStackTrace()
             }
         }
-        resultsArrayList.add(i, Exercise.linkedToPairHashMap(newResultMap))
+        intResultsArrayList.add(i, newResultMap)
+        setArrayListOfResults(intResultsArrayList)
 
     }
 
     fun containsResult(date: String): Boolean {
-        for (result in resultsArrayList) {
+        for (result in getArrayListOfResults()) {
             if (result[0]?.second == Day.dayIDtoDashSeparator(date)) {
                 return true
             }
@@ -128,26 +163,31 @@ class ExerciseResults {
     }
 
     fun getResultPosition(date: String): Int {
+        var intResultsArrayList = getArrayListOfResults()
 
-        for (result in resultsArrayList) {
+        for (result in intResultsArrayList) {
             if (result[0]?.second == Day.dayIDtoDashSeparator(date)) {
-                return resultsArrayList.indexOf(result)
+                return intResultsArrayList.indexOf(result)
             }
         }
         return -1
     }
 
     fun getResultDate(position: Int): String {
-        return resultsArrayList[position][0]!!.second
+        return getArrayListOfResults()[position][0]!!.second
     }
 
     fun getPlottableNames(): ArrayList<String> {
+        var intResultsFieldsMap = Exercise.stringMapToIntMap(resultFieldsMap)
+
         var array = arrayListOf<String>()
-        for (i in 0 until resultFieldsMap.size) {
-            if (resultFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
-                array.add(resultFieldsMap[i]!!.first)
+        for (i in 0 until intResultsFieldsMap.size) {
+            if (intResultsFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
+                array.add(intResultsFieldsMap[i]!!.first)
             }
         }
         return array
     }
+
+
 }

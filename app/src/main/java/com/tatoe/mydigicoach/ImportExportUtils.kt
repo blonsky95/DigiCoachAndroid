@@ -31,7 +31,7 @@ object ImportExportUtils {
             for (index in selectedIndexes) {
                 allExercises[index].exerciseId =
                     0 //when imported + inserted, exercises will be assigned a new id
-                allExercises[index].exerciseResults.resultsArrayList= arrayListOf()
+                allExercises[index].exerciseResults.setArrayListOfResults(arrayListOf())
                 selectedExercises.add(allExercises[index])
             }
             exportBlock.components = selectedExercises

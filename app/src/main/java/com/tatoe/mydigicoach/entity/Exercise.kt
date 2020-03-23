@@ -5,17 +5,14 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 import com.tatoe.mydigicoach.ExerciseResults
-import com.tatoe.mydigicoach.ResultSet
-import timber.log.Timber
-import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.LinkedHashMap
 
 @Entity(tableName = "exercise_table")
 
 data class Exercise(
-    @ColumnInfo(name = "name") @field: SerializedName("name") var name: String="",
-    @ColumnInfo(name = "description") @field: SerializedName("description") var description: String=""
+    @ColumnInfo(name = "name") @field: SerializedName("name") var name: String = "",
+    @ColumnInfo(name = "description") @field: SerializedName("description") var description: String = ""
 ) {
 
     @PrimaryKey(autoGenerate = true)
@@ -32,7 +29,8 @@ data class Exercise(
 
     @ColumnInfo(name = "fieldsHashMap")
     @field: SerializedName("fieldsHashMap")
-    var fieldsHashMap: HashMap<Int,Pair<String,String>> = HashMap() //todo eventually this will get rid of saving name and description in database
+    var fieldsHashMap: HashMap<String, Pair<String, String>> =
+        HashMap() //todo eventually this will get rid of saving name and description in database
 
     //todo find a way of making the constructor, and instance data retrieval more efficient by
     //todo finding synergy between the LinkedHashMap including name and description and having a method here
@@ -43,44 +41,71 @@ data class Exercise(
     //I only want name and description as constructors, so primary key id is outside
     // constructor and starts with 0 (initialization required).
 //    constructor(name: String, description: String) : this(name, description)
-    constructor() :this("","") {
+    constructor() : this("", "") {
 //        fieldsHashMap= HashMap()
 //        exerciseResults = ExerciseResults()
     }
 
-    constructor(mFieldsHashMap:HashMap<Int,Pair<String,String>>) : this (mFieldsHashMap[0]!!.second,mFieldsHashMap[1]!!.second) {
-        fieldsHashMap=mFieldsHashMap
+    constructor(mFieldsHashMap: HashMap<Int, Pair<String, String>>) : this(
+        mFieldsHashMap[0]!!.second,
+        mFieldsHashMap[1]!!.second
+    ) {
+        setFieldsMap(mFieldsHashMap)
     }
 
 
     //returns linked hash map with name, description + extra fieldsHashMap
-    fun getFieldsMap():HashMap<Int,Pair<String,String>> {
-        return fieldsHashMap
+    fun getFieldsMap(): HashMap<Int, Pair<String, String>> {
+        return stringMapToIntMap(fieldsHashMap)
+    }
+
+    fun setFieldsMap(mFieldsHashMap: HashMap<Int, Pair<String, String>>) {
+        fieldsHashMap = intMapToStringMap(mFieldsHashMap)
     }
 
     companion object {
 
-        fun pairHashMapToLinked(exerciseFieldsMap: HashMap<Int,Pair<String,String>>): LinkedHashMap<String,String> {
-            var linkedHashMap = LinkedHashMap<String,String>()
+        const val DATE_ID = "0"
+        const val NAME_ID = "1"
+        const val DESCRIPTION_ID = "2"
 
-            for (i in 0 until exerciseFieldsMap.size){
-                linkedHashMap[exerciseFieldsMap[i]!!.first]=exerciseFieldsMap[i]!!.second
-            }
-            return linkedHashMap
-        }
+//        fun pairHashMapToLinked(exerciseFieldsMap: HashMap<Int, Pair<String, String>>): LinkedHashMap<String, String> {
+//            var linkedHashMap = LinkedHashMap<String, String>()
+//
+//            for (i in 0 until exerciseFieldsMap.size) {
+//                linkedHashMap[exerciseFieldsMap[i]!!.first] = exerciseFieldsMap[i]!!.second
+//            }
+//            return linkedHashMap
+//        }
 
-        fun linkedToPairHashMap(linkedHashMap: LinkedHashMap<String,String>) : HashMap<Int,Pair<String,String>> {
-            var pairHashMap=HashMap<Int,Pair<String,String>>()
+        fun linkedToPairHashMap(linkedHashMap: LinkedHashMap<String, String>): HashMap<Int, Pair<String, String>> {
+            var pairHashMap = HashMap<Int, Pair<String, String>>()
 
-            var i =0
-            linkedHashMap.forEach{
-                pairHashMap[i] = Pair(it.key,it.value)
+            var i = 0
+            linkedHashMap.forEach {
+                pairHashMap[i] = Pair(it.key, it.value)
                 i++
             }
 //            for (i in 0 until linkedHashMap.size) {
 //                pairHashMap.put(i,Pair<String,String>(linkedHashMap.))
 //            }
             return pairHashMap
+        }
+
+        fun intMapToStringMap(mFieldsHashMap: HashMap<Int, Pair<String, String>>): HashMap<String, Pair<String, String>> {
+            var stringMap = HashMap<String, Pair<String, String>>()
+            for (i in 0 until mFieldsHashMap.size){
+                stringMap[i.toString()]=mFieldsHashMap[i]!!
+            }
+            return stringMap
+        }
+
+        fun stringMapToIntMap(fieldsHashMap: HashMap<String, Pair<String, String>>): HashMap<Int, Pair<String, String>> {
+            var intMap = HashMap<Int, Pair<String, String>>()
+            for (i in 0 until fieldsHashMap.size){
+                intMap[i]=fieldsHashMap[i.toString()]!!
+            }
+            return intMap
         }
     }
 

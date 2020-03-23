@@ -3,7 +3,6 @@ package com.tatoe.mydigicoach.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
@@ -11,6 +10,7 @@ import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.utils.MyCustomFirestoreExercise
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -38,6 +38,34 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
         allExercises = repository.allExercises
     }
 
+    fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
+        val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    document.reference.delete()
+                }
+
+                for (exercise in listExercises) {
+//                    docRef.add(exercise.exerciseResults.resultsArrayList.toList())
+//                    var list = mutableListOf<Map<String,Pair<String,String>>>()
+//                    var theMap = exerciseToFirestoreMap(exercise)
+//                    var pair=Pair("1","POWER")
+//                    var map1 = hashMapOf("pair1" to pair)
+//                    var map2 = hashMapOf("pair2" to pair)
+//                    var arrayList = arrayListOf(map1,map2)
+//                    var map = HashMap<String,ArrayList<HashMap<String,Pair<String,String>>>>()
+//                    map["da_list"] = arrayList
+
+//                    list.add(map)
+                    docRef.add(exerciseToFirestoreFormat(exercise))
+                }
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
     fun getExercisesFromFirestore() = viewModelScope.launch {
 
         val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
@@ -47,10 +75,10 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
                 if (documents != null && !documents.isEmpty) {
                     for (document in documents) {
                         Timber.d("DocumentSnapshot data: ${document.data}")
-                        exercises.add(document.toObject(Exercise::class.java))
+                        exercises.add(document.toObject(MyCustomFirestoreExercise::class.java).toExercise())
                     }
                 } else {
-                    Timber.d ("documents is empty or null")
+                    Timber.d("documents is empty or null")
                 }
                 modifyLocalTable(exercises)
             }
@@ -61,7 +89,7 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
 
     }
 
-    private fun modifyLocalTable(exercises: MutableList<Exercise>)= viewModelScope.launch {
+    private fun modifyLocalTable(exercises: MutableList<Exercise>) = viewModelScope.launch {
         //collect exercises from here
 
         withContext(Dispatchers.Default)
@@ -74,30 +102,12 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
 
     }
 
-    fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
-        val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
-        docRef.get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    document.reference.delete()
-                }
+    private fun exerciseToFirestoreFormat(exercise: Exercise): MyCustomFirestoreExercise {
+        return MyCustomFirestoreExercise(exercise)
+    }
 
-                for (exercise in listExercises) {
-                    docRef.add(exercise)
-                }
-//                if (documents == null || documents.isEmpty) {
-//                    db.collection("users").document(DataHolder.userEmail!!).collection("exercises").
-//                }
-//                for (document in documents) {
-//                    if (document != null) {
-//                        Timber.d("DocumentSnapshot data: ${document.data}")
-//                    }
-//                }
-
-            }
-            .addOnFailureListener { exception ->
-                Timber.d("get failed with: $exception ")
-            }
+    private fun firestoreFormatToExercise(myCustomFirestoreExercise: MyCustomFirestoreExercise): Exercise {
+        return myCustomFirestoreExercise.toExercise()
     }
 
     fun insertBlock(block: Block) = viewModelScope.launch {
