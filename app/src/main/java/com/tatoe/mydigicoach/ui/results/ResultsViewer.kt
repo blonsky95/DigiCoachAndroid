@@ -68,7 +68,7 @@ class ResultsViewer : AppCompatActivity() {
         ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
 
         activeExercise = DataHolder.activeExerciseHolder
-        sResults = activeExercise!!.exerciseResults.resultsArrayList
+        sResults = activeExercise!!.exerciseResults.getArrayListOfResults()
         plottableBundles = activeExercise!!.exerciseResults.getPlottableArrays()
         sChart = chart1
         sSpinner = spinner

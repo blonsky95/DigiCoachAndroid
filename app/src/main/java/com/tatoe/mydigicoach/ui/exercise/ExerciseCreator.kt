@@ -240,14 +240,14 @@ class ExerciseCreator : AppCompatActivity() {
 
     private fun getFieldContents(): HashMap<Int,Pair<String,String>> {
 
-        var fieldsMap = LinkedHashMap<String, String>()
-        for (i in 0 until linearLayout.childCount step 3) {
-            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
-            var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
-            fieldsMap[keyString] =
-                (linearLayout.getChildAt(i + 1) as EditText).text.trim().toString()
+        var fieldsMap = HashMap<Int,Pair<String,String>>()
+        for (i in 0 until linearLayout.childCount/3) {
+//            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
+            var fieldName = (linearLayout.getChildAt(3*i) as TextView).text.toString()
+            var fieldValue = (linearLayout.getChildAt(3*i + 1) as EditText).text.trim().toString()
+            fieldsMap[i] = Pair(fieldName,fieldValue)
         }
-        return Exercise.linkedToPairHashMap(fieldsMap)
+        return fieldsMap
     }
 
     private val addButtonListener = View.OnClickListener {
@@ -257,7 +257,7 @@ class ExerciseCreator : AppCompatActivity() {
 //        var newExercise = Exercise(newExerciseFields["Name"]!!, newExerciseFields["Description"]!!)
         var newExercise = Exercise(newExerciseFields)
 
-        newExercise.fieldsHashMap = newExerciseFields
+        newExercise.setFieldsMap(newExerciseFields)
 
         dataViewModel.insertExercise(newExercise)
         backToViewer()
@@ -270,7 +270,7 @@ class ExerciseCreator : AppCompatActivity() {
 //        activeExercise!!.name = updatingExerciseFields["Name"]!!
         activeExercise!!.description = updatingExerciseFields[1]!!.second
 //        activeExercise!!.description = updatingExerciseFields["Description"]!!
-        activeExercise!!.fieldsHashMap = updatingExerciseFields
+        activeExercise!!.setFieldsMap(updatingExerciseFields)
 
         dataViewModel.updateExercise(activeExercise!!)
 
