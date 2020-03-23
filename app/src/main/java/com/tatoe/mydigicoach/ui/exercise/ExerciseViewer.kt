@@ -84,25 +84,29 @@ class ExerciseViewer : AppCompatActivity() {
         }
 
         getButton.setOnClickListener {
-            //get stuff from firestore
-//            var exercises = mutableListOf<Exercise>()
-//            exercises.add(Exercise(LinkedHashMap(mutableMapOf("Name" to "150s", "Description" to "Try 2x4x150 with 3' and 6' or 3x3x150 with 3' and 6'"))))
-//            exercises.add(Exercise(LinkedHashMap(mutableMapOf("Name" to "Pyramid", "Description" to "200 - 250 - 300 - 350 - 300 - 250 - 200 R=4-6'"))))
 
-            //get exercises from firestore
-            //create a androidviewmodel for exerciseviewer, which will need the repository, the allexercises LiveData and the firebase firestore (probs factory too)
-            //add in this model a function that you give email and it returns the list of exercises in firestore if not empty
-            // and then it replaces your exercises by these ones - needs a dialog
-            // + progress thing (https://stackoverflow.com/questions/48239657/how-to-handle-android-livedataviewmodel-with-progressbar-on-screen-rotate)
-            //add in this model a function that allows you to update your online exercises + creates document + completion toast
 
             //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
-            exerciseViewerViewModel.getExercisesFromFirestore()
+            Utils.getInfoDialogView(this,title.toString(),"Replace for your cloud exercises?",object:
+                DialogPositiveNegativeHandler {
+//todo do progress bar
+                override fun onPositiveButton(editTextText:String) {
+                    super.onPositiveButton(editTextText)
+                    exerciseViewerViewModel.getExercisesFromFirestore()
+                }
+            })
         }
 
         postButton.setOnClickListener {
             //post stuff to firestore
-            exerciseViewerViewModel.postExercisesToFirestore(allExercises)
+            Utils.getInfoDialogView(this,title.toString(),"Make this your cloud exercises?",object:
+                DialogPositiveNegativeHandler {
+
+                override fun onPositiveButton(editTextText:String) {
+                    super.onPositiveButton(editTextText)
+                    exerciseViewerViewModel.postExercisesToFirestore(allExercises)
+                }
+            })
         }
     }
 
