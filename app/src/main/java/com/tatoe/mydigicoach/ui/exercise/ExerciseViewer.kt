@@ -17,6 +17,7 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import com.tatoe.mydigicoach.*
+import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.DataViewModel
@@ -74,6 +75,18 @@ class ExerciseViewer : AppCompatActivity() {
             }
         })
 
+
+        val dialog = setProgressDialog(this, "Talking with cloud...")
+
+        exerciseViewerViewModel.getIsLoading().observe(this, Observer { isLoading ->
+            if (isLoading){
+                dialog.show()
+
+            } else {
+                dialog.hide()
+            }
+        })
+
         addExerciseBtn.setOnClickListener {
             Timber.d("Exercise Viewer --> Exercise creator")
 
@@ -89,7 +102,6 @@ class ExerciseViewer : AppCompatActivity() {
             //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
             Utils.getInfoDialogView(this,title.toString(),"Replace for your cloud exercises?",object:
                 DialogPositiveNegativeHandler {
-//todo do progress bar
                 override fun onPositiveButton(editTextText:String) {
                     super.onPositiveButton(editTextText)
                     exerciseViewerViewModel.getExercisesFromFirestore()

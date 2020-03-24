@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.viewmodels
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
@@ -36,9 +37,14 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
             AppRepository(exerciseDao, blockDao, dayDao)
 
         allExercises = repository.allExercises
+
+        repository.isLoading.value=false
+
     }
 
     fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
+        repository.isLoading.value=true
+
         val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
         docRef.get()
             .addOnSuccessListener { documents ->
@@ -60,14 +66,17 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
 //                    list.add(map)
                     docRef.add(exerciseToFirestoreFormat(exercise))
                 }
+                repository.isLoading.value=false
+
             }
             .addOnFailureListener { exception ->
+                repository.isLoading.value=false
                 Timber.d("get failed with: $exception ")
             }
     }
 
     fun getExercisesFromFirestore() = viewModelScope.launch {
-
+        repository.isLoading.value=true
         val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
         var exercises = mutableListOf<Exercise>()
         docRef.get()
@@ -81,12 +90,18 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
                     Timber.d("documents is empty or null")
                 }
                 modifyLocalTable(exercises)
+                repository.isLoading.value=false
             }
             .addOnFailureListener { exception ->
+                repository.isLoading.value=false
                 Timber.d("get failed with: $exception ")
             }
 
 
+    }
+
+    fun getIsLoading(): MutableLiveData<Boolean> {
+        return repository.isLoading
     }
 
     private fun modifyLocalTable(exercises: MutableList<Exercise>) = viewModelScope.launch {

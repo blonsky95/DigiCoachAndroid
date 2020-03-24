@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach
 
+import androidx.lifecycle.MutableLiveData
 import com.tatoe.mydigicoach.database.BlockDao
 import com.tatoe.mydigicoach.database.DayDao
 import com.tatoe.mydigicoach.database.ExerciseDao
@@ -7,6 +8,7 @@ import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
+
 
 class AppRepository(
     private val exerciseDao: ExerciseDao,
@@ -22,6 +24,8 @@ class AppRepository(
     val allExportBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getExportBlocksLive()
 
     val allDays: androidx.lifecycle.LiveData<List<Day>> = dayDao.getAll()
+
+    var isLoading = MutableLiveData<Boolean>()
 
     private val ACTION_UPDATE = 1
     private val ACTION_DELETE = 2
