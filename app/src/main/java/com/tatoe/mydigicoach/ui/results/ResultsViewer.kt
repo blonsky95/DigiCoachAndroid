@@ -31,7 +31,7 @@ class ResultsViewer : AppCompatActivity() {
 
     private var activeExercise: Exercise? = null
     lateinit var adapter: ResultListAdapter
-    private var sResults :ArrayList<HashMap<Int, Pair<String, String>>> = arrayListOf()
+    private var sResults :ArrayList<HashMap<Int, HashMap<String, String>>> = arrayListOf()
     private lateinit var sChart: LineChart
     private var chartManager: ChartManager?=null
     private var plottableBundles = arrayListOf<PlottableBundle>()

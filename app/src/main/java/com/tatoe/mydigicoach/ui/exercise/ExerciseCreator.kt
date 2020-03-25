@@ -39,7 +39,7 @@ class ExerciseCreator : AppCompatActivity() {
     private lateinit var dataViewModel: DataViewModel
 
     private var activeExercise: Exercise? = null
-    private var exerciseFieldsMap = HashMap<Int, Pair<String,String>>()
+    private var exerciseFieldsMap = HashMap<Int, HashMap<String,String>>()
 
 
     var menuItemRead: MenuItem? = null
@@ -85,10 +85,10 @@ class ExerciseCreator : AppCompatActivity() {
 //                }
             } else {
 //                exerciseFieldsMap[0]!!["Name"] = ""
-                exerciseFieldsMap[0]=Pair("Name","")
 
+                exerciseFieldsMap[0]= hashMapOf("Name" to "")
 //                exerciseFieldsMap[1]!!["Description"] = ""
-                exerciseFieldsMap[1]=Pair("Description","")
+                exerciseFieldsMap[1]=hashMapOf("Description" to "")
             }
             updateBodyUI(mAction)
             updateButtonUI(mAction)
@@ -160,8 +160,10 @@ class ExerciseCreator : AppCompatActivity() {
 
             var currentField = pairsHashMap[i]
 
-            var fieldEntryKey = currentField!!.first //first of pair - title of entry
-            var fieldEntryValue = currentField.second //second of pair - value of entry
+            var firstEntry = currentField!!.entries.iterator().next()
+
+            var fieldEntryKey = firstEntry.key //first of pair - title of entry
+            var fieldEntryValue = firstEntry.value //second of pair - value of entry
             var entryHintString = "Type here"
 
             var fieldTitleTextView = TextView(this)
@@ -238,14 +240,14 @@ class ExerciseCreator : AppCompatActivity() {
         return (index + 3) % 3 == 0
     }
 
-    private fun getFieldContents(): HashMap<Int,Pair<String,String>> {
+    private fun getFieldContents(): HashMap<Int,HashMap<String,String>> {
 
-        var fieldsMap = HashMap<Int,Pair<String,String>>()
+        var fieldsMap = HashMap<Int,HashMap<String,String>>()
         for (i in 0 until linearLayout.childCount/3) {
 //            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
             var fieldName = (linearLayout.getChildAt(3*i) as TextView).text.toString()
             var fieldValue = (linearLayout.getChildAt(3*i + 1) as EditText).text.trim().toString()
-            fieldsMap[i] = Pair(fieldName,fieldValue)
+            fieldsMap[i] = hashMapOf(fieldName to fieldValue)
         }
         return fieldsMap
     }
@@ -266,9 +268,9 @@ class ExerciseCreator : AppCompatActivity() {
 
         var updatingExerciseFields = getFieldContents()
 
-        activeExercise!!.name = updatingExerciseFields[0]!!.second
+        activeExercise!!.name = updatingExerciseFields[0]!!["Name"]!!
 //        activeExercise!!.name = updatingExerciseFields["Name"]!!
-        activeExercise!!.description = updatingExerciseFields[1]!!.second
+        activeExercise!!.description = updatingExerciseFields[1]!!["Description"]!!
 //        activeExercise!!.description = updatingExerciseFields["Description"]!!
         activeExercise!!.setFieldsMap(updatingExerciseFields)
 
@@ -315,7 +317,7 @@ class ExerciseCreator : AppCompatActivity() {
 
     private fun addFieldLayout() {
         //todo save what was written
-        exerciseFieldsMap[exerciseFieldsMap.size] = Pair("","")
+        exerciseFieldsMap[exerciseFieldsMap.size] = hashMapOf("" to "")
 
 //        updateBodyUI(OBJECT_EDIT)
 

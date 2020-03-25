@@ -8,7 +8,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
+import kotlin.collections.HashMap
 import kotlin.collections.arrayListOf
 import kotlin.collections.set
 
@@ -18,11 +18,11 @@ class ExerciseResults {
     //contains all the results
 
     //when you want to access this use the getter, as this data type is string and not int - to store in firestore
-    var resultsArrayList: ArrayList<HashMap<String, Pair<String, String>>> = arrayListOf()
+    var resultsArrayList: ArrayList<HashMap<String, HashMap<String, String>>> = arrayListOf()
 
     //when you want to access this use the getter, as this data type is string and not int - to store in firestore
     //contains all the names of fields and the first time text/hints
-    var resultFieldsMap = HashMap<String, Pair<String, String>>()
+    var resultFieldsMap = HashMap<String, HashMap<String, String>>()
 
     //todo ResultSet should be based on the resultFieldsMap
     //so result set should be modified to accord the LinkedHashMap - think about this - make an array of linked hash maps?
@@ -34,12 +34,12 @@ class ExerciseResults {
         const val PLOTTABLE_VALUE = "plottable"
         const val DATE_KEY = "Date"
 
-        fun getGenericFields(): HashMap<Int, Pair<String, String>> {
-            val genericResultFields = HashMap<Int, Pair<String, String>>()
+        fun getGenericFields(): HashMap<Int, HashMap<String, String>> {
+            val genericResultFields = HashMap<Int, HashMap<String, String>>()
 
-            genericResultFields[0] = Pair(DATE_KEY, "04-03-1995")
-            genericResultFields[1] = Pair(NOTE_KEY, "String")
-            genericResultFields[2] = Pair(PLOTTABLE_KEY, PLOTTABLE_VALUE)
+            genericResultFields[0] = hashMapOf(DATE_KEY to "04-03-1995")
+            genericResultFields[1] = hashMapOf(NOTE_KEY to "String")
+            genericResultFields[2] = hashMapOf(PLOTTABLE_KEY to PLOTTABLE_VALUE)
 
             return genericResultFields
         }
@@ -54,35 +54,35 @@ class ExerciseResults {
         }
     }
 
-    fun getFieldsMap(): HashMap<Int, Pair<String, String>> {
+    fun getFieldsMap(): HashMap<Int, HashMap<String, String>> {
         return Exercise.stringMapToIntMap(resultFieldsMap)
     }
 
-    fun setFieldsMap(mFieldsHashMap: HashMap<Int, Pair<String, String>>) {
+    fun setFieldsMap(mFieldsHashMap: HashMap<Int, HashMap<String, String>>) {
         resultFieldsMap = Exercise.intMapToStringMap(mFieldsHashMap)
     }
 
-    fun getArrayListOfResults(): ArrayList<HashMap<Int, Pair<String, String>>> {
-        var arrayList = ArrayList<HashMap<Int, Pair<String, String>>>()
+    fun getArrayListOfResults(): ArrayList<HashMap<Int, HashMap<String, String>>> {
+        var arrayList = ArrayList<HashMap<Int, HashMap<String, String>>>()
         resultsArrayList.forEach{
             arrayList.add(Exercise.stringMapToIntMap(it))
         }
         return arrayList
     }
 
-    fun setArrayListOfResults( arrayList: ArrayList<HashMap<Int, Pair<String, String>>>) {
-        var stringArrayList = ArrayList<HashMap<String, Pair<String, String>>>()
+    fun setArrayListOfResults( arrayList: ArrayList<HashMap<Int, HashMap<String, String>>>) {
+        var stringArrayList = ArrayList<HashMap<String, HashMap<String, String>>>()
         arrayList.forEach{
             stringArrayList.add(Exercise.intMapToStringMap(it))
         }
         resultsArrayList=stringArrayList
     }
 
-    fun addResult(resultFieldsMap: HashMap<Int, Pair<String, String>>) {
+    fun addResult(resultFieldsMap: HashMap<Int, HashMap<String, String>>) {
         addToArrayByDate(resultFieldsMap)
     }
 
-    fun updateResult(resultFieldsMap: HashMap<Int, Pair<String, String>>, position: Int) {
+    fun updateResult(resultFieldsMap: HashMap<Int, HashMap<String, String>>, position: Int) {
 //        resultFieldsMap[DATE_KEY] = resultsArrayList[position][0]!!.second //getting the date (index 0), and the value of the pair (second)
         resultsArrayList[position] = Exercise.intMapToStringMap(resultFieldsMap)
     }
@@ -99,15 +99,20 @@ class ExerciseResults {
             var arrayX = arrayListOf<Date>()
             var arrayY = arrayListOf<Double>()
             var nameVariable = ""
-            if (intResultsFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
-                nameVariable = intResultsFieldsMap[i]!!.first
+            var fieldEntry = intResultsFieldsMap[i]!!.entries.iterator().next()
+            if (fieldEntry.value == PLOTTABLE_VALUE) {
+                nameVariable = fieldEntry.key
                 var containsEmptyValues = false
+
                 for (result in intResultsArrayList) {
                     try {
                         Timber.d("NUTS: $result")
                         if (result[i] != null) {
-                            arrayX.add(stringToDate(result[0]!!.second))
-                            arrayY.add(result[i]!!.second.toDouble())
+                            var yAxisEntry = result[i]!!.entries.iterator().next()
+                            var xAxisEntry = result[0]!!.entries.iterator().next()
+
+                            arrayX.add(stringToDate(xAxisEntry.value))
+                            arrayY.add(yAxisEntry.value.toDouble())
                         }
                     } catch (e: NumberFormatException) {
                         arrayY.add(0.toDouble())
@@ -129,16 +134,16 @@ class ExerciseResults {
         return plottableBundleArray
     }
 
-    private fun addToArrayByDate(newResultMap: HashMap<Int, Pair<String, String>>) {
+    private fun addToArrayByDate(newResultMap: HashMap<Int, HashMap<String, String>>) {
 
         var intResultsArrayList = getArrayListOfResults()
 
         var i = 0
         while (i < intResultsArrayList.size) {
             try {
-                val newDate = stringToDate(newResultMap[0]!!.second)
+                val newDate = stringToDate(newResultMap[0]!![DATE_KEY]!!)
                 val oldDate =
-                    stringToDate(intResultsArrayList[i][0]!!.second) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
+                    stringToDate(intResultsArrayList[i][0]!![DATE_KEY]!!) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
                 if (newDate.after(oldDate)) {
                     intResultsArrayList.add(i, newResultMap)
                     return
@@ -155,7 +160,7 @@ class ExerciseResults {
 
     fun containsResult(date: String): Boolean {
         for (result in getArrayListOfResults()) {
-            if (result[0]?.second == Day.dayIDtoDashSeparator(date)) {
+            if (result[0]!![DATE_KEY]!! == Day.dayIDtoDashSeparator(date)) {
                 return true
             }
         }
@@ -166,7 +171,7 @@ class ExerciseResults {
         var intResultsArrayList = getArrayListOfResults()
 
         for (result in intResultsArrayList) {
-            if (result[0]?.second == Day.dayIDtoDashSeparator(date)) {
+            if (result[0]!![DATE_KEY]!! == Day.dayIDtoDashSeparator(date)) {
                 return intResultsArrayList.indexOf(result)
             }
         }
@@ -174,7 +179,7 @@ class ExerciseResults {
     }
 
     fun getResultDate(position: Int): String {
-        return getArrayListOfResults()[position][0]!!.second
+        return getArrayListOfResults()[position][0]!![DATE_KEY]!!
     }
 
     fun getPlottableNames(): ArrayList<String> {
@@ -182,8 +187,9 @@ class ExerciseResults {
 
         var array = arrayListOf<String>()
         for (i in 0 until intResultsFieldsMap.size) {
-            if (intResultsFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
-                array.add(intResultsFieldsMap[i]!!.first)
+            var entry = intResultsFieldsMap[i]!!.entries.iterator().next()
+            if (entry.value == PLOTTABLE_VALUE) {
+                array.add(entry.key)
             }
         }
         return array
