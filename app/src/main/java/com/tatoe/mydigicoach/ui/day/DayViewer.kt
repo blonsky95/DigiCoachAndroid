@@ -68,6 +68,7 @@ class DayViewer : AppCompatActivity() {
         recyclerViewDaySlider.layoutManager=LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false)
         recyclerViewDaySlider.adapter=DaySliderAdapter(this)
         recyclerViewDaySlider.layoutManager!!.scrollToPosition(DaySliderAdapter.INITIAL_POSITION-1)
+        //todo set an on click listener that 1. changes colour of tapped and 2. tells view pager to change to that 3. changes in view pager should move the day slider?
 
         mPager = findViewById(R.id.pager)
 
