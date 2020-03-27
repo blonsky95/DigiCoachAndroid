@@ -47,8 +47,8 @@ data class Exercise(
     }
 
     constructor(mFieldsHashMap: HashMap<Int, HashMap<String, String>>) : this(
-        mFieldsHashMap[0]!!["name"]!!,
-        mFieldsHashMap[1]!!["description"]!!
+        mFieldsHashMap[0]!!["Name"]!!,
+        mFieldsHashMap[1]!!["Description"]!!
     ) {
         setFieldsMap(mFieldsHashMap)
     }

@@ -28,7 +28,8 @@ data class Day(
 
         var dashSeparatedDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         var presentableDateFormat = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault())
-
+        var dayOfWeekDateFormat = SimpleDateFormat("EEE", Locale.getDefault())
+        var numberAndMonthDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
 
     }
 

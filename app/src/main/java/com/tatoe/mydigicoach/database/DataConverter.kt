@@ -41,13 +41,13 @@ class DataConverter {
     }
 
     @TypeConverter
-    fun stringToPairHashMap(data: String?) : HashMap<String,Pair<String,String>> {
-        return Gson().fromJson(data, object :TypeToken<HashMap<String,Pair<String,String>>>() {}.type)
+    fun stringToHashMap(data: String?) : HashMap<String,HashMap<String,String>> {
+        return Gson().fromJson(data, object :TypeToken<HashMap<String,HashMap<String,String>>>() {}.type)
     }
 
     @TypeConverter
-    fun pairHashMapToString(pairHashMap: HashMap<String,Pair<String,String>>) :String? {
-        return Gson().toJson(pairHashMap)
+    fun hashMapToString(hashMap: HashMap<String,HashMap<String,String>>) :String? {
+        return Gson().toJson(hashMap)
     }
 //    @TypeConverter
 //    fun stringToResultSetList(data: String?) : ArrayList<ResultSet> {

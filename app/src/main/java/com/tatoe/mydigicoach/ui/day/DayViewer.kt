@@ -9,12 +9,15 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.ui.util.DaySliderAdapter
 import kotlinx.android.synthetic.main.activity_day_viewer.*
 import kotlinx.android.synthetic.main.custom_dialog_window.view.*
 import timber.log.Timber
@@ -60,6 +63,11 @@ class DayViewer : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        var recyclerViewDaySlider = daySliderRecyclerView as RecyclerView
+        recyclerViewDaySlider.layoutManager=LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false)
+        recyclerViewDaySlider.adapter=DaySliderAdapter(this)
+        recyclerViewDaySlider.layoutManager!!.scrollToPosition(DaySliderAdapter.INITIAL_POSITION-1)
 
         mPager = findViewById(R.id.pager)
 
