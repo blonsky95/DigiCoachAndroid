@@ -161,30 +161,6 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
             intent.putExtra(ResultsCreator.RESULTS_DATE, date)
         }
 
-//        if (sDay!!.exerciseOccurencesMap[exercise]!!>0 && sDay!!.checkExistingResult(exercise)) {
-//            if (sDay!!.exerciseOccurencesMap[exercise]==1) {
-//
-//                intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
-//                intent.putExtra(
-//                    ResultsCreator.RESULT_INDEX,
-//                    exercise.exerciseResults.getResultPosition(date)
-//                )
-//            } else {
-//                intent = Intent(context, ResultsViewer::class.java)
-//                intent.putExtra(ResultsCreator.RESULTS_DATE,date)
-//                Toast.makeText(
-//                    context,
-//                    "This exercise has ${exercise.exerciseResults.numberResultsPerDate(date)} for this date, choose from the following",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//
-//            }
-//
-//        } else {
-//            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
-//            intent.putExtra(ResultsCreator.RESULTS_DATE, date)
-//        }
-
         startActivity(context, intent, null)
     }
 

@@ -1,10 +1,13 @@
 package com.tatoe.mydigicoach.entity
 
+import android.annotation.SuppressLint
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import timber.log.Timber
 import java.text.DecimalFormat
+import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
@@ -24,6 +27,17 @@ data class Day(
 
         fun dayIDtoDashSeparator(dayId:String) : String {
             return " ${dayId.substring(0,2)}-${dayId.substring(2,4)}-${dayId.substring(4,8)}"
+        }
+
+        @SuppressLint("SimpleDateFormat")
+        fun dayIDToDate(dayId: String) : Date? {
+            var dayIdFormat = SimpleDateFormat("ddMMyyyy")
+            return try {
+                dayIdFormat.parse(dayId)
+            } catch (e : ParseException){
+                Timber.d("parse exception: $e")
+                null
+            }
         }
 
         var dashSeparatedDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())

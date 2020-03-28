@@ -2,17 +2,17 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/constraint_layout"
         android:layout_width="150dp"
         android:layout_height="80dp"
-        android:background="#A8FFFFFF"
-        android:padding="1dp"
+        android:background="#919EE6"
+        android:layout_margin="1dp"
         android:orientation="vertical">
 
     <TextView
             android:id="@+id/week_day"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="#919EE6"
             android:gravity="center"
             android:padding="0dp"
             android:text="WED"
@@ -25,7 +25,6 @@
             android:id="@+id/day_and_month"
             android:layout_width="match_parent"
             android:layout_height="40dp"
-            android:background="#919EE6"
             android:gravity="center"
             android:padding="0dp"
             android:text="15 March"

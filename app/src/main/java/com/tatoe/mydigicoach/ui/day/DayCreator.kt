@@ -19,6 +19,8 @@ import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
+import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_creator.*
 import timber.log.Timber
 import kotlin.collections.ArrayList
@@ -35,7 +37,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     private lateinit var pagerAdapterTop: ScreenSlidePagerAdapter
     private lateinit var pagerAdapterBottom: ScreenSlidePagerAdapter
 
-    private lateinit var dataViewModel: DataViewModel
+    private lateinit var dataViewModel: DayViewerViewModel
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
@@ -53,7 +55,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
         setContentView(R.layout.activity_day_creator)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        dataViewModel = ViewModelProviders.of(this, MyDayViewerViewModelFactory(application)).get(DayViewerViewModel::class.java)
 
         initObservers()
 
