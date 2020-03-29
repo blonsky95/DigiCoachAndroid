@@ -11,7 +11,9 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
+import kotlin.math.abs
+import kotlin.math.floor
+import kotlin.math.roundToInt
 
 @Entity(tableName = "day_table")
 data class Day(
@@ -31,7 +33,6 @@ data class Day(
 
         @SuppressLint("SimpleDateFormat")
         fun dayIDToDate(dayId: String) : Date? {
-            var dayIdFormat = SimpleDateFormat("ddMMyyyy")
             return try {
                 dayIdFormat.parse(dayId)
             } catch (e : ParseException){
@@ -40,10 +41,29 @@ data class Day(
             }
         }
 
+        fun dateToDayID(date:Date):String{
+            return dayIdFormat.format(date)
+        }
+
+        fun getTodayDate():Date {
+            return Calendar.getInstance().time
+        }
+
+        fun getDayDifference(date1:Date, date2:Date) :Int {
+            var difference = date1.time - date2.time
+            return (difference.toDouble()/ MS_IN_DAY).roundToInt()
+
+        }
+
+
+        var dayIdFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
         var dashSeparatedDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         var presentableDateFormat = SimpleDateFormat("EEE MMM dd yyyy", Locale.getDefault())
         var dayOfWeekDateFormat = SimpleDateFormat("EEE", Locale.getDefault())
         var numberAndMonthDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
+
+        const val MS_IN_DAY = 86400000
+
 
     }
 

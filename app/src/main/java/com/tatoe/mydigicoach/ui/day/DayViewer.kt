@@ -12,11 +12,9 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.DaySliderAdapter
@@ -24,7 +22,6 @@ import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
 import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_viewer.*
 import kotlinx.android.synthetic.main.custom_dialog_window.view.*
-import kotlinx.android.synthetic.main.item_holder_day_slider_item.view.*
 import timber.log.Timber
 import java.util.*
 
@@ -35,19 +32,22 @@ class DayViewer : AppCompatActivity() {
     private lateinit var pagerAdapter: ScreenSlidePagerAdapter
     private lateinit var dataViewModel: DayViewerViewModel
     private lateinit var selectDaySliderListener: ClickListenerRecyclerView
+    private lateinit var linearLayoutManager: LinearLayoutManager
+    private var daySliderPosition = -1
+
 
     private var activeDay: Day? = null
     private lateinit var activeDayId: String
     private var allDays: List<Day> = listOf()
 
-    val MS_IN_WEEK:Long = 7*24*3600*1000
+    val MS_IN_WEEK: Long = 7 * 24 * 3600 * 1000
 
     val calendar: Calendar = Calendar.getInstance()
-    private var currentWeekOfYear=calendar.get(Calendar.WEEK_OF_YEAR)
-    private var tempWeekOfYear=currentWeekOfYear
+    private var currentWeekOfYear = calendar.get(Calendar.WEEK_OF_YEAR)
+    private var tempWeekOfYear = currentWeekOfYear
 
     var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
-    var fakeTimeInMillis :Long= System.currentTimeMillis()
+    var fakeTimeInMillis: Long = System.currentTimeMillis()
 
     //activeDay of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
     private fun filterDayOfWeek(dayWeek: Int): Int {
@@ -63,24 +63,30 @@ class DayViewer : AppCompatActivity() {
         setContentView(R.layout.activity_day_viewer)
         title = "Week View"
 
-        initListeners()
+        daySliderPosition=DaySliderAdapter.DEFAULT_POS
+
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        initListeners()
 
         var recyclerViewDaySlider = daySliderRecyclerView as RecyclerView
 
         var adapter = DaySliderAdapter(this)
         adapter.setOnClickInterface(selectDaySliderListener)
 
-        recyclerViewDaySlider.adapter=adapter
-        recyclerViewDaySlider.layoutManager=LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL,false)
-        recyclerViewDaySlider.layoutManager!!.scrollToPosition(DaySliderAdapter.DEFAULT_POS-1)
+        recyclerViewDaySlider.adapter = adapter
+
+        linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+        recyclerViewDaySlider.layoutManager=linearLayoutManager
+        recyclerViewDaySlider.layoutManager!!.scrollToPosition(DaySliderAdapter.DEFAULT_POS - 1)
 
 
         mPager = findViewById(R.id.pager)
 
-        dataViewModel = ViewModelProviders.of(this,MyDayViewerViewModelFactory(application)).get(DayViewerViewModel::class.java)
+        dataViewModel = ViewModelProviders.of(this, MyDayViewerViewModelFactory(application))
+            .get(DayViewerViewModel::class.java)
 
         AddTrainingBtn.setOnClickListener(updateDayListener)
         ChangeWeekBtn.setOnClickListener {
@@ -104,10 +110,22 @@ class DayViewer : AppCompatActivity() {
     private fun initObservers() {
         dataViewModel.activeDay.observe(this, androidx.lifecycle.Observer { dayId ->
             Timber.d("OBSERVER NEW DAYID: $dayId")
-            //todo here gets these nuts
-//            changeColour(dayId)
 //            changePagerPosition(dayId)
         })
+        dataViewModel.activePosition.observe(this, androidx.lifecycle.Observer { position ->
+            Timber.d("OBSERVER NEW POSITION: $position DAY SLIDER POSITION: $daySliderPosition")
+
+            val v1=linearLayoutManager.findViewByPosition(position)
+            v1?.setBackgroundColor(resources.getColor(R.color.darkBlue))
+
+            if (daySliderPosition>=0 && daySliderPosition!=position) {
+                val v2 = linearLayoutManager.findViewByPosition(daySliderPosition)
+                v2?.setBackgroundColor(resources.getColor(R.color.lightBlue))
+            }
+            daySliderPosition=position
+
+        })
+
 
         dataViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
             days?.let {
@@ -117,27 +135,32 @@ class DayViewer : AppCompatActivity() {
             //this way Adapter is created when observer is triggered
             pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
             mPager.adapter = pagerAdapter
-            if (DataHolder.pagerPosition>=0) {
-                mPager.currentItem = DataHolder.pagerPosition
-                DataHolder.pagerPosition=-1
+            if (DataHolder.pagerPosition >= 0) {
+                mPager.setCurrentItem(DataHolder.pagerPosition, false)
+//                mPager.currentItem = DataHolder.pagerPosition
+                DataHolder.pagerPosition = -1
             } else {
-                mPager.currentItem = dayOfWeek
+//                mPager.currentItem = dayOfWeek
+                mPager.setCurrentItem(dayOfWeek, false)
             }
 
 
-            Timber.d("list of days has been updated to: $allDays")
-        })    }
 
-    private fun generateDialog () {
+
+            Timber.d("list of days has been updated to: $allDays")
+        })
+    }
+
+    private fun generateDialog() {
         val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-        mDialogView.dialogTextTextView.text= "Current week: $tempWeekOfYear"
-        mDialogView.dialogEditText.hint="Enter week"
+        mDialogView.dialogTextTextView.text = "Current week: $tempWeekOfYear"
+        mDialogView.dialogEditText.hint = "Enter week"
         //AlertDialogBuilder
         val mBuilder = AlertDialog.Builder(this)
             .setView(mDialogView)
             .setTitle("Change week")
         //show dialog
-        val  mAlertDialog = mBuilder.show()
+        val mAlertDialog = mBuilder.show()
         //login button click of custom layout
         mDialogView.dialogEnterBtn.setOnClickListener {
             //dismiss dialog
@@ -154,14 +177,15 @@ class DayViewer : AppCompatActivity() {
     }
 
     private fun changeWeekContent(weekNumber: Int) {
-        tempWeekOfYear=weekNumber
-        fakeTimeInMillis=System.currentTimeMillis()+((tempWeekOfYear-currentWeekOfYear)*MS_IN_WEEK)
+        tempWeekOfYear = weekNumber
+        fakeTimeInMillis =
+            System.currentTimeMillis() + ((tempWeekOfYear - currentWeekOfYear) * MS_IN_WEEK)
         mPager.adapter = pagerAdapter
         mPager.currentItem = 0
     }
 
     override fun onDestroy() {
-        DataHolder.pagerPosition=-1
+        DataHolder.pagerPosition = -1
         super.onDestroy()
     }
 
@@ -170,7 +194,7 @@ class DayViewer : AppCompatActivity() {
 
         val intent = Intent(this, DayCreator::class.java)
         intent.putExtra(DayCreator.DAY_ID, activeDayId)
-        DataHolder.pagerPosition=mPager.currentItem
+        DataHolder.pagerPosition = mPager.currentItem
         startActivity(intent)
     }
 
@@ -183,7 +207,7 @@ class DayViewer : AppCompatActivity() {
     }
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
-        FragmentStatePagerAdapter(fm) {
+        FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
         var tempDayOfWeek = ""
         var tempDayOfMonth = ""
@@ -233,7 +257,7 @@ class DayViewer : AppCompatActivity() {
             )
             return Day.intDatetoDayId(
                 fakeCalendar.get(Calendar.DAY_OF_MONTH),
-                fakeCalendar.get(Calendar.MONTH)+1, //month is always 1 behind despite consistent Locale.getDefault() (?)
+                fakeCalendar.get(Calendar.MONTH) + 1, //month is always 1 behind despite consistent Locale.getDefault() (?)
                 fakeCalendar.get(Calendar.YEAR)
             )
         }
@@ -257,7 +281,11 @@ class DayViewer : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.action_info -> {
-            Utils.getInfoDialogView(this,"Duplicate exercises","There can only be one result per exercise per date")
+            Utils.getInfoDialogView(
+                this,
+                "Duplicate exercises",
+                "There can only be one result per exercise per date"
+            )
             true
         }
         else -> {

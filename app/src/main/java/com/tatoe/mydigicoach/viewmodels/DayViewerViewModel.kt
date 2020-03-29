@@ -5,12 +5,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.util.DaySliderAdapter
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,6 +25,8 @@ class DayViewerViewModel(application: Application) :
     val allUserBlocks: LiveData<List<Block>>
 
     val activeDay: MutableLiveData<String> =  MutableLiveData()
+    val activePosition: MutableLiveData<Int> =  MutableLiveData()
+    val oldActivePosition: MutableLiveData<Int> =  MutableLiveData()
 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
@@ -57,6 +59,12 @@ class DayViewerViewModel(application: Application) :
     }
 
     fun changeActiveDay(dayId:String) {
-        activeDay.value=dayId
+        activePosition.value=DaySliderAdapter.dayIdToPosition(dayId)
+        activeDay.value= dayId
     }
+
+//    fun changeActivePosition(position:Int) {
+//        newActivePosition.value=position
+//        activeDay.value= DaySliderAdapter.positionToDayId(position)
+//    }
 }

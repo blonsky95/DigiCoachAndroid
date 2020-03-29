@@ -18,23 +18,30 @@ class DaySliderAdapter(var context: Context) :
     companion object {
         const val MAX_DAYS = 100
         const val DEFAULT_POS = (MAX_DAYS / 2) - 1
-        const val MS_IN_DAY = 86400000
 
         fun positionToDayId(position: Int): String {
             val myCalendar = getDifferentCalendar(position)
 
-            return Day.intDatetoDayId(
-                myCalendar.get(Calendar.DAY_OF_MONTH),
-                myCalendar.get(Calendar.MONTH) + 1, //month is always 1 behind despite consistent Locale.getDefault() (?)
-                myCalendar.get(Calendar.YEAR)
-            )
+            return Day.dateToDayID(myCalendar.time)
+
+//            return Day.intDatetoDayId(
+//                myCalendar.get(Calendar.DAY_OF_MONTH),
+//                myCalendar.get(Calendar.MONTH) + 1, //month is always 1 behind despite consistent Locale.getDefault() (?)
+//                myCalendar.get(Calendar.YEAR)
+//            )
+        }
+
+        fun dayIdToPosition(dayId:String) : Int {
+            //make day id date and find day difference between day id and now and then use default pos
+            val dayDiff = Day.getDayDifference(Day.dayIDToDate(dayId)!!,Day.getTodayDate())
+            return DEFAULT_POS+dayDiff
         }
 
         private fun getDifferentCalendar(position: Int): Calendar {
             val calendar = Calendar.getInstance()
             //this is like getting current calendar and adding/subtracting millis to set the new calendar
             calendar.timeInMillis =
-                calendar.timeInMillis + ((position - DEFAULT_POS) * MS_IN_DAY)
+                calendar.timeInMillis + ((position - DEFAULT_POS) * Day.MS_IN_DAY)
             return calendar
         }
     }
@@ -46,7 +53,7 @@ class DaySliderAdapter(var context: Context) :
     var dayOfWeek: String = ""
     var numberAndMonth: String = ""
 
-    val rightNowCalendar = Calendar.getInstance()
+//    val rightNowCalendar = Calendar.getInstance()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): DaySliderViewHolder {
         var itemView = inflater.inflate(R.layout.item_holder_day_slider_item, parent, false)
