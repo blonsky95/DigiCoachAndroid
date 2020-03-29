@@ -59,7 +59,7 @@ class DayViewerViewModel(application: Application) :
     }
 
     fun changeActiveDay(dayId:String) {
-        activePosition.value=DaySliderAdapter.dayIdToPosition(dayId)
+//        activePosition.value=DaySliderAdapter.dayIdToPosition(dayId)
         activeDay.value= dayId
     }
 

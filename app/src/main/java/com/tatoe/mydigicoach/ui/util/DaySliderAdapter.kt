@@ -108,5 +108,4 @@ class DaySliderAdapter(var context: Context) :
         }
 
     }
-
 }

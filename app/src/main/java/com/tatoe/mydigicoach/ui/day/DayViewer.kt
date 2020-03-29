@@ -3,7 +3,6 @@ package com.tatoe.mydigicoach.ui.day
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -15,13 +14,13 @@ import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.entity.Day.Companion.isLeapYear
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.DaySliderAdapter
 import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
 import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_viewer.*
-import kotlinx.android.synthetic.main.custom_dialog_window.view.*
 import timber.log.Timber
 import java.util.*
 
@@ -40,14 +39,16 @@ class DayViewer : AppCompatActivity() {
     private lateinit var activeDayId: String
     private var allDays: List<Day> = listOf()
 
+    private var isLeapYearBoolean:Boolean?=null
+
     val MS_IN_WEEK: Long = 7 * 24 * 3600 * 1000
 
     val calendar: Calendar = Calendar.getInstance()
     private var currentWeekOfYear = calendar.get(Calendar.WEEK_OF_YEAR)
-    private var tempWeekOfYear = currentWeekOfYear
+    private var nonCurrentWeekOfYear = currentWeekOfYear
 
     var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
-    var fakeTimeInMillis: Long = System.currentTimeMillis()
+    var nonCurrentTimeInMillis: Long = System.currentTimeMillis()
 
     //activeDay of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
     private fun filterDayOfWeek(dayWeek: Int): Int {
@@ -77,7 +78,6 @@ class DayViewer : AppCompatActivity() {
         adapter.setOnClickInterface(selectDaySliderListener)
 
         recyclerViewDaySlider.adapter = adapter
-
         linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
         recyclerViewDaySlider.layoutManager=linearLayoutManager
         recyclerViewDaySlider.layoutManager!!.scrollToPosition(DaySliderAdapter.DEFAULT_POS - 1)
@@ -89,9 +89,9 @@ class DayViewer : AppCompatActivity() {
             .get(DayViewerViewModel::class.java)
 
         AddTrainingBtn.setOnClickListener(updateDayListener)
-        ChangeWeekBtn.setOnClickListener {
-            generateDialog()
-        }
+//        ChangeWeekBtn.setOnClickListener {
+//            generateDialog()
+//        }
 
         initObservers()
 
@@ -110,19 +110,28 @@ class DayViewer : AppCompatActivity() {
     private fun initObservers() {
         dataViewModel.activeDay.observe(this, androidx.lifecycle.Observer { dayId ->
             Timber.d("OBSERVER NEW DAYID: $dayId")
-//            changePagerPosition(dayId)
+//            pagerAdapter.setDay(dayId)
+//            mPager.changePagerPosition(dayId)
+
+            var nonCurrentCalendar = Calendar.getInstance()
+            nonCurrentCalendar.time=Day.dayIDToDate(dayId)
+
+            changeWeekContent(nonCurrentCalendar)
+            mPager.currentItem= changeDayPositionInPager(nonCurrentCalendar)
         })
         dataViewModel.activePosition.observe(this, androidx.lifecycle.Observer { position ->
             Timber.d("OBSERVER NEW POSITION: $position DAY SLIDER POSITION: $daySliderPosition")
+            //does nothing atm - the slider is clickable but doesnt react to anything
 
-            val v1=linearLayoutManager.findViewByPosition(position)
-            v1?.setBackgroundColor(resources.getColor(R.color.darkBlue))
 
-            if (daySliderPosition>=0 && daySliderPosition!=position) {
-                val v2 = linearLayoutManager.findViewByPosition(daySliderPosition)
-                v2?.setBackgroundColor(resources.getColor(R.color.lightBlue))
-            }
-            daySliderPosition=position
+//            val v1=linearLayoutManager.findViewByPosition(position)
+//            v1?.setBackgroundColor(resources.getColor(R.color.darkBlue))
+//
+//            if (daySliderPosition>=0 && daySliderPosition!=position) {
+//                val v2 = linearLayoutManager.findViewByPosition(daySliderPosition)
+//                v2?.setBackgroundColor(resources.getColor(R.color.lightBlue))
+//            }
+//            daySliderPosition=position
 
         })
 
@@ -143,46 +152,70 @@ class DayViewer : AppCompatActivity() {
 //                mPager.currentItem = dayOfWeek
                 mPager.setCurrentItem(dayOfWeek, false)
             }
-
-
-
-
-            Timber.d("list of days has been updated to: $allDays")
         })
     }
 
-    private fun generateDialog() {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-        mDialogView.dialogTextTextView.text = "Current week: $tempWeekOfYear"
-        mDialogView.dialogEditText.hint = "Enter week"
-        //AlertDialogBuilder
-        val mBuilder = AlertDialog.Builder(this)
-            .setView(mDialogView)
-            .setTitle("Change week")
-        //show dialog
-        val mAlertDialog = mBuilder.show()
-        //login button click of custom layout
-        mDialogView.dialogEnterBtn.setOnClickListener {
-            //dismiss dialog
-            mAlertDialog.dismiss()
-            //get text from EditTexts of custom layout
-            val weekNumber = mDialogView.dialogEditText.text.toString().toInt()
-            changeWeekContent(weekNumber)
+    private fun changeDayPositionInPager(nonCurrentCalendar: Calendar) : Int {
+
+        var mDayOfWeek=nonCurrentCalendar.get(Calendar.DAY_OF_WEEK)
+        if (isLeapYearBoolean==null) {
+            isLeapYearBoolean=isLeapYear(nonCurrentCalendar)
+            changeDayPositionInPager(nonCurrentCalendar)
+        } else {
+            if (isLeapYearBoolean!!) {
+                if (mDayOfWeek==1){
+                    mDayOfWeek=7
+                } else {
+                    mDayOfWeek--
+                }
+            }
         }
-        //cancel button click of custom layout
-        mDialogView.dialogCancelBtn.setOnClickListener {
-            //dismiss dialog
-            mAlertDialog.dismiss()
-        }
+
+        return mDayOfWeek-1
     }
 
-    private fun changeWeekContent(weekNumber: Int) {
-        tempWeekOfYear = weekNumber
-        fakeTimeInMillis =
-            System.currentTimeMillis() + ((tempWeekOfYear - currentWeekOfYear) * MS_IN_WEEK)
-        mPager.adapter = pagerAdapter
-        mPager.currentItem = 0
+    private fun changeWeekContent(nonCurrentCalendar: Calendar) {
+
+        nonCurrentWeekOfYear = nonCurrentCalendar.get(Calendar.WEEK_OF_YEAR)
+
+        if (nonCurrentWeekOfYear!=currentWeekOfYear) {
+            nonCurrentTimeInMillis =
+                System.currentTimeMillis() + ((nonCurrentWeekOfYear - currentWeekOfYear) * MS_IN_WEEK)
+            pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+            mPager.adapter = pagerAdapter
+
+        }
+//        mPager.currentItem = 0
     }
+
+
+
+//    private fun generateDialog() {
+//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
+//        mDialogView.dialogTextTextView.text = "Current week: $nonCurrentWeekOfYear"
+//        mDialogView.dialogEditText.hint = "Enter week"
+//        //AlertDialogBuilder
+//        val mBuilder = AlertDialog.Builder(this)
+//            .setView(mDialogView)
+//            .setTitle("Change week")
+//        //show dialog
+//        val mAlertDialog = mBuilder.show()
+//        //login button click of custom layout
+//        mDialogView.dialogEnterBtn.setOnClickListener {
+//            //dismiss dialog
+//            mAlertDialog.dismiss()
+//            //get text from EditTexts of custom layout
+//            val weekNumber = mDialogView.dialogEditText.text.toString().toInt()
+//            changeWeekContent(weekNumber)
+//        }
+//        //cancel button click of custom layout
+//        mDialogView.dialogCancelBtn.setOnClickListener {
+//            //dismiss dialog
+//            mAlertDialog.dismiss()
+//        }
+//    }
+
+
 
     override fun onDestroy() {
         DataHolder.pagerPosition = -1
@@ -206,27 +239,47 @@ class DayViewer : AppCompatActivity() {
         }
     }
 
+
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
         FragmentStatePagerAdapter(fm, BEHAVIOR_RESUME_ONLY_CURRENT_FRAGMENT) {
 
-        var tempDayOfWeek = ""
-        var tempDayOfMonth = ""
-        var tempMonthOfYear = ""
+        private val DAYS_WEEK = 7
+//        private lateinit var sPager: ViewPager
+
+//        var tempDayOfWeek = ""
+//        var tempDayOfMonth = ""
+//        var tempMonthOfYear = ""
         var primaryItemSet = -1
+
+        var mDayOfWeek = -1
+        var mDayOfMonth = -1
+
+//        fun setPager(pager:ViewPager){
+//            sPager=pager
+//        }
+
+//        fun setDay(dayId:String) {
+//            var newCalendar = Calendar.getInstance()
+//            newCalendar.time=Day.dayIDToDate(dayId)
+//
+//            mDayOfWeek=newCalendar.get(Calendar.DAY_OF_WEEK)
+//
+////            viewPager.currentItem=mDayOfWeek
+//        }
 
         override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
             //this says which position is currently active, use it to know which activedayid
             super.setPrimaryItem(container, position, `object`)
             if (position != primaryItemSet) {  //this function is called 2 or 3 times per swipe so avoid reupdating the dayid variable unnecesarily and creating conflicts
-                activeDayId = toDayIdFormat(dayOfWeek - position)
+                activeDayId = toDayIdFormat(mDayOfWeek - position)
                 activeDay = getDayById(activeDayId)
-                dataViewModel.changeActiveDay(activeDayId)
+//                dataViewModel.changeActiveDay(activeDayId)
 
                 primaryItemSet = position
             }
         }
 
-        override fun getCount(): Int = 7
+        override fun getCount(): Int = DAYS_WEEK
 
         override fun getItem(position: Int): Fragment {
             //this is also called to load the adjacent fragments - so shouldnt be used to know which fragment dayId is currently active
@@ -240,26 +293,28 @@ class DayViewer : AppCompatActivity() {
         // to DDMMYYYY format, dayDiff is the
         private fun toDayIdFormat(dayDiff: Int): String {
 
-            var fakeCalendar = Calendar.getInstance()
+            var nonCurrentCalendar = Calendar.getInstance()
 //            fakeCalendar.timeInMillis =
 //                System.currentTimeMillis() - ((24 * 60 * 60 * 1000) * dayDiff)
-            fakeCalendar.timeInMillis =
-                fakeTimeInMillis - ((24 * 60 * 60 * 1000) * dayDiff)
-            Timber.d("ptg fake calendar week of year: ${fakeCalendar.get(Calendar.WEEK_OF_YEAR)}")
+            nonCurrentCalendar.timeInMillis =
+                nonCurrentTimeInMillis - ((Day.MS_IN_DAY) * dayDiff)
 
-            tempDayOfMonth = fakeCalendar.get(Calendar.DAY_OF_MONTH).toString()
-            tempMonthOfYear =
-                fakeCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
-            tempDayOfWeek = fakeCalendar.getDisplayName(
-                Calendar.DAY_OF_WEEK,
-                Calendar.LONG,
-                Locale.getDefault()
-            )
-            return Day.intDatetoDayId(
-                fakeCalendar.get(Calendar.DAY_OF_MONTH),
-                fakeCalendar.get(Calendar.MONTH) + 1, //month is always 1 behind despite consistent Locale.getDefault() (?)
-                fakeCalendar.get(Calendar.YEAR)
-            )
+//            tempDayOfMonth = fakeCalendar.get(Calendar.DAY_OF_MONTH).toString()
+//            tempMonthOfYear =
+//                fakeCalendar.getDisplayName(Calendar.MONTH, Calendar.LONG, Locale.getDefault())
+//            tempDayOfWeek = fakeCalendar.getDisplayName(
+//                Calendar.DAY_OF_WEEK,
+//                Calendar.LONG,
+//                Locale.getDefault()
+//            )
+
+
+            return Day.dateToDayID(nonCurrentCalendar.time)
+//            return Day.intDatetoDayId(
+//                fakeCalendar.get(Calendar.DAY_OF_MONTH),
+//                fakeCalendar.get(Calendar.MONTH) + 1, //month is always 1 behind despite consistent Locale.getDefault() (?)
+//                fakeCalendar.get(Calendar.YEAR)
+//            )
         }
 
     }

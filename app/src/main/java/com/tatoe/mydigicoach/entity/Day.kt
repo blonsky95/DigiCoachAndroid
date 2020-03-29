@@ -55,6 +55,10 @@ data class Day(
 
         }
 
+        fun isLeapYear(newCalendar: Calendar?): Boolean {
+            return newCalendar!!.get(Calendar.YEAR)%4==0
+        }
+
 
         var dayIdFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
         var dashSeparatedDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
