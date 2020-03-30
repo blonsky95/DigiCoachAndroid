@@ -10,7 +10,6 @@ import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.util.DaySliderAdapter
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -24,7 +23,7 @@ class DayViewerViewModel(application: Application) :
     val allExercises: LiveData<List<Exercise>>
     val allUserBlocks: LiveData<List<Block>>
 
-    val activeDay: MutableLiveData<String> =  MutableLiveData()
+    val activeDayIdStr: MutableLiveData<String> =  MutableLiveData()
     val activePosition: MutableLiveData<Int> =  MutableLiveData()
     val oldActivePosition: MutableLiveData<Int> =  MutableLiveData()
 
@@ -60,7 +59,7 @@ class DayViewerViewModel(application: Application) :
 
     fun changeActiveDay(dayId:String) {
 //        activePosition.value=DaySliderAdapter.dayIdToPosition(dayId)
-        activeDay.value= dayId
+        activeDayIdStr.value= dayId
     }
 
 //    fun changeActivePosition(position:Int) {
