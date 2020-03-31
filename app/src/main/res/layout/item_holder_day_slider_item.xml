@@ -5,7 +5,7 @@
         android:id="@+id/constraint_layout"
         android:layout_width="150dp"
         android:layout_height="80dp"
-        android:background="@color/lightBlue"
+        android:background="@drawable/day_slider_background_colour"
         android:layout_margin="1dp"
         android:orientation="vertical">
 
