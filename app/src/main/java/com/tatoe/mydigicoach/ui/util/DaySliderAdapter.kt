@@ -16,7 +16,7 @@ class DaySliderAdapter(var context: Context) :
     RecyclerView.Adapter<DaySliderAdapter.DaySliderViewHolder>() {
 
     companion object {
-        const val MAX_DAYS = 100
+        const val MAX_DAYS = 120
         const val DEFAULT_POS = (MAX_DAYS / 2) - 1
 
         fun positionToDayId(position: Int): String {
@@ -40,8 +40,11 @@ class DaySliderAdapter(var context: Context) :
         private fun getDifferentCalendar(position: Int): Calendar {
             val calendar = Calendar.getInstance()
             //this is like getting current calendar and adding/subtracting millis to set the new calendar
+
+            //THIS HAS TO BE LONG TYPE ELSE IT RUNS OUT OF INT RANGE
             calendar.timeInMillis =
-                calendar.timeInMillis + ((position - DEFAULT_POS) * Day.MS_IN_DAY)
+                Calendar.getInstance().timeInMillis + ((position - DEFAULT_POS) * Day.MS_IN_DAY)
+
             return calendar
         }
     }
@@ -67,6 +70,7 @@ class DaySliderAdapter(var context: Context) :
     override fun onBindViewHolder(holder: DaySliderViewHolder, position: Int) {
         dayOfWeek = getDayOfWeek(position)
         numberAndMonth = getNumberAndMonth(position)
+        Timber.d("ptg viewholderbind position: $position numberandmonth: $numberAndMonth dayofweek:$dayOfWeek")
         holder.dayWeek.text = dayOfWeek
         holder.numberAndMonth.text = numberAndMonth
     }

@@ -66,42 +66,8 @@ data class Day(
         var dayOfWeekDateFormat = SimpleDateFormat("EEE", Locale.getDefault())
         var numberAndMonthDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
 
-        const val MS_IN_DAY = 86400000
+        const val MS_IN_DAY:Long = 86400000
 
 
     }
-
-//    var exerciseOccurencesMap = LinkedHashMap<Exercise,Int?>()
-
-//    fun checkExistingResult(exercise: Exercise) : Boolean {
-//        iterateExes(exercises)
-//        for (block in blocks) {
-//            iterateExes(block.components)
-//        }
-//
-//        return if (exerciseOccurencesMap[exercise]!!<exercise.exerciseResults.numberResultsPerDate(dayIDtoDashSeparator(dayId))) {
-//            exerciseOccurencesMap[exercise]=exerciseOccurencesMap[exercise]!!.plus(1)
-//            true
-//        } else {
-//            false
-//        }
-//    }
-//
-//    fun iterateExes(exercisesArrayList: ArrayList<Exercise>) {
-//        for (exe in exercisesArrayList) {
-//            if (!exerciseOccurencesMap.containsKey(exe)) {
-//                exerciseOccurencesMap[exe] = 0
-//            }
-//        }
-//    }
-
-
-//    private fun modifyCounter(exe: Exercise) {
-//        if (exerciseOccurencesMap.containsKey(exe)) {
-//            exerciseOccurencesMap[exe] = exerciseOccurencesMap[exe]?.plus(1)
-//        } else {
-//            exerciseOccurencesMap[exe]=0
-//        }
-//    }
-
 }
