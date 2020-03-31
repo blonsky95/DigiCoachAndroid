@@ -217,6 +217,8 @@ class DayViewer : AppCompatActivity() {
             super.setPrimaryItem(container, position, `object`)
             if (position != primaryItemSet) {  //this function is called 2 or 3 times per swipe so avoid reupdating the dayid variable unnecesarily and creating conflicts
 //                activeDayId = toDayIdFormat(mDayOfWeek - position)
+//                activeDayId = dayId
+                activeDayId = toDayIdFormat(reformatDayOfWeek(currentCalendar) - position)
                 activeDay = getDayByDayId(activeDayId)
                 primaryItemSet = position
                 Timber.d("ptg displaying day $activeDayId position: $position")
