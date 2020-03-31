@@ -176,9 +176,9 @@ class DayViewer : AppCompatActivity() {
                 currentCalendar.timeInMillis + ((nonCurrentWeekOfYear - currentWeekOfYear) * MS_IN_WEEK)
             currentCalendar.time = nonCurrentCalendar.time
 
-//            pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
-//            mPager.adapter = pagerAdapter
-            mPager.adapter!!.notifyDataSetChanged()
+            pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+            mPager.adapter = pagerAdapter
+//            mPager.adapter!!.notifyDataSetChanged()
         }
 //        mPager.currentItem = 0
     }
