@@ -38,8 +38,8 @@ class ResultsCreator : AppCompatActivity() {
 
     private lateinit var linearLayout: LinearLayout
 
-    private var sResultFieldsMap = HashMap<Int, Pair<String, String>>()
-    private var sResultsArrayList: ArrayList<HashMap<Int, Pair<String, String>>> = arrayListOf()
+    private var sResultFieldsMap = HashMap<Int, HashMap<String, String>>()
+    private var sResultsArrayList: ArrayList<HashMap<Int, HashMap<String, String>>> = arrayListOf()
 
 
     private lateinit var dataViewModel: DataViewModel
@@ -178,15 +178,17 @@ class ResultsCreator : AppCompatActivity() {
 //            }
             //the current hashmap with the int for order and the key and value for this field
             var currentField = uiFieldsValues[i]
+            var currentEntry = currentField!!.entries.iterator().next()
 
-            var fieldEntryKey = currentField!!.first //first of pair - title of entry
+            var fieldEntryKey = currentEntry.key //first of pair - title of entry
             var fieldEntryValue = "" //second of pair - value of entry
             var entryHintString = "Type here"
             if (mAction != OBJECT_NEW) {
 //                currentField = sResultsArrayList[resultIndex][i]
                 sResultsArrayList[resultIndex][i]?.let {
-                    fieldEntryKey = it.first
-                    fieldEntryValue = it.second
+                    var entry = sResultsArrayList[resultIndex][i]!!.entries.iterator().next()
+                    fieldEntryKey = entry.key
+                    fieldEntryValue = entry.value
 //                entryValueTextString = "whats going on here"
 //                }
                 }
@@ -219,7 +221,7 @@ class ResultsCreator : AppCompatActivity() {
                 )
             fieldInfoTextView.text = fieldEntryValue
 
-            if (currentField.second == ExerciseResults.PLOTTABLE_VALUE) {
+            if (currentEntry.value == ExerciseResults.PLOTTABLE_VALUE) {
                 fieldEditText.inputType = InputType.TYPE_CLASS_NUMBER
                 fieldEditText.setBackgroundColor(resources.getColor(R.color.lightBlue))
                 fieldInfoTextView.setBackgroundColor(resources.getColor(R.color.lightBlue))
@@ -271,7 +273,7 @@ class ResultsCreator : AppCompatActivity() {
             newFieldValue = ExerciseResults.PLOTTABLE_VALUE
         }
 //        sResultFieldsMap[fieldName] = newFieldValue
-        sResultFieldsMap[sResultFieldsMap.size] = Pair(fieldName, newFieldValue)
+        sResultFieldsMap[sResultFieldsMap.size] = hashMapOf(fieldName to newFieldValue)
         updateBodyUI(OBJECT_EDIT)
 
     }
@@ -361,13 +363,13 @@ class ResultsCreator : AppCompatActivity() {
         backToViewer()
     }
 
-    private fun getFieldContents(): HashMap<Int, Pair<String, String>> {
+    private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
 
-        var fieldsMap = HashMap<Int, Pair<String, String>>()
+        var fieldsMap = HashMap<Int, HashMap<String, String>>()
         if (mAction== OBJECT_NEW) {
-            fieldsMap[0] = Pair(ExerciseResults.DATE_KEY,Day.dayIDtoDashSeparator(resultDate))
+            fieldsMap[0] = hashMapOf(ExerciseResults.DATE_KEY to Day.dayIDtoDashSeparator(resultDate))
         } else {
-            fieldsMap[0] =Pair(ExerciseResults.DATE_KEY,activeExercise!!.exerciseResults.getResultDate(resultIndex))
+            fieldsMap[0] =hashMapOf(ExerciseResults.DATE_KEY to activeExercise!!.exerciseResults.getResultDate(resultIndex))
         }
         for (i in 0 until linearLayout.childCount/3) {
 //            var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
@@ -375,7 +377,7 @@ class ResultsCreator : AppCompatActivity() {
             var fieldName = (linearLayout.getChildAt(3*i) as TextView).text.toString()
             var fieldValue = (linearLayout.getChildAt(3*i + 1) as EditText).text.trim().toString()
 
-            fieldsMap[i+1] =   Pair(fieldName,fieldValue)
+            fieldsMap[i+1] =   hashMapOf(fieldName to fieldValue)
         }
         return fieldsMap
     }

@@ -11,7 +11,7 @@ import timber.log.Timber
 class ResultListAdapter(var context: Context) : RecyclerView.Adapter<CollapsibleItemViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var sResults = arrayListOf<HashMap<Int, Pair<String, String>>>()
+    private var sResults = arrayListOf<HashMap<Int, HashMap<String, String>>>()
     private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
 
@@ -29,9 +29,9 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
 
 
         if (sResults.isNotEmpty()) {
-                holder.resultDate.text=ExerciseResults.getReadableDate(ExerciseResults.stringToDate(sResults[position][0]!!.second)) //0 is date
-                if (sResults[position][0]!!.second!=null) {
-                    holder.resultResult.text=sResults[position][1]!!.second //1 is note
+                holder.resultDate.text=ExerciseResults.getReadableDate(ExerciseResults.stringToDate(sResults[position][0]!![ExerciseResults.DATE_KEY]!!)) //0 is date
+                if (sResults[position][0]!![ExerciseResults.DATE_KEY]!=null) {
+                    holder.resultResult.text=sResults[position][1]!![ExerciseResults.NOTE_KEY]!! //1 is note
                     holder.resultResult.visibility=View.GONE
                 } else {
                     holder.resultResult.text="nothing written here"
@@ -45,7 +45,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<Collapsible
         }
     }
 
-    internal fun setContent(results : ArrayList<HashMap<Int, Pair<String, String>>>) {
+    internal fun setContent(results : ArrayList<HashMap<Int, HashMap<String, String>>>) {
         this.sResults = results
         notifyDataSetChanged()
     }
