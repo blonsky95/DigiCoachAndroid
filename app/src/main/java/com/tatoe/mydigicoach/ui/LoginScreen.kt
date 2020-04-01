@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.ui
 
 import android.content.Intent
+import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
@@ -8,11 +9,14 @@ import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.tatoe.mydigicoach.R
 import kotlinx.android.synthetic.main.activity_login_screen.*
 import timber.log.Timber
+import java.util.jar.Manifest
 
 class LoginScreen : AppCompatActivity() {
 
@@ -21,6 +25,9 @@ class LoginScreen : AppCompatActivity() {
 
     private lateinit var userEditText: EditText
     private lateinit var passwordEditText: EditText
+
+    private var hasPermissions = false
+    private val PERMISSION_REQUEST_CODE=123
 
     private lateinit var auth: FirebaseAuth
     private lateinit var progress: ProgressBar
@@ -40,6 +47,16 @@ class LoginScreen : AppCompatActivity() {
 
         userEditText = username_field
         passwordEditText = password_field
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            != PackageManager.PERMISSION_GRANTED) {
+            // Permission is not granted
+            ActivityCompat.requestPermissions(this,
+                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                PERMISSION_REQUEST_CODE)
+        } else {
+            hasPermissions=true
+        }
 
     }
 
@@ -130,9 +147,13 @@ class LoginScreen : AppCompatActivity() {
 
     private fun updateUI(user: FirebaseUser?) {
         if (user != null) {
-            val intent = Intent(this, HomeScreen::class.java)
-            startActivity(intent)
-            finish()
+            if (hasPermissions) {
+                val intent = Intent(this, HomeScreen::class.java)
+                startActivity(intent)
+                finish()
+            } else {
+                Toast.makeText(this,"Accept permissions you turd", Toast.LENGTH_LONG).show()
+            }
         }
     }
 
@@ -146,5 +167,22 @@ class LoginScreen : AppCompatActivity() {
         val currentUser = auth.currentUser
         //todo when is this current user reset to null???
         updateUI(currentUser)
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            PERMISSION_REQUEST_CODE -> {
+                // If request is cancelled, the result arrays are empty.
+                hasPermissions = (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                return
+            }
+
+            // Add other 'when' lines to check for other
+            // permissions this app might request.
+            else -> {
+                // Ignore all other requests.
+            }
+        }
     }
 }
