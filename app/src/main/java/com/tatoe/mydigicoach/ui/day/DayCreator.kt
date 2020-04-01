@@ -41,7 +41,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
-    private var allUserBlocks: List<Block> = listOf()
+//    private var allUserBlocks: List<Block> = listOf()
     private var allExercises: List<Exercise> = listOf()
 
     lateinit var activeDay: Day
@@ -69,7 +69,7 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
 
         DataHolder.activeDayHolder?.let { it ->
             activeDay = it
-            currentDayBlocks = activeDay.blocks
+//            currentDayBlocks = activeDay.blocks
             currentDayExercises = activeDay.exercises
             Timber.d("data holder: active day: $activeDay")
         }
@@ -84,21 +84,21 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     }
 
     private fun updateBottomContent() {
-        Timber.d("updating bottom content blocks $currentDayBlocks")
-        Timber.d("updating bottom content exes $currentDayExercises")
+//        Timber.d("updating bottom content blocks $currentDayBlocks")
+//        Timber.d("updating bottom content exes $currentDayExercises")
 
 
-        pagerAdapterBottom.mBlockFragment?.updateBlockAdapterContent(currentDayBlocks)
+//        pagerAdapterBottom.mBlockFragment?.updateBlockAdapterContent(currentDayBlocks)
         pagerAdapterBottom.mExerciseFragment?.updateExerciseAdapterContent(currentDayExercises)
     }
 
     private fun initObservers() {
-        dataViewModel.allUserBlocks.observe(this, Observer { blocks ->
-            blocks?.let {
-                allUserBlocks = it
-                pagerAdapterTop.mBlockFragment?.updateBlockAdapterContent(it)
-            }
-        })
+//        dataViewModel.allUserBlocks.observe(this, Observer { blocks ->
+//            blocks?.let {
+//                allUserBlocks = it
+//                pagerAdapterTop.mBlockFragment?.updateBlockAdapterContent(it)
+//            }
+//        })
 
         dataViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
@@ -118,14 +118,14 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     override fun itemSelected(adapterType: Int, position: Int, deletingItem: Boolean) {
         when (adapterType) {
             CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> {
-                if (deletingItem) {
-                    currentDayBlocks.remove(currentDayBlocks[position])
-                } else {
-                    currentDayBlocks.add(
-                        currentDayBlocks.size,
-                        allUserBlocks[position]
-                    )
-                }
+//                if (deletingItem) {
+//                    currentDayBlocks.remove(currentDayBlocks[position])
+//                } else {
+//                    currentDayBlocks.add(
+//                        currentDayBlocks.size,
+//                        allUserBlocks[position]
+//                    )
+//                }
             }
             CustomAdapterFragment.EXERCISE_TYPE_ADAPTER -> {
                 if (deletingItem) {
@@ -158,25 +158,30 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
             mExerciseFragment?.contentUpdated = true
         }
 
-        override fun getCount(): Int = 2
+//        override fun getCount(): Int = 2
+        override fun getCount(): Int = 1
+
 
         override fun getItem(position: Int): CustomAdapterFragment {
-            return CustomAdapterFragment.newInstance(position + isDeletable)
+//            return CustomAdapterFragment.newInstance(position + isDeletable)
+            return CustomAdapterFragment.newInstance(count + isDeletable)
+
         }
+
 
         override fun setPrimaryItem(container: ViewGroup, position: Int, `object`: Any) {
             val mFragment = `object` as CustomAdapterFragment
             //todo clean this shit up
             if (mFragment.adapterType == CustomAdapterFragment.BLOCK_TYPE_ADAPTER || mFragment.adapterType == CustomAdapterFragment.BLOCK_DELETE_TYPE_ADAPTER) {
-                mBlockFragment = mFragment
-                if (mBlockFragment?.contentUpdated == false) {
-                    when (mFragment.adapterType) {
-                        CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> loadBlocks(allUserBlocks)
-                        CustomAdapterFragment.BLOCK_DELETE_TYPE_ADAPTER -> loadBlocks(
-                            currentDayBlocks
-                        )
-                    }
-                }
+//                mBlockFragment = mFragment
+//                if (mBlockFragment?.contentUpdated == false) {
+//                    when (mFragment.adapterType) {
+//                        CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> loadBlocks(allUserBlocks)
+//                        CustomAdapterFragment.BLOCK_DELETE_TYPE_ADAPTER -> loadBlocks(
+//                            currentDayBlocks
+//                        )
+//                    }
+//                }
             } else {
                 mExerciseFragment = mFragment
                 if (mExerciseFragment?.contentUpdated == false) {
