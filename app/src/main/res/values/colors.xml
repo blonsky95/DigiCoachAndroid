@@ -7,8 +7,14 @@
     <color name="lightBlue">#9500BCD4</color>
     <color name="darkBlue">#95264DB4</color>
 
+    <color name="lightOrange">#FFA500</color>
+    <color name="darkOrange">#FF3C00</color>
+
     <color name="lightRed">#95FC3E3E</color>
     <color name="darkRed">#95F80404</color>
+
+    <color name="white">#FAF7F7</color>
+
 
 
 

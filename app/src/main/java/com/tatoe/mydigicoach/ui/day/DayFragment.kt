@@ -57,28 +57,28 @@ class DayFragment : Fragment() {
         fragmentView = inflater.inflate(R.layout.fragment_day_view, container, false)
         fragmentView.weekDay.text = Day.presentableDateFormat.format(Day.dayIDToDate(date))
 
-        val recyclerViewBlocks = fragmentView.dayBlocksRecyclerView as RecyclerView
+//        val recyclerViewBlocks = fragmentView.dayBlocksRecyclerView as RecyclerView
         val recyclerViewExercises = fragmentView.dayExercisesRecyclerView as RecyclerView
 
 
         if (day == null || (day!!.blocks.isEmpty() && day!!.exercises.isEmpty())) {
             fragmentView.ifEmptyDaytext.visibility = View.VISIBLE
-            recyclerViewBlocks.visibility = View.GONE
+//            recyclerViewBlocks.visibility = View.GONE
             recyclerViewExercises.visibility = View.GONE
-            fragmentView.divider.visibility=View.GONE
+//            fragmentView.divider.visibility=View.GONE
 
         } else {
 
             fragmentView.ifEmptyDaytext.visibility = View.GONE
-            recyclerViewBlocks.visibility = View.VISIBLE
+//            recyclerViewBlocks.visibility = View.VISIBLE
             recyclerViewExercises.visibility = View.VISIBLE
-            fragmentView.divider.visibility=View.VISIBLE
+//            fragmentView.divider.visibility=View.VISIBLE
 
 
             val dayContentAdapterBlocks =
                 DayContentAdapter(context!!, date, CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
-            recyclerViewBlocks.adapter = dayContentAdapterBlocks
-            recyclerViewBlocks.layoutManager = LinearLayoutManager(context!!)
+//            recyclerViewBlocks.adapter = dayContentAdapterBlocks
+//            recyclerViewBlocks.layoutManager = LinearLayoutManager(context!!)
             dayContentAdapterBlocks.setContent(day)
 
             val dayContentAdapterExercises =
