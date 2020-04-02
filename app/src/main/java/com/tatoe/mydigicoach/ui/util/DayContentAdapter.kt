@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -16,12 +15,10 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.day.CustomAdapterFragment
+import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
-import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import kotlinx.android.synthetic.main.item_day_result.view.*
-import timber.log.Timber
 
 
 class DayContentAdapter(var context: Context, var date: String, var itemType: Int) :

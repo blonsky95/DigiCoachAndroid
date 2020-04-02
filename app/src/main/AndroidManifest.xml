@@ -31,8 +31,7 @@
 
         <activity android:name=".ui.LoginScreen">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />re
-
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
@@ -53,7 +52,7 @@
                 android:name=".ui.block.BlockViewer"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
-                android:name=".ui.day.DayViewer"
+                android:name=".ui.calendar.DayViewer"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseCreator"
@@ -62,7 +61,10 @@
                 android:name=".ui.block.BlockCreator"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".ui.day.DayCreator"
+                android:name=".ui.calendar.DayCreator"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.calendar.MonthViewer"
                 android:windowSoftInputMode="adjustPan" />
         <activity
                 android:name=".ui.results.ResultsViewer"

@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach.ui.day
+package com.tatoe.mydigicoach.ui.calendar
 
 import android.content.Intent
 import android.os.Bundle
@@ -13,7 +13,6 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day

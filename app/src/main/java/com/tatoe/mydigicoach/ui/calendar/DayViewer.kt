@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach.ui.day
+package com.tatoe.mydigicoach.ui.calendar
 
 import android.content.Intent
 import android.os.Bundle

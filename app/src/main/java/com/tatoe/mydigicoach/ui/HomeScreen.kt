@@ -13,7 +13,8 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.*
 //import com.google.firebase.iid.FirebaseInstanceId
 import com.tatoe.mydigicoach.ui.block.BlockViewer
-import com.tatoe.mydigicoach.ui.day.DayViewer
+import com.tatoe.mydigicoach.ui.calendar.DayViewer
+import com.tatoe.mydigicoach.ui.calendar.MonthViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.HomeScreenViewModel
@@ -58,7 +59,7 @@ class HomeScreen : AppCompatActivity() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         calendar_button.setOnClickListener {
-            var intent = Intent(this, DayViewer::class.java)
+            var intent = Intent(this, MonthViewer::class.java)
             startActivity(intent)
         }
 
