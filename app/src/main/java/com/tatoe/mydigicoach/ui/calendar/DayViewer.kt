@@ -9,7 +9,6 @@ import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
@@ -17,7 +16,6 @@ import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Day.Companion.isLeapYear
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.DaySliderAdapter
 import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
 import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_viewer.*
@@ -26,6 +24,24 @@ import java.util.*
 
 
 class DayViewer : AppCompatActivity() {
+
+    companion object {
+
+        fun getDayOfWeek0to6(nonCurrentCalendar: Calendar): Int {
+            var mDayOfWeek = nonCurrentCalendar.get(Calendar.DAY_OF_WEEK)
+
+            //checks leap year - gergorian calendars don't do leap years and thats default calendar (?)
+            if (isLeapYear(nonCurrentCalendar)) {
+                if (mDayOfWeek == 1) {
+                    mDayOfWeek = 7
+                } else {
+                    mDayOfWeek--
+                }
+            }
+            //day of week varies 1-7 but pager positions are 0-6 so subtract 1:
+            return mDayOfWeek -1
+        }
+    }
 
     private lateinit var mPager: ViewPager
     private lateinit var pagerAdapter: ScreenSlidePagerAdapter
@@ -38,17 +54,17 @@ class DayViewer : AppCompatActivity() {
 
     val MS_IN_WEEK: Long = 7 * 24 * 3600 * 1000
 
-    val calendar: Calendar = Calendar.getInstance()
+//    val calendar: Calendar = Calendar.getInstance()
     var currentCalendar: Calendar = Calendar.getInstance()
 
     private var activeDay: Day? = null
-    private var activeDayId: String = Day.dateToDayID(currentCalendar.time)
+    private var activeDayId: String?=null
     private var allDays: List<Day> = listOf()
 
-    private var currentWeekOfYear = calendar.get(Calendar.WEEK_OF_YEAR)
-    private var nonCurrentWeekOfYear = currentWeekOfYear
+//    private var currentWeekOfYear = calendar.get(Calendar.WEEK_OF_YEAR)
+//    private var nonCurrentWeekOfYear = currentWeekOfYear
 
-    var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
+//    var dayOfWeek = filterDayOfWeek(calendar.get(Calendar.DAY_OF_WEEK))
     var nonCurrentTimeInMillis: Long = System.currentTimeMillis()
 
     //activeDay of week goes 0 to 6 (Calendar.DAY_OF_WEEK returns Sunday as 1 and Saturday as 7) - this normalises it to 0 monday, 6 sunday
@@ -65,7 +81,7 @@ class DayViewer : AppCompatActivity() {
         setContentView(R.layout.activity_day_viewer)
         title = "Week View"
 
-        daySliderPosition = DaySliderAdapter.DEFAULT_POS
+//        daySliderPosition = DaySliderAdapter.DEFAULT_POS
 
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
@@ -73,16 +89,15 @@ class DayViewer : AppCompatActivity() {
 
         initListeners()
 
-        var recyclerViewDaySlider = daySliderRecyclerView as RecyclerView
+//        var recyclerViewDaySlider = daySliderRecyclerView as RecyclerView
 
-        var adapter = DaySliderAdapter(this)
-        adapter.setOnClickInterface(selectDaySliderListener)
+//        var adapter = DaySliderAdapter(this)
+//        adapter.setOnClickInterface(selectDaySliderListener)
 
-        recyclerViewDaySlider.adapter = adapter
-        linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
-        recyclerViewDaySlider.layoutManager = linearLayoutManager
-        recyclerViewDaySlider.layoutManager!!.scrollToPosition(DaySliderAdapter.DEFAULT_POS - 1)
-
+//        recyclerViewDaySlider.adapter = adapter
+//        linearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false)
+//        recyclerViewDaySlider.layoutManager = linearLayoutManager
+//        recyclerViewDaySlider.layoutManager!!.scrollToPosition(DaySliderAdapter.DEFAULT_POS - 1)
 
         mPager = findViewById(R.id.pager)
 
@@ -96,29 +111,32 @@ class DayViewer : AppCompatActivity() {
 
         initObservers()
 
+        dataViewModel.changeActiveDay(intent.getStringExtra(MonthViewer.DAY_ID_KEY))
+
     }
 
     private fun initListeners() {
-        selectDaySliderListener = object : ClickListenerRecyclerView {
-            override fun onClick(view: View, position: Int) {
-                super.onClick(view, position)
-//                view.setBackgroundColor(resources.getColor(R.color.darkBlue))
-                dataViewModel.changeActiveDay(DaySliderAdapter.positionToDayId(position))
-            }
-        }
+//        selectDaySliderListener = object : ClickListenerRecyclerView {
+//            override fun onClick(view: View, position: Int) {
+//                super.onClick(view, position)
+////                view.setBackgroundColor(resources.getColor(R.color.darkBlue))
+//                dataViewModel.changeActiveDay(DaySliderAdapter.positionToDayId(position))
+//            }
+//        }
     }
 
     private fun initObservers() {
         dataViewModel.activeDayIdStr.observe(this, androidx.lifecycle.Observer { dayId ->
-            Timber.d("OBSERVER NEW DAYID: $dayId")
 //            pagerAdapter.setDay(dayId)
 //            mPager.changePagerPosition(dayId)
             activeDayId = dayId
-            var nonCurrentCalendar = Calendar.getInstance()
-            nonCurrentCalendar.time = Day.dayIDToDate(dayId)
+            var nonCurrentCalendar = getDayIDCalendar(dayId)
 
-            changeWeekContent(nonCurrentCalendar)
+//            changeWeekContent(nonCurrentCalendar)
             mPager.currentItem = changeDayPositionInPager(nonCurrentCalendar)
+
+            Timber.d("OBSERVER NEW DAYID: $dayId and pager position ${changeDayPositionInPager((nonCurrentCalendar))}")
+
         })
 //        dataViewModel.activePosition.observe(this, androidx.lifecycle.Observer { position ->
 //            Timber.d("OBSERVER NEW POSITION: $position DAY SLIDER POSITION: $daySliderPosition")
@@ -140,48 +158,54 @@ class DayViewer : AppCompatActivity() {
                 DataHolder.pagerPosition = -1
             } else {
 //                mPager.currentItem = dayOfWeek
-                mPager.setCurrentItem(dayOfWeek, false)
+                mPager.setCurrentItem(getDayOfWeek0to6(getDayIDCalendar(activeDayId)), false)
             }
         })
+    }
+
+    private fun getDayIDCalendar(dayId:String?) : Calendar {
+        var nonCurrentCalendar = Calendar.getInstance()
+        nonCurrentCalendar.time = Day.dayIDToDate(dayId!!)
+        return nonCurrentCalendar
     }
 
     private fun changeDayPositionInPager(nonCurrentCalendar: Calendar): Int {
         //to get the right slider pager position (between 0 and 6) have to check if leap year,
         // which will give us a value in range 1-7 and then subtract 1 so it's 0-6
-        return reformatDayOfWeek(nonCurrentCalendar)
+        return getDayOfWeek0to6(nonCurrentCalendar)
     }
 
-    private fun reformatDayOfWeek(nonCurrentCalendar: Calendar): Int {
-        var mDayOfWeek = nonCurrentCalendar.get(Calendar.DAY_OF_WEEK)
+//    private fun reformatDayOfWeek(nonCurrentCalendar: Calendar): Int {
+//        var mDayOfWeek = nonCurrentCalendar.get(Calendar.DAY_OF_WEEK)
+//
+//        //checks leap year - gergorian calendars don't do leap years and thats default calendar (?)
+//        if (isLeapYear(nonCurrentCalendar)) {
+//            if (mDayOfWeek == 1) {
+//                mDayOfWeek = 7
+//            } else {
+//                mDayOfWeek--
+//            }
+//        }
+//        //day of week varies 1-7 but pager positions are 0-6 so subtract 1:
+//        return mDayOfWeek -1
+//    }
 
-        //checks leap year - gergorian calendars don't do leap years and thats default calendar (?)
-        if (isLeapYear(nonCurrentCalendar)) {
-            if (mDayOfWeek == 1) {
-                mDayOfWeek = 7
-            } else {
-                mDayOfWeek--
-            }
-        }
-        //day of week varies 1-7 but pager positions are 0-6 so subtract 1:
-        return mDayOfWeek -1
-    }
-
-    private fun changeWeekContent(nonCurrentCalendar: Calendar) {
-
-        nonCurrentWeekOfYear = nonCurrentCalendar.get(Calendar.WEEK_OF_YEAR)
-        currentWeekOfYear = currentCalendar.get(Calendar.WEEK_OF_YEAR)
-
-        if (nonCurrentWeekOfYear != currentWeekOfYear) {
-            nonCurrentTimeInMillis =
-                currentCalendar.timeInMillis + ((nonCurrentWeekOfYear - currentWeekOfYear) * MS_IN_WEEK)
-            currentCalendar.time = nonCurrentCalendar.time
-
-            pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
-            mPager.adapter = pagerAdapter
-//            mPager.adapter!!.notifyDataSetChanged()
-        }
-//        mPager.currentItem = 0
-    }
+//    private fun changeWeekContent(nonCurrentCalendar: Calendar) {
+//
+//        nonCurrentWeekOfYear = nonCurrentCalendar.get(Calendar.WEEK_OF_YEAR)
+//        currentWeekOfYear = currentCalendar.get(Calendar.WEEK_OF_YEAR)
+//
+//        if (nonCurrentWeekOfYear != currentWeekOfYear) {
+//            nonCurrentTimeInMillis =
+//                currentCalendar.timeInMillis + ((nonCurrentWeekOfYear - currentWeekOfYear) * MS_IN_WEEK)
+//            currentCalendar.time = nonCurrentCalendar.time
+//
+//            pagerAdapter = ScreenSlidePagerAdapter(supportFragmentManager)
+//            mPager.adapter = pagerAdapter
+////            mPager.adapter!!.notifyDataSetChanged()
+//        }
+////        mPager.currentItem = 0
+//    }
 
     override fun onDestroy() {
         DataHolder.pagerPosition = -1
@@ -197,13 +221,13 @@ class DayViewer : AppCompatActivity() {
         startActivity(intent)
     }
 
-    override fun onBackPressed() {
-        if (mPager.currentItem != dayOfWeek) {
-            mPager.currentItem = dayOfWeek
-        } else {
-            super.onBackPressed()
-        }
-    }
+//    override fun onBackPressed() {
+//        if (mPager.currentItem != dayOfWeek) {
+//            mPager.currentItem = dayOfWeek
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
 
 
     private inner class ScreenSlidePagerAdapter(fm: FragmentManager) :
@@ -218,7 +242,7 @@ class DayViewer : AppCompatActivity() {
             if (position != primaryItemSet) {  //this function is called 2 or 3 times per swipe so avoid reupdating the dayid variable unnecesarily and creating conflicts
 //                activeDayId = toDayIdFormat(mDayOfWeek - position)
 //                activeDayId = dayId
-                activeDayId = toDayIdFormat(reformatDayOfWeek(currentCalendar) - position)
+//                activeDayId = toDayIdFormat(getDayOfWeek0to6(currentCalendar) - position)
                 activeDay = getDayByDayId(activeDayId)
                 primaryItemSet = position
                 Timber.d("ptg displaying day $activeDayId position: $position")
@@ -230,7 +254,7 @@ class DayViewer : AppCompatActivity() {
         override fun getItem(position: Int): Fragment {
             //this is also called to load the adjacent fragments - so shouldnt be used to know which fragment dayId is currently active
 //            var loadingDayId = toDayIdFormat(dayOfWeek - position)
-            var loadingDayId = toDayIdFormat(reformatDayOfWeek(currentCalendar) - position)
+            var loadingDayId = positionToDayId(position)
             var loadDay = getDayByDayId(loadingDayId)
             Timber.d("ptg generating day $loadingDayId position: $position")
 
@@ -238,19 +262,22 @@ class DayViewer : AppCompatActivity() {
         }
 
         // to DDMMYYYY format, dayDiff is the
-        private fun toDayIdFormat(dayOfWeekDiff: Int): String {
+        private fun positionToDayId(position: Int): String {
 
+//            getDayOfWeek0to6(getDayIDCalendar(activeDayId))
+            var selectedDateCalendar = Calendar.getInstance()
+            selectedDateCalendar.time=Day.dayIDToDate(activeDayId!!)
+            var dayOfWeek = getDayOfWeek0to6(selectedDateCalendar)
 
-            var nonActiveNonCurrentCalendar = Calendar.getInstance()
-            nonActiveNonCurrentCalendar.timeInMillis =
-                currentCalendar.timeInMillis - ((Day.MS_IN_DAY) * dayOfWeekDiff)
-            return Day.dateToDayID(nonActiveNonCurrentCalendar.time)
+            selectedDateCalendar.timeInMillis=selectedDateCalendar.timeInMillis+((position-dayOfWeek)*Day.MS_IN_DAY)
+
+            return Day.dateToDayID(selectedDateCalendar.time)
 
         }
 
     }
 
-    private fun getDayByDayId(activeDayId: String): Day? {
+    private fun getDayByDayId(activeDayId: String?): Day? {
         for (day in allDays) {
             if (day.dayId == activeDayId) {
                 return day

@@ -8,6 +8,7 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.ui.calendar.DayViewer
 import kotlinx.android.synthetic.main.item_holder_day_slider_item.view.*
 import timber.log.Timber
 import java.util.*
@@ -16,8 +17,8 @@ class DaySliderAdapter(var context: Context) :
     RecyclerView.Adapter<DaySliderAdapter.DaySliderViewHolder>() {
 
     companion object {
-        const val MAX_DAYS = 120
-        const val DEFAULT_POS = (MAX_DAYS / 2) - 1
+        const val MAX_DAYS = 7
+        const val DEFAULT_POS = 1
 
         fun positionToDayId(position: Int): String {
             val myCalendar = getDifferentCalendar(position)
@@ -39,11 +40,13 @@ class DaySliderAdapter(var context: Context) :
 
         private fun getDifferentCalendar(position: Int): Calendar {
             val calendar = Calendar.getInstance()
+
+            var dayOfWeek0To6Is = DayViewer.getDayOfWeek0to6(calendar)
             //this is like getting current calendar and adding/subtracting millis to set the new calendar
 
             //THIS HAS TO BE LONG TYPE ELSE IT RUNS OUT OF INT RANGE
             calendar.timeInMillis =
-                Calendar.getInstance().timeInMillis + ((position - DEFAULT_POS) * Day.MS_IN_DAY)
+                Calendar.getInstance().timeInMillis + ((position - dayOfWeek0To6Is) * Day.MS_IN_DAY)
 
             return calendar
         }
