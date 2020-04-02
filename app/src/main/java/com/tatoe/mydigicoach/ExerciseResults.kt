@@ -146,6 +146,7 @@ class ExerciseResults {
                     stringToDate(intResultsArrayList[i][0]!![DATE_KEY]!!) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
                 if (newDate.after(oldDate)) {
                     intResultsArrayList.add(i, newResultMap)
+                    setArrayListOfResults(intResultsArrayList)
                     return
                 }
                 i++
