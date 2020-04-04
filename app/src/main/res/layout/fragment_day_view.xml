@@ -27,11 +27,25 @@
 
     <TextView
             android:id="@+id/ifEmptyDaytext"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/lightGrey"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingTop="72dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="72dp"
+            android:text="It seems your training diary is empty.\nDon't forget to add your training below"
+            android:fontFamily="@font/open_sans_light"
+            android:textSize="16sp"
+            android:textColor="@color/darkGreen"
             android:visibility="visible"
-            android:text="No blocks/exercises have been added here yet, press add training"/>
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/weekDay" />
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dayExercisesRecyclerView"

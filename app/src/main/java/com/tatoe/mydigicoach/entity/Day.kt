@@ -65,26 +65,26 @@ data class Day(
 //        const val MAX_DAYS = 7
         const val DEFAULT_POS = 1
 
-        fun positionToDayId(position: Int): String {
-            val myCalendar = getDifferentCalendar(position)
-            return dateToDayID(myCalendar.time)
-        }
-
         fun dayIdToPosition(dayId: String): Int {
             //make day id date and find day difference between day id and now and then use default pos
-            val dayDiff = Day.getDayDifference(Day.dayIDToDate(dayId)!!, Day.getTodayDate())
+            val dayDiff = Day.getDayDifference(dayIDToDate(dayId)!!, Day.getTodayDate())
             return DEFAULT_POS + dayDiff
         }
 
-        private fun getDifferentCalendar(position: Int): Calendar {
-            val calendar = Calendar.getInstance()
+        //calendar of week
+        //position you want dayid from, so if position is 0, returns calendar day id
+        fun calendarAndPositionToDayId(calendar: Calendar, position: Int): String {
+            val myCalendar = getDifferentCalendar(calendar, position)
+            return dateToDayID(myCalendar.time)
+        }
+
+        private fun getDifferentCalendar(calendar: Calendar, position: Int): Calendar {
 
             var dayOfWeek0To6Is = getDayOfWeek0to6(calendar)
             //this is like getting current calendar and adding/subtracting millis to set the new calendar
 
             //THIS HAS TO BE LONG TYPE ELSE IT RUNS OUT OF INT RANGE
-            calendar.timeInMillis =
-                Calendar.getInstance().timeInMillis + ((position - dayOfWeek0To6Is) * Day.MS_IN_DAY)
+            calendar.timeInMillis += ((position - dayOfWeek0To6Is) * MS_IN_DAY)
 
             return calendar
         }

@@ -25,7 +25,7 @@ class DayViewerViewModel(application: Application) :
 
     val activeDayIdStr: MutableLiveData<String> =  MutableLiveData()
     val activePosition: MutableLiveData<Int> =  MutableLiveData()
-    val oldActivePosition: MutableLiveData<Int> =  MutableLiveData()
+//    val oldActivePosition: MutableLiveData<Int> =  MutableLiveData()
 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
@@ -58,12 +58,12 @@ class DayViewerViewModel(application: Application) :
     }
 
     fun changeActiveDay(dayId:String) {
-//        activePosition.value=DaySliderAdapter.dayIdToPosition(dayId)
+//        activePosition.value=Day.dayIdToPosition(dayId)
         activeDayIdStr.value= dayId
     }
 
-//    fun changeActivePosition(position:Int) {
-//        newActivePosition.value=position
-//        activeDay.value= DaySliderAdapter.positionToDayId(position)
-//    }
+    fun changeActivePosition(position:Int) {
+        activePosition.value=position
+//        activeDay.value= Day.positionToDayId(position)
+    }
 }
