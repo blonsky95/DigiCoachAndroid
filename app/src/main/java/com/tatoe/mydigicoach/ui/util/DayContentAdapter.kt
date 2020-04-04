@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.ui.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -86,11 +87,16 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
                 }
 //                var xxx = getExerciseResultButtonStateColour(exercise)
 //                Timber.d("COLOUR EXERCISE BLOCK: $xxx")
-                exerciseView.result_button.setBackgroundColor(
-                    getExerciseResultButtonStateColour(
+//                exerciseView.result_button.setBackgroundColor(
+//                    getExerciseResultButtonStateColour(
+//                        exercise
+//                    )
+//                )
+                exerciseView.result_button.background =
+                    getExerciseResultButtonDrawable(
                         exercise
+
                     )
-                )
 
                 exerciseView.result_button.setOnClickListener {
                     goToExerciseResults(exercise)
@@ -113,6 +119,7 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         }
     }
 
+
     private fun populateExercises(holder: CollapsibleItemViewHolderDay, position: Int = -1) {
         val bindingExercise = exercises[position]
         createExerciseTabLayout(holder, bindingExercise)
@@ -124,11 +131,16 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
             viewExerciseInCreator(exercise)
         }
 
-        holder.exerciseResultButton!!.setBackgroundColor(
-            getExerciseResultButtonStateColour(
+//        holder.exerciseResultButton!!.setBackgroundColor(
+//            getExerciseResultButtonStateColour(
+//                exercise
+//            )
+//        )
+        holder.exerciseResultButton!!.background =
+            getExerciseResultButtonDrawable(
                 exercise
             )
-        )
+
 
         holder.exerciseResultButton.setOnClickListener {
             goToExerciseResults(exercise)
@@ -173,19 +185,19 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
     //checks if that result already has an entry and returns a different colour to apply to button
     private fun getExerciseResultButtonStateColour(exercise: Exercise): Int {
         var colourInt = R.color.lightBlue
-
-//        if (exercise.exerciseResults.containsResult(date)) {
-//            colourInt = R.color.darkBlue
-//            Timber.d("DARK BLUE: $colourInt")
-//        }
-
-        if (exercise.exerciseResults.containsResult(date)){
+        if (exercise.exerciseResults.containsResult(date)) {
             colourInt = R.color.darkBlue
         }
-//        if (sDay!!.checkExistingResult(exercise)) {
-//            colourInt = R.color.darkBlue
-//            Timber.d("DARK BLUE: $colourInt")
-//        }
+
         return ContextCompat.getColor(context, colourInt)
+    }
+
+    private fun getExerciseResultButtonDrawable(exercise: Exercise): Drawable {
+        var drawable = R.drawable.ic_circle_gray
+        if (exercise.exerciseResults.containsResult(date)) {
+            drawable = R.drawable.ic_check_white_24dp
+        }
+        return context.resources.getDrawable(drawable)
+
     }
 }
