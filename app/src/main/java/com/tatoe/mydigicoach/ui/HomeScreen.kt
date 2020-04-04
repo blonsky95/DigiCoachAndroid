@@ -13,7 +13,6 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.*
 //import com.google.firebase.iid.FirebaseInstanceId
 import com.tatoe.mydigicoach.ui.block.BlockViewer
-import com.tatoe.mydigicoach.ui.calendar.DayViewer
 import com.tatoe.mydigicoach.ui.calendar.MonthViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder

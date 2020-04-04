@@ -242,7 +242,8 @@ class DayCreator : AppCompatActivity(), CustomAdapterFragment.CustomAdapterEvent
     }
 
     private fun backToViewer() {
-        val intent = Intent(this, DayViewer::class.java)
+        val intent = Intent(this, WeekViewer::class.java)
+        intent.putExtra(MonthViewer.DAY_ID_KEY,activeDayId)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
     }

@@ -55,7 +55,7 @@ class DayFragment : Fragment() {
     ): View {
 
         fragmentView = inflater.inflate(R.layout.fragment_day_view, container, false)
-        fragmentView.weekDay.text = Day.presentableDateFormat.format(Day.dayIDToDate(date))
+        fragmentView.weekDay.text = Day.dayFragmentFormat.format(Day.dayIDToDate(date))
 
 //        val recyclerViewBlocks = fragmentView.dayBlocksRecyclerView as RecyclerView
         val recyclerViewExercises = fragmentView.dayExercisesRecyclerView as RecyclerView

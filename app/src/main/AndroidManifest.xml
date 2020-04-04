@@ -28,6 +28,9 @@
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
                 android:value="Find me in the manifest" />
+        <meta-data
+                android:name="preloaded_fonts"
+                android:resource="@array/preloaded_fonts" />
 
         <activity android:name=".ui.LoginScreen">
             <intent-filter>
@@ -52,7 +55,7 @@
                 android:name=".ui.block.BlockViewer"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
-                android:name=".ui.calendar.DayViewer"
+                android:name=".ui.calendar.WeekViewer"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseCreator"

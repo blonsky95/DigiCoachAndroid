@@ -28,7 +28,7 @@ class MonthViewer : AppCompatActivity() {
             if (calendar.selectedDate!=null) {
                 var dayId= Day.intDatetoDayId(calendar.selectedDate!!.day,calendar.selectedDate!!.month,calendar.selectedDate!!.year)
                 Timber.d("OIOI 2 $dayId")
-                var intent = Intent(this, DayViewer::class.java)
+                var intent = Intent(this, WeekViewer::class.java)
                 intent.putExtra(DAY_ID_KEY, dayId)
                 startActivity(intent)
             } else {
