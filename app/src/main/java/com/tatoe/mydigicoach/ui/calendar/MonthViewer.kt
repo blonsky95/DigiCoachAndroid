@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat.startActivity
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.ui.HomeScreen
 import kotlinx.android.synthetic.main.activity_month_viewer.*
 import timber.log.Timber
 
@@ -33,6 +34,10 @@ class MonthViewer : AppCompatActivity() {
                 intent.putExtra(DAY_ID_KEY, dayId)
                 startActivity(intent)
             }
+        }
+
+        home_button.setOnClickListener {
+            startActivity(Intent(this,HomeScreen::class.java))
         }
 
     }
