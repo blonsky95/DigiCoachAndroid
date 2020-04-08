@@ -49,7 +49,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         recyclerView = recyclerview as RecyclerView
 
-        exportBtn.visibility = View.GONE
+//        exportBtn.visibility = View.GONE
         initAdapterListeners()
 
         adapter = ExerciseListAdapter(this)
@@ -96,30 +96,30 @@ class ExerciseViewer : AppCompatActivity() {
 
         }
 
-        getButton.setOnClickListener {
-
-
-            //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
-            Utils.getInfoDialogView(this,title.toString(),"Replace for your cloud exercises?",object:
-                DialogPositiveNegativeHandler {
-                override fun onPositiveButton(editTextText:String) {
-                    super.onPositiveButton(editTextText)
-                    exerciseViewerViewModel.getExercisesFromFirestore()
-                }
-            })
-        }
-
-        postButton.setOnClickListener {
-            //post stuff to firestore
-            Utils.getInfoDialogView(this,title.toString(),"Make this your cloud exercises?",object:
-                DialogPositiveNegativeHandler {
-
-                override fun onPositiveButton(editTextText:String) {
-                    super.onPositiveButton(editTextText)
-                    exerciseViewerViewModel.postExercisesToFirestore(allExercises)
-                }
-            })
-        }
+//        getButton.setOnClickListener {
+//
+//
+//            //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
+//            Utils.getInfoDialogView(this,title.toString(),"Replace for your cloud exercises?",object:
+//                DialogPositiveNegativeHandler {
+//                override fun onPositiveButton(editTextText:String) {
+//                    super.onPositiveButton(editTextText)
+//                    exerciseViewerViewModel.getExercisesFromFirestore()
+//                }
+//            })
+//        }
+//
+//        postButton.setOnClickListener {
+//            //post stuff to firestore
+//            Utils.getInfoDialogView(this,title.toString(),"Make this your cloud exercises?",object:
+//                DialogPositiveNegativeHandler {
+//
+//                override fun onPositiveButton(editTextText:String) {
+//                    super.onPositiveButton(editTextText)
+//                    exerciseViewerViewModel.postExercisesToFirestore(allExercises)
+//                }
+//            })
+//        }
     }
 
     private fun initAdapterListeners() {
@@ -230,27 +230,27 @@ class ExerciseViewer : AppCompatActivity() {
     }
 
     private fun makeListSelectable(exportBlockName: String) {
-        selectedIndexes.clear()
-        addExerciseBtn.visibility = View.GONE
-        title = "Select Exercises"
-
-
-        updateAdapterListener(itemSelectorListener)
-        exportBtn.visibility = View.VISIBLE
-        exportBtn.setOnClickListener {
-            Timber.d("Final selection: $selectedIndexes")
-            exportBtn.visibility = View.GONE
-            exerciseViewerViewModel.insertBlock(
-                ImportExportUtils.makeExportBlock(
-                    allExercises,
-                    selectedIndexes,
-                    exportBlockName
-                )
-            )
-            addExerciseBtn.visibility = View.VISIBLE
-            title = "Exercise Viewer"
-            updateAdapterListener(goToCreatorListener)
-        }
+//        selectedIndexes.clear()
+//        addExerciseBtn.visibility = View.GONE
+//        title = "Select Exercises"
+//
+//
+//        updateAdapterListener(itemSelectorListener)
+//        exportBtn.visibility = View.VISIBLE
+//        exportBtn.setOnClickListener {
+//            Timber.d("Final selection: $selectedIndexes")
+//            exportBtn.visibility = View.GONE
+//            exerciseViewerViewModel.insertBlock(
+//                ImportExportUtils.makeExportBlock(
+//                    allExercises,
+//                    selectedIndexes,
+//                    exportBlockName
+//                )
+//            )
+//            addExerciseBtn.visibility = View.VISIBLE
+//            title = "Exercise Viewer"
+//            updateAdapterListener(goToCreatorListener)
+//        }
 
     }
 

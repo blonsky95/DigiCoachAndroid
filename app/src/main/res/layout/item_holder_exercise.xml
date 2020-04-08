@@ -3,25 +3,35 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="30dp"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
         android:orientation="vertical">
 
 
     <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/lightGrey"
             android:orientation="horizontal">
+
+        <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginEnd="16dp"
+                android:padding="4dp"
+                android:background="@color/lightGreen"
+                android:src="@drawable/ic_fast" />
 
         <TextView
                 android:id="@+id/textView"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
+                android:layout_marginStart="16dp"
                 android:layout_weight="4"
-                android:textColor="@color/textBlue"
-                android:fontFamily="@font/open_sans_light"
-                android:padding="12dp" />
+                android:layout_gravity="center_vertical"
+                android:fontFamily="@font/open_sans_bold"
+                android:textSize="16sp"
+                android:textColor="@color/textBlue" />
 
         <ImageView
                 android:id="@+id/secondaryButton"
@@ -33,11 +43,11 @@
                 android:visibility="gone" />
     </LinearLayout>
 
-<!--    <View-->
-<!--            android:id="@+id/divider"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="2dp"-->
-<!--            android:background="@android:color/darker_gray"/>-->
+    <!--    <View-->
+    <!--            android:id="@+id/divider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="2dp"-->
+    <!--            android:background="@android:color/darker_gray"/>-->
 
 </LinearLayout>
 

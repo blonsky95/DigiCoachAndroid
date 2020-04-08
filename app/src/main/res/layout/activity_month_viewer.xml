@@ -12,7 +12,7 @@
             android:layout_height="110dp"
             android:layout_marginTop="32dp"
             android:layout_marginEnd="24dp"
-            android:background="@drawable/ic_home_black_24dp"
+            android:background="@drawable/ic_business_and_finance"
             android:translationZ="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
