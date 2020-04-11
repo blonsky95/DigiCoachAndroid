@@ -32,9 +32,9 @@ import java.util.ArrayList
 
 class ResultsCreator : AppCompatActivity() {
 
-    private lateinit var rightButton: Button
-    private lateinit var leftButton: Button
-    private lateinit var centreButton: Button
+    private lateinit var rightButton: TextView
+    private lateinit var leftButton: TextView
+    private lateinit var centreButton: TextView
 
     private lateinit var linearLayout: LinearLayout
 

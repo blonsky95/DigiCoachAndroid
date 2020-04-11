@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="10dp">
+
+    <TextView
+            android:id="@+id/fieldKey1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:gravity="start|center_vertical"
+            android:text="Title"
+            android:fontFamily="@font/open_sans_regular"
+            android:textSize="16sp" />
+
+
+    <TextView
+            android:id="@+id/fieldValueTextView1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:gravity="start|center_vertical"
+            android:fontFamily="@font/open_sans_bold"
+            android:textColor="@color/black"
+            android:text="Squats"
+            android:textSize="28sp" />
+
+</LinearLayout>

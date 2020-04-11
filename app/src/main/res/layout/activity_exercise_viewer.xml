@@ -65,7 +65,7 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="32dp"
             app:layout_constraintBottom_toTopOf="@+id/addExerciseBtn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
@@ -86,39 +86,40 @@
             android:id="@+id/addExerciseBtn"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:paddingTop="14dp"
+            android:paddingBottom="14dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="24dp"
-            android:background="@color/lightGreen"
-            android:gravity="center_vertical"
+            android:background="@drawable/rounded_border_background"
+            android:gravity="center"
             android:orientation="horizontal"
-            android:padding="4dp"
+
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pager">
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:fontFamily="@font/open_sans_bold"
-                android:gravity="start|center_vertical"
-                android:text="+"
-                android:textColor="@color/white"
-                android:textSize="30sp" />
+<!--        <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_marginStart="16dp"-->
+<!--                android:fontFamily="@font/open_sans_bold"-->
+<!--                android:gravity="start|center_vertical"-->
+<!--                android:text="+"-->
+<!--                android:textColor="@color/white"-->
+<!--                android:textSize="30sp" />-->
 
 
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="24dp"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center_vertical"
-                android:text="Add exercise"
-                android:textAllCaps="true"
-                android:textColor="@color/white"
-                android:textSize="20sp" />
+                android:text="Add your own exercise"
+                android:textAllCaps="false"
+                android:textColor="@color/black"
+                android:textSize="16sp" />
 
 
     </LinearLayout>

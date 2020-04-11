@@ -1,12 +1,10 @@
 package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
-import android.graphics.Typeface
 import android.os.Bundle
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
-import android.widget.Button
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -23,6 +21,10 @@ import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.custom_dialog_window.view.*
+import kotlinx.android.synthetic.main.inflate_nontitle_edittext_layout.view.*
+import kotlinx.android.synthetic.main.inflate_nontitle_textview_layout.view.*
+import kotlinx.android.synthetic.main.inflate_title_edittext_layout.view.*
+import kotlinx.android.synthetic.main.inflate_title_textview_layout.view.*
 import timber.log.Timber
 import java.util.HashMap
 
@@ -32,14 +34,14 @@ class ExerciseCreator : AppCompatActivity() {
 
     private lateinit var newField: String
 
-    private lateinit var rightButton: Button
-    private lateinit var leftButton: Button
-    private lateinit var centreButton: Button
+    private lateinit var rightButton: TextView
+    private lateinit var leftButton: TextView
+    private lateinit var centreButton: TextView
 
     private lateinit var dataViewModel: DataViewModel
 
     private var activeExercise: Exercise? = null
-    private var exerciseFieldsMap = HashMap<Int, HashMap<String,String>>()
+    private var exerciseFieldsMap = HashMap<Int, HashMap<String, String>>()
 
 
     var menuItemRead: MenuItem? = null
@@ -47,7 +49,12 @@ class ExerciseCreator : AppCompatActivity() {
 
     lateinit var mAction: String
 
-    var NEW_FIELD_VALUE = ""
+    var NEW_FIELD_VALUE = "I'm a new field"
+
+    private var LAYOUT_TYPE_TITLE_TV = 1
+    private var LAYOUT_TYPE_TITLE_ET = 2
+    private var LAYOUT_TYPE_NONTITLE_TV = 3
+    private var LAYOUT_TYPE_NONTITLE_ET = 4
 
     companion object {
         var OBJECT_ACTION = "exercise_action"
@@ -62,6 +69,7 @@ class ExerciseCreator : AppCompatActivity() {
         title = "Exercise Creator"
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
         linearLayout = exercise_properties as LinearLayout
@@ -86,11 +94,11 @@ class ExerciseCreator : AppCompatActivity() {
             } else {
 //                exerciseFieldsMap[0]!!["Name"] = ""
 
-                exerciseFieldsMap[0]= hashMapOf("Name" to "")
+                exerciseFieldsMap[0] = hashMapOf("Name" to "")
 //                exerciseFieldsMap[1]!!["Description"] = ""
-                exerciseFieldsMap[1]=hashMapOf("Description" to "")
+                exerciseFieldsMap[1] = hashMapOf("Description" to "")
             }
-            updateBodyUI(mAction)
+            createExerciseFieldsLayout()
             updateButtonUI(mAction)
 
         }
@@ -99,7 +107,7 @@ class ExerciseCreator : AppCompatActivity() {
     private fun updateButtonUI(actionType: String) {
         if (actionType == OBJECT_NEW) {
             rightButton.visibility = View.VISIBLE
-            rightButton.text = "ADD"
+            rightButton.text = "Save"
             rightButton.setOnClickListener(addButtonListener)
 
             centreButton.visibility = View.VISIBLE
@@ -111,20 +119,20 @@ class ExerciseCreator : AppCompatActivity() {
 
             if (actionType == OBJECT_EDIT) {
                 rightButton.visibility = View.VISIBLE
-                rightButton.text = "UPDATE"
+                rightButton.text = "Save"
                 rightButton.setOnClickListener(updateButtonListener)
 
                 centreButton.visibility = View.VISIBLE
-                centreButton.text = "ADD FIELD"
+                centreButton.text = "Add Field"
                 centreButton.setOnClickListener(addFieldButtonListener)
 
                 leftButton.visibility = View.VISIBLE
-                leftButton.text = "DELETE"
+                leftButton.text = "Delete"
                 leftButton.setOnClickListener(deleteButtonListener)
             }
             if (actionType == OBJECT_VIEW) {
                 rightButton.visibility = View.VISIBLE
-                rightButton.text = "HISTORY"
+                rightButton.text = "Results"
                 rightButton.setOnClickListener(historyButtonListener)
 
                 centreButton.visibility = View.INVISIBLE
@@ -140,66 +148,137 @@ class ExerciseCreator : AppCompatActivity() {
 
         createExerciseFieldsLayout()
 
-        if (actionType == OBJECT_NEW) {
-            changeVisibility(linearLayout, false)
-        }
-        if (actionType == OBJECT_EDIT) {
-            changeVisibility(linearLayout, false)
-        }
-        if (actionType == OBJECT_VIEW) {
-            changeVisibility(linearLayout, true)
-        }
+//        if (actionType == OBJECT_NEW) {
+//            changeVisibility(linearLayout, false)
+//        }
+//        if (actionType == OBJECT_EDIT) {
+//            changeVisibility(linearLayout, false)
+//        }
+//        if (actionType == OBJECT_VIEW) {
+//            changeVisibility(linearLayout, true)
+//        }
     }
 
     private fun createExerciseFieldsLayout() {
-
         linearLayout.removeAllViews()
-        var pairsHashMap = exerciseFieldsMap
+        var hashMapHashMap = exerciseFieldsMap
 
-        for (i in 0 until pairsHashMap.size) {
+        for (fieldPosition in 0 until hashMapHashMap.size) {
 
-            var currentField = pairsHashMap[i]
+            var currentField = hashMapHashMap[fieldPosition]
 
             var firstEntry = currentField!!.entries.iterator().next()
 
             var fieldEntryKey = firstEntry.key //first of pair - title of entry
             var fieldEntryValue = firstEntry.value //second of pair - value of entry
-            var entryHintString = "Type here"
+//            var entryHintString = "Type here"
 
-            var fieldTitleTextView = TextView(this)
-            fieldTitleTextView.layoutParams =
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            fieldTitleTextView.text = fieldEntryKey
-            fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
+            addLayout(fieldEntryKey, fieldEntryValue, getLayoutType(fieldPosition))
 
-            linearLayout.addView(fieldTitleTextView)
 
-            var fieldEditText = EditText(this)
-            fieldEditText.layoutParams =
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            fieldEditText.hint = fieldEntryValue
-            fieldEditText.text=SpannableStringBuilder(fieldEntryValue)
-
-            linearLayout.addView(fieldEditText)
-
-            var fieldInfoTextView = TextView(this)
-            fieldInfoTextView.layoutParams =
-                ViewGroup.LayoutParams(
-                    ViewGroup.LayoutParams.MATCH_PARENT,
-                    ViewGroup.LayoutParams.WRAP_CONTENT
-                )
-            fieldInfoTextView.text = fieldEntryValue
-
-            linearLayout.addView(fieldInfoTextView)
+//            var fieldTitleTextView = TextView(this)
+//            fieldTitleTextView.layoutParams =
+//                ViewGroup.LayoutParams(
+//                    ViewGroup.LayoutParams.MATCH_PARENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT
+//                )
+//            fieldTitleTextView.text = fieldEntryKey
+//            fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
+//
+//            linearLayout.addView(fieldTitleTextView)
+//
+//            var fieldEditText = EditText(this)
+//            fieldEditText.layoutParams =
+//                ViewGroup.LayoutParams(
+//                    ViewGroup.LayoutParams.MATCH_PARENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT
+//                )
+//            fieldEditText.hint = fieldEntryValue
+//            fieldEditText.text=SpannableStringBuilder(fieldEntryValue)
+//
+//            linearLayout.addView(fieldEditText)
+//
+//            var fieldInfoTextView = TextView(this)
+//            fieldInfoTextView.layoutParams =
+//                ViewGroup.LayoutParams(
+//                    ViewGroup.LayoutParams.MATCH_PARENT,
+//                    ViewGroup.LayoutParams.WRAP_CONTENT
+//                )
+//            fieldInfoTextView.text = fieldEntryValue
+//
+//            linearLayout.addView(fieldInfoTextView)
         }
 
 //        Timber.d("Child count: ${linearLayout.childCount}")
+    }
+
+    private fun getLayoutType(fieldPosition: Int): Int {
+        return if (fieldPosition == 0) {
+            if (mAction == OBJECT_NEW || mAction == OBJECT_EDIT) {
+                LAYOUT_TYPE_TITLE_ET
+            } else {
+                LAYOUT_TYPE_TITLE_TV
+            }
+
+        } else {
+            if (mAction == OBJECT_NEW || mAction == OBJECT_EDIT) {
+                LAYOUT_TYPE_NONTITLE_ET
+            } else {
+                LAYOUT_TYPE_NONTITLE_TV
+            }
+        }
+    }
+
+    private fun addLayout(fieldEntryKey: String, fieldEntryValue: String, layoutType: Int) {
+
+        var fieldLayout = View(this)
+
+        if (layoutType == LAYOUT_TYPE_TITLE_TV) {
+            fieldLayout =
+                layoutInflater.inflate(R.layout.inflate_title_textview_layout, null)
+            fieldLayout.fieldKey1.text=fieldEntryKey
+            fieldLayout.fieldValueTextView1.text = fieldEntryValue
+
+        }
+        if (layoutType == LAYOUT_TYPE_TITLE_ET) {
+            fieldLayout =
+                layoutInflater.inflate(R.layout.inflate_title_edittext_layout, null)
+            fieldLayout.fieldKey2.text=fieldEntryKey
+
+            var editText = fieldLayout.fieldValueEditText2
+            if (mAction == OBJECT_NEW) {
+                editText.hint = "e.g. Squats"
+            } else {
+                editText.text =
+                    SpannableStringBuilder(fieldEntryValue)
+            }
+        }
+        if (layoutType == LAYOUT_TYPE_NONTITLE_TV) {
+            fieldLayout =
+                layoutInflater.inflate(R.layout.inflate_nontitle_textview_layout, null)
+            fieldLayout.fieldKey3.text=fieldEntryKey
+
+            fieldLayout.fieldValueTextView3.text = fieldEntryValue
+        }
+        if (layoutType == LAYOUT_TYPE_NONTITLE_ET) {
+            fieldLayout =
+                layoutInflater.inflate(R.layout.inflate_nontitle_edittext_layout, null)
+            fieldLayout.fieldKey4.text=fieldEntryKey
+
+            val editText=fieldLayout.fieldValueEditText4
+            if (mAction == OBJECT_NEW) {
+                editText.hint = "Describe here your activity"
+            } else {
+                editText.text =
+                    SpannableStringBuilder(fieldEntryValue)
+            }
+        }
+
+//        val fieldKey = fieldLayout.findViewById(R.id.fieldKey)
+//        fieldLayout.fieldKey.text = fieldEntryKey
+
+        linearLayout.addView(fieldLayout)
+
     }
 
     private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {
@@ -240,13 +319,15 @@ class ExerciseCreator : AppCompatActivity() {
         return (index + 3) % 3 == 0
     }
 
-    private fun getFieldContents(): HashMap<Int,HashMap<String,String>> {
+    private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
 
-        var fieldsMap = HashMap<Int,HashMap<String,String>>()
-        for (i in 0 until linearLayout.childCount/3) {
+        var fieldsMap = HashMap<Int, HashMap<String, String>>()
+        for (i in 0 until linearLayout.childCount) {
 //            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
-            var fieldName = (linearLayout.getChildAt(3*i) as TextView).text.toString()
-            var fieldValue = (linearLayout.getChildAt(3*i + 1) as EditText).text.trim().toString()
+            var layout = linearLayout.getChildAt(i) as LinearLayout
+
+            var fieldName = (layout.getChildAt(0) as TextView).text.toString()
+            var fieldValue = (layout.getChildAt(1) as EditText).text.trim().toString()
             fieldsMap[i] = hashMapOf(fieldName to fieldValue)
         }
         return fieldsMap
@@ -280,15 +361,19 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        Utils.getInfoDialogView(this,title.toString(),"Are you sure you want to delete this exercise?",object:
-            DialogPositiveNegativeHandler {
+        Utils.getInfoDialogView(
+            this,
+            title.toString(),
+            "Are you sure you want to delete this exercise?",
+            object :
+                DialogPositiveNegativeHandler {
 
-            override fun onPositiveButton(editTextText:String) {
-                super.onPositiveButton(editTextText)
-                dataViewModel.deleteExercise(activeExercise!!)
-                backToViewer()
-            }
-        })
+                override fun onPositiveButton(editTextText: String) {
+                    super.onPositiveButton(editTextText)
+                    dataViewModel.deleteExercise(activeExercise!!)
+                    backToViewer()
+                }
+            })
 
     }
 
@@ -307,59 +392,29 @@ class ExerciseCreator : AppCompatActivity() {
         val mAlertDialog = mBuilder.show()
         mDialogView.dialogEnterBtn.setOnClickListener {
             mAlertDialog.dismiss()
-            newField = mDialogView.dialogEditText.text.toString().trim()
-            addFieldLayout()
+            var newFieldKey = mDialogView.dialogEditText.text.toString().trim()
+            addNewFieldLayout(newFieldKey)
         }
         mDialogView.dialogCancelBtn.setOnClickListener {
             mAlertDialog.dismiss()
         }
     }
 
-    private fun addFieldLayout() {
+    private fun addNewFieldLayout(newFieldKey: String) {
         //todo save what was written
-        exerciseFieldsMap[exerciseFieldsMap.size] = hashMapOf("" to "")
+        exerciseFieldsMap[exerciseFieldsMap.size] = hashMapOf(newFieldKey to "")
 
-//        updateBodyUI(OBJECT_EDIT)
+        var fieldEntryKey = newFieldKey //first of pair - title of entry
+        var fieldEntryValue = NEW_FIELD_VALUE //second of pair - value of entry
 
-        var fieldTitleTextView = TextView(this)
-        fieldTitleTextView.layoutParams =
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        fieldTitleTextView.text = newField
-        fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
+        addLayout(fieldEntryKey, fieldEntryValue, LAYOUT_TYPE_NONTITLE_ET)
 
-        linearLayout.addView(fieldTitleTextView)
-
-        var fieldEditText = EditText(this)
-        fieldEditText.layoutParams =
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        fieldEditText.hint = NEW_FIELD_VALUE
-        fieldEditText.text=SpannableStringBuilder(NEW_FIELD_VALUE)
-
-        linearLayout.addView(fieldEditText)
-
-        var fieldInfoTextView = TextView(this)
-        fieldInfoTextView.layoutParams =
-            ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-        fieldInfoTextView.text = NEW_FIELD_VALUE
-
-        linearLayout.addView(fieldInfoTextView)
-
-        changeVisibility(linearLayout,false)
     }
 
     private val historyButtonListener = View.OnClickListener {
         val intent = Intent(this, ResultsViewer::class.java)
 
-        DataHolder.activeExerciseHolder=activeExercise
+        DataHolder.activeExerciseHolder = activeExercise
         intent.putExtra(OBJECT_ACTION, OBJECT_VIEW)
         intent.putExtra(ResultsCreator.RESULTS_EXE_ID, activeExercise!!.exerciseId)
 
@@ -379,7 +434,7 @@ class ExerciseCreator : AppCompatActivity() {
         when (mAction) {
             OBJECT_EDIT -> {
                 updateToolbarItemVisibility(menuItemEdit, false)
-                updateToolbarItemVisibility(menuItemRead, true)
+                updateToolbarItemVisibility(menuItemRead, false)
             }
             OBJECT_VIEW -> {
                 updateToolbarItemVisibility(menuItemEdit, true)
@@ -400,15 +455,15 @@ class ExerciseCreator : AppCompatActivity() {
             true
         }
         R.id.action_edit -> {
-            mAction= OBJECT_EDIT
+            mAction = OBJECT_EDIT
             updateButtonUI(mAction)
             updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, false)
-            updateToolbarItemVisibility(menuItemRead, true)
+            updateToolbarItemVisibility(menuItemRead, false)
             true
         }
         R.id.action_read -> {
-            mAction= OBJECT_VIEW
+            mAction = OBJECT_VIEW
             updateButtonUI(mAction)
             updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, true)
