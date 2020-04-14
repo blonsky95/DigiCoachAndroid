@@ -19,6 +19,7 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerR
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.HomeScreen
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
@@ -47,6 +48,9 @@ class ExerciseViewer : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
+        home_button.setOnClickListener {
+            startActivity(Intent(this, HomeScreen::class.java))
+        }
         recyclerView = recyclerview as RecyclerView
 
 //        exportBtn.visibility = View.GONE

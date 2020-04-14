@@ -21,8 +21,10 @@ import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.custom_dialog_window.view.*
-import kotlinx.android.synthetic.main.inflate_nontitle_edittext_layout.view.*
-import kotlinx.android.synthetic.main.inflate_nontitle_textview_layout.view.*
+import kotlinx.android.synthetic.main.inflate_description_edittext_layout.view.*
+import kotlinx.android.synthetic.main.inflate_description_textview_layout.view.*
+import kotlinx.android.synthetic.main.inflate_extrafield_edittext_layout.view.*
+import kotlinx.android.synthetic.main.inflate_extrafield_textview_layout.view.*
 import kotlinx.android.synthetic.main.inflate_title_edittext_layout.view.*
 import kotlinx.android.synthetic.main.inflate_title_textview_layout.view.*
 import timber.log.Timber
@@ -53,8 +55,10 @@ class ExerciseCreator : AppCompatActivity() {
 
     private var LAYOUT_TYPE_TITLE_TV = 1
     private var LAYOUT_TYPE_TITLE_ET = 2
-    private var LAYOUT_TYPE_NONTITLE_TV = 3
-    private var LAYOUT_TYPE_NONTITLE_ET = 4
+    private var LAYOUT_TYPE_DESCRIPTION_TV = 3
+    private var LAYOUT_TYPE_DESCRIPTION_ET = 4
+    private var LAYOUT_TYPE_EXTRAFIELD_TV = 5
+    private var LAYOUT_TYPE_EXTRAFIELD_ET = 6
 
     companion object {
         var OBJECT_ACTION = "exercise_action"
@@ -70,6 +74,8 @@ class ExerciseCreator : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        backBtn.setOnClickListener {         super.onBackPressed()
+        }
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
         linearLayout = exercise_properties as LinearLayout
@@ -213,20 +219,31 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private fun getLayoutType(fieldPosition: Int): Int {
-        return if (fieldPosition == 0) {
-            if (mAction == OBJECT_NEW || mAction == OBJECT_EDIT) {
+        var layoutType: Int
+        if (fieldPosition == 0) {
+            layoutType = if (mAction == OBJECT_NEW || mAction == OBJECT_EDIT) {
                 LAYOUT_TYPE_TITLE_ET
             } else {
                 LAYOUT_TYPE_TITLE_TV
             }
 
         } else {
-            if (mAction == OBJECT_NEW || mAction == OBJECT_EDIT) {
-                LAYOUT_TYPE_NONTITLE_ET
+            layoutType = if (fieldPosition == 1) {
+                if (mAction == OBJECT_NEW || mAction == OBJECT_EDIT) {
+                    LAYOUT_TYPE_DESCRIPTION_ET
+                } else {
+                    LAYOUT_TYPE_DESCRIPTION_TV
+                }
             } else {
-                LAYOUT_TYPE_NONTITLE_TV
+                if (mAction == OBJECT_NEW || mAction == OBJECT_EDIT) {
+                    LAYOUT_TYPE_EXTRAFIELD_ET
+                } else {
+                    LAYOUT_TYPE_EXTRAFIELD_TV
+                }
             }
         }
+        Timber.d("LAYOUT TYPE: $layoutType")
+        return layoutType
     }
 
     private fun addLayout(fieldEntryKey: String, fieldEntryValue: String, layoutType: Int) {
@@ -236,14 +253,14 @@ class ExerciseCreator : AppCompatActivity() {
         if (layoutType == LAYOUT_TYPE_TITLE_TV) {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_title_textview_layout, null)
-            fieldLayout.fieldKey1.text=fieldEntryKey
+            fieldLayout.fieldKey1.text = fieldEntryKey
             fieldLayout.fieldValueTextView1.text = fieldEntryValue
 
         }
         if (layoutType == LAYOUT_TYPE_TITLE_ET) {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_title_edittext_layout, null)
-            fieldLayout.fieldKey2.text=fieldEntryKey
+            fieldLayout.fieldKey2.text = fieldEntryKey
 
             var editText = fieldLayout.fieldValueEditText2
             if (mAction == OBJECT_NEW) {
@@ -253,19 +270,19 @@ class ExerciseCreator : AppCompatActivity() {
                     SpannableStringBuilder(fieldEntryValue)
             }
         }
-        if (layoutType == LAYOUT_TYPE_NONTITLE_TV) {
+        if (layoutType == LAYOUT_TYPE_DESCRIPTION_TV) {
             fieldLayout =
-                layoutInflater.inflate(R.layout.inflate_nontitle_textview_layout, null)
-            fieldLayout.fieldKey3.text=fieldEntryKey
+                layoutInflater.inflate(R.layout.inflate_description_textview_layout, null)
+            fieldLayout.fieldKey3.text = fieldEntryKey
 
             fieldLayout.fieldValueTextView3.text = fieldEntryValue
         }
-        if (layoutType == LAYOUT_TYPE_NONTITLE_ET) {
+        if (layoutType == LAYOUT_TYPE_DESCRIPTION_ET) {
             fieldLayout =
-                layoutInflater.inflate(R.layout.inflate_nontitle_edittext_layout, null)
-            fieldLayout.fieldKey4.text=fieldEntryKey
+                layoutInflater.inflate(R.layout.inflate_description_edittext_layout, null)
+            fieldLayout.fieldKey4.text = fieldEntryKey
 
-            val editText=fieldLayout.fieldValueEditText4
+            val editText = fieldLayout.fieldValueEditText4
             if (mAction == OBJECT_NEW) {
                 editText.hint = "Describe here your activity"
             } else {
@@ -274,8 +291,26 @@ class ExerciseCreator : AppCompatActivity() {
             }
         }
 
-//        val fieldKey = fieldLayout.findViewById(R.id.fieldKey)
-//        fieldLayout.fieldKey.text = fieldEntryKey
+        if (layoutType == LAYOUT_TYPE_EXTRAFIELD_TV) {
+            fieldLayout =
+                layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
+            fieldLayout.fieldKey5.text = fieldEntryKey
+
+            fieldLayout.fieldValueTextView5.text = fieldEntryValue
+        }
+        if (layoutType == LAYOUT_TYPE_EXTRAFIELD_ET) {
+            fieldLayout =
+                layoutInflater.inflate(R.layout.inflate_extrafield_edittext_layout, null)
+            fieldLayout.fieldKey6.text = fieldEntryKey
+
+            val editText = fieldLayout.fieldValueEditText6
+            if (mAction == OBJECT_NEW) {
+                editText.hint = "New field"
+            } else {
+                editText.text =
+                    SpannableStringBuilder(fieldEntryValue)
+            }
+        }
 
         linearLayout.addView(fieldLayout)
 
@@ -325,6 +360,11 @@ class ExerciseCreator : AppCompatActivity() {
         for (i in 0 until linearLayout.childCount) {
 //            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
             var layout = linearLayout.getChildAt(i) as LinearLayout
+
+            //extra fields have a layout inside the layout - check the respective inflate files
+            if (i > 1 && layout.getChildAt(0) is LinearLayout) {
+                layout = layout.getChildAt(0) as LinearLayout
+            }
 
             var fieldName = (layout.getChildAt(0) as TextView).text.toString()
             var fieldValue = (layout.getChildAt(1) as EditText).text.trim().toString()
@@ -407,7 +447,7 @@ class ExerciseCreator : AppCompatActivity() {
         var fieldEntryKey = newFieldKey //first of pair - title of entry
         var fieldEntryValue = NEW_FIELD_VALUE //second of pair - value of entry
 
-        addLayout(fieldEntryKey, fieldEntryValue, LAYOUT_TYPE_NONTITLE_ET)
+        addLayout(fieldEntryKey, fieldEntryValue, LAYOUT_TYPE_EXTRAFIELD_ET)
 
     }
 
@@ -426,6 +466,12 @@ class ExerciseCreator : AppCompatActivity() {
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
     }
+
+//    private fun editToRead() {
+//        val intent = Intent(this, ExerciseViewer::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//        startActivity(intent)
+//    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.exercise_creator_toolbar, menu)
