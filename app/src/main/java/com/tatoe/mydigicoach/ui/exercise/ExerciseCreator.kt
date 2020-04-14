@@ -2,12 +2,14 @@ package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
@@ -336,7 +338,10 @@ class ExerciseCreator : AppCompatActivity() {
         newExercise.setFieldsMap(newExerciseFields)
 
         dataViewModel.insertExercise(newExercise)
-        backToViewer()
+//        backToViewer()
+        activeExercise=newExercise //new exercise are not fetched from SQLite from creator
+        Toast.makeText(this,"${activeExercise?.name} has been added",Toast.LENGTH_SHORT).show()
+        refreshCreator()
     }
     private val updateButtonListener = View.OnClickListener {
 
@@ -347,8 +352,9 @@ class ExerciseCreator : AppCompatActivity() {
         activeExercise!!.setFieldsMap(updatingExerciseFields)
 
         dataViewModel.updateExercise(activeExercise!!)
-
-        backToViewer()
+        Toast.makeText(this,"${activeExercise?.name} has been updated",Toast.LENGTH_SHORT).show()
+//        backToViewer()
+        refreshCreator()
     }
 
     private val deleteButtonListener = View.OnClickListener {
@@ -362,6 +368,7 @@ class ExerciseCreator : AppCompatActivity() {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     dataViewModel.deleteExercise(activeExercise!!)
+                    Toast.makeText(applicationContext,"${activeExercise?.name} has been deleted",Toast.LENGTH_SHORT).show()
                     backToViewer()
                 }
             })
@@ -426,11 +433,13 @@ class ExerciseCreator : AppCompatActivity() {
         startActivity(intent)
     }
 
-//    private fun editToRead() {
-//        val intent = Intent(this, ExerciseViewer::class.java)
-//        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-//        startActivity(intent)
-//    }
+    private fun refreshCreator() {
+        val intent = Intent(this, ExerciseCreator::class.java)
+        intent.putExtra(OBJECT_ACTION, OBJECT_VIEW)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        DataHolder.activeExerciseHolder = activeExercise
+        startActivity(intent)
+    }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.exercise_creator_toolbar, menu)
