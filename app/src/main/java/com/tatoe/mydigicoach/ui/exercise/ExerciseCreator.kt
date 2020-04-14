@@ -464,10 +464,10 @@ class ExerciseCreator : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-        R.id.action_back -> {
-            super.onBackPressed()
-            true
-        }
+//        R.id.action_back -> {
+//            super.onBackPressed()
+//            true
+//        }
         R.id.action_edit -> {
             mAction = OBJECT_EDIT
             updateButtonUI(mAction)
