@@ -9,7 +9,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
-import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -219,8 +219,8 @@ class BlockCreator : AppCompatActivity() {
 
         Utils.getInfoDialogView(this,title.toString(),"Do you want to delete the exercises in this block too?",object:DialogPositiveNegativeHandler{
 
-            override fun onPositiveButton(editTextText:String) {
-                super.onPositiveButton(editTextText)
+            override fun onPositiveButton(inputText:String) {
+                super.onPositiveButton(inputText)
                 dataViewModel.deleteBlock(blockToDelete,true)
                 backToViewer()
             }

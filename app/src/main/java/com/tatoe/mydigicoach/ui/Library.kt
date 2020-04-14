@@ -164,8 +164,8 @@ class Library : AppCompatActivity() {
             object :
                 DialogPositiveNegativeHandler {
 
-                override fun onPositiveButton(editTextText: String) {
-                    super.onPositiveButton(editTextText)
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
                     val blockToImport = activeBlockList[position]
                     blockToBeUpdated = activeBlockList[position]
 
@@ -213,8 +213,8 @@ class Library : AppCompatActivity() {
             object :
                 DialogPositiveNegativeHandler {
 
-                override fun onPositiveButton(editTextText: String) {
-                    super.onPositiveButton(editTextText)
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
                     dataViewModel.deleteBlock(blockToDelete, false)
                     (activeBlockList as MutableList).removeAt(position)
                     displayAdapter(activeBlockList,"No blocks have been imported or exported")

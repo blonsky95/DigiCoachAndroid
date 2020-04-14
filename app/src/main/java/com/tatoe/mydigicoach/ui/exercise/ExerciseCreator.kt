@@ -51,7 +51,7 @@ class ExerciseCreator : AppCompatActivity() {
 
     lateinit var mAction: String
 
-    var NEW_FIELD_VALUE = "I'm a new field"
+    var NEW_FIELD_VALUE = ""
 
     private var LAYOUT_TYPE_TITLE_TV = 1
     private var LAYOUT_TYPE_TITLE_ET = 2
@@ -74,7 +74,8 @@ class ExerciseCreator : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
-        backBtn.setOnClickListener {         super.onBackPressed()
+        backBtn.setOnClickListener {
+            super.onBackPressed()
         }
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
@@ -148,21 +149,9 @@ class ExerciseCreator : AppCompatActivity() {
         }
     }
 
-    private fun updateBodyUI(actionType: String) {
-
-        //try examining childs of layout and changing visibility of edit texts and of text views
-
+    private fun updateBodyUI() {
         createExerciseFieldsLayout()
 
-//        if (actionType == OBJECT_NEW) {
-//            changeVisibility(linearLayout, false)
-//        }
-//        if (actionType == OBJECT_EDIT) {
-//            changeVisibility(linearLayout, false)
-//        }
-//        if (actionType == OBJECT_VIEW) {
-//            changeVisibility(linearLayout, true)
-//        }
     }
 
     private fun createExerciseFieldsLayout() {
@@ -181,41 +170,7 @@ class ExerciseCreator : AppCompatActivity() {
 
             addLayout(fieldEntryKey, fieldEntryValue, getLayoutType(fieldPosition))
 
-
-//            var fieldTitleTextView = TextView(this)
-//            fieldTitleTextView.layoutParams =
-//                ViewGroup.LayoutParams(
-//                    ViewGroup.LayoutParams.MATCH_PARENT,
-//                    ViewGroup.LayoutParams.WRAP_CONTENT
-//                )
-//            fieldTitleTextView.text = fieldEntryKey
-//            fieldTitleTextView.typeface = Typeface.DEFAULT_BOLD
-//
-//            linearLayout.addView(fieldTitleTextView)
-//
-//            var fieldEditText = EditText(this)
-//            fieldEditText.layoutParams =
-//                ViewGroup.LayoutParams(
-//                    ViewGroup.LayoutParams.MATCH_PARENT,
-//                    ViewGroup.LayoutParams.WRAP_CONTENT
-//                )
-//            fieldEditText.hint = fieldEntryValue
-//            fieldEditText.text=SpannableStringBuilder(fieldEntryValue)
-//
-//            linearLayout.addView(fieldEditText)
-//
-//            var fieldInfoTextView = TextView(this)
-//            fieldInfoTextView.layoutParams =
-//                ViewGroup.LayoutParams(
-//                    ViewGroup.LayoutParams.MATCH_PARENT,
-//                    ViewGroup.LayoutParams.WRAP_CONTENT
-//                )
-//            fieldInfoTextView.text = fieldEntryValue
-//
-//            linearLayout.addView(fieldInfoTextView)
         }
-
-//        Timber.d("Child count: ${linearLayout.childCount}")
     }
 
     private fun getLayoutType(fieldPosition: Int): Int {
@@ -284,7 +239,7 @@ class ExerciseCreator : AppCompatActivity() {
 
             val editText = fieldLayout.fieldValueEditText4
             if (mAction == OBJECT_NEW) {
-                editText.hint = "Describe here your activity"
+                editText.hint = "Describe here your exercise"
             } else {
                 editText.text =
                     SpannableStringBuilder(fieldEntryValue)
@@ -316,43 +271,43 @@ class ExerciseCreator : AppCompatActivity() {
 
     }
 
-    private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {
+//    private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {
+//
+//        var editTextVisibility = View.VISIBLE
+//        var textViewVisibility = View.GONE
+//
+//        if (isRead) {
+//            editTextVisibility = View.GONE
+//            textViewVisibility = View.VISIBLE
+//        }
+//
+//        for (index in 0 until layout.childCount) {
+//            //Here I could change checking the view type to checking if index is 0,1,2 like Im doing
+//            //with title fieldsHashMap, in case its not edit texts or to improve performance.
+//            val childView = layout.getChildAt(index)
+//            if (isFieldTitle(index)) {
+//                childView.visibility = View.VISIBLE
+//                continue
+//            }
+//            if (childView is EditText) {
+////                Timber.d("visibility of child $index changed to $editTextVisibility")
+//
+//                childView.visibility = editTextVisibility
+//                continue
+//
+//            }
+//            if (childView is TextView) {
+////                Timber.d("visibility of child $index changed to $textViewVisibility")
+//
+//                childView.visibility = textViewVisibility
+//            }
+//        }
+//    }
 
-        var editTextVisibility = View.VISIBLE
-        var textViewVisibility = View.GONE
-
-        if (isRead) {
-            editTextVisibility = View.GONE
-            textViewVisibility = View.VISIBLE
-        }
-
-        for (index in 0 until layout.childCount) {
-            //Here I could change checking the view type to checking if index is 0,1,2 like Im doing
-            //with title fieldsHashMap, in case its not edit texts or to improve performance.
-            val childView = layout.getChildAt(index)
-            if (isFieldTitle(index)) {
-                childView.visibility = View.VISIBLE
-                continue
-            }
-            if (childView is EditText) {
-//                Timber.d("visibility of child $index changed to $editTextVisibility")
-
-                childView.visibility = editTextVisibility
-                continue
-
-            }
-            if (childView is TextView) {
-//                Timber.d("visibility of child $index changed to $textViewVisibility")
-
-                childView.visibility = textViewVisibility
-            }
-        }
-    }
-
-    private fun isFieldTitle(index: Int): Boolean {
-        //fieldsHashMap go in 3s, so childs 0,3,6,9... are alwasy titles
-        return (index + 3) % 3 == 0
-    }
+//    private fun isFieldTitle(index: Int): Boolean {
+//        //fieldsHashMap go in 3s, so childs 0,3,6,9... are alwasy titles
+//        return (index + 3) % 3 == 0
+//    }
 
     private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
 
@@ -376,8 +331,6 @@ class ExerciseCreator : AppCompatActivity() {
     private val addButtonListener = View.OnClickListener {
 
         var newExerciseFields = getFieldContents()
-
-//        var newExercise = Exercise(newExerciseFields["Name"]!!, newExerciseFields["Description"]!!)
         var newExercise = Exercise(newExerciseFields)
 
         newExercise.setFieldsMap(newExerciseFields)
@@ -390,9 +343,7 @@ class ExerciseCreator : AppCompatActivity() {
         var updatingExerciseFields = getFieldContents()
 
         activeExercise!!.name = updatingExerciseFields[0]!!["Name"]!!
-//        activeExercise!!.name = updatingExerciseFields["Name"]!!
         activeExercise!!.description = updatingExerciseFields[1]!!["Description"]!!
-//        activeExercise!!.description = updatingExerciseFields["Description"]!!
         activeExercise!!.setFieldsMap(updatingExerciseFields)
 
         dataViewModel.updateExercise(activeExercise!!)
@@ -408,8 +359,8 @@ class ExerciseCreator : AppCompatActivity() {
             object :
                 DialogPositiveNegativeHandler {
 
-                override fun onPositiveButton(editTextText: String) {
-                    super.onPositiveButton(editTextText)
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
                     dataViewModel.deleteExercise(activeExercise!!)
                     backToViewer()
                 }
@@ -422,26 +373,34 @@ class ExerciseCreator : AppCompatActivity() {
     }
 
     private fun generateDialog() {
-        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
-        mDialogView.dialogEditText.hint = "New field name"
-        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
-        val mBuilder = AlertDialog.Builder(this)
-            .setView(mDialogView)
-            .setTitle("Add Field")
-        val mAlertDialog = mBuilder.show()
-        mDialogView.dialogEnterBtn.setOnClickListener {
-            mAlertDialog.dismiss()
-            var newFieldKey = mDialogView.dialogEditText.text.toString().trim()
-            addNewFieldLayout(newFieldKey)
-        }
-        mDialogView.dialogCancelBtn.setOnClickListener {
-            mAlertDialog.dismiss()
-        }
+
+        Utils.getDialogViewWithEditText(this, "Add Field", null, "Name of new field",
+            object : DialogPositiveNegativeHandler {
+                override fun onPositiveButton(inputText: String) {
+                    addNewFieldLayout(inputText)
+                }
+
+            })
+
+//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
+//        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
+//        mDialogView.dialogEditText.hint = "New field name"
+//        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
+//        val mBuilder = AlertDialog.Builder(this)
+//            .setView(mDialogView)
+//            .setTitle("Add Field")
+//        val mAlertDialog = mBuilder.show()
+//        mDialogView.dialogEnterBtn.setOnClickListener {
+//            mAlertDialog.dismiss()
+//            var newFieldKey = mDialogView.dialogEditText.text.toString().trim()
+//            addNewFieldLayout(newFieldKey)
+//        }
+//        mDialogView.dialogCancelBtn.setOnClickListener {
+//            mAlertDialog.dismiss()
+//        }
     }
 
     private fun addNewFieldLayout(newFieldKey: String) {
-        //todo save what was written
         exerciseFieldsMap[exerciseFieldsMap.size] = hashMapOf(newFieldKey to "")
 
         var fieldEntryKey = newFieldKey //first of pair - title of entry
@@ -503,7 +462,7 @@ class ExerciseCreator : AppCompatActivity() {
         R.id.action_edit -> {
             mAction = OBJECT_EDIT
             updateButtonUI(mAction)
-            updateBodyUI(mAction)
+            updateBodyUI()
             updateToolbarItemVisibility(menuItemEdit, false)
             updateToolbarItemVisibility(menuItemRead, false)
             true
@@ -511,7 +470,7 @@ class ExerciseCreator : AppCompatActivity() {
         R.id.action_read -> {
             mAction = OBJECT_VIEW
             updateButtonUI(mAction)
-            updateBodyUI(mAction)
+            updateBodyUI()
             updateToolbarItemVisibility(menuItemEdit, true)
             updateToolbarItemVisibility(menuItemRead, false)
             true

@@ -21,7 +21,6 @@ import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.HomeScreen
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
 import com.tatoe.mydigicoach.viewmodels.MyExerciseViewerViewModelFactory
 
@@ -203,22 +202,23 @@ class ExerciseViewer : AppCompatActivity() {
             this,
             title.toString(),
             "Click the exercises you desire to select",
+            null,
             object :
                 DialogPositiveNegativeHandler {
-                override fun onPositiveButton(editTextText: String) {
-                    super.onPositiveButton(editTextText)
-                    if (editTextText.isEmpty()) {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    if (inputText.isEmpty()) {
                         Toast.makeText(
                             this@ExerciseViewer,
                             "Block name must not be empty",
                             Toast.LENGTH_SHORT
                         ).show()
                     } else {
-                        makeListSelectable(editTextText)
+                        makeListSelectable(inputText)
                     }
                 }
             })
-//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_export, null)
+//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_edittext, null)
 //        mDialogView.text_info.text = "Click the exercises you desire to select"
 //
 //        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)

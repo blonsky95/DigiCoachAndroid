@@ -27,7 +27,7 @@
                 android:layout_height="wrap_content"
                 android:background="@color/pinkTransparent"
                 android:gravity="start|center_vertical"
-                android:hint="Describe your activity"
+                android:hint="Type here"
                 android:inputType="textPersonName"
                 android:paddingStart="6dp"
                 android:paddingTop="6dp"
