@@ -38,7 +38,10 @@ class WeekViewer : AppCompatActivity() {
         setContentView(R.layout.activity_week_viewer)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        backBtn.setOnClickListener {
+            super.onBackPressed()
+        }
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
 //        initListeners()
