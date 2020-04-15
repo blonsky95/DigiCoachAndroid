@@ -3,12 +3,9 @@ package com.tatoe.mydigicoach.ui.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
@@ -19,23 +16,21 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
-import kotlinx.android.synthetic.main.item_day_result.view.*
 
 
-class DayContentAdapter(var context: Context, var date: String, var itemType: Int) :
-    RecyclerView.Adapter<CollapsibleItemViewHolderDay>() {
+class DayExercisesListAdapter(var context: Context, var date: String, var itemType: Int) :
+    RecyclerView.Adapter<DayExerciseViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
     private var blocks = emptyList<Block>()
     private var exercises = emptyList<Exercise>()
     private var sDay: Day? = null
 
-    private var exerciseTextSize: Float = 14.toFloat()
+    private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
     override fun getItemCount(): Int {
         var size = 0
         when (itemType) {
-            CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> size = blocks.size
             CustomAdapterFragment.EXERCISE_TYPE_ADAPTER -> size = exercises.size
         }
         return size
@@ -44,99 +39,38 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
     override fun onCreateViewHolder(
         parent: ViewGroup,
         viewType: Int
-    ): CollapsibleItemViewHolderDay {
+    ): DayExerciseViewHolder {
 
         var itemView = View(context)
         when (itemType) {
-            CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> itemView =
-                inflater.inflate(R.layout.item_holder_block, parent, false)
             CustomAdapterFragment.EXERCISE_TYPE_ADAPTER -> itemView =
-                inflater.inflate(R.layout.item_day_result, parent, false)
+                inflater.inflate(R.layout.item_holder_day_exercise, parent, false)
         }
 
-        return CollapsibleItemViewHolderDay(itemView)
+        return DayExerciseViewHolder(itemView)
     }
 
     @SuppressLint("InflateParams")
-    override fun onBindViewHolder(holder: CollapsibleItemViewHolderDay, position: Int) {
+    override fun onBindViewHolder(holder: DayExerciseViewHolder, position: Int) {
 
         when (itemType) {
-            CustomAdapterFragment.BLOCK_TYPE_ADAPTER -> {
-                populateBlocks(holder, position)
-            }
             CustomAdapterFragment.EXERCISE_TYPE_ADAPTER -> {
                 populateExercises(holder, position)
             }
         }
-
-
     }
 
-    private fun populateBlocks(holder: CollapsibleItemViewHolderDay, position: Int) {
-        val bindingBlock = blocks[position]
-        holder.itemTitle!!.text = bindingBlock.name
-        val exercises = bindingBlock.components
-        if (exercises.isNotEmpty()) {
-            for (exercise in exercises) {
-                val inflater2 = LayoutInflater.from(context)
-                val exerciseView = inflater2.inflate(R.layout.item_day_result, null)
-//                createExerciseTabLayout(CollapsibleItemViewHolderDay(exerciseView),exercise)
-                exerciseView.exercise_name.text = exercise.name
-                exerciseView.exercise_name.setOnClickListener {
-                    viewExerciseInCreator(exercise)
-                }
-//                var xxx = getExerciseResultButtonStateColour(exercise)
-//                Timber.d("COLOUR EXERCISE BLOCK: $xxx")
-//                exerciseView.result_button.setBackgroundColor(
-//                    getExerciseResultButtonStateColour(
-//                        exercise
-//                    )
-//                )
-                exerciseView.result_button.setBackgroundColor(
-                    getExerciseResultButtonDrawable(
-                        exercise
-                    )
-                )
-
-
-                exerciseView.result_button.setOnClickListener {
-                    goToExerciseResults(exercise)
-                }
-                holder.collapsibleLayout!!.addView(exerciseView)
-            }
-        } else {
-            val exerciseText = TextView(context)
-            exerciseText.text = "No exercises in this block"
-            exerciseText.setPadding(5, 3, 5, 3)
-            exerciseText.setTextSize(TypedValue.COMPLEX_UNIT_SP, exerciseTextSize)
-
-            holder.collapsibleLayout!!.addView(exerciseText)
-        }
-
-        holder.itemTitle.setOnClickListener {
-            holder.collapsibleLayout!!.visibility =
-                if (!holder.expanded!!) View.VISIBLE else View.GONE
-            holder.expanded = !holder.expanded!!
-        }
-    }
-
-
-    private fun populateExercises(holder: CollapsibleItemViewHolderDay, position: Int = -1) {
+    private fun populateExercises(holder: DayExerciseViewHolder, position: Int = -1) {
         val bindingExercise = exercises[position]
         createExerciseTabLayout(holder, bindingExercise)
     }
 
-    private fun createExerciseTabLayout(holder: CollapsibleItemViewHolderDay, exercise: Exercise) {
+    private fun createExerciseTabLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
         holder.exerciseTextView!!.text = exercise.name
         holder.exerciseTextView.setOnClickListener {
             viewExerciseInCreator(exercise)
         }
 
-//        holder.exerciseResultButton!!.setBackgroundColor(
-//            getExerciseResultButtonStateColour(
-//                exercise
-//            )
-//        )
         holder.exerciseResultButton!!.setBackgroundColor(
             getExerciseResultButtonDrawable(
                 exercise
@@ -176,6 +110,8 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         startActivity(context, intent, null)
     }
 
+
+
     internal fun setContent(day: Day?) {
         if (day != null) {
             this.blocks = day.blocks
@@ -183,6 +119,10 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
             this.sDay = day
             notifyDataSetChanged()
         }
+    }
+
+    fun setOnClickInterface (listener: ClickListenerRecyclerView) {
+        this.listenerRecyclerView=listener
     }
 
     //checks if that result already has an entry and returns a different colour to apply to button

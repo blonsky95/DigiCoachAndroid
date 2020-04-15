@@ -11,7 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
-import com.tatoe.mydigicoach.ui.util.DayContentAdapter
+import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
 import kotlinx.android.synthetic.main.fragment_day_view.view.*
 
 class DayFragment : Fragment() {
@@ -57,37 +57,24 @@ class DayFragment : Fragment() {
         fragmentView = inflater.inflate(R.layout.fragment_day_view, container, false)
         fragmentView.weekDay.text = Day.dayFragmentFormat.format(Day.dayIDToDate(date))
 
-//        val recyclerViewBlocks = fragmentView.dayBlocksRecyclerView as RecyclerView
         val recyclerViewExercises = fragmentView.dayExercisesRecyclerView as RecyclerView
-
 
         if (day == null || (day!!.blocks.isEmpty() && day!!.exercises.isEmpty())) {
             fragmentView.ifEmptyDaytext.visibility = View.VISIBLE
-//            recyclerViewBlocks.visibility = View.GONE
             recyclerViewExercises.visibility = View.GONE
-//            fragmentView.divider.visibility=View.GONE
-
         } else {
-
             fragmentView.ifEmptyDaytext.visibility = View.GONE
-//            recyclerViewBlocks.visibility = View.VISIBLE
             recyclerViewExercises.visibility = View.VISIBLE
-//            fragmentView.divider.visibility=View.VISIBLE
-
-
-            val dayContentAdapterBlocks =
-                DayContentAdapter(context!!, date, CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
-//            recyclerViewBlocks.adapter = dayContentAdapterBlocks
-//            recyclerViewBlocks.layoutManager = LinearLayoutManager(context!!)
-            dayContentAdapterBlocks.setContent(day)
+//            val dayContentAdapterBlocks =
+//                DayContentAdapter(context!!, date, CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
+//            dayContentAdapterBlocks.setContent(day)
 
             val dayContentAdapterExercises =
-                DayContentAdapter(context!!, date, CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
+                DayExercisesListAdapter(context!!, date, CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
             recyclerViewExercises.adapter = dayContentAdapterExercises
             recyclerViewExercises.layoutManager = LinearLayoutManager(context!!)
             dayContentAdapterExercises.setContent(day)
         }
-
 
         return fragmentView
     }

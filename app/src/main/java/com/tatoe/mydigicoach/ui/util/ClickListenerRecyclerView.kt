@@ -12,6 +12,10 @@ interface ClickListenerRecyclerView {
 
     }
 
+    fun onClick(view: View,position: Int, holder:EditableItemViewHolder){
+
+    }
+
     fun onLongClick(view: View, position: Int) {
 
     }

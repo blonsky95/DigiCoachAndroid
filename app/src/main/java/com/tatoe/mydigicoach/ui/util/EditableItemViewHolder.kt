@@ -1,21 +1,24 @@
 package com.tatoe.mydigicoach.ui.util
 
+import android.content.Context
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
+import kotlinx.android.synthetic.main.item_holder_exercise.view.*
 
 class EditableItemViewHolder(
-    v: View,
+    var v: View,
     private var listener: ClickListenerRecyclerView?,
-    hasSecondaryButton: Boolean = false
+    var rightImageHasListener: Boolean = false
 ) :
     RecyclerView.ViewHolder(v),
     View.OnClickListener, View.OnLongClickListener {
 
     val itemInfoView: TextView = v.findViewById(R.id.titleTextExerciseHolder)
-    private val secondaryBtn: ImageView = v.findViewById(R.id.imageRightExerciseHolder)
+    private val rightImage: ImageView = v.findViewById(R.id.imageRightExerciseHolder)
+    var isChecked = false
 
     // 2. In a BlockCreator activity, where it is temporarily added until block saved: in this usage, delete button is the listener and there is no listener in the textview
 
@@ -28,13 +31,28 @@ class EditableItemViewHolder(
     }
 
     override fun onClick(v: View) {
-        listener?.onClick(v, adapterPosition)
+        if (!rightImageHasListener) {
+            listener?.onClick(v, adapterPosition)
+        } else {
+            listener?.onClick(v, adapterPosition, this)
+        }
+
+    }
+
+    fun changeCheckedState(shouldCheck: Boolean, context: Context){
+        isChecked = if (shouldCheck) {
+            v.imageRightExerciseHolder.setImageDrawable(context.resources.getDrawable(R.drawable.ic_check_white_24dp))
+            true
+        } else {
+            v.imageRightExerciseHolder.setImageDrawable(context.resources.getDrawable(R.drawable.ic_circle_grey))
+            false
+        }
     }
 
     init {
-        if (hasSecondaryButton) {
-            secondaryBtn.visibility = View.VISIBLE
-            secondaryBtn.setOnClickListener(this)
+        if (rightImageHasListener) {
+//            secondaryBtn.visibility = View.VISIBLE
+            rightImage.setOnClickListener(this)
         } else {
             v.setOnClickListener(this)
             v.setOnLongClickListener(this)

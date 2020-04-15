@@ -23,6 +23,7 @@
 
     <color name="lightGreen">#99CC99</color>
     <color name="darkGreen">#669966</color>
+    <color name="evenDarkerGreen">#516451</color>
 
     <color name="white">#FFFFFF</color>
     <color name="black">#000000</color>
