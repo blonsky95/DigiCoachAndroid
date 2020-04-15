@@ -3,7 +3,7 @@ package com.tatoe.mydigicoach.ui.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.graphics.drawable.Drawable
+import android.graphics.Color
 import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
@@ -92,11 +92,12 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
 //                        exercise
 //                    )
 //                )
-                exerciseView.result_button.background =
+                exerciseView.result_button.setBackgroundColor(
                     getExerciseResultButtonDrawable(
                         exercise
-
                     )
+                )
+
 
                 exerciseView.result_button.setOnClickListener {
                     goToExerciseResults(exercise)
@@ -136,10 +137,12 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
 //                exercise
 //            )
 //        )
-        holder.exerciseResultButton!!.background =
+        holder.exerciseResultButton!!.setBackgroundColor(
             getExerciseResultButtonDrawable(
                 exercise
             )
+        )
+
 
 
         holder.exerciseResultButton.setOnClickListener {
@@ -192,12 +195,12 @@ class DayContentAdapter(var context: Context, var date: String, var itemType: In
         return ContextCompat.getColor(context, colourInt)
     }
 
-    private fun getExerciseResultButtonDrawable(exercise: Exercise): Drawable {
-        var drawable = R.drawable.ic_circle_gray
+    private fun getExerciseResultButtonDrawable(exercise: Exercise): Int {
+        var color = R.color.lightGrey
         if (exercise.exerciseResults.containsResult(date)) {
-            drawable = R.drawable.ic_check_white_24dp
+            color = R.color.darkGreen
         }
-        return context.resources.getDrawable(drawable)
+        return context.resources.getColor(color)
 
     }
 }

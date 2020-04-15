@@ -2,7 +2,6 @@ package com.tatoe.mydigicoach.ui.util
 
 import android.view.View
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
@@ -17,7 +16,7 @@ class CollapsibleItemViewHolder(
 
     val resultDate: TextView = v.findViewById(R.id.result_date)
     val resultResult: TextView = v.findViewById(R.id.result_result)
-    private val secondaryBtn: ImageView = v.findViewById(R.id.secondaryButton)
+    private val secondaryBtn: ImageView = v.findViewById(R.id.imageRightExerciseHolder)
 
 
     override fun onLongClick(v: View?): Boolean {

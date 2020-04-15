@@ -97,7 +97,7 @@ class CustomAdapterFragment : Fragment() {
     }
 
     private fun prepareExerciseAdapter(listener:ClickListenerRecyclerView,hasDelete:Boolean) {
-        adapterExercises = ExerciseListAdapter(activity!!,hasDelete)
+        adapterExercises = ExerciseListAdapter(activity!!,ExerciseListAdapter.DEFAULT_LAYOUT, hasDelete)
         mRecyclerView.adapter = adapterExercises
         mRecyclerView.layoutManager=LinearLayoutManager(activity!!)
         adapterExercises?.setOnClickInterface(listener)

@@ -84,7 +84,7 @@ class BlockCreator : AppCompatActivity() {
         recyclerView.adapter = adapterExercises
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        adapterDeletableExercises = ExerciseListAdapter(this, true)
+        adapterDeletableExercises = ExerciseListAdapter(this, ExerciseListAdapter.DEFAULT_LAYOUT,true)
         adapterDeletableExercises.setOnClickInterface(itemDeletableListener)
         recyclerViewV2.adapter = adapterDeletableExercises
         recyclerViewV2.layoutManager = LinearLayoutManager(this)

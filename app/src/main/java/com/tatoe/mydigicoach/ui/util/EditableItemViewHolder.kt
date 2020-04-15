@@ -14,8 +14,8 @@ class EditableItemViewHolder(
     RecyclerView.ViewHolder(v),
     View.OnClickListener, View.OnLongClickListener {
 
-    val itemInfoView: TextView = v.findViewById(R.id.textView)
-    private val secondaryBtn: ImageView = v.findViewById(R.id.secondaryButton)
+    val itemInfoView: TextView = v.findViewById(R.id.titleTextExerciseHolder)
+    private val secondaryBtn: ImageView = v.findViewById(R.id.imageRightExerciseHolder)
 
     // 2. In a BlockCreator activity, where it is temporarily added until block saved: in this usage, delete button is the listener and there is no listener in the textview
 
