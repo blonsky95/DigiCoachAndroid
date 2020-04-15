@@ -66,6 +66,10 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
     }
 
     private fun createExerciseTabLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
+
+        //todo reformat all this but basically here check if there is a result and then build the fields in the layout
+        //todo also tapping the view makes layout uncollapse, and builds the fields like in exerciseCreator - results fields map uh oh
+
         holder.exerciseTextView!!.text = exercise.name
         holder.exerciseTextView.setOnClickListener {
             viewExerciseInCreator(exercise)

@@ -13,7 +13,9 @@ class DayExerciseViewHolder (v: View) :
 
     var expanded:Boolean? = false
 
+    val mainLinearLayout:LinearLayout? = v.findViewById(R.id.mainLinearLayout)
     val exerciseTextView:TextView? = v.findViewById(R.id.exercise_name)
-    val exerciseResultButton:ImageView? = v.findViewById(R.id.result_button)
+    val collapsibleLinearLayout:LinearLayout? = v.findViewById(R.id.collapsibleLinearLayout)
+    val exerciseResultButton:ImageView? = v.findViewById(R.id.resultsBtn)
 
 }
