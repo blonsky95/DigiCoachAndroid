@@ -18,6 +18,7 @@ import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_ACTION
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_EDIT
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_NEW
@@ -62,10 +63,13 @@ class ResultsCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_creator)
-        title = "Exercise Result"
-
+        toolbar_title.text = "Result"
+        backBtn.setOnClickListener {
+            super.onBackPressed()
+        }
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
+        supportActionBar!!.setDisplayShowTitleEnabled(false)
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
         linearLayout = exercise_properties as LinearLayout
@@ -112,28 +116,28 @@ class ResultsCreator : AppCompatActivity() {
     private fun updateButtonUI(actionType: String) {
         if (actionType == OBJECT_NEW) {
             rightButton.visibility = View.VISIBLE
-            rightButton.text = "ADD"
+            rightButton.text = "Add"
             rightButton.setOnClickListener(addButtonListener)
 
             leftButton.visibility = View.INVISIBLE
 
             centreButton.visibility = View.VISIBLE
-            centreButton.text = "ADD FIELD"
+            centreButton.text = "Add Field"
             centreButton.setOnClickListener(addFieldButtonListener)
             return
         } else {
 
             if (actionType == OBJECT_EDIT) {
                 rightButton.visibility = View.VISIBLE
-                rightButton.text = "UPDATE"
+                rightButton.text = "Update"
                 rightButton.setOnClickListener(updateButtonListener)
 //
                 centreButton.visibility = View.VISIBLE
-                centreButton.text = "ADD FIELD"
+                centreButton.text = "Add Field"
                 centreButton.setOnClickListener(addFieldButtonListener)
 
                 leftButton.visibility = View.VISIBLE
-                leftButton.text = "DELETE"
+                leftButton.text = "Delete"
                 leftButton.setOnClickListener(deleteButtonListener)
             }
             if (actionType == OBJECT_VIEW) {
@@ -334,7 +338,8 @@ class ResultsCreator : AppCompatActivity() {
             dataViewModel.updateExerciseResult(activeExercise!!)
             DataHolder.activeExerciseHolder = activeExercise
         }
-        finish() //?
+        refreshCreator()
+//        finish() //?
     }
 
     private val updateButtonListener = View.OnClickListener {
@@ -351,11 +356,11 @@ class ResultsCreator : AppCompatActivity() {
             DataHolder.activeExerciseHolder = activeExercise
         }
 
-        backToViewer()
+        refreshCreator()
     }
 
     private val deleteButtonListener = View.OnClickListener {
-//        activeExercise!!.exerciseResults.getArrayListOfResults().removeAt(resultIndex)
+        //        activeExercise!!.exerciseResults.getArrayListOfResults().removeAt(resultIndex)
         activeExercise!!.exerciseResults.removeResult(resultIndex)
         dataViewModel.updateExerciseResult(activeExercise!!)
         DataHolder.activeExerciseHolder = activeExercise
@@ -366,20 +371,37 @@ class ResultsCreator : AppCompatActivity() {
     private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
 
         var fieldsMap = HashMap<Int, HashMap<String, String>>()
-        if (mAction== OBJECT_NEW) {
-            fieldsMap[0] = hashMapOf(ExerciseResults.DATE_KEY to Day.dayIDtoDashSeparator(resultDate))
+        if (mAction == OBJECT_NEW) {
+            fieldsMap[0] =
+                hashMapOf(ExerciseResults.DATE_KEY to Day.dayIDtoDashSeparator(resultDate))
         } else {
-            fieldsMap[0] =hashMapOf(ExerciseResults.DATE_KEY to activeExercise!!.exerciseResults.getResultDate(resultIndex))
+            fieldsMap[0] = hashMapOf(
+                ExerciseResults.DATE_KEY to activeExercise!!.exerciseResults.getResultDate(
+                    resultIndex
+                )
+            )
         }
-        for (i in 0 until linearLayout.childCount/3) {
+        for (i in 0 until linearLayout.childCount / 3) {
 //            var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
 
-            var fieldName = (linearLayout.getChildAt(3*i) as TextView).text.toString()
-            var fieldValue = (linearLayout.getChildAt(3*i + 1) as EditText).text.trim().toString()
+            var fieldName = (linearLayout.getChildAt(3 * i) as TextView).text.toString()
+            var fieldValue = (linearLayout.getChildAt(3 * i + 1) as EditText).text.trim().toString()
 
-            fieldsMap[i+1] =   hashMapOf(fieldName to fieldValue)
+            fieldsMap[i + 1] = hashMapOf(fieldName to fieldValue)
         }
         return fieldsMap
+    }
+
+    private fun refreshCreator() {
+        val intent = Intent(this, ResultsCreator::class.java)
+        intent.putExtra(OBJECT_ACTION, OBJECT_VIEW)
+        if (resultIndex==-1) {
+               resultIndex= activeExercise!!.exerciseResults.getResultPosition(resultDate)
+            }
+        intent.putExtra(RESULT_INDEX, resultIndex)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        DataHolder.activeExerciseHolder = activeExercise
+        startActivity(intent)
     }
 
     private fun backToViewer() {
@@ -412,20 +434,20 @@ class ResultsCreator : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-        R.id.action_back -> {
-            super.onBackPressed()
-            true
-        }
+//        R.id.action_back -> {
+//            super.onBackPressed()
+//            true
+//        }
         R.id.action_edit -> {
-            mAction= OBJECT_EDIT
+            mAction = OBJECT_EDIT
             updateButtonUI(mAction)
             updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, false)
-            updateToolbarItemVisibility(menuItemRead, true)
+            updateToolbarItemVisibility(menuItemRead, false)
             true
         }
         R.id.action_read -> {
-            mAction= OBJECT_VIEW
+            mAction = OBJECT_VIEW
             updateButtonUI(mAction)
             updateBodyUI(mAction)
             updateToolbarItemVisibility(menuItemEdit, true)

@@ -11,11 +11,23 @@ import com.tatoe.mydigicoach.R
 class DayExerciseViewHolder (v: View) :
     RecyclerView.ViewHolder(v) {
 
-    var expanded:Boolean? = false
+    var expanded:Boolean = false
 
     val mainLinearLayout:LinearLayout? = v.findViewById(R.id.mainLinearLayout)
     val exerciseTextView:TextView? = v.findViewById(R.id.exercise_name)
     val collapsibleLinearLayout:LinearLayout? = v.findViewById(R.id.collapsibleLinearLayout)
-    val exerciseResultButton:ImageView? = v.findViewById(R.id.resultsBtn)
+    val exerciseResultButton:TextView? = v.findViewById(R.id.resultsBtn)
+
+    fun toggleExpand(){
+        if (!expanded) {
+            collapsibleLinearLayout!!.visibility=View.VISIBLE
+            exerciseResultButton!!.visibility=View.VISIBLE
+            expanded=true
+        } else {
+            collapsibleLinearLayout!!.visibility=View.GONE
+            exerciseResultButton!!.visibility=View.GONE
+            expanded=false
+        }
+    }
 
 }

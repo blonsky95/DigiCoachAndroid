@@ -6,9 +6,12 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.LinearLayout
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
+import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
@@ -16,6 +19,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
+import kotlinx.android.synthetic.main.inflate_results_collapsible_textview_layout.view.*
 
 
 class DayExercisesListAdapter(var context: Context, var date: String, var itemType: Int) :
@@ -52,48 +56,77 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
 
     @SuppressLint("InflateParams")
     override fun onBindViewHolder(holder: DayExerciseViewHolder, position: Int) {
-
-        when (itemType) {
-            CustomAdapterFragment.EXERCISE_TYPE_ADAPTER -> {
-                populateExercises(holder, position)
-            }
-        }
-    }
-
-    private fun populateExercises(holder: DayExerciseViewHolder, position: Int = -1) {
         val bindingExercise = exercises[position]
-        createExerciseTabLayout(holder, bindingExercise)
+        updateExerciseLayout(holder, bindingExercise)
+
     }
 
-    private fun createExerciseTabLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
+//    private fun populateExercises(holder: DayExerciseViewHolder, position: Int = -1) {
+//        val bindingExercise = exercises[position]
+//        createExerciseTabLayout(holder, bindingExercise)
+//    }
 
-        //todo reformat all this but basically here check if there is a result and then build the fields in the layout
-        //todo also tapping the view makes layout uncollapse, and builds the fields like in exerciseCreator - results fields map uh oh
+    private fun updateExerciseLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
+
+        if (exercise.exerciseResults.containsResult(date)) {
+            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGreen))
+        } else {
+            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGrey))
+        }
+        loadResultsLayout(holder.collapsibleLinearLayout, exercise.exerciseResults)
 
         holder.exerciseTextView!!.text = exercise.name
         holder.exerciseTextView.setOnClickListener {
-            viewExerciseInCreator(exercise)
+            holder.toggleExpand()
         }
 
-        holder.exerciseResultButton!!.setBackgroundColor(
-            getExerciseResultButtonDrawable(
-                exercise
-            )
-        )
+//        holder.exerciseResultButton!!.setBackgroundColor(
+//            getExerciseResultButtonDrawable(
+//                exercise
+//            )
+//        )
 
-
-
-        holder.exerciseResultButton.setOnClickListener {
+        holder.exerciseResultButton!!.setOnClickListener {
+//            Toast.makeText(context, "result pressed", Toast.LENGTH_SHORT).show()
             goToExerciseResults(exercise)
         }
     }
 
-    private fun viewExerciseInCreator(exercise: Exercise) {
-        DataHolder.activeExerciseHolder = exercise
-        val intent = Intent(context, ExerciseCreator::class.java)
-        intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
-        startActivity(context, intent, null)
+    private fun loadResultsLayout(
+        collapsibleLinearLayout: LinearLayout?,
+        exerciseResults: ExerciseResults
+    ) {
+
+        collapsibleLinearLayout!!.removeAllViews()
+        var resultsMap = exerciseResults.getResultFromDate(date)
+        if (resultsMap.isEmpty()) {
+            collapsibleLinearLayout.addView(inflater.inflate(R.layout.inflate_noresults_collapsible_textview_layout, null))
+        } else {
+
+            for (i in 1 until resultsMap.size) {
+                var fieldLayout =
+                    inflater.inflate(R.layout.inflate_results_collapsible_textview_layout, null)
+                //the reason I use iterator().next() is because when I load resultsmap[i]
+                //even though I have a hashmap of size 1, it is still a hashmap of undefined size (and order, thats why i use ints), so to
+                //iterate through the entries and get the first one I use that, otherwise could get entries
+                fieldLayout.fieldKey7.text = resultsMap[i]!!.iterator().next().key
+                fieldLayout.fieldValueTextView8.text = resultsMap[i]!!.iterator().next().value
+                collapsibleLinearLayout.addView(fieldLayout)
+            }
+        }
     }
+
+    private fun load(fieldEntryKey: String, fieldEntryValue: String, layoutType: Int) {
+
+
+    }
+
+//    private fun viewExerciseInCreator(exercise: Exercise) {
+//        DataHolder.activeExerciseHolder = exercise
+//        val intent = Intent(context, ExerciseCreator::class.java)
+//        intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
+//        startActivity(context, intent, null)
+//    }
 
     private fun goToExerciseResults(exercise: Exercise) {
 
@@ -115,7 +148,6 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
     }
 
 
-
     internal fun setContent(day: Day?) {
         if (day != null) {
             this.blocks = day.blocks
@@ -125,8 +157,8 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
         }
     }
 
-    fun setOnClickInterface (listener: ClickListenerRecyclerView) {
-        this.listenerRecyclerView=listener
+    fun setOnClickInterface(listener: ClickListenerRecyclerView) {
+        this.listenerRecyclerView = listener
     }
 
     //checks if that result already has an entry and returns a different colour to apply to button

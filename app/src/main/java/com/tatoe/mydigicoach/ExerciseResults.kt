@@ -183,6 +183,15 @@ class ExerciseResults {
         return getArrayListOfResults()[position][0]!![DATE_KEY]!!
     }
 
+    fun getResultFromDate(date:String): HashMap<Int, HashMap<String, String>> {
+        var resultsMap = hashMapOf<Int, HashMap<String, String>>()
+        if (containsResult(date)){
+            resultsMap = getArrayListOfResults()[getResultPosition(date)]
+        }
+        return resultsMap
+
+    }
+
     fun getPlottableNames(): ArrayList<String> {
         var intResultsFieldsMap = Exercise.stringMapToIntMap(resultFieldsMap)
 
