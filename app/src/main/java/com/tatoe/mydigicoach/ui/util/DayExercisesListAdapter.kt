@@ -80,16 +80,23 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
             holder.toggleExpand()
         }
 
-//        holder.exerciseResultButton!!.setBackgroundColor(
-//            getExerciseResultButtonDrawable(
-//                exercise
-//            )
-//        )
-
         holder.exerciseResultButton!!.setOnClickListener {
 //            Toast.makeText(context, "result pressed", Toast.LENGTH_SHORT).show()
             goToExerciseResults(exercise)
         }
+
+        holder.questionBtn!!.setOnClickListener {
+            goToExercise(exercise)
+        }
+    }
+
+    private fun goToExercise(exercise: Exercise) {
+
+        val intent = Intent(context, ExerciseCreator::class.java)
+        intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
+        DataHolder.activeExerciseHolder = exercise
+        startActivity(context, intent, null)
+
     }
 
     private fun loadResultsLayout(

@@ -15,6 +15,7 @@ class DayExerciseViewHolder (v: View) :
 
     val mainLinearLayout:LinearLayout? = v.findViewById(R.id.mainLinearLayout)
     val exerciseTextView:TextView? = v.findViewById(R.id.exercise_name)
+    val questionBtn:ImageView? = v.findViewById(R.id.questionBtn)
     val collapsibleLinearLayout:LinearLayout? = v.findViewById(R.id.collapsibleLinearLayout)
     val exerciseResultButton:TextView? = v.findViewById(R.id.resultsBtn)
 
@@ -22,10 +23,12 @@ class DayExerciseViewHolder (v: View) :
         if (!expanded) {
             collapsibleLinearLayout!!.visibility=View.VISIBLE
             exerciseResultButton!!.visibility=View.VISIBLE
+            questionBtn!!.visibility=View.VISIBLE
             expanded=true
         } else {
             collapsibleLinearLayout!!.visibility=View.GONE
             exerciseResultButton!!.visibility=View.GONE
+            questionBtn!!.visibility=View.GONE
             expanded=false
         }
     }
