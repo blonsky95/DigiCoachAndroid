@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.ui.calendar
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -23,6 +24,7 @@ import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_creator.*
 import kotlinx.android.synthetic.main.item_holder_exercise.view.*
 import timber.log.Timber
+import java.util.*
 import kotlin.collections.ArrayList
 
 class DayCreator : AppCompatActivity() {
@@ -47,6 +49,9 @@ class DayCreator : AppCompatActivity() {
     lateinit var activeDay: Day
     lateinit var activeDayId: String
 
+    private var weekDaysViewHashMap = hashMapOf<Int, TextView>()
+
+
     //todo fix errors and create the recyclerview for exercises here in the order bla bla
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -58,6 +63,15 @@ class DayCreator : AppCompatActivity() {
         backBtn.setOnClickListener {
             super.onBackPressed()
         }
+
+        weekDaysViewHashMap[Day.MONDAY]=monday_btn
+        weekDaysViewHashMap[Day.TUESDAY]=tuesday_btn
+        weekDaysViewHashMap[Day.WEDNESDAY]=wednesday_btn
+        weekDaysViewHashMap[Day.THURSDAY]=thursday_btn
+        weekDaysViewHashMap[Day.FRIDAY]=friday_btn
+        weekDaysViewHashMap[Day.SATURDAY]=saturday_btn
+        weekDaysViewHashMap[Day.SUNDAY]=sunday_btn
+
         dataViewModel = ViewModelProviders.of(this, MyDayViewerViewModelFactory(application))
             .get(DayViewerViewModel::class.java)
 
@@ -77,15 +91,33 @@ class DayCreator : AppCompatActivity() {
 
         DataHolder.activeDayHolder?.let { it ->
             activeDay = it
+
 //            currentDayBlocks = activeDay.blocks
             currentDayExercises = activeDay.exercises
             Timber.d("data holder: active day: $activeDay")
         }
         activeDayId = intent.getStringExtra(DAY_ID)
+        changeWeekDayHighlight()
+
         addToDiaryViewContainer.setOnClickListener(updateDayListener)
 
     }
 
+    private fun changeWeekDayHighlight() {
+        var calendar = Calendar.getInstance()
+        calendar.time=Day.dayIDToDate(activeDayId)
+        var weekDay = Day.getDayOfWeek0to6(calendar)
+
+        for (entry in weekDaysViewHashMap) {
+            if (entry.key==weekDay) {
+                entry.value.setBackgroundColor(resources.getColor(R.color.lightGreen))
+                entry.value.setTextColor(resources.getColor(R.color.white))
+            } else {
+                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey))
+                entry.value.setTextColor(resources.getColor(R.color.darkGrey))
+            }
+        }
+    }
 
     private fun initObservers() {
 
