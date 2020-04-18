@@ -273,44 +273,6 @@ class ExerciseCreator : AppCompatActivity() {
 
     }
 
-//    private fun changeVisibility(layout: LinearLayout, isRead: Boolean) {
-//
-//        var editTextVisibility = View.VISIBLE
-//        var textViewVisibility = View.GONE
-//
-//        if (isRead) {
-//            editTextVisibility = View.GONE
-//            textViewVisibility = View.VISIBLE
-//        }
-//
-//        for (index in 0 until layout.childCount) {
-//            //Here I could change checking the view type to checking if index is 0,1,2 like Im doing
-//            //with title fieldsHashMap, in case its not edit texts or to improve performance.
-//            val childView = layout.getChildAt(index)
-//            if (isFieldTitle(index)) {
-//                childView.visibility = View.VISIBLE
-//                continue
-//            }
-//            if (childView is EditText) {
-////                Timber.d("visibility of child $index changed to $editTextVisibility")
-//
-//                childView.visibility = editTextVisibility
-//                continue
-//
-//            }
-//            if (childView is TextView) {
-////                Timber.d("visibility of child $index changed to $textViewVisibility")
-//
-//                childView.visibility = textViewVisibility
-//            }
-//        }
-//    }
-
-//    private fun isFieldTitle(index: Int): Boolean {
-//        //fieldsHashMap go in 3s, so childs 0,3,6,9... are alwasy titles
-//        return (index + 3) % 3 == 0
-//    }
-
     private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
 
         var fieldsMap = HashMap<Int, HashMap<String, String>>()
@@ -388,23 +350,6 @@ class ExerciseCreator : AppCompatActivity() {
                 }
 
             })
-
-//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_window, null)
-//        mDialogView.dialogTextTextView.visibility = View.INVISIBLE
-//        mDialogView.dialogEditText.hint = "New field name"
-//        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
-//        val mBuilder = AlertDialog.Builder(this)
-//            .setView(mDialogView)
-//            .setTitle("Add Field")
-//        val mAlertDialog = mBuilder.show()
-//        mDialogView.dialogEnterBtn.setOnClickListener {
-//            mAlertDialog.dismiss()
-//            var newFieldKey = mDialogView.dialogEditText.text.toString().trim()
-//            addNewFieldLayout(newFieldKey)
-//        }
-//        mDialogView.dialogCancelBtn.setOnClickListener {
-//            mAlertDialog.dismiss()
-//        }
     }
 
     private fun addNewFieldLayout(newFieldKey: String) {
@@ -464,10 +409,6 @@ class ExerciseCreator : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-//        R.id.action_back -> {
-//            super.onBackPressed()
-//            true
-//        }
         R.id.action_edit -> {
             mAction = OBJECT_EDIT
             updateButtonUI(mAction)

@@ -172,11 +172,13 @@ class ExerciseResults {
         var intResultsArrayList = getArrayListOfResults()
 
         for (result in intResultsArrayList) {
+            var x = result[0]!![DATE_KEY]!!
+            var y = Day.dayIDtoDashSeparator(date)
             if (result[0]!![DATE_KEY]!! == Day.dayIDtoDashSeparator(date)) {
                 return intResultsArrayList.indexOf(result)
             }
         }
-        return -1
+        return -2
     }
 
     fun getResultDate(position: Int): String {

@@ -31,7 +31,7 @@ data class Day(
         }
 
         fun dayIDtoDashSeparator(dayId: String): String {
-            return " ${dayId.substring(0, 2)}-${dayId.substring(2, 4)}-${dayId.substring(4, 8)}"
+            return "${dayId.substring(0, 2)}-${dayId.substring(2, 4)}-${dayId.substring(4, 8)}"
         }
 
         @SuppressLint("SimpleDateFormat")
