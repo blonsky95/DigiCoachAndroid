@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach.utils
 
+import android.content.Context
 import android.graphics.Color
 import com.github.mikephil.charting.charts.LineChart
 import com.github.mikephil.charting.components.XAxis
@@ -10,10 +11,11 @@ import com.github.mikephil.charting.data.LineDataSet
 import com.github.mikephil.charting.formatter.ValueFormatter
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.tatoe.mydigicoach.PlottableBundle
+import com.tatoe.mydigicoach.R
 import timber.log.Timber
 import java.util.concurrent.TimeUnit
 
-class ChartManager(lineChartView: LineChart, plottableBundle: PlottableBundle) {
+class ChartManager(var context:Context, lineChartView: LineChart, plottableBundle: PlottableBundle) {
 
     var sPlottableBundle = plottableBundle
     var sChartView = lineChartView
@@ -64,15 +66,15 @@ class ChartManager(lineChartView: LineChart, plottableBundle: PlottableBundle) {
         var lineDataSet = LineDataSet(values, sPlottableBundle.sName)
         lineDataSet.setDrawIcons(false)
         lineDataSet.setDrawValues(false)
-        lineDataSet.setCircleColor(Color.BLUE)
-        lineDataSet.color = Color.BLUE
+        lineDataSet.setCircleColor(context.resources.getColor(R.color.darkGreen))
+        lineDataSet.color = context.resources.getColor(R.color.darkGreen)
         lineDataSet.lineWidth = 3f
         lineDataSet.circleRadius = 3f
 //        lineDataSet.setDrawCircleHole(true)
 //        lineDataSet.valueTextSize=9f
 //        lineDataSet.label=""
         lineDataSet.setDrawFilled(true)
-        lineDataSet.fillColor = Color.BLUE
+        lineDataSet.fillColor = context.resources.getColor(R.color.lightGreen)
 
         var dataSets = arrayListOf<ILineDataSet>()
         dataSets.add(lineDataSet)

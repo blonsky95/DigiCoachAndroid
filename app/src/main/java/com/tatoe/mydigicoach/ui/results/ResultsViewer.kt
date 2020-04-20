@@ -20,6 +20,8 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import com.github.mikephil.charting.charts.LineChart
 import com.tatoe.mydigicoach.PlottableBundle
+import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
+import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
 import com.tatoe.mydigicoach.utils.ChartManager
 import kotlinx.android.synthetic.main.activity_results_viewer.*
 import timber.log.Timber
@@ -47,23 +49,16 @@ class ResultsViewer : AppCompatActivity() {
         title = "Exercise Results"
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
+        supportActionBar?.setDisplayShowTitleEnabled(false)
+        backBtn.setOnClickListener {
+            super.onBackPressed()
+        }
 
         dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
-        val myListener = object : ClickListenerRecyclerView {
-            override fun onClick(view: View, position: Int) {
-                super.onClick(view, position)
-                val intent = Intent(this@ResultsViewer, ResultsCreator::class.java)
-                intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
-                intent.putExtra(ResultsCreator.RESULT_INDEX, position)
-
-                startActivity(intent)
-
-            }
-        }
-
         adapter = ResultListAdapter(this)
-        adapter.setOnClickInterface(myListener)
+
+//        adapter.setOnClickInterface(myListener)
         ResultsRecyclerView.adapter = adapter
         ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
 
@@ -86,13 +81,30 @@ class ResultsViewer : AppCompatActivity() {
             ifEmptyResultsText.visibility = View.GONE
             ResultsRecyclerView.visibility = View.VISIBLE
 
-            adapter.setContent(sResults)
+            adapter.setContent(activeExercise)
         }
 
 //        initObserver()
     }
 
-        //todo - set initial value to spinner
+    override fun onResume() {
+        super.onResume()
+        //when coming back from editing a result
+        activeExercise=DataHolder.activeExerciseHolder
+        adapter = ResultListAdapter(this)
+        adapter.setContent(activeExercise)
+
+        refreshChartData()
+//        sSpinner.onItemSelectedListener = spinnerListener
+
+    }
+
+    private fun refreshChartData() {
+        plottableBundles = activeExercise!!.exerciseResults.getPlottableArrays()
+        displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
+    }
+
+    //todo - set initial value to spinner
     //todo - see if onitemselected listener is triggered at the start, in which case remove the call to displaydata in onCreate
 
     private fun getPlottableBundleFromName(pBundleName: String): PlottableBundle? {
@@ -119,7 +131,7 @@ class ResultsViewer : AppCompatActivity() {
             if (chartManager!=null) {
                 chartManager!!.setLineDataSet(plottableBundle)
             } else {
-                chartManager=ChartManager(chart1,plottableBundle)
+                chartManager=ChartManager(this,chart1,plottableBundle)
             }
         }
 
@@ -171,23 +183,5 @@ class ResultsViewer : AppCompatActivity() {
 //        })
 //    }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.creator_toolbar_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        R.id.action_back -> {
-            super.onBackPressed()
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
 
 }

@@ -1,6 +1,5 @@
 package com.tatoe.mydigicoach.ui.util
 
-import android.graphics.drawable.Drawable
 import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -8,28 +7,32 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 
-class DayExerciseViewHolder (v: View) :
+class DayExerciseViewHolder(v: View) :
     RecyclerView.ViewHolder(v) {
 
-    var expanded:Boolean = false
+    var expanded: Boolean = false
 
-    val mainLinearLayout:LinearLayout? = v.findViewById(R.id.mainLinearLayout)
-    val exerciseTextView:TextView? = v.findViewById(R.id.exercise_name)
-    val questionBtn:ImageView? = v.findViewById(R.id.questionBtn)
-    val collapsibleLinearLayout:LinearLayout? = v.findViewById(R.id.collapsibleLinearLayout)
-    val exerciseResultButton:TextView? = v.findViewById(R.id.resultsBtn)
+    val mainLinearLayout: LinearLayout? = v.findViewById(R.id.mainLinearLayout)
+    val exerciseTextView: TextView? = v.findViewById(R.id.exercise_name)
+    val questionBtn: ImageView? = v.findViewById(R.id.questionBtn)
+    val collapsibleLinearLayout: LinearLayout? = v.findViewById(R.id.collapsibleLinearLayout)
+    val exerciseResultButton: TextView? = v.findViewById(R.id.resultsBtn)
 
-    fun toggleExpand(){
+    fun toggleExpand(showQuestionBtn: Boolean = true) {
         if (!expanded) {
-            collapsibleLinearLayout!!.visibility=View.VISIBLE
-            exerciseResultButton!!.visibility=View.VISIBLE
-            questionBtn!!.visibility=View.VISIBLE
-            expanded=true
+            collapsibleLinearLayout!!.visibility = View.VISIBLE
+            exerciseResultButton!!.visibility = View.VISIBLE
+
+            //if you are viewing all the results of an exercise no need to have a question btn to go to exercise
+            if (showQuestionBtn) {
+                questionBtn!!.visibility = View.VISIBLE
+            }
+            expanded = true
         } else {
-            collapsibleLinearLayout!!.visibility=View.GONE
-            exerciseResultButton!!.visibility=View.GONE
-            questionBtn!!.visibility=View.GONE
-            expanded=false
+            collapsibleLinearLayout!!.visibility = View.GONE
+            exerciseResultButton!!.visibility = View.GONE
+            questionBtn!!.visibility = View.GONE
+            expanded = false
         }
     }
 

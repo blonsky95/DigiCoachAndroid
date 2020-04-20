@@ -61,11 +61,6 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
 
     }
 
-//    private fun populateExercises(holder: DayExerciseViewHolder, position: Int = -1) {
-//        val bindingExercise = exercises[position]
-//        createExerciseTabLayout(holder, bindingExercise)
-//    }
-
     private fun updateExerciseLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
 
         if (exercise.exerciseResults.containsResult(date)) {
@@ -123,18 +118,6 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
         }
     }
 
-    private fun load(fieldEntryKey: String, fieldEntryValue: String, layoutType: Int) {
-
-
-    }
-
-//    private fun viewExerciseInCreator(exercise: Exercise) {
-//        DataHolder.activeExerciseHolder = exercise
-//        val intent = Intent(context, ExerciseCreator::class.java)
-//        intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
-//        startActivity(context, intent, null)
-//    }
-
     private fun goToExerciseResults(exercise: Exercise) {
 
         DataHolder.activeExerciseHolder = exercise
@@ -167,23 +150,22 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
     fun setOnClickInterface(listener: ClickListenerRecyclerView) {
         this.listenerRecyclerView = listener
     }
-
-    //checks if that result already has an entry and returns a different colour to apply to button
-    private fun getExerciseResultButtonStateColour(exercise: Exercise): Int {
-        var colourInt = R.color.lightBlue
-        if (exercise.exerciseResults.containsResult(date)) {
-            colourInt = R.color.darkBlue
-        }
-
-        return ContextCompat.getColor(context, colourInt)
-    }
-
-    private fun getExerciseResultButtonDrawable(exercise: Exercise): Int {
-        var color = R.color.lightGrey
-        if (exercise.exerciseResults.containsResult(date)) {
-            color = R.color.darkGreen
-        }
-        return context.resources.getColor(color)
-
-    }
+//    //checks if that result already has an entry and returns a different colour to apply to button
+//    private fun getExerciseResultButtonStateColour(exercise: Exercise): Int {
+//        var colourInt = R.color.lightBlue
+//        if (exercise.exerciseResults.containsResult(date)) {
+//            colourInt = R.color.darkBlue
+//        }
+//
+//        return ContextCompat.getColor(context, colourInt)
+//    }
+//
+//    private fun getExerciseResultButtonDrawable(exercise: Exercise): Int {
+//        var color = R.color.lightGrey
+//        if (exercise.exerciseResults.containsResult(date)) {
+//            color = R.color.darkGreen
+//        }
+//        return context.resources.getColor(color)
+//
+//    }
 }

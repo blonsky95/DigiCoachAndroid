@@ -115,9 +115,6 @@ class ResultsCreator : AppCompatActivity() {
 
             Timber.d("ACTIVE EXERCISE IN CREATOR ${activeExercise!!}")
 
-//            result_title_text_view.text = activeExercise!!.name
-//            Timber.d("ACTION RECEIVED AT RESULTS CREATOR: $mAction $resultDate result index: $resultIndex")
-
             createExerciseFieldsLayout()
             updateButtonUI(mAction)
 
@@ -159,41 +156,16 @@ class ResultsCreator : AppCompatActivity() {
         }
     }
 
-//    private fun updateBodyUI(actionType: String) {
-//
-//        //try examining childs of layout and changing visibility of edit texts and of text views
-//
-//        createExerciseFieldsLayout()
-//
-//        if (actionType == OBJECT_NEW) {
-//            changeVisibility(linearLayout, false)
-//        }
-//        if (actionType == OBJECT_EDIT) {
-//            changeVisibility(linearLayout, false)
-//        }
-//        if (actionType == OBJECT_VIEW) {
-//            changeVisibility(linearLayout, true)
-//        }
-//    }
-
     private fun createExerciseFieldsLayout() {
 
         linearLayout.removeAllViews()
 
-//        val index = if (resultIndex==-1){
-//            activeExercise!!.exerciseResults.getResultPosition(resultDate)
-//        } else {
-//            resultIndex
-//        }
         val hashMapHashMap =
             if (mAction == OBJECT_NEW) {
                 sResultFieldsTypes
             } else {
                 sResultsArrayList[resultIndex]
             }
-
-//        var hashMapHashMap = sResultFieldsMap
-
         for (fieldPosition in 0 until hashMapHashMap.size) {
 
             var currentField = hashMapHashMap[fieldPosition]
@@ -219,6 +191,8 @@ class ResultsCreator : AppCompatActivity() {
         } else {
             LAYOUT_TYPE_EXTRAFIELD_TV
         }
+
+
 
         Timber.d("LAYOUT TYPE: $layoutType")
         return layoutType
@@ -290,20 +264,12 @@ class ResultsCreator : AppCompatActivity() {
     }
 
     private fun addFieldLayout(fieldName: String, isPlottable: Boolean) {
-        //todo save what was written
-//        exerciseFieldsMap[newField] = ""
-
-//        updateBodyUI(OBJECT_EDIT)
         var newFieldValue = "String"
         if (isPlottable) {
             newFieldValue = ExerciseResults.PLOTTABLE_VALUE
         }
-//        sResultFieldsMap[fieldName] = newFieldValue
         addLayout(fieldName, newFieldValue, LAYOUT_TYPE_EXTRAFIELD_ET)
 
-//        sResultFieldsMap[sResultFieldsMap.size] = hashMapOf(fieldName to newFieldValue)
-//        updateBodyUI(OBJECT_EDIT)
-//
     }
 
     private val addButtonListener = View.OnClickListener {
@@ -323,7 +289,6 @@ class ResultsCreator : AppCompatActivity() {
             DataHolder.activeExerciseHolder = activeExercise
         }
         refreshCreator()
-//        finish() //?
     }
 
     private val updateButtonListener = View.OnClickListener {
@@ -375,26 +340,6 @@ class ResultsCreator : AppCompatActivity() {
         }
         return fieldsMap
 
-//        var fieldsMap = HashMap<Int, HashMap<String, String>>()
-//        if (mAction == OBJECT_NEW) {
-//            fieldsMap[0] =
-//                hashMapOf(ExerciseResults.DATE_KEY to Day.dayIDtoDashSeparator(resultDate))
-//        } else {
-//            fieldsMap[0] = hashMapOf(
-//                ExerciseResults.DATE_KEY to activeExercise!!.exerciseResults.getResultDate(
-//                    resultIndex
-//                )
-//            )
-//        }
-//        for (i in 0 until linearLayout.childCount / 3) {
-////            var keyString = (linearLayout.getChildAt(i) as TextView).text.toString()
-//
-//            var fieldName = (linearLayout.getChildAt(3 * i) as TextView).text.toString()
-//            var fieldValue = (linearLayout.getChildAt(3 * i + 1) as EditText).text.trim().toString()
-//
-//            fieldsMap[i + 1] = hashMapOf(fieldName to fieldValue)
-//        }
-//        return fieldsMap
     }
 
     private fun refreshCreator() {
@@ -439,10 +384,6 @@ class ResultsCreator : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
-//        R.id.action_back -> {
-//            super.onBackPressed()
-//            true
-//        }
         R.id.action_edit -> {
             mAction = OBJECT_EDIT
             updateButtonUI(mAction)
