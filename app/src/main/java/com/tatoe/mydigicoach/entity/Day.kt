@@ -5,15 +5,17 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
+import com.prolificinteractive.materialcalendarview.CalendarDay
 import timber.log.Timber
 import java.text.DecimalFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.math.abs
-import kotlin.math.floor
 import kotlin.math.roundToInt
+
 
 @Entity(tableName = "day_table")
 data class Day(
@@ -51,6 +53,15 @@ data class Day(
         fun getTodayDate(): Date {
             return Calendar.getInstance().time
         }
+
+        fun dayToCalendarDay(day:Day):CalendarDay{
+            var date = dayIDToDate(day.dayId)
+            var calendar = Calendar.getInstance()
+            calendar.time=date
+            return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)+1,calendar.get(Calendar.DAY_OF_MONTH))
+        }
+
+
 
         fun getDayDifference(date1: Date, date2: Date): Int {
             var difference = date1.time - date2.time
