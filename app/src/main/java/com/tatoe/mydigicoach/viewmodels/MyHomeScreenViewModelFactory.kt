@@ -1,15 +1,16 @@
 package com.tatoe.mydigicoach.viewmodels
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.google.firebase.firestore.FirebaseFirestore
 
-class MyHomeScreenViewModelFactory(var firebaseFirestore: FirebaseFirestore) : ViewModelProvider.Factory {
+class MyHomeScreenViewModelFactory(var application: Application, var firebaseFirestore: FirebaseFirestore) : ViewModelProvider.Factory {
 
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
         return HomeScreenViewModel(
-            firebaseFirestore
+            application,firebaseFirestore
         ) as T
     }
 }

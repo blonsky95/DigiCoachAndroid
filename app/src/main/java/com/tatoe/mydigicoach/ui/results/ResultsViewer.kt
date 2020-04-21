@@ -29,7 +29,7 @@ import timber.log.Timber
 
 class ResultsViewer : AppCompatActivity() {
 
-    private lateinit var dataViewModel: DataViewModel
+//    private lateinit var dataViewModel: DataViewModel
 
     private var activeExercise: Exercise? = null
     lateinit var adapter: ResultListAdapter
@@ -54,7 +54,7 @@ class ResultsViewer : AppCompatActivity() {
             super.onBackPressed()
         }
 
-        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+//        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
 
         adapter = ResultListAdapter(this)
 

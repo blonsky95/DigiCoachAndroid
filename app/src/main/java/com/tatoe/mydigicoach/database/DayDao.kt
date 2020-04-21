@@ -9,7 +9,7 @@ interface DayDao {
     fun getAll(): androidx.lifecycle.LiveData<List<Day>>
 
     @Query("SELECT * FROM day_table WHERE dayId LIKE :dayId")
-    suspend fun findByName(dayId: String): Day
+    fun findByName(dayId: String): androidx.lifecycle.LiveData<Day>
 
     @Update
     suspend fun update(exercise: Day)

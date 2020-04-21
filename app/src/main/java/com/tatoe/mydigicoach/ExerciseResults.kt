@@ -159,9 +159,9 @@ class ExerciseResults {
 
     }
 
-    fun containsResult(date: String): Boolean {
+    fun containsResult(dayId: String): Boolean {
         for (result in getArrayListOfResults()) {
-            if (result[0]!![DATE_KEY]!! == Day.dayIDtoDashSeparator(date)) {
+            if (result[0]!![DATE_KEY]!! == Day.dayIDtoDashSeparator(dayId)) {
                 return true
             }
         }

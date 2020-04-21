@@ -24,6 +24,7 @@ class AppRepository(
     val allExportBlocks: androidx.lifecycle.LiveData<List<Block>> = blockDao.getExportBlocksLive()
 
     val allDays: androidx.lifecycle.LiveData<List<Day>> = dayDao.getAll()
+    val dayToday: androidx.lifecycle.LiveData<Day> = dayDao.findByName(Day.dateToDayID(Day.getTodayDate()))
 
     var isLoading = MutableLiveData<Boolean>()
 
@@ -154,11 +155,11 @@ class AppRepository(
         }
     }
 
-    suspend fun getDayById(dayId: String): Day? {
-        var day = dayDao.findByName(dayId)
-        Timber.d("activeDay exists?, row: $day")
-        return day
-    }
+//    suspend fun getDayById(dayId: String): Day? {
+//        var day = dayDao.findByName(dayId)
+//        Timber.d("activeDay exists?, row: $day")
+//        return day
+//    }
 
     suspend fun insertDay(day: Day) {
         dayDao.insert(day)

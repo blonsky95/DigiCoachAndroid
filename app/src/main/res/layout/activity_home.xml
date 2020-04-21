@@ -16,130 +16,149 @@
     <!--            app:layout_constraintTop_toTopOf="parent"-->
     <!--            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
 
-    <androidx.appcompat.widget.Toolbar
-            android:id="@+id/my_toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:layout_constraintTop_toTopOf="parent"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+<!--    <androidx.appcompat.widget.Toolbar-->
+<!--            android:id="@+id/my_toolbar"-->
+<!--            android:layout_width="match_parent"-->
+<!--            android:layout_height="?attr/actionBarSize"-->
+<!--            android:background="?attr/colorPrimary"-->
+<!--            android:elevation="4dp"-->
+<!--            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"-->
+<!--            app:layout_constraintTop_toTopOf="parent"-->
+<!--            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />-->
 
     <ImageView
             android:id="@+id/exercise_button"
-            android:layout_width="115dp"
-            android:layout_height="115dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/circle_background"
             android:contentDescription="Exercise_Image"
             android:src="@drawable/ic_exercise"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.2"
+            app:layout_constraintEnd_toStartOf="@+id/calendar_button"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.33" />
+            app:layout_constraintVertical_bias="0.18" />
+
+<!--    <TextView-->
+<!--            android:id="@+id/exercise_text"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:fontFamily="sans-serif-black"-->
+<!--            android:letterSpacing="0.15"-->
+<!--            android:text="Exercises"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/exercise_button"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/exercise_button"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/exercise_button" />-->
 
     <TextView
-            android:id="@+id/exercise_text"
+            android:id="@+id/today_training"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="32dp"
             android:fontFamily="sans-serif-black"
             android:letterSpacing="0.15"
-            android:text="Exercises"
+            android:text="Today Training"
             android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/exercise_button"
-            app:layout_constraintStart_toStartOf="@+id/exercise_button"
-            app:layout_constraintTop_toBottomOf="@+id/exercise_button" />
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.07"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/library_button" />
 
     <ImageView
             android:id="@+id/block_button"
-            android:layout_width="115dp"
-            android:layout_height="115dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="16dp"
             android:background="@drawable/circle_background"
             android:contentDescription="Block_Image"
             android:src="@drawable/ic_block"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.8"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toEndOf="@+id/library_button"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.33" />
+            app:layout_constraintVertical_bias="0.18" />
 
-    <TextView
-            android:id="@+id/block_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif-black"
-            android:letterSpacing="0.15"
-            android:text="Blocks"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/block_button"
-            app:layout_constraintStart_toStartOf="@+id/block_button"
-            app:layout_constraintTop_toBottomOf="@+id/block_button" />
+<!--    <TextView-->
+<!--            android:id="@+id/block_text"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:fontFamily="sans-serif-black"-->
+<!--            android:letterSpacing="0.15"-->
+<!--            android:text="Blocks"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/block_button"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/block_button"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/block_button" />-->
 
     <ImageView
             android:id="@+id/library_button"
-            android:layout_width="115dp"
-            android:layout_height="115dp"
-            android:layout_marginTop="24dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/circle_background"
             android:contentDescription="Library_Image"
             android:src="@drawable/ic_library"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.2"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/block_button"
+            app:layout_constraintStart_toEndOf="@+id/calendar_button"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.68" />
+            app:layout_constraintVertical_bias="0.18" />
 
-    <TextView
-            android:id="@+id/library_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif-black"
-            android:letterSpacing="0.15"
-            android:text="Library"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/library_button"
-            app:layout_constraintStart_toStartOf="@+id/library_button"
-            app:layout_constraintTop_toBottomOf="@+id/library_button" />
+<!--    <TextView-->
+<!--            android:id="@+id/library_text"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:fontFamily="sans-serif-black"-->
+<!--            android:letterSpacing="0.15"-->
+<!--            android:text="Library"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/library_button"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/library_button"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/library_button" />-->
 
     <ImageView
             android:id="@+id/calendar_button"
-            android:layout_width="115dp"
-            android:layout_height="115dp"
-            android:layout_marginTop="24dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
             android:background="@drawable/circle_background"
             android:contentDescription="Calendar_Image"
             android:src="@drawable/ic_calendar"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.8"
-            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/library_button"
+            app:layout_constraintStart_toEndOf="@+id/exercise_button"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.68" />
+            app:layout_constraintVertical_bias="0.18" />
 
-    <TextView
-            android:id="@+id/calendar_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:fontFamily="sans-serif-black"
-            android:letterSpacing="0.15"
-            android:text="Calendar"
-            android:textSize="18sp"
-            app:layout_constraintEnd_toEndOf="@+id/calendar_button"
-            app:layout_constraintStart_toStartOf="@+id/calendar_button"
-            app:layout_constraintTop_toBottomOf="@+id/calendar_button" />
+<!--    <TextView-->
+<!--            android:id="@+id/calendar_text"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginTop="8dp"-->
+<!--            android:fontFamily="sans-serif-black"-->
+<!--            android:letterSpacing="0.15"-->
+<!--            android:text="Calendar"-->
+<!--            android:textSize="18sp"-->
+<!--            app:layout_constraintEnd_toEndOf="@+id/calendar_button"-->
+<!--            app:layout_constraintStart_toStartOf="@+id/calendar_button"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/calendar_button" />-->
 
     <TextView
             android:id="@+id/welcome_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
             android:fontFamily="sans-serif-black"
             android:gravity="center"
             android:letterSpacing="0.1"
@@ -147,7 +166,50 @@
             android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.528"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.12" />
+            app:layout_constraintVertical_bias="0.0" />
+
+
+    <TextView
+            android:id="@+id/ifEmptyTodaytext"
+            android:layout_width="match_parent"
+            android:layout_height="240dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
+            android:background="@color/lightGreen"
+            android:fontFamily="@font/open_sans_regular"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingTop="72dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="72dp"
+            android:text="Click here to add today's training!"
+            android:textColor="@color/darkGrey"
+            android:textSize="16sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/today_training"
+            app:layout_constraintVertical_bias="0.0" />
+
+    <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dayExercisesRecyclerView"
+            android:layout_width="0dp"
+            android:layout_height="240dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="32dp"
+            android:background="@color/white"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/today_training"
+            app:layout_constraintVertical_bias="0.0"
+            tools:listitem="@layout/item_holder_exercise" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

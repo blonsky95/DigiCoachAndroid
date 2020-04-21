@@ -7,8 +7,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
-import android.widget.Toast
-import androidx.core.content.ContextCompat
 import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ExerciseResults
@@ -22,7 +20,7 @@ import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import kotlinx.android.synthetic.main.inflate_results_collapsible_textview_layout.view.*
 
 
-class DayExercisesListAdapter(var context: Context, var date: String, var itemType: Int) :
+class DayExercisesListAdapter(var context: Context, var dayId: String, var itemType: Int) :
     RecyclerView.Adapter<DayExerciseViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
@@ -63,7 +61,7 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
 
     private fun updateExerciseLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
 
-        if (exercise.exerciseResults.containsResult(date)) {
+        if (exercise.exerciseResults.containsResult(dayId)) {
             holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGreen))
         } else {
             holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGrey))
@@ -100,7 +98,7 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
     ) {
 
         collapsibleLinearLayout!!.removeAllViews()
-        var resultsMap = exerciseResults.getResultFromDate(date)
+        var resultsMap = exerciseResults.getResultFromDate(dayId)
         if (resultsMap.isEmpty()) {
             collapsibleLinearLayout.addView(inflater.inflate(R.layout.inflate_noresults_collapsible_textview_layout, null))
         } else {
@@ -123,15 +121,15 @@ class DayExercisesListAdapter(var context: Context, var date: String, var itemTy
         DataHolder.activeExerciseHolder = exercise
         var intent = Intent(context, ResultsCreator::class.java)
 
-        if (exercise.exerciseResults.containsResult(date)) {
+        if (exercise.exerciseResults.containsResult(dayId)) {
             intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_VIEW)
             intent.putExtra(
                 ResultsCreator.RESULT_INDEX,
-                exercise.exerciseResults.getResultPosition(date)
+                exercise.exerciseResults.getResultPosition(dayId)
             )
         } else {
             intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
-            intent.putExtra(ResultsCreator.RESULTS_DATE, date)
+            intent.putExtra(ResultsCreator.RESULTS_DATE, dayId)
         }
 
         startActivity(context, intent, null)
