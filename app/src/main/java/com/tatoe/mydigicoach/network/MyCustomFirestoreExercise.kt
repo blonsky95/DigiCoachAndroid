@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach.utils
+package com.tatoe.mydigicoach.network
 
 import com.tatoe.mydigicoach.entity.Exercise
 

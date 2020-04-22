@@ -36,7 +36,7 @@ class ExerciseViewer : AppCompatActivity() {
 
     private lateinit var allExercises: List<Exercise>
 
-    private var db = FirebaseFirestore.getInstance()
+//    private var db = FirebaseFirestore.getInstance()
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +51,6 @@ class ExerciseViewer : AppCompatActivity() {
             startActivity(Intent(this, HomeScreen::class.java))
         }
         recyclerView = recyclerview as RecyclerView
-
 //        exportBtn.visibility = View.GONE
         initAdapterListeners()
 
@@ -60,11 +59,11 @@ class ExerciseViewer : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        exerciseViewerViewModel = ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application,db)).get(ExerciseViewerViewModel::class.java)
+        exerciseViewerViewModel = ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application)).get(ExerciseViewerViewModel::class.java)
 
         exerciseViewerViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
-                Timber.d("I WANNA SEE THIS: $exercises")
+//                Timber.d("I WANNA SEE THIS: $exercises")
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
@@ -98,7 +97,10 @@ class ExerciseViewer : AppCompatActivity() {
             startActivity(intent)
 
         }
-
+        var receivedExercises = DataHolder.receivedExercises
+        for (exe in receivedExercises){
+            exerciseViewerViewModel.insertExercise(exe)
+        }
 //        getButton.setOnClickListener {
 //
 //

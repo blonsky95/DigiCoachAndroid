@@ -16,6 +16,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.network.DatabaseListener
 //import com.google.firebase.iid.FirebaseInstanceId
 import com.tatoe.mydigicoach.ui.block.BlockViewer
 import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
@@ -35,12 +36,12 @@ import java.util.*
 
 class HomeScreen : AppCompatActivity() {
 
-    private var firebaseUser:FirebaseUser? = null
+    private var firebaseUser: FirebaseUser? = null
     private var db = FirebaseFirestore.getInstance()
 
     private lateinit var homeScreenViewModel: HomeScreenViewModel
-    private var dayToday:Day? = null
-    private lateinit var recyclerViewExercises:RecyclerView
+    private var dayToday: Day? = null
+    private lateinit var recyclerViewExercises: RecyclerView
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -53,15 +54,21 @@ class HomeScreen : AppCompatActivity() {
         }
 
 //        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-        homeScreenViewModel = ViewModelProviders.of(this,
-            MyHomeScreenViewModelFactory(application,db)
+        homeScreenViewModel = ViewModelProviders.of(
+            this,
+            MyHomeScreenViewModelFactory(application, db)
         ).get(
-            HomeScreenViewModel::class.java)
+            HomeScreenViewModel::class.java
+        )
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
+
+        if (!DatabaseListener.isServiceRunning) {
+            startService(Intent(this, DatabaseListener::class.java))
+        }
         if (firebaseUser != null) {
             welcome_text.text = firebaseUser!!.email
-            DataHolder.userEmail=firebaseUser!!.email
+            DataHolder.userEmail = firebaseUser!!.email
         } else {
             // No user is signed in
         }
@@ -89,7 +96,7 @@ class HomeScreen : AppCompatActivity() {
             startActivity(intent)
         }
 
-         recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
+        recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
 
         initObservers()
 
@@ -108,15 +115,15 @@ class HomeScreen : AppCompatActivity() {
 
     private fun initObservers() {
         homeScreenViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
-            dayToday=day
+            dayToday = day
             var isDayEmpty =
-                dayToday==null || dayToday?.exercises!!.isEmpty()
+                dayToday == null || dayToday?.exercises!!.isEmpty()
             updateUI(isDayEmpty)
         })
 
     }
 
-    private fun updateUI(isDayEmpty:Boolean) {
+    private fun updateUI(isDayEmpty: Boolean) {
         if (isDayEmpty) {
             ifEmptyTodaytext.visibility = View.VISIBLE
             recyclerViewExercises.visibility = View.GONE
@@ -129,11 +136,16 @@ class HomeScreen : AppCompatActivity() {
             ifEmptyTodaytext.visibility = View.GONE
             recyclerViewExercises.visibility = View.VISIBLE
             val dayContentAdapterExercises =
-                DayExercisesListAdapter(this, dayToday!!.dayId, CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
+                DayExercisesListAdapter(
+                    this,
+                    dayToday!!.dayId,
+                    CustomAdapterFragment.EXERCISE_TYPE_ADAPTER
+                )
             recyclerViewExercises.adapter = dayContentAdapterExercises
             recyclerViewExercises.layoutManager = LinearLayoutManager(this)
             dayContentAdapterExercises.setContent(dayToday)
-        }    }
+        }
+    }
 
 //    private fun initObservers() {
 //        homeScreenViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->

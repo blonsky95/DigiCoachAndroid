@@ -2,15 +2,12 @@ package com.tatoe.mydigicoach.ui.exercise
 
 import android.content.Intent
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.viewmodels.DataViewModel
@@ -21,8 +18,9 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
+import com.tatoe.mydigicoach.viewmodels.MyExerciseViewerViewModelFactory
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
-import kotlinx.android.synthetic.main.custom_dialog_window.view.*
 import kotlinx.android.synthetic.main.inflate_description_edittext_layout.view.*
 import kotlinx.android.synthetic.main.inflate_description_textview_layout.view.*
 import kotlinx.android.synthetic.main.inflate_extrafield_edittext_layout.view.*
@@ -42,7 +40,7 @@ class ExerciseCreator : AppCompatActivity() {
     private lateinit var leftButton: TextView
     private lateinit var centreButton: TextView
 
-    private lateinit var dataViewModel: DataViewModel
+    private lateinit var dataViewModel: ExerciseViewerViewModel
 
     private var activeExercise: Exercise? = null
     private var exerciseFieldsMap = HashMap<Int, HashMap<String, String>>()
@@ -80,7 +78,7 @@ class ExerciseCreator : AppCompatActivity() {
             super.onBackPressed()
         }
 
-        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        dataViewModel = ViewModelProviders.of(this).get(ExerciseViewerViewModel::class.java)
         linearLayout = exercise_properties as LinearLayout
 
         rightButton = right_button
@@ -146,7 +144,9 @@ class ExerciseCreator : AppCompatActivity() {
 
                 centreButton.visibility = View.INVISIBLE
 
-                leftButton.visibility = View.INVISIBLE
+                leftButton.visibility = View.VISIBLE
+                leftButton.text = "Send"
+                leftButton.setOnClickListener(sendToUserListener)
             }
         }
     }
@@ -370,6 +370,16 @@ class ExerciseCreator : AppCompatActivity() {
         intent.putExtra(ResultsCreator.RESULTS_EXE_ID, activeExercise!!.exerciseId)
 
         startActivity(intent)
+    }
+
+    private val sendToUserListener = View.OnClickListener {
+        Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
+            object : DialogPositiveNegativeHandler {
+                override fun onPositiveButton(username: String) {
+                    dataViewModel.sendExerciseToUser(activeExercise, username)
+                }
+
+            })
     }
 
     private fun backToViewer() {

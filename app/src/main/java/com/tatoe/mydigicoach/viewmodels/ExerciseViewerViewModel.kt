@@ -5,17 +5,19 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.utils.MyCustomFirestoreExercise
+import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestore) :
+class ExerciseViewerViewModel(application: Application) :
     AndroidViewModel(application) {
 
     private val repository: AppRepository
@@ -23,6 +25,9 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
     private val viewModelJob = SupervisorJob()
 
     val allExercises: LiveData<List<Exercise>>
+
+    private var db = FirebaseFirestore.getInstance()
+
 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
@@ -38,12 +43,12 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
 
         allExercises = repository.allExercises
 
-        repository.isLoading.value=false
+        repository.isLoading.value = false
 
     }
 
     fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
-        repository.isLoading.value=true
+        repository.isLoading.value = true
 
         val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
         docRef.get()
@@ -66,17 +71,17 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
 //                    list.add(map)
                     docRef.add(exerciseToFirestoreFormat(exercise))
                 }
-                repository.isLoading.value=false
+                repository.isLoading.value = false
 
             }
             .addOnFailureListener { exception ->
-                repository.isLoading.value=false
+                repository.isLoading.value = false
                 Timber.d("get failed with: $exception ")
             }
     }
 
     fun getExercisesFromFirestore() = viewModelScope.launch {
-        repository.isLoading.value=true
+        repository.isLoading.value = true
         val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
         var exercises = mutableListOf<Exercise>()
         docRef.get()
@@ -90,10 +95,10 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
                     Timber.d("documents is empty or null")
                 }
                 modifyLocalTable(exercises)
-                repository.isLoading.value=false
+                repository.isLoading.value = false
             }
             .addOnFailureListener { exception ->
-                repository.isLoading.value=false
+                repository.isLoading.value = false
                 Timber.d("get failed with: $exception ")
             }
 
@@ -121,6 +126,21 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
         return MyCustomFirestoreExercise(exercise)
     }
 
+    fun insertExercise(newExercise: Exercise) = viewModelScope.launch {
+        Timber.d("ptg - data view model - insert called")
+        repository.insertExercise(newExercise)
+    }
+
+    fun updateExercise(exercise: Exercise) = viewModelScope.launch {
+        Timber.d("ptg - data view model - update called $exercise")
+        repository.updateExercise(exercise)
+    }
+
+    fun deleteExercise(exercise: Exercise) = viewModelScope.launch {
+        Timber.d("ptg - data view model - delete $exercise")
+        repository.deleteExercise(exercise)
+    }
+
     private fun firestoreFormatToExercise(myCustomFirestoreExercise: MyCustomFirestoreExercise): Exercise {
         return myCustomFirestoreExercise.toExercise()
     }
@@ -133,6 +153,27 @@ class ExerciseViewerViewModel(application: Application, var db: FirebaseFirestor
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
+    }
+
+    fun sendExerciseToUser(exercise: Exercise?, username: String) {
+        repository.isLoading.value = true
+
+        val docRef = db.collection("users").document(username).collection("transfers")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                docRef.add(
+                    ExercisePackage(
+                        exerciseToFirestoreFormat(exercise!!),
+                        FirebaseAuth.getInstance().currentUser!!.email!!
+                    )
+                )
+                repository.isLoading.value = false
+
+            }
+            .addOnFailureListener { exception ->
+                repository.isLoading.value = false
+                Timber.d("get failed with: $exception ")
+            }
     }
 
 

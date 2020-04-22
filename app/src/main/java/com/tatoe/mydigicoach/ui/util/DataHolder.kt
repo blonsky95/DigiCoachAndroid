@@ -14,6 +14,8 @@ object DataHolder {
 
     var userEmail: String? = null
 
+    var receivedExercises = arrayListOf<Exercise>()
+
 //    lateinit var updatedDayHolder: Day
 
     var pagerPosition: Int =
