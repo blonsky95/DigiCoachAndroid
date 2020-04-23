@@ -1,8 +1,10 @@
 package com.tatoe.mydigicoach.network
 
-class ExercisePackage(mFirestoreExercise: MyCustomFirestoreExercise? = null, sender: String = "") {
+import com.google.firebase.firestore.DocumentReference
 
-    constructor():this(null,"")
+class ExercisePackage(mFirestoreExercise: MyCustomFirestoreExercise? = null, sender: String = "", receiver: String = "", removeResults:Boolean = false) {
+
+//    constructor():this(null,"")
 
     companion object {
         val STATE_SENT = "sent"
@@ -11,13 +13,18 @@ class ExercisePackage(mFirestoreExercise: MyCustomFirestoreExercise? = null, sen
         val STATE_REJECTED = "rejected"
     }
 
-    var firestoreExercise = mFirestoreExercise
+    val firestoreExercise = mFirestoreExercise
     var mSender: String? = sender
+    var mReceiver: String? = receiver
     var mState: String = STATE_SENT
+    var documentPath:String? = null
 
     init {
         if (mSender == null) {
             mSender = "unknown_user_ptg"
+        }
+        if (removeResults){
+            firestoreExercise?.resultsArrayList= arrayListOf()
         }
     }
 }

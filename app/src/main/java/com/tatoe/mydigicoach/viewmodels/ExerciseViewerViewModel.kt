@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
@@ -164,7 +165,9 @@ class ExerciseViewerViewModel(application: Application) :
                 docRef.add(
                     ExercisePackage(
                         exerciseToFirestoreFormat(exercise!!),
-                        FirebaseAuth.getInstance().currentUser!!.email!!
+                        FirebaseAuth.getInstance().currentUser!!.email!!,
+                        username,
+                        true
                     )
                 )
                 repository.isLoading.value = false
@@ -176,5 +179,15 @@ class ExerciseViewerViewModel(application: Application) :
             }
     }
 
+    fun updateTransferExercise(exercisePackage: ExercisePackage, newState: String) {
+        exercisePackage.mState = ExercisePackage.STATE_SAVED
+        val docRef = db.document(exercisePackage.documentPath!!)
+//        val docRef = db.collection("users").document(exercisePackage.mReceiver!!).collection("transfers")
+//            .whereEqualTo("mstate", ExercisePackage.STATE_SENT)
 
+        docRef
+            .update("mstate", newState)
+            .addOnSuccessListener { Timber.d("DocumentSnapshot successfully updated!") }
+            .addOnFailureListener { e -> Timber.w("Error updating document: $e") }
+    }
 }

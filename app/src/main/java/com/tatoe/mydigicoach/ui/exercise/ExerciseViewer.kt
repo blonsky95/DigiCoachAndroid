@@ -19,6 +19,8 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerR
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
 import com.tatoe.mydigicoach.ui.HomeScreen
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
@@ -50,6 +52,35 @@ class ExerciseViewer : AppCompatActivity() {
         home_button.setOnClickListener {
             startActivity(Intent(this, HomeScreen::class.java))
         }
+
+        social_button.setOnClickListener {
+            var receivedExercises = DataHolder.receivedExercises
+            var title = "New Exercises"
+            var text = "You have not received any new exercises"
+            var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+
+            if (receivedExercises.isNotEmpty()) {
+                val exePackage = receivedExercises[0]
+                text="Import ${exePackage.firestoreExercise!!.mName} from your friend ${exePackage.mSender}"
+                dialogPositiveNegativeHandler = object :DialogPositiveNegativeHandler {
+                    override fun onPositiveButton(inputText:String) {
+                        super.onPositiveButton(inputText)
+                        exerciseViewerViewModel.insertExercise(exePackage.firestoreExercise.toExercise())
+                        exerciseViewerViewModel.updateTransferExercise(exePackage,ExercisePackage.STATE_SAVED)
+                        //update state in firestore to SAVED
+                    }
+
+                    override fun onNegativeButton() {
+                        super.onNegativeButton()
+                        exerciseViewerViewModel.updateTransferExercise(exePackage,ExercisePackage.STATE_REJECTED)
+                    }
+
+            }
+
+            }
+            Utils.getInfoDialogView(this,title,text,dialogPositiveNegativeHandler)
+        }
+
         recyclerView = recyclerview as RecyclerView
 //        exportBtn.visibility = View.GONE
         initAdapterListeners()
@@ -97,10 +128,7 @@ class ExerciseViewer : AppCompatActivity() {
             startActivity(intent)
 
         }
-        var receivedExercises = DataHolder.receivedExercises
-        for (exe in receivedExercises){
-            exerciseViewerViewModel.insertExercise(exe)
-        }
+
 //        getButton.setOnClickListener {
 //
 //
@@ -141,131 +169,36 @@ class ExerciseViewer : AppCompatActivity() {
             }
         }
 
-        itemSelectorListener = object : ClickListenerRecyclerView {
-            override fun onClick(view: View, position: Int) {
-                super.onClick(view, position)
-                Timber.d("$position was clicked, selected before: $selectedIndexes")
-
-                if (!selectedIndexes.contains(position)) {
-                    view.alpha = 0.5f
-                    selectedIndexes.add(position)
-                } else {
-
-                    val iterator = selectedIndexes.iterator()
-                    while (iterator.hasNext()) {
-                        val y = iterator.next()
-                        if (y == position) {
-                            view.alpha = 1.0f
-                            iterator.remove()
-                            break
-                        }
-                    }
-
-                }
-                Timber.d("$position was clicked, selected after: $selectedIndexes")
-
-//                Timber.d("current selection: $selectedIndexes")
-
-            }
-        }
-    }
-
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.viewer_toolbar_menu, menu)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        android.R.id.home -> {
-            onBackPressed()
-            true
-        }
-
-        R.id.action_export -> {
-            //show dialog with instructions to select
-//            checkPermissions()
-//            managePermissions.checkPermissions()
-            showImportDialog()
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun showImportDialog() {
-
-        Utils.getDialogViewWithEditText(
-            this,
-            title.toString(),
-            "Click the exercises you desire to select",
-            null,
-            object :
-                DialogPositiveNegativeHandler {
-                override fun onPositiveButton(inputText: String) {
-                    super.onPositiveButton(inputText)
-                    if (inputText.isEmpty()) {
-                        Toast.makeText(
-                            this@ExerciseViewer,
-                            "Block name must not be empty",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        makeListSelectable(inputText)
-                    }
-                }
-            })
-//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_edittext, null)
-//        mDialogView.text_info.text = "Click the exercises you desire to select"
+//        itemSelectorListener = object : ClickListenerRecyclerView {
+//            override fun onClick(view: View, position: Int) {
+//                super.onClick(view, position)
+//                Timber.d("$position was clicked, selected before: $selectedIndexes")
 //
-//        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
-//        mBuilder.setPositiveButton("OK") { _, _ ->
-//            val exportFileName = mDialogView.export_name_edittext.text.trim().toString()
-//            if (exportFileName.isEmpty()) {
-//                Toast.makeText(this, "Block name must not be empty", Toast.LENGTH_SHORT).show()
-//            } else {
-//                makeListSelectable(exportFileName)
+//                if (!selectedIndexes.contains(position)) {
+//                    view.alpha = 0.5f
+//                    selectedIndexes.add(position)
+//                } else {
+//
+//                    val iterator = selectedIndexes.iterator()
+//                    while (iterator.hasNext()) {
+//                        val y = iterator.next()
+//                        if (y == position) {
+//                            view.alpha = 1.0f
+//                            iterator.remove()
+//                            break
+//                        }
+//                    }
+//
+//                }
 //            }
 //        }
-//        mBuilder.show()
     }
-
-    private fun makeListSelectable(exportBlockName: String) {
-//        selectedIndexes.clear()
-//        addExerciseBtn.visibility = View.GONE
-//        title = "Select Exercises"
-//
-//
-//        updateAdapterListener(itemSelectorListener)
-//        exportBtn.visibility = View.VISIBLE
-//        exportBtn.setOnClickListener {
-//            Timber.d("Final selection: $selectedIndexes")
-//            exportBtn.visibility = View.GONE
-//            exerciseViewerViewModel.insertBlock(
-//                ImportExportUtils.makeExportBlock(
-//                    allExercises,
-//                    selectedIndexes,
-//                    exportBlockName
-//                )
-//            )
-//            addExerciseBtn.visibility = View.VISIBLE
-//            title = "Exercise Viewer"
-//            updateAdapterListener(goToCreatorListener)
-//        }
-
-    }
-
-    private fun updateAdapterListener(newListener: ClickListenerRecyclerView) {
-        adapter = ExerciseListAdapter(this)
-        adapter.setOnClickInterface(newListener)
-        recyclerView.adapter = adapter
-        adapter.setExercises(allExercises)
-    }
+//    private fun updateAdapterListener(newListener: ClickListenerRecyclerView) {
+//        adapter = ExerciseListAdapter(this)
+//        adapter.setOnClickInterface(newListener)
+//        recyclerView.adapter = adapter
+//        adapter.setExercises(allExercises)
+//    }
 
     private fun updateUpdatingExercise(position: Int) {
 
