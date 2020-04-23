@@ -33,9 +33,9 @@ class ResultsViewer : AppCompatActivity() {
 
     private var activeExercise: Exercise? = null
     lateinit var adapter: ResultListAdapter
-    private var sResults :ArrayList<HashMap<Int, HashMap<String, String>>> = arrayListOf()
+    private var sResults: ArrayList<HashMap<Int, HashMap<String, String>>> = arrayListOf()
     private lateinit var sChart: LineChart
-    private var chartManager: ChartManager?=null
+    private var chartManager: ChartManager? = null
     private var plottableBundles = arrayListOf<PlottableBundle>()
     private lateinit var sSpinner: Spinner
 
@@ -54,54 +54,42 @@ class ResultsViewer : AppCompatActivity() {
             super.onBackPressed()
         }
 
-//        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-
-        adapter = ResultListAdapter(this)
-
-//        adapter.setOnClickInterface(myListener)
-        ResultsRecyclerView.adapter = adapter
-        ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
-
         activeExercise = DataHolder.activeExerciseHolder
         sResults = activeExercise!!.exerciseResults.getArrayListOfResults()
-        plottableBundles = activeExercise!!.exerciseResults.getPlottableArrays()
+
+        loadLayout()
+        loadData()
+    }
+
+    private fun loadLayout() {
         sChart = chart1
         sSpinner = spinner
-        configureSpinner()
-
-//        displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
-
         if (sResults.isEmpty()) {
             ifEmptyResultsText.visibility = View.VISIBLE
             ResultsRecyclerView.visibility = View.GONE
-            sSpinner.visibility=View.GONE
-
+            sSpinner.visibility = View.GONE
         } else {
-//            displayPlottableParameter()
             ifEmptyResultsText.visibility = View.GONE
             ResultsRecyclerView.visibility = View.VISIBLE
-
-            adapter.setContent(activeExercise)
+            loadData()
         }
-
-//        initObserver()
     }
 
-    override fun onResume() {
-        super.onResume()
-        //when coming back from editing a result
-        activeExercise=DataHolder.activeExerciseHolder
-        adapter = ResultListAdapter(this)
-        adapter.setContent(activeExercise)
+    private fun loadData() {
 
-        refreshChartData()
-//        sSpinner.onItemSelectedListener = spinnerListener
+            adapter = ResultListAdapter(this)
+            plottableBundles = activeExercise!!.exerciseResults.getPlottableArrays()
 
+            ResultsRecyclerView.adapter = adapter
+            ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
+            configureSpinner()
+            adapter.setContent(activeExercise)
     }
 
-    private fun refreshChartData() {
-        plottableBundles = activeExercise!!.exerciseResults.getPlottableArrays()
-        displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
+    override fun onRestart() {
+        super.onRestart()
+        loadLayout()
+        Timber.d("RESTART GOOOOO")
     }
 
     //todo - set initial value to spinner
@@ -128,14 +116,12 @@ class ResultsViewer : AppCompatActivity() {
 
     private fun displayPlottableParameter(plottableBundle: PlottableBundle?) {
         if (plottableBundle != null) {
-            if (chartManager!=null) {
+            if (chartManager != null) {
                 chartManager!!.setLineDataSet(plottableBundle)
             } else {
-                chartManager=ChartManager(this,chart1,plottableBundle)
+                chartManager = ChartManager(this, chart1, plottableBundle)
             }
-        }
-
-         else {
+        } else {
             //display toast
         }
 
