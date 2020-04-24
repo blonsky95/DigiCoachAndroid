@@ -52,6 +52,7 @@ class MonthViewer : AppCompatActivity() {
 
         home_button.setOnClickListener {
             startActivity(Intent(this,HomeScreen::class.java))
+            finish()
         }
 
     }

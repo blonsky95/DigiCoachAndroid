@@ -29,20 +29,19 @@ class DatabaseListener :
 
         docRef.addSnapshotListener { snapshot, e ->
 
-            DataHolder.emptyReceivedExercises()
-
-            for (document in snapshot!!.documents) {
-                val exercisePackage = document.toObject(ExercisePackage::class.java)
-//                val newExercise = exercisePackage?.firestoreExercise!!.toExercise()
-                exercisePackage!!.documentPath=document.reference.path
-                DataHolder.addReceivedExercise(exercisePackage)
-//                DataHolder.receivedExercises.add(newExercise)
-//                updateExeState(document.reference, exercisePackage)
+            if (snapshot!=null){
+                DataHolder.emptyReceivedExercises()
+                for (document in snapshot.documents) {
+                    val exercisePackage = document.toObject(ExercisePackage::class.java)
+                    exercisePackage!!.documentPath=document.reference.path
+                    DataHolder.addReceivedExercise(exercisePackage)
+                }
             }
 
-            if (e != null) {
-                return@addSnapshotListener
-            }
+
+//            if (e != null) {
+//                return@addSnapshotListener
+//            }
 
         }
     }

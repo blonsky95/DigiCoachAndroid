@@ -63,7 +63,7 @@ class HomeScreen : AppCompatActivity() {
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
 
-        if (!DatabaseListener.isServiceRunning) {
+        if (!DatabaseListener.isServiceRunning && firebaseUser!=null) {
             startService(Intent(this, DatabaseListener::class.java))
         }
         if (firebaseUser != null) {
@@ -97,6 +97,18 @@ class HomeScreen : AppCompatActivity() {
         }
 
         recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
+
+        //todo test this
+        log_off.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
+            var intent = Intent(this, LoginScreen::class.java)
+//            intent.flags=Intent.FLAG_ACTIVITY_CLEAR_TOP
+//            intent.flags=Intent.FLAG_ACTIVITY_CLEAR_TASK
+//            intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
+            startActivity(intent)
+//            onBackPressed()
+            finish()
+        }
 
         initObservers()
 

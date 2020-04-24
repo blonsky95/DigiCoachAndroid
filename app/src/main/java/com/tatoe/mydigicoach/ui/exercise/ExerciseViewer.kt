@@ -51,6 +51,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         home_button.setOnClickListener {
             startActivity(Intent(this, HomeScreen::class.java))
+            finish()
         }
 
         social_button.setOnClickListener {

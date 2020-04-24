@@ -4,6 +4,8 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.Spannable
+import android.text.SpannableStringBuilder
 import android.view.View
 import android.widget.EditText
 import android.widget.ProgressBar
@@ -13,6 +15,7 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.tatoe.mydigicoach.BuildConfig
 import com.tatoe.mydigicoach.R
 import kotlinx.android.synthetic.main.activity_login_screen.*
 import timber.log.Timber
@@ -58,6 +61,14 @@ class LoginScreen : AppCompatActivity() {
             hasPermissions=true
         }
 
+        if (BuildConfig.DEBUG) {
+            magicBtn.visibility=View.VISIBLE
+            magicBtn.setOnClickListener {
+                userEditText.text=SpannableStringBuilder("pablo.trescoli@gmail.com")
+                passwordEditText.text=SpannableStringBuilder("123456")
+
+            }
+        }
     }
 
     private val checkValidUser = View.OnClickListener {
@@ -115,7 +126,7 @@ class LoginScreen : AppCompatActivity() {
                     progress.visibility = View.GONE
 
                     if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
+                        // Register success, update UI with the signed-in user's information
                         Timber.d("createUserWithEmail:success")
                         val user = auth.currentUser
                         Toast.makeText(
@@ -124,7 +135,7 @@ class LoginScreen : AppCompatActivity() {
                         ).show()
                         updateUI(user)
                     } else {
-                        // If sign in fails, display a message to the user.
+                        // If Register fails, display a message to the user.
                         Timber.w("createUserWithEmail:failure exception: ${task.exception}")
                         Toast.makeText(
                             baseContext, "Authentication register failed.",
@@ -152,7 +163,7 @@ class LoginScreen : AppCompatActivity() {
                 startActivity(intent)
                 finish()
             } else {
-                Toast.makeText(this,"Accept permissions you turd", Toast.LENGTH_LONG).show()
+//                Toast.makeText(this,"Accept permissions you turd", Toast.LENGTH_LONG).show()
             }
         }
     }
