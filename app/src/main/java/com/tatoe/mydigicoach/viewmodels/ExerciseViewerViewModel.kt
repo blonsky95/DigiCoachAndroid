@@ -1,10 +1,7 @@
 package com.tatoe.mydigicoach.viewmodels
 
 import android.app.Application
-import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
@@ -29,6 +26,7 @@ class ExerciseViewerViewModel(application: Application) :
 
     private var db = FirebaseFirestore.getInstance()
 
+    var receivedExercises = MutableLiveData<ArrayList<ExercisePackage>>(arrayListOf())
 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
@@ -45,6 +43,8 @@ class ExerciseViewerViewModel(application: Application) :
         allExercises = repository.allExercises
 
         repository.isLoading.value = false
+
+        receivedExercises=repository.receivedExercisesMediator
 
     }
 

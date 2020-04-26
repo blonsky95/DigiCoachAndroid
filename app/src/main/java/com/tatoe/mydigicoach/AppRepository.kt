@@ -1,5 +1,7 @@
 package com.tatoe.mydigicoach
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tatoe.mydigicoach.database.BlockDao
 import com.tatoe.mydigicoach.database.DayDao
@@ -7,6 +9,7 @@ import com.tatoe.mydigicoach.database.ExerciseDao
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.ExercisePackage
 import timber.log.Timber
 
 
@@ -28,8 +31,18 @@ class AppRepository(
 
     var isLoading = MutableLiveData<Boolean>()
 
+    val receivedExercisesMediator = MediatorLiveData<ArrayList<ExercisePackage>>()
+
     private val ACTION_UPDATE = 1
     private val ACTION_DELETE = 2
+
+    fun addDataSource(data: LiveData<ArrayList<ExercisePackage>>) {
+        receivedExercisesMediator.addSource(data, receivedExercisesMediator::setValue)
+    }
+
+    fun removeDataSource(data: LiveData<ArrayList<ExercisePackage>>) {
+        receivedExercisesMediator.removeSource(data)
+    }
 
     suspend fun insertExercise(exercise: Exercise) {
         var rowId = exerciseDao.insert(exercise)

@@ -11,23 +11,17 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
-import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.entity.Day
-import com.tatoe.mydigicoach.network.DatabaseListener
 //import com.google.firebase.iid.FirebaseInstanceId
 import com.tatoe.mydigicoach.ui.block.BlockViewer
 import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.calendar.DayCreator
 import com.tatoe.mydigicoach.ui.calendar.MonthViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
-import com.tatoe.mydigicoach.ui.util.CurrentDayDecorator
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.DatesWithTrainingDecorator
 import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
-import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
 import com.tatoe.mydigicoach.viewmodels.HomeScreenViewModel
 import com.tatoe.mydigicoach.viewmodels.MyHomeScreenViewModelFactory
 import kotlinx.android.synthetic.main.activity_home.*
@@ -63,9 +57,9 @@ class HomeScreen : AppCompatActivity() {
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
 
-        if (!DatabaseListener.isServiceRunning && firebaseUser!=null) {
-            startService(Intent(this, DatabaseListener::class.java))
-        }
+//        if (!DatabaseListener.isServiceRunning && firebaseUser!=null) {
+//            startService(Intent(this, DatabaseListener::class.java))
+//        }
         if (firebaseUser != null) {
             welcome_text.text = firebaseUser!!.email
             DataHolder.userEmail = firebaseUser!!.email

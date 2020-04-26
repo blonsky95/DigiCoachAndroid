@@ -73,7 +73,7 @@
                 android:windowSoftInputMode="adjustPan" />
 
         <service
-                android:name=".network.DatabaseListener"
+                android:name=".network.FirebaseListenerService"
                 android:exported="false" />
     </application>
 

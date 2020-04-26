@@ -1,17 +1,18 @@
 package com.tatoe.mydigicoach.ui.exercise
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.os.IBinder
 import android.view.View
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
@@ -19,12 +20,14 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerR
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.ExercisePackage
-import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
 import com.tatoe.mydigicoach.ui.HomeScreen
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.utils.FirestoreReceiver
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
 import com.tatoe.mydigicoach.viewmodels.MyExerciseViewerViewModelFactory
+import java.util.ArrayList
 
 
 class ExerciseViewer : AppCompatActivity() {
@@ -37,9 +40,55 @@ class ExerciseViewer : AppCompatActivity() {
     private var selectedIndexes = arrayListOf<Int>()
 
     private lateinit var allExercises: List<Exercise>
+    private lateinit var receivedExercises: ArrayList<ExercisePackage>
+    private lateinit var mReceiver: FirestoreReceiver
+    private lateinit var mService: FirebaseListenerService
 
 //    private var db = FirebaseFirestore.getInstance()
 
+    //    override fun onRestart() {
+//        receivedExercises = DataHolder.receivedExercises
+//        super.onRestart()
+//    }
+    var mBound = false
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+
+            val binder = service as FirebaseListenerService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+            observe()
+
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
+    private fun observe() {
+        mService.receivedExercisesLiveData.observe(this, Observer { lol ->
+            receivedExercises = lol
+            updateSocialButtonListener()
+            updateSocialButtonNumber()
+        })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Bind to LocalService
+        Intent(this, FirebaseListenerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        mBound = false
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -54,33 +103,12 @@ class ExerciseViewer : AppCompatActivity() {
             finish()
         }
 
-        social_button.setOnClickListener {
-            var receivedExercises = DataHolder.receivedExercises
-            var title = "New Exercises"
-            var text = "You have not received any new exercises"
-            var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
-
-            if (receivedExercises.isNotEmpty()) {
-                val exePackage = receivedExercises[0]
-                text="Import ${exePackage.firestoreExercise!!.mName} from your friend ${exePackage.mSender}"
-                dialogPositiveNegativeHandler = object :DialogPositiveNegativeHandler {
-                    override fun onPositiveButton(inputText:String) {
-                        super.onPositiveButton(inputText)
-                        exerciseViewerViewModel.insertExercise(exePackage.firestoreExercise.toExercise())
-                        exerciseViewerViewModel.updateTransferExercise(exePackage,ExercisePackage.STATE_SAVED)
-                        //update state in firestore to SAVED
-                    }
-
-                    override fun onNegativeButton() {
-                        super.onNegativeButton()
-                        exerciseViewerViewModel.updateTransferExercise(exePackage,ExercisePackage.STATE_REJECTED)
-                    }
-
-            }
-
-            }
-            Utils.getInfoDialogView(this,title,text,dialogPositiveNegativeHandler)
+        var firebaseUser = FirebaseAuth.getInstance().currentUser
+        if (!FirebaseListenerService.isServiceRunning && firebaseUser != null) {
+            startService(Intent(this, FirebaseListenerService::class.java))
         }
+//        receivedExercises = DataHolder.receivedExercises
+        mReceiver = FirestoreReceiver()
 
         recyclerView = recyclerview as RecyclerView
 //        exportBtn.visibility = View.GONE
@@ -91,11 +119,19 @@ class ExerciseViewer : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        exerciseViewerViewModel = ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application)).get(ExerciseViewerViewModel::class.java)
+        exerciseViewerViewModel =
+            ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application))
+                .get(ExerciseViewerViewModel::class.java)
+
+//        exerciseViewerViewModel.receivedExercises.observe(this, Observer { recExercises ->
+//            receivedExercises = recExercises
+//            updateSocialButtonNumber()
+//            updateSocialButtonListener()
+//        })
 
         exerciseViewerViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
-//                Timber.d("I WANNA SEE THIS: $exercises")
+                //                Timber.d("I WANNA SEE THIS: $exercises")
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
@@ -113,7 +149,7 @@ class ExerciseViewer : AppCompatActivity() {
         val dialog = setProgressDialog(this, "Talking with cloud...")
 
         exerciseViewerViewModel.getIsLoading().observe(this, Observer { isLoading ->
-            if (isLoading){
+            if (isLoading) {
                 dialog.show()
 
             } else {
@@ -156,6 +192,57 @@ class ExerciseViewer : AppCompatActivity() {
 //        }
     }
 
+    private fun updateSocialButtonListener() {
+        social_button.setOnClickListener {
+            //            var receivedExercises = DataHolder.receivedExercises
+            var title = "New Exercises"
+            var text = "You have not received any new exercises"
+            var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+
+            if (receivedExercises.isNotEmpty()) {
+                val exePackage = receivedExercises[0]
+                text =
+                    "Import ${exePackage.firestoreExercise!!.mName} from your friend ${exePackage.mSender}"
+                dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                    override fun onPositiveButton(inputText: String) {
+                        super.onPositiveButton(inputText)
+                        exerciseViewerViewModel.insertExercise(exePackage.firestoreExercise.toExercise())
+                        exerciseViewerViewModel.updateTransferExercise(
+                            exePackage,
+                            ExercisePackage.STATE_SAVED
+                        )
+                        //update state in firestore to SAVED
+                    }
+
+                    override fun onNegativeButton() {
+                        super.onNegativeButton()
+                        exerciseViewerViewModel.updateTransferExercise(
+                            exePackage,
+                            ExercisePackage.STATE_REJECTED
+                        )
+                    }
+
+                }
+
+            }
+            Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
+        }
+    }
+
+    private fun updateSocialButtonNumber() {
+        if (receivedExercises.isEmpty()) {
+            textOne.visibility = View.GONE
+            return
+        }
+        if (receivedExercises.size > 9) {
+            textOne.visibility = View.VISIBLE
+            textOne.text = "9+"
+        } else {
+            textOne.visibility = View.VISIBLE
+            textOne.text = receivedExercises.size.toString()
+        }
+    }
+
     private fun initAdapterListeners() {
         goToCreatorListener = object : ClickListenerRecyclerView {
             override fun onClick(view: View, position: Int) {
@@ -170,36 +257,7 @@ class ExerciseViewer : AppCompatActivity() {
             }
         }
 
-//        itemSelectorListener = object : ClickListenerRecyclerView {
-//            override fun onClick(view: View, position: Int) {
-//                super.onClick(view, position)
-//                Timber.d("$position was clicked, selected before: $selectedIndexes")
-//
-//                if (!selectedIndexes.contains(position)) {
-//                    view.alpha = 0.5f
-//                    selectedIndexes.add(position)
-//                } else {
-//
-//                    val iterator = selectedIndexes.iterator()
-//                    while (iterator.hasNext()) {
-//                        val y = iterator.next()
-//                        if (y == position) {
-//                            view.alpha = 1.0f
-//                            iterator.remove()
-//                            break
-//                        }
-//                    }
-//
-//                }
-//            }
-//        }
     }
-//    private fun updateAdapterListener(newListener: ClickListenerRecyclerView) {
-//        adapter = ExerciseListAdapter(this)
-//        adapter.setOnClickInterface(newListener)
-//        recyclerView.adapter = adapter
-//        adapter.setExercises(allExercises)
-//    }
 
     private fun updateUpdatingExercise(position: Int) {
 
@@ -212,6 +270,5 @@ class ExerciseViewer : AppCompatActivity() {
         }
 
     }
-
 
 }
