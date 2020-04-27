@@ -8,7 +8,7 @@
         tools:context=".ui.LoginScreen">
 
     <TextView
-            android:id="@+id/textView4"
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Email"
@@ -62,8 +62,8 @@
             android:padding="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/textView4"
-            app:layout_constraintTop_toBottomOf="@+id/textView4" />
+            app:layout_constraintStart_toStartOf="@+id/title"
+            app:layout_constraintTop_toBottomOf="@+id/title" />
 
     <EditText
             android:id="@+id/password_field"
@@ -75,7 +75,7 @@
             android:padding="4dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="@+id/textView4"
+            app:layout_constraintStart_toStartOf="@+id/title"
             app:layout_constraintTop_toBottomOf="@+id/textView5" />
 
     <TextView
@@ -93,22 +93,22 @@
             app:layout_constraintTop_toBottomOf="@+id/username_field"
             app:layout_constraintVertical_bias="0.0" />
 
-    <ProgressBar
-            android:id="@+id/progressBar_cyclic"
-            android:visibility="gone"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerVertical="true"
-            android:layout_marginTop="24dp"
-            android:indeterminate="true"
-            android:minWidth="50dp"
-            android:minHeight="50dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/register_button"
-            app:layout_constraintVertical_bias="0.0" />
+<!--    <ProgressBar-->
+<!--            android:id="@+id/progressBar_cyclic"-->
+<!--            android:visibility="gone"-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_centerHorizontal="true"-->
+<!--            android:layout_centerVertical="true"-->
+<!--            android:layout_marginTop="24dp"-->
+<!--            android:indeterminate="true"-->
+<!--            android:minWidth="50dp"-->
+<!--            android:minHeight="50dp"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintStart_toStartOf="parent"-->
+<!--            app:layout_constraintTop_toBottomOf="@+id/register_button"-->
+<!--            app:layout_constraintVertical_bias="0.0" />-->
 
     <TextView
             android:id="@+id/magicBtn"

@@ -19,7 +19,8 @@
 
 
     <color name="lightGrey">#66E0E0E0</color>
-    <color name="darkGrey">#5A5A5A</color>
+    <color name="lightGreyv2">#A8A5A5</color>
+    <color name="darkGrey">#6B6B6B</color>
 
     <color name="lightGreen">#99CC99</color>
     <color name="darkGreen">#669966</color>

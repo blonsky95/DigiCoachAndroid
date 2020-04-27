@@ -38,9 +38,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.HomeScreen"
-                android:launchMode="singleTask">
-        </activity>
+        <activity
+                android:name=".ui.LoginScreenV2"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.HomeScreen"
+                android:launchMode="singleTask" />
         <activity
                 android:name=".ui.Library"
                 android:parentActivityName=".ui.HomeScreen" />
