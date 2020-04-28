@@ -95,7 +95,7 @@ class HomeScreen : AppCompatActivity() {
         //todo test this
         log_off.setOnClickListener {
             FirebaseAuth.getInstance().signOut()
-            var intent = Intent(this, LoginScreen::class.java)
+            var intent = Intent(this, UserAccess::class.java)
 //            intent.flags=Intent.FLAG_ACTIVITY_CLEAR_TOP
 //            intent.flags=Intent.FLAG_ACTIVITY_CLEAR_TASK
 //            intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
@@ -107,13 +107,13 @@ class HomeScreen : AppCompatActivity() {
         initObservers()
 
 
-        val user1 = hashMapOf(
-            "username" to "${firebaseUser?.displayName}",
-            "email" to "${firebaseUser?.email}",
-            "last_contact" to Calendar.getInstance().time.toString()
-        ) as HashMap<String, Any>
-
-        homeScreenViewModel.checkInUserFirestore(user1)
+//        val user1 = hashMapOf(
+//            "username" to "${firebaseUser?.displayName}",
+//            "email" to "${firebaseUser?.email}",
+//            "last_contact" to Calendar.getInstance().time.toString()
+//        ) as HashMap<String, Any>
+//
+//        homeScreenViewModel.checkInUserFirestore(user1)
 
 //        viewData()
 
@@ -209,7 +209,7 @@ class HomeScreen : AppCompatActivity() {
 
         R.id.action_logout -> {
             FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, LoginScreen::class.java)
+            val intent = Intent(this, UserAccess::class.java)
             startActivity(intent)
             true
         }

@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.viewmodels
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.DocumentReference
@@ -44,7 +45,7 @@ class ExerciseViewerViewModel(application: Application) :
 
         repository.isLoading.value = false
 
-        receivedExercises=repository.receivedExercisesMediator
+        receivedExercises = repository.receivedExercisesMediator
 
     }
 
@@ -83,7 +84,8 @@ class ExerciseViewerViewModel(application: Application) :
 
     fun getExercisesFromFirestore() = viewModelScope.launch {
         repository.isLoading.value = true
-        val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
+        val docRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser!!.uid)
+            .collection("exercises")
         var exercises = mutableListOf<Exercise>()
         docRef.get()
             .addOnSuccessListener { documents ->
@@ -159,24 +161,44 @@ class ExerciseViewerViewModel(application: Application) :
     fun sendExerciseToUser(exercise: Exercise?, username: String) {
         repository.isLoading.value = true
 
-        val docRef = db.collection("users").document(username).collection("transfers")
-        docRef.get()
-            .addOnSuccessListener { documents ->
-                docRef.add(
-                    ExercisePackage(
-                        exerciseToFirestoreFormat(exercise!!),
-                        FirebaseAuth.getInstance().currentUser!!.email!!,
-                        username,
-                        true
-                    )
-                )
-                repository.isLoading.value = false
+        var docUid:String
+        val docRef2 = db.collection("users").whereEqualTo("username", username)
+        docRef2.get().addOnSuccessListener { docs ->
+            if (docs.isEmpty) {
+                //no user with this name exists
+                Toast.makeText(
+                    getApplication(), " User doesn't exist",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                docUid=docs.documents[0].id
 
+                val docRef = db.collection("users").document(docUid).collection("transfers")
+                docRef.get()
+                    .addOnSuccessListener { documents ->
+                        docRef.add(
+                            ExercisePackage(
+                                exerciseToFirestoreFormat(exercise!!),
+                                FirebaseAuth.getInstance().currentUser!!.email!!,
+                                username,
+                                true
+                            )
+                        )
+                        Toast.makeText(
+                            getApplication(), "Exercise sent",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        repository.isLoading.value = false
+
+                    }
+                    .addOnFailureListener { exception ->
+                        repository.isLoading.value = false
+                        Timber.d("get failed with: $exception ")
+                    }
             }
-            .addOnFailureListener { exception ->
-                repository.isLoading.value = false
-                Timber.d("get failed with: $exception ")
-            }
+
+        }
+
     }
 
     fun updateTransferExercise(exercisePackage: ExercisePackage, newState: String) {

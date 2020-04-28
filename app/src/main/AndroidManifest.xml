@@ -32,14 +32,14 @@
                 android:name="preloaded_fonts"
                 android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".ui.LoginScreen">
+        <activity android:name=".ui.UserAccess">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-                android:name=".ui.LoginScreenV2"
+                android:name=".ui.LoginSignUp"
                 android:windowSoftInputMode="adjustPan" />
         <activity
                 android:name=".ui.HomeScreen"

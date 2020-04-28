@@ -14,6 +14,8 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.BuildConfig
 import com.tatoe.mydigicoach.R
 import kotlinx.android.synthetic.main.activity_login_screen_2.login_button
@@ -21,7 +23,7 @@ import kotlinx.android.synthetic.main.activity_login_screen_2.register_button
 import kotlinx.android.synthetic.main.activity_login_signup.*
 import timber.log.Timber
 
-class LoginScreenV2 : AppCompatActivity() {
+class LoginSignUp : AppCompatActivity() {
     private lateinit var loginButton: TextView
     private lateinit var registerButton: TextView
 
@@ -33,6 +35,8 @@ class LoginScreenV2 : AppCompatActivity() {
     private val PERMISSION_REQUEST_CODE = 123
 
     private lateinit var auth: FirebaseAuth
+    private var db = FirebaseFirestore.getInstance()
+
     private lateinit var progress: ProgressBar
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +56,7 @@ class LoginScreenV2 : AppCompatActivity() {
         passwordEditText = password_et
         emailEditText = email_et
 
-        var accessType = intent.getIntExtra(LoginScreen.ACCESS_EXTRA,LoginScreen.ACCESS_LOGIN)
+        var accessType = intent.getIntExtra(UserAccess.ACCESS_EXTRA, UserAccess.ACCESS_LOGIN)
         updateLayout(accessType)
 
         checkPermissions()
@@ -68,19 +72,19 @@ class LoginScreenV2 : AppCompatActivity() {
 
     private fun updateLayout(accessType: Int) {
         when (accessType) {
-            LoginScreen.ACCESS_LOGIN -> {
-                emailEditText.visibility=View.GONE
-                forgot_your_pw.visibility=View.VISIBLE
-                loginButton.visibility=View.VISIBLE
-                registerButton.visibility=View.GONE
+            UserAccess.ACCESS_LOGIN -> {
+                emailEditText.visibility = View.GONE
+                forgot_your_pw.visibility = View.VISIBLE
+                loginButton.visibility = View.VISIBLE
+                registerButton.visibility = View.GONE
 
 //                loginButton.setOnClickListener(logInUser)
             }
-            LoginScreen.ACCESS_REGISTER-> {
-                emailEditText.visibility=View.VISIBLE
-                forgot_your_pw.visibility=View.GONE
-                loginButton.visibility=View.GONE
-                registerButton.visibility=View.VISIBLE
+            UserAccess.ACCESS_REGISTER -> {
+                emailEditText.visibility = View.VISIBLE
+                forgot_your_pw.visibility = View.GONE
+                loginButton.visibility = View.GONE
+                registerButton.visibility = View.VISIBLE
 
 //                registerButton.setOnClickListener(registerNewUser)
             }
@@ -119,35 +123,65 @@ class LoginScreenV2 : AppCompatActivity() {
     private val logInUser = View.OnClickListener {
         progress.visibility = View.VISIBLE
 
-        if (userEditText.text.toString().isNotEmpty() && passwordEditText.text.toString().isNotEmpty()) {
-            auth.signInWithEmailAndPassword(
-                userEditText.text.toString(),
-                passwordEditText.text.toString()
-            )
-                .addOnCompleteListener(this) { task ->
-                    progress.visibility = View.GONE
-                    if (task.isSuccessful) {
-                        // Sign in success, update UI with the signed-in user's information
-                        Timber.d("signInWithEmail:success")
-                        val user = auth.currentUser
-                        Toast.makeText(
-                            baseContext, " Welcome back ${user?.email}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        attemptLogIn(user)
-                    } else {
-                        // If sign in fails, display a message to the user.
-                        progress.visibility = View.GONE
-                        Timber.w("signInWithEmail:failure exception: ${task.exception}")
-                        Toast.makeText(
-                            baseContext, "Authentication login failed.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        attemptLogIn(null)
-                    }
+        val username = userEditText.text.toString()
+        val password = passwordEditText.text.toString()
 
-                    // ...
+        if (username.isNotEmpty() && password.isNotEmpty()) {
+
+            val docRef = db.collection("users").whereEqualTo("username", username)
+            docRef.get().addOnSuccessListener { docs ->
+                if (docs.isEmpty) {
+                    progress.visibility = View.GONE
+
+                    Timber.d("signInWithEmail:failure: unexistent")
+                    Toast.makeText(
+                        baseContext, " User doesn't exist",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                } else {
+                    var doc = docs.documents[0]
+                    val userEmail = doc["email"].toString()
+
+                    auth.signInWithEmailAndPassword(
+                        userEmail,
+                        password
+                    )
+                        .addOnCompleteListener(this) { task ->
+                            progress.visibility = View.GONE
+                            if (task.isSuccessful) {
+                                // Sign in success, update UI with the signed-in user's information
+                                Timber.d("signInWithEmail:success")
+                                val user = auth.currentUser
+                                Toast.makeText(
+                                    baseContext, " Welcome back ${user?.email}",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                attemptLogIn(user)
+                            } else {
+                                // If sign in fails, display a message to the user.
+                                progress.visibility = View.GONE
+                                Timber.w("signInWithEmail:failure exception: ${task.exception}")
+                                Toast.makeText(
+                                    baseContext, "Authentication login failed.",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                attemptLogIn(null)
+                            }
+                        }
                 }
+            }
+
+                .addOnFailureListener { e ->
+                    progress.visibility = View.GONE
+
+                    Timber.d("signInWithEmail:failure: $e")
+                    Toast.makeText(
+                        baseContext, " Weird error",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+
         } else {
             progress.visibility = View.GONE
             Toast.makeText(
@@ -164,26 +198,44 @@ class LoginScreenV2 : AppCompatActivity() {
 
         //todo modify structure authentication so its user and password, see how to introduce user into profile (email already unique)
 
-
-        if (userEditText.text.toString().isNotEmpty() && passwordEditText.text.toString().isNotEmpty()) {
+        val username = userEditText.text.toString()
+        val email = emailEditText.text.toString()
+        val password = passwordEditText.text.toString()
+        if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
             auth.createUserWithEmailAndPassword(
-                userEditText.text.toString(),
-                passwordEditText.text.toString()
+                email, password
             )
                 .addOnCompleteListener(this) { task ->
-                    progress.visibility = View.GONE
+
 
                     if (task.isSuccessful) {
-                        // Register success, update UI with the signed-in user's information
-                        Timber.d("createUserWithEmail:success")
-                        val user = auth.currentUser
-                        Toast.makeText(
-                            baseContext, "New user registered! Welcome: ${user?.email}",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        attemptLogIn(user)
+
+                        val userMap = HashMap<String, String>()
+                        userMap["username"] = username
+                        userMap["email"] = email
+                        db.collection("users").document(auth.currentUser!!.uid).set(userMap)
+                            .addOnSuccessListener {
+                                progress.visibility = View.GONE
+
+                                Timber.d("createUserWithEmail:success")
+                                val user = auth.currentUser
+                                Toast.makeText(
+                                    baseContext, "New user registered! Welcome: $username",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                                attemptLogIn(user)
+
+                            }
+                            .addOnFailureListener { e ->
+                                progress.visibility = View.GONE
+
+                                Timber.d("error registering: $e")
+                                Toast.makeText(
+                                    baseContext, "Registration failed",
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
                     } else {
-                        // If Register fails, display a message to the user.
                         Timber.w("createUserWithEmail:failure exception: ${task.exception}")
                         Toast.makeText(
                             baseContext, "Authentication register failed.",
@@ -191,8 +243,6 @@ class LoginScreenV2 : AppCompatActivity() {
                         ).show()
                         attemptLogIn(null)
                     }
-
-                    // ...
                 }
         } else {
             progress.visibility = View.GONE
