@@ -1,5 +1,7 @@
 package com.tatoe.mydigicoach.ui.util
 
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
@@ -12,16 +14,19 @@ object DataHolder {
 
     var activeDayHolder: Day? = null
 
-    var userEmail: String? = null
 
     var receivedExercises = arrayListOf<ExercisePackage>()
+
+    var userEmail = ""
+    var userDocId = ""
+    var userName = ""
 
     fun addReceivedExercise(newExercise: ExercisePackage) {
         receivedExercises.add(newExercise)
     }
 
     fun emptyReceivedExercises() {
-        receivedExercises= arrayListOf()
+        receivedExercises = arrayListOf()
     }
 
 //    lateinit var updatedDayHolder: Day

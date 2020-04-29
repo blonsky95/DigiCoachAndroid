@@ -1,7 +1,6 @@
 package com.tatoe.mydigicoach.ui
 
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.View
@@ -10,18 +9,19 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.BuildConfig
+import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import kotlinx.android.synthetic.main.activity_login_screen_2.login_button
 import kotlinx.android.synthetic.main.activity_login_screen_2.register_button
 import kotlinx.android.synthetic.main.activity_login_signup.*
+//import org.junit.experimental.results.ResultMatchers.isSuccessful
 import timber.log.Timber
+
 
 class LoginSignUp : AppCompatActivity() {
     private lateinit var loginButton: TextView
@@ -31,8 +31,6 @@ class LoginSignUp : AppCompatActivity() {
     private lateinit var passwordEditText: EditText
     private lateinit var emailEditText: EditText
 
-    private var hasPermissions = false
-    private val PERMISSION_REQUEST_CODE = 123
 
     private lateinit var auth: FirebaseAuth
     private var db = FirebaseFirestore.getInstance()
@@ -50,6 +48,17 @@ class LoginSignUp : AppCompatActivity() {
         registerButton = register_button
         registerButton.setOnClickListener(registerNewUser)
 
+        forgot_your_pw.setOnClickListener {
+            Utils.getDialogViewWithEditText(this,"Reset password", "Type your email below","Email",object :
+                DialogPositiveNegativeHandler {
+                override fun onPositiveButton(userEmail: String) {
+                    resetPassword(userEmail)
+                }
+
+            })
+
+        }
+
         progress = progressBar_cyclic
 
         userEditText = username_et
@@ -59,7 +68,7 @@ class LoginSignUp : AppCompatActivity() {
         var accessType = intent.getIntExtra(UserAccess.ACCESS_EXTRA, UserAccess.ACCESS_LOGIN)
         updateLayout(accessType)
 
-        checkPermissions()
+//        checkPermissions()
 
         if (BuildConfig.DEBUG) {
             magic_btn.visibility = View.VISIBLE
@@ -68,6 +77,16 @@ class LoginSignUp : AppCompatActivity() {
                 passwordEditText.text = SpannableStringBuilder("123456")
             }
         }
+    }
+
+    private fun resetPassword(userEmail: String) {
+        auth.sendPasswordResetEmail(userEmail)
+            .addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Timber.d("Email sent.")
+                    Toast.makeText(this,"Email sent to $userEmail", Toast.LENGTH_SHORT).show()
+                }
+            }
     }
 
     private fun updateLayout(accessType: Int) {
@@ -93,32 +112,31 @@ class LoginSignUp : AppCompatActivity() {
     }
 
     private fun attemptLogIn(user: FirebaseUser?) {
+        //assuming you already have permissions if you're here
         if (user != null) {
-            if (hasPermissions) {
-                val intent = Intent(this, HomeScreen::class.java)
-                startActivity(intent)
-                finish()
-            }
+            val intent = Intent(this, HomeScreen::class.java)
+            startActivity(intent)
+            finish()
         }
     }
 
-    private fun checkPermissions() {
-        if (ContextCompat.checkSelfPermission(
-                this,
-                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-            )
-            != PackageManager.PERMISSION_GRANTED
-        ) {
-            // Permission is not granted
-            ActivityCompat.requestPermissions(
-                this,
-                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                PERMISSION_REQUEST_CODE
-            )
-        } else {
-            hasPermissions = true
-        }
-    }
+//    private fun checkPermissions() {
+//        if (ContextCompat.checkSelfPermission(
+//                this,
+//                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
+//            )
+//            != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            // Permission is not granted
+//            ActivityCompat.requestPermissions(
+//                this,
+//                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
+//                PERMISSION_REQUEST_CODE
+//            )
+//        } else {
+//            hasPermissions = true
+//        }
+//    }
 
     private val logInUser = View.OnClickListener {
         progress.visibility = View.VISIBLE
@@ -196,8 +214,6 @@ class LoginSignUp : AppCompatActivity() {
     private val registerNewUser = View.OnClickListener {
         progress.visibility = View.VISIBLE
 
-        //todo modify structure authentication so its user and password, see how to introduce user into profile (email already unique)
-
         val username = userEditText.text.toString()
         val email = emailEditText.text.toString()
         val password = passwordEditText.text.toString()
@@ -259,23 +275,5 @@ class LoginSignUp : AppCompatActivity() {
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = auth.currentUser
         attemptLogIn(currentUser)
-    }
-
-    override fun onRequestPermissionsResult(
-        requestCode: Int,
-        permissions: Array<String>, grantResults: IntArray
-    ) {
-        when (requestCode) {
-            PERMISSION_REQUEST_CODE -> {
-                // If request is cancelled, the result arrays are empty.
-                hasPermissions =
-                    (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)
-                return
-            }
-
-            else -> {
-                // Ignore all other requests.
-            }
-        }
     }
 }

@@ -52,7 +52,7 @@ class ExerciseViewerViewModel(application: Application) :
     fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
         repository.isLoading.value = true
 
-        val docRef = db.collection("users").document(DataHolder.userEmail!!).collection("exercises")
+        val docRef = db.collection("users").document(DataHolder.userDocId).collection("exercises")
         docRef.get()
             .addOnSuccessListener { documents ->
                 for (document in documents) {
@@ -84,7 +84,7 @@ class ExerciseViewerViewModel(application: Application) :
 
     fun getExercisesFromFirestore() = viewModelScope.launch {
         repository.isLoading.value = true
-        val docRef = db.collection("users").document(FirebaseAuth.getInstance().currentUser!!.uid)
+        val docRef = db.collection("users").document(DataHolder.userDocId)
             .collection("exercises")
         var exercises = mutableListOf<Exercise>()
         docRef.get()

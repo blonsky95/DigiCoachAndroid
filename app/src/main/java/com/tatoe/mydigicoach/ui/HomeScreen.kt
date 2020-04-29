@@ -61,8 +61,17 @@ class HomeScreen : AppCompatActivity() {
 //            startService(Intent(this, DatabaseListener::class.java))
 //        }
         if (firebaseUser != null) {
-            welcome_text.text = firebaseUser!!.email
-            DataHolder.userEmail = firebaseUser!!.email
+
+            val docRef1 = db.collection("users").whereEqualTo("email", firebaseUser!!.email)
+            docRef1.get().addOnSuccessListener { docs ->
+                if (!docs.isEmpty) {
+                    DataHolder.userDocId=docs.documents[0].id
+                    DataHolder.userName=docs.documents[0]["username"] as String
+                    welcome_text.text = DataHolder.userName
+                }
+            }
+
+            DataHolder.userEmail = firebaseUser!!.email!!
         } else {
             // No user is signed in
         }

@@ -34,7 +34,10 @@ class FirebaseListenerService :
         isServiceRunning = true
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
-        val docRef = db.collection("users").document(firebaseUser!!.email!!).collection("transfers")
+
+
+
+        val docRef = db.collection("users").document(DataHolder.userDocId).collection("transfers")
             .whereEqualTo("mstate", ExercisePackage.STATE_SENT)
 
         docRef.addSnapshotListener { snapshot, e ->
