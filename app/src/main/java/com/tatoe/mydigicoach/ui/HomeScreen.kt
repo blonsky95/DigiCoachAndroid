@@ -22,18 +22,17 @@ import com.tatoe.mydigicoach.ui.calendar.MonthViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
-import com.tatoe.mydigicoach.viewmodels.HomeScreenViewModel
-import com.tatoe.mydigicoach.viewmodels.MyHomeScreenViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.LoginSignUpViewModel
+import com.tatoe.mydigicoach.viewmodels.MyLoginSignUpViewModelFactory
 import kotlinx.android.synthetic.main.activity_home.*
 import timber.log.Timber
-import java.util.*
 
 class HomeScreen : AppCompatActivity() {
 
     private var firebaseUser: FirebaseUser? = null
     private var db = FirebaseFirestore.getInstance()
 
-    private lateinit var homeScreenViewModel: HomeScreenViewModel
+    private lateinit var loginSignUpViewModel: LoginSignUpViewModel
     private var dayToday: Day? = null
     private lateinit var recyclerViewExercises: RecyclerView
 
@@ -48,11 +47,11 @@ class HomeScreen : AppCompatActivity() {
         }
 
 //        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-        homeScreenViewModel = ViewModelProviders.of(
+        loginSignUpViewModel = ViewModelProviders.of(
             this,
-            MyHomeScreenViewModelFactory(application, db)
+            MyLoginSignUpViewModelFactory(application, db)
         ).get(
-            HomeScreenViewModel::class.java
+            LoginSignUpViewModel::class.java
         )
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
@@ -61,7 +60,7 @@ class HomeScreen : AppCompatActivity() {
 //            startService(Intent(this, DatabaseListener::class.java))
 //        }
         if (firebaseUser != null) {
-
+                //todo do this in viewmodel
             val docRef1 = db.collection("users").whereEqualTo("email", firebaseUser!!.email)
             docRef1.get().addOnSuccessListener { docs ->
                 if (!docs.isEmpty) {
@@ -129,7 +128,7 @@ class HomeScreen : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        homeScreenViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
+        loginSignUpViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
             dayToday = day
             var isDayEmpty =
                 dayToday == null || dayToday?.exercises!!.isEmpty()

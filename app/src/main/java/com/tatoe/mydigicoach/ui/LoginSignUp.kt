@@ -9,6 +9,8 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
@@ -16,6 +18,8 @@ import com.tatoe.mydigicoach.BuildConfig
 import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
+import com.tatoe.mydigicoach.viewmodels.LoginSignUpViewModel
+import com.tatoe.mydigicoach.viewmodels.MyLoginSignUpViewModelFactory
 import kotlinx.android.synthetic.main.activity_login_screen_2.login_button
 import kotlinx.android.synthetic.main.activity_login_screen_2.register_button
 import kotlinx.android.synthetic.main.activity_login_signup.*
@@ -35,7 +39,11 @@ class LoginSignUp : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private var db = FirebaseFirestore.getInstance()
 
+    private lateinit var loginSignUpViewModel: LoginSignUpViewModel
+
     private lateinit var progress: ProgressBar
+    private var mHasAccess = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login_signup)
@@ -43,22 +51,35 @@ class LoginSignUp : AppCompatActivity() {
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
+        loginSignUpViewModel = ViewModelProviders.of(
+            this,
+            MyLoginSignUpViewModelFactory(application, db)
+        ).get(
+            LoginSignUpViewModel::class.java
+        )
+
         loginButton = login_button
         loginButton.setOnClickListener(logInUser)
         registerButton = register_button
         registerButton.setOnClickListener(registerNewUser)
 
         forgot_your_pw.setOnClickListener {
-            Utils.getDialogViewWithEditText(this,"Reset password", "Type your email below","Email",object :
-                DialogPositiveNegativeHandler {
-                override fun onPositiveButton(userEmail: String) {
-                    resetPassword(userEmail)
-                }
-
-            })
-
+            val context = this
+            Utils.getDialogViewWithEditText(
+                this,
+                "Reset password",
+                "Type your email below",
+                "Email",
+                object :
+                    DialogPositiveNegativeHandler {
+                    override fun onPositiveButton(inputText: String) {
+                        loginSignUpViewModel.resetFirebaseUserPassword(inputText, context)
+//                    resetPassword(userEmail)
+                    }
+                })
         }
 
+        initObservers()
         progress = progressBar_cyclic
 
         userEditText = username_et
@@ -79,15 +100,20 @@ class LoginSignUp : AppCompatActivity() {
         }
     }
 
-    private fun resetPassword(userEmail: String) {
-        auth.sendPasswordResetEmail(userEmail)
-            .addOnCompleteListener { task ->
-                if (task.isSuccessful) {
-                    Timber.d("Email sent.")
-                    Toast.makeText(this,"Email sent to $userEmail", Toast.LENGTH_SHORT).show()
-                }
+    private fun initObservers() {
+        loginSignUpViewModel.isDoingBackgroundTask.observe(this, Observer {
+            if (it) {
+                progress.visibility = View.VISIBLE
+            } else {
+                progress.visibility = View.GONE
             }
+        })
+
+        loginSignUpViewModel.hasAccess.observe(this, Observer {
+            attemptLogIn(it)
+        })
     }
+
 
     private fun updateLayout(accessType: Int) {
         when (accessType) {
@@ -110,15 +136,22 @@ class LoginSignUp : AppCompatActivity() {
 
         }
     }
-
-    private fun attemptLogIn(user: FirebaseUser?) {
+    private fun attemptLogIn(hasAccess:Boolean) {
         //assuming you already have permissions if you're here
-        if (user != null) {
+        if (hasAccess) {
             val intent = Intent(this, HomeScreen::class.java)
             startActivity(intent)
             finish()
         }
     }
+//    private fun attemptLogIn(user: FirebaseUser?) {
+//        //assuming you already have permissions if you're here
+//        if (user != null) {
+//            val intent = Intent(this, HomeScreen::class.java)
+//            startActivity(intent)
+//            finish()
+//        }
+//    }
 
 //    private fun checkPermissions() {
 //        if (ContextCompat.checkSelfPermission(
@@ -139,66 +172,14 @@ class LoginSignUp : AppCompatActivity() {
 //    }
 
     private val logInUser = View.OnClickListener {
-        progress.visibility = View.VISIBLE
+//        progress.visibility = View.VISIBLE
 
         val username = userEditText.text.toString()
         val password = passwordEditText.text.toString()
 
         if (username.isNotEmpty() && password.isNotEmpty()) {
 
-            val docRef = db.collection("users").whereEqualTo("username", username)
-            docRef.get().addOnSuccessListener { docs ->
-                if (docs.isEmpty) {
-                    progress.visibility = View.GONE
-
-                    Timber.d("signInWithEmail:failure: unexistent")
-                    Toast.makeText(
-                        baseContext, " User doesn't exist",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                } else {
-                    var doc = docs.documents[0]
-                    val userEmail = doc["email"].toString()
-
-                    auth.signInWithEmailAndPassword(
-                        userEmail,
-                        password
-                    )
-                        .addOnCompleteListener(this) { task ->
-                            progress.visibility = View.GONE
-                            if (task.isSuccessful) {
-                                // Sign in success, update UI with the signed-in user's information
-                                Timber.d("signInWithEmail:success")
-                                val user = auth.currentUser
-                                Toast.makeText(
-                                    baseContext, " Welcome back ${user?.email}",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                attemptLogIn(user)
-                            } else {
-                                // If sign in fails, display a message to the user.
-                                progress.visibility = View.GONE
-                                Timber.w("signInWithEmail:failure exception: ${task.exception}")
-                                Toast.makeText(
-                                    baseContext, "Authentication login failed.",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                attemptLogIn(null)
-                            }
-                        }
-                }
-            }
-
-                .addOnFailureListener { e ->
-                    progress.visibility = View.GONE
-
-                    Timber.d("signInWithEmail:failure: $e")
-                    Toast.makeText(
-                        baseContext, " Weird error",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-
+            loginSignUpViewModel.logInUser(username, password, this)
 
         } else {
             progress.visibility = View.GONE
@@ -218,48 +199,7 @@ class LoginSignUp : AppCompatActivity() {
         val email = emailEditText.text.toString()
         val password = passwordEditText.text.toString()
         if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-            auth.createUserWithEmailAndPassword(
-                email, password
-            )
-                .addOnCompleteListener(this) { task ->
-
-
-                    if (task.isSuccessful) {
-
-                        val userMap = HashMap<String, String>()
-                        userMap["username"] = username
-                        userMap["email"] = email
-                        db.collection("users").document(auth.currentUser!!.uid).set(userMap)
-                            .addOnSuccessListener {
-                                progress.visibility = View.GONE
-
-                                Timber.d("createUserWithEmail:success")
-                                val user = auth.currentUser
-                                Toast.makeText(
-                                    baseContext, "New user registered! Welcome: $username",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                                attemptLogIn(user)
-
-                            }
-                            .addOnFailureListener { e ->
-                                progress.visibility = View.GONE
-
-                                Timber.d("error registering: $e")
-                                Toast.makeText(
-                                    baseContext, "Registration failed",
-                                    Toast.LENGTH_SHORT
-                                ).show()
-                            }
-                    } else {
-                        Timber.w("createUserWithEmail:failure exception: ${task.exception}")
-                        Toast.makeText(
-                            baseContext, "Authentication register failed.",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        attemptLogIn(null)
-                    }
-                }
+            loginSignUpViewModel.registerNewUser(username,email,password, this)
         } else {
             progress.visibility = View.GONE
             Toast.makeText(
@@ -273,7 +213,7 @@ class LoginSignUp : AppCompatActivity() {
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = auth.currentUser
-        attemptLogIn(currentUser)
+//        val currentUser = auth.currentUser
+//        attemptLogIn(currentUser)
     }
 }
