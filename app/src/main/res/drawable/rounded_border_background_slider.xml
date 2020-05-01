@@ -9,7 +9,7 @@
 <!--            android:right="1dp"-->
 <!--            android:bottom="1dp" />-->
 
-    <corners android:bottomRightRadius="33dp"
+    <corners android:bottomRightRadius="9dp"
             android:bottomLeftRadius="9dp"
             android:topLeftRadius="9dp"
             android:topRightRadius="9dp" />
