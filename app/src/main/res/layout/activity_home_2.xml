@@ -30,7 +30,7 @@
                 android:text="My training diary"
                 android:textAllCaps="true"
                 android:textColor="@color/black"
-                android:textSize="24sp"
+                android:textSize="18sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintHorizontal_bias="1"
                 app:layout_constraintStart_toStartOf="parent"
