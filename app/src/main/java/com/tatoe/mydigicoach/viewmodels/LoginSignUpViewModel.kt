@@ -15,6 +15,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.HashMap
@@ -152,5 +153,17 @@ class LoginSignUpViewModel(var application: Application, var db: FirebaseFiresto
 
                 }
             }
+    }
+
+    fun saveUserToDataholder() {
+        val docRef1 = db.collection("users").whereEqualTo("email", auth.currentUser!!.email)
+        docRef1.get().addOnSuccessListener { docs ->
+            if (!docs.isEmpty) {
+                DataHolder.userDocId=docs.documents[0].id
+                DataHolder.userName=docs.documents[0]["username"] as String
+            }
+        }
+
+        DataHolder.userEmail = auth.currentUser!!.email!!
     }
 }

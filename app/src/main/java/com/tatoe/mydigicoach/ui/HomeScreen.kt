@@ -2,9 +2,7 @@ package com.tatoe.mydigicoach.ui
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -15,16 +13,14 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.entity.Day
 //import com.google.firebase.iid.FirebaseInstanceId
-import com.tatoe.mydigicoach.ui.block.BlockViewer
 import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.calendar.DayCreator
-import com.tatoe.mydigicoach.ui.calendar.MonthViewer
-import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
-import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
 import com.tatoe.mydigicoach.viewmodels.LoginSignUpViewModel
 import com.tatoe.mydigicoach.viewmodels.MyLoginSignUpViewModelFactory
 import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.activity_home_2.*
+import kotlinx.android.synthetic.main.item_holder_home_slider.view.*
 import timber.log.Timber
 
 class HomeScreen : AppCompatActivity() {
@@ -39,14 +35,12 @@ class HomeScreen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        title = "Home"
+        setContentView(R.layout.activity_home_2)
+
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
-        } else {
         }
 
-//        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
         loginSignUpViewModel = ViewModelProviders.of(
             this,
             MyLoginSignUpViewModelFactory(application, db)
@@ -56,74 +50,70 @@ class HomeScreen : AppCompatActivity() {
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
 
-//        if (!DatabaseListener.isServiceRunning && firebaseUser!=null) {
-//            startService(Intent(this, DatabaseListener::class.java))
-//        }
         if (firebaseUser != null) {
-                //todo do this in viewmodel
-            val docRef1 = db.collection("users").whereEqualTo("email", firebaseUser!!.email)
-            docRef1.get().addOnSuccessListener { docs ->
-                if (!docs.isEmpty) {
-                    DataHolder.userDocId=docs.documents[0].id
-                    DataHolder.userName=docs.documents[0]["username"] as String
-                    welcome_text.text = DataHolder.userName
-                }
-            }
+           loginSignUpViewModel.saveUserToDataholder()
 
-            DataHolder.userEmail = firebaseUser!!.email!!
-        } else {
-            // No user is signed in
         }
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        calendar_button.setOnClickListener {
-            var intent = Intent(this, MonthViewer::class.java)
-            startActivity(intent)
-        }
+//        val viewpager = viewpager
+        viewpager.adapter=CustomPagerAdapter(this)
 
-        block_button.setOnClickListener {
-            var intent = Intent(this, BlockViewer::class.java)
-            startActivity(intent)
-        }
-
-        exercise_button.setOnClickListener {
-            var intent = Intent(this, ExerciseViewer::class.java)
-            startActivity(intent)
-        }
-
-        library_button.setOnClickListener {
-            var intent = Intent(this, Library::class.java)
-            startActivity(intent)
-        }
-
-        recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
-
-        //todo test this
-        log_off.setOnClickListener {
-            FirebaseAuth.getInstance().signOut()
-            var intent = Intent(this, UserAccess::class.java)
-//            intent.flags=Intent.FLAG_ACTIVITY_CLEAR_TOP
-//            intent.flags=Intent.FLAG_ACTIVITY_CLEAR_TASK
-//            intent.flags=Intent.FLAG_ACTIVITY_NEW_TASK
-            startActivity(intent)
-//            onBackPressed()
-            finish()
-        }
-
-        initObservers()
-
-
-//        val user1 = hashMapOf(
-//            "username" to "${firebaseUser?.displayName}",
-//            "email" to "${firebaseUser?.email}",
-//            "last_contact" to Calendar.getInstance().time.toString()
-//        ) as HashMap<String, Any>
+//        calendar_button.setOnClickListener {
+//            var intent = Intent(this, MonthViewer::class.java)
+//            startActivity(intent)
+//        }
 //
-//        homeScreenViewModel.checkInUserFirestore(user1)
+//        block_button.setOnClickListener {
+//            var intent = Intent(this, BlockViewer::class.java)
+//            startActivity(intent)
+//        }
+//
+//        exercise_button.setOnClickListener {
+//            var intent = Intent(this, ExerciseViewer::class.java)
+//            startActivity(intent)
+//        }
+//
+//        library_button.setOnClickListener {
+//            var intent = Intent(this, Library::class.java)
+//            startActivity(intent)
+//        }
 
-//        viewData()
+//        recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
+
+//        initObservers()
+
+    }
+
+
+    class CustomPagerAdapter(homeScreen: HomeScreen) : RecyclerView.Adapter<CustomPagerAdapter.MyViewHolder>() {
+
+        private val inflater: LayoutInflater = LayoutInflater.from(homeScreen)
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+            val itemView = inflater.inflate(R.layout.item_holder_home_slider, parent, false)
+            return MyViewHolder(itemView)
+        }
+
+        override fun getItemCount(): Int {
+            return 4
+        }
+
+        override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+            when (position) {
+                0 -> holder.name.text="EXERCISES"
+                1 -> holder.name.text="CALENDAR"
+                2 -> holder.name.text="LIBRARY"
+                3 -> holder.name.text="PROFILE"
+            }
+        }
+
+        class MyViewHolder(v:View) : RecyclerView.ViewHolder(v){
+            var background = v.category_image
+            var name = v.category_name
+        }
 
     }
 
@@ -161,55 +151,8 @@ class HomeScreen : AppCompatActivity() {
         }
     }
 
-//    private fun initObservers() {
-//        homeScreenViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
-//            days?.let {
-//
-//            }
-//        })
-//    }
-
-//    private fun viewData() {
-//        db.collection("users")
-//            .get()
-//            .addOnSuccessListener { result ->
-//                for (document in result) {
-//                    Timber.d( "${document.id} => ${document.data} ********** email: ${document["email"]}")
-//                }
-//            }
-//            .addOnFailureListener { exception ->
-//                Timber.d( "Error getting documents: $exception")
-//            }
-//    }
-
-//    private fun addUser(user: HashMap<String, Any>) {
-//        //todo run this in non UI thread
-//        if (!userInCollection(user["email"] as String)) {
-//            db.collection("users").document(user["email"] as String)
-//                .set(user)
-//                .addOnSuccessListener {
-//                    Timber.d("DocumentSnapshot added!")
-//                }
-//                .addOnFailureListener { e ->
-//                    Timber.d("Error adding document: $e")
-//                }
-//        }
-//        Timber.d("we gucci no need to add")
-//
-//    }
-//
-//    private fun userInCollection(userEmail: String): Boolean {
-//        // check if in users there is document
-//        val docRef : DocumentReference = db.collection("users").document(userEmail)
-////        Timber.d("is docref succesfull: ${docRef.get().result?.exists()}")
-//
-//        return docRef.get().isSuccessful
-//
-//    }
-
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.home_toolbar_menu, menu)
-
         return super.onCreateOptionsMenu(menu)
     }
 
@@ -219,6 +162,7 @@ class HomeScreen : AppCompatActivity() {
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, UserAccess::class.java)
             startActivity(intent)
+            finish()
             true
         }
 
