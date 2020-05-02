@@ -6,6 +6,7 @@ import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -29,25 +30,12 @@ class Library : AppCompatActivity() {
     private lateinit var adapter: BlockV2ListAdapter
     private lateinit var libraryViewModel: LibraryViewModel
 
+    private var allExercisePairs= arrayListOf<Pair<String,Exercise>>()
+    private var allCategories = arrayListOf<String>()
+
     private var db = FirebaseFirestore.getInstance()
 
-//    private lateinit var blockActionHandler: ClickListenerRecyclerView
-//
-//    //    private var userBlockList: List<Block> = listOf()
-//    private var appBlockList: List<Block> = listOf()
-//    private var importBlockList: List<Block> = listOf()
-//    private var exportBlockList: List<Block> = listOf()
-//
-//    private var activeBlockList: List<Block> = mutableListOf()
-//
-//    private var loadDefaultBlockList = true //so display user blocks
-//    private var blockNeedsInserting = false
-//    lateinit var blockToBeUpdated: Block
-    private var allExercises = listOf<Exercise>()
-//    companion object {
-//
-//    }
-
+    //todo get UI sorted
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_library)
@@ -63,24 +51,17 @@ class Library : AppCompatActivity() {
             LibraryViewModel::class.java
         )
 
-        //todo observe the online stored_exercises
-
         initObservers()
 
     }
 
     private fun initObservers() {
-//        dataViewModel.allExercises.observe(this, Observer { exercises ->
-//            exercises.let {
-//                allExercises = it
-//                //the following is run when a premade block has been inserted and needs non-IDied
-//                //exercises to be swapped for exercises with ID
-//                if (blockNeedsInserting) {
-//                    insertBlockReExercises()
-//                }
-//            }
-//        })
-
+        libraryViewModel.categoriesList.observe(this, Observer {
+            allCategories=it
+        })
+        libraryViewModel.exercisesPairsList.observe(this, Observer {
+            allExercisePairs=it
+        })
     }
 
 
@@ -96,8 +77,6 @@ class Library : AppCompatActivity() {
             onBackPressed()
             true
         }
-
-
 
         else -> {
             super.onOptionsItemSelected(item)

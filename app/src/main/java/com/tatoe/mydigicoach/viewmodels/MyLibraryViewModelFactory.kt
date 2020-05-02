@@ -9,7 +9,7 @@ class MyLibraryViewModelFactory(var application: Application, var firebaseFirest
 
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return LoginSignUpViewModel(
+        return LibraryViewModel(
             application,firebaseFirestore
         ) as T
     }
