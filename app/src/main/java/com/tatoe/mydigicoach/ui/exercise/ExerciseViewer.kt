@@ -110,7 +110,7 @@ class ExerciseViewer : AppCompatActivity() {
 //        receivedExercises = DataHolder.receivedExercises
         mReceiver = FirestoreReceiver()
 
-        recyclerView = recyclerview as RecyclerView
+        recyclerView = libraryExercisesList as RecyclerView
 //        exportBtn.visibility = View.GONE
         initAdapterListeners()
 
@@ -122,12 +122,6 @@ class ExerciseViewer : AppCompatActivity() {
         exerciseViewerViewModel =
             ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application))
                 .get(ExerciseViewerViewModel::class.java)
-
-//        exerciseViewerViewModel.receivedExercises.observe(this, Observer { recExercises ->
-//            receivedExercises = recExercises
-//            updateSocialButtonNumber()
-//            updateSocialButtonListener()
-//        })
 
         exerciseViewerViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {

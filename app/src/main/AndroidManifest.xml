@@ -46,6 +46,7 @@
                 android:launchMode="singleTask" />
         <activity
                 android:name=".ui.Library"
+                android:windowSoftInputMode="adjustPan"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseViewer"

@@ -15,7 +15,7 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
 
     private var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
-    val isDoingBackgroundTask = MutableLiveData<Boolean>(false)
+    val isDoingBackgroundTask = MutableLiveData<Boolean>(true)
     private val repository: AppRepository
     val categoriesList = MutableLiveData<ArrayList<String>>(arrayListOf())
     val exercisesPairsList = MutableLiveData<ArrayList<Pair<String,Exercise>>>(arrayListOf())
@@ -34,6 +34,7 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
     }
 
     private fun getLibraryExercises() {
+        isDoingBackgroundTask.postValue(true)
         var docRef = db.collection("store_exercises")
 
         docRef.get().addOnSuccessListener { docs ->
@@ -50,9 +51,11 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
                         exercisePairList.add(Pair(exerciseCategory, doc.toObject(MyCustomFirestoreExercise::class.java).toExercise()))
                     }
                     //little cheat to only trigger observers when all categories are present
-                    if (categoryList.size==4){
+                    if (exercisePairList.size==16){
+                        Timber.d("posting to observers ")
                         categoriesList.value=categoryList
                         exercisesPairsList.value=exercisePairList
+                        isDoingBackgroundTask.postValue(false)
                     }
                 }
 
@@ -61,6 +64,7 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
         }.addOnFailureListener { e ->
             Timber.d("Error recovering doc: $e")
         }
+
     }
 
     fun addBunchOfStubStoreExercises() {

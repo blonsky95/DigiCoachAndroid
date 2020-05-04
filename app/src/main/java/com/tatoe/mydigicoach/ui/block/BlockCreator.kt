@@ -72,7 +72,7 @@ class BlockCreator : AppCompatActivity() {
 
         allExercises = listOf()
 
-        recyclerView = recyclerview as RecyclerView
+        recyclerView = libraryExercisesList as RecyclerView
         recyclerViewV2 = CurrentBlockDisplay as RecyclerView
 
         blockNameText = BlockNameText as EditText
