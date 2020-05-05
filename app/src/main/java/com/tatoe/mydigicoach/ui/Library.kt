@@ -28,7 +28,8 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
     private lateinit var libraryViewModel: LibraryViewModel
 
     private var allExercisePairs = arrayListOf<Pair<String, Exercise>>()
-    private var allCategories = arrayListOf<String>()
+//    private var allCategories = arrayListOf<String>()
+    var filterCategories = arrayListOf<Pair<String,Boolean>>()
 
     private var db = FirebaseFirestore.getInstance()
 
@@ -64,7 +65,7 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         val mDialogView =
             LayoutInflater.from(this).inflate(R.layout.dialog_window_library_filter, null)
-        var customCategoriesAdapter = MyCustomCategoriesAdapter(this, allCategories)
+        var customCategoriesAdapter = MyCustomCategoriesAdapter(this)
         mDialogView.libraryCategoriesList.layoutManager = LinearLayoutManager(this)
         mDialogView.libraryCategoriesList.adapter = customCategoriesAdapter
         mDialogView.filter_btn.setOnClickListener {
@@ -72,6 +73,7 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             filterByCategory(customCategoriesAdapter.checkedCategories)
         }
         mDialogView.clear_btn.setOnClickListener {
+            customCategoriesAdapter.clearFilters()
             //            customCategoriesAdapter= MyCustomCategoriesAdapter(this, allCategories)
         }
 
@@ -124,7 +126,10 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         })
 
         libraryViewModel.categoriesList.observe(this, Observer {
-            allCategories = it
+//            allCategories = it
+            for (cat in it) {
+                filterCategories.add(Pair(cat,false))
+            }
             toolbar_filter.setOnClickListener {
                 showFilterDialog()
             }
@@ -151,14 +156,13 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         return true
     }
 
-    class MyCustomCategoriesAdapter(
-        context: Context,
-        var allCategories: java.util.ArrayList<String>
-    ) :
+    //is an inner class because I want to acces the categoriesfilter variable which says which filters there is and if they are active (Pair<String, Boolean>)
+    inner class MyCustomCategoriesAdapter(
+        context: Context) :
         RecyclerView.Adapter<MyCategoryViewHolder>() {
-
+//todo get rid of checked categories - build custom class with methods to check if contains ???
         private val inflater: LayoutInflater = LayoutInflater.from(context)
-        val checkedCategories = arrayListOf<String>()
+        var checkedCategories = buildCheckedCats()
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyCategoryViewHolder {
             val itemView = inflater.inflate(R.layout.item_holder_filter_library, parent, false)
@@ -166,20 +170,42 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         }
 
         override fun getItemCount(): Int {
-            return allCategories.size
+            return filterCategories.size
         }
 
         override fun onBindViewHolder(holder: MyCategoryViewHolder, position: Int) {
-            var categoryName = allCategories[position]
-            holder.name.text = categoryName
+            var categoryName = filterCategories[position]
+            holder.name.text = categoryName.first
+            holder.checkBox.isChecked=categoryName.second
             holder.checkBox.setOnClickListener {
-                if (holder.checkBox.isChecked && !checkedCategories.contains(categoryName)) {
-                    checkedCategories.add(categoryName)
+                if (holder.checkBox.isChecked && !checkedCategories.contains(categoryName.first)) {
+                    checkedCategories.add(categoryName.first)
+                    filterCategories[position]= Pair(categoryName.first,true)
                 } else {
-                    checkedCategories.remove(categoryName)
+                    checkedCategories.remove(categoryName.first)
+                    filterCategories[position]=Pair(categoryName.first,false)
                 }
             }
         }
+
+        fun clearFilters() {
+            for (i in 0 until filterCategories.size) {
+                filterCategories[i]=Pair(filterCategories[i].first, false)
+            }
+            checkedCategories=buildCheckedCats()
+
+            notifyDataSetChanged()
+        }
+        private fun buildCheckedCats(): ArrayList<String> {
+            var array = arrayListOf<String>()
+            for ( cat in filterCategories){
+                if (cat.second){
+                    array.add(cat.first)
+                }
+            }
+            return array
+        }
+
 
     }
 
