@@ -39,7 +39,7 @@ class ExerciseListAdapter(var context: Context, var layout:Int=0, var rightImage
         }
         val itemView = inflater.inflate(layout, parent, false)
         itemView.linearLayoutExerciseHolder.setBackgroundColor(backgroundColor)
-        itemView.imageLeftExerciseHolder.visibility=imageLeftVisibility
+        itemView.checkboxLeftExerciseHolder.visibility=imageLeftVisibility
         itemView.imageRightExerciseHolder.visibility=imageRightVisibility
         itemView.titleTextExerciseHolder.setTextColor(textColor)
 

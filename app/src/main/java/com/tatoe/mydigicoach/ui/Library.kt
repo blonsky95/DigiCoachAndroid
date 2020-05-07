@@ -4,6 +4,7 @@ import android.content.Context
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
+import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -11,7 +12,6 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.viewmodels.LibraryViewModel
@@ -28,8 +28,9 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
     private lateinit var libraryViewModel: LibraryViewModel
 
     private var allExercisePairs = arrayListOf<Pair<String, Exercise>>()
-//    private var allCategories = arrayListOf<String>()
-    var filterCategories = arrayListOf<Pair<String,Boolean>>()
+    //    private var allCategories = arrayListOf<String>()
+    var filterCategories = arrayListOf<Pair<String, Boolean>>()
+    var toImportExercises = arrayListOf<Exercise>()
 
     private var db = FirebaseFirestore.getInstance()
 
@@ -53,6 +54,15 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         libraryExercisesList.layoutManager = LinearLayoutManager(this)
         libraryExercisesList.adapter = myExercisesAdapter
+
+        addToTrainingBtn.setOnClickListener {
+            toImportExercises = myExercisesAdapter.checkedExercises
+            Timber.d("exercises to import ${toImportExercises.size}")
+
+            libraryViewModel.importExercises(toImportExercises)
+            //todo add something to check if succesfully imported + reset checked state
+            //start an observer, when you receive that the imported were imported unregister observer?
+        }
 
         initObservers()
     }
@@ -86,28 +96,28 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private fun filterByCategory(checkedCategories: java.util.ArrayList<String>) {
         Timber.d("Filter by:  and size is ${checkedCategories.size}")
-        active_categories.visibility=View.GONE
+        active_categories.visibility = View.GONE
 
         var filteredExes = arrayListOf<Exercise>()
         for (exePair in allExercisePairs) {
             if (checkedCategories.isEmpty()) {
                 filteredExes.add(exePair.second)
             } else {
-                var catsString=""
+                var catsString = ""
                 var i = 0
                 for (categ in checkedCategories) {
                     i++
-                    catsString+= categ
-                    if (i<checkedCategories.size){
-                        catsString+="  -  "
+                    catsString += categ
+                    if (i < checkedCategories.size) {
+                        catsString += "  -  "
                     }
                     if (exePair.first == categ) {
                         filteredExes.add(exePair.second)
                         continue
                     }
                 }
-                active_categories.visibility=View.VISIBLE
-                active_categories.text=catsString
+                active_categories.visibility = View.VISIBLE
+                active_categories.text = catsString
             }
 
         }
@@ -119,16 +129,33 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         libraryViewModel.isDoingBackgroundTask.observe(this, Observer {
             Timber.d("is doing background task: $it ")
             if (it) {
-                progressBar_cyclic.visibility=View.VISIBLE
+                progressBar_cyclic.visibility = View.VISIBLE
             } else {
-                progressBar_cyclic.visibility=View.GONE
+                progressBar_cyclic.visibility = View.GONE
+            }
+        })
+
+        var isInserting = false
+
+        libraryViewModel.isInsertingExercises.observe(this, Observer {
+            if (isInserting && !it) {
+                progressBar_cyclic.visibility = View.GONE
+                Toast.makeText(this, "Exercises imported", Toast.LENGTH_SHORT).show()
+                val allExercises = arrayListOf<Exercise>()
+                for (exe in allExercisePairs) {
+                    allExercises.add(exe.second)
+                }
+                myExercisesAdapter.setContent(allExercises)
+            } else {
+                isInserting=true
+                progressBar_cyclic.visibility=View.VISIBLE
             }
         })
 
         libraryViewModel.categoriesList.observe(this, Observer {
-//            allCategories = it
+            //            allCategories = it
             for (cat in it) {
-                filterCategories.add(Pair(cat,false))
+                filterCategories.add(Pair(cat, false))
             }
             toolbar_filter.setOnClickListener {
                 showFilterDialog()
@@ -158,9 +185,10 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     //is an inner class because I want to acces the categoriesfilter variable which says which filters there is and if they are active (Pair<String, Boolean>)
     inner class MyCustomCategoriesAdapter(
-        context: Context) :
+        context: Context
+    ) :
         RecyclerView.Adapter<MyCategoryViewHolder>() {
-//todo get rid of checked categories - build custom class with methods to check if contains ???
+        //todo get rid of checked categories - build custom class with methods to check if contains ???
         private val inflater: LayoutInflater = LayoutInflater.from(context)
         var checkedCategories = buildCheckedCats()
 
@@ -176,30 +204,31 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         override fun onBindViewHolder(holder: MyCategoryViewHolder, position: Int) {
             var categoryName = filterCategories[position]
             holder.name.text = categoryName.first
-            holder.checkBox.isChecked=categoryName.second
+            holder.checkBox.isChecked = categoryName.second
             holder.checkBox.setOnClickListener {
                 if (holder.checkBox.isChecked && !checkedCategories.contains(categoryName.first)) {
                     checkedCategories.add(categoryName.first)
-                    filterCategories[position]= Pair(categoryName.first,true)
+                    filterCategories[position] = Pair(categoryName.first, true)
                 } else {
                     checkedCategories.remove(categoryName.first)
-                    filterCategories[position]=Pair(categoryName.first,false)
+                    filterCategories[position] = Pair(categoryName.first, false)
                 }
             }
         }
 
         fun clearFilters() {
             for (i in 0 until filterCategories.size) {
-                filterCategories[i]=Pair(filterCategories[i].first, false)
+                filterCategories[i] = Pair(filterCategories[i].first, false)
             }
-            checkedCategories=buildCheckedCats()
+            checkedCategories = buildCheckedCats()
 
             notifyDataSetChanged()
         }
+
         private fun buildCheckedCats(): ArrayList<String> {
             var array = arrayListOf<String>()
-            for ( cat in filterCategories){
-                if (cat.second){
+            for (cat in filterCategories) {
+                if (cat.second) {
                     array.add(cat.first)
                 }
             }
@@ -212,12 +241,12 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
     class MyCustomExercisesAdapter(context: Context) :
         RecyclerView.Adapter<MyExerciseViewHolder>() {
 
-        //todo offline copy of
 
         private val inflater: LayoutInflater = LayoutInflater.from(context)
 
         var currentExesInAdapter: ArrayList<Exercise> = arrayListOf()
         var initialExesInAdapter: ArrayList<Exercise> = arrayListOf()
+        var checkedExercises: ArrayList<Exercise> = arrayListOf()
 
         fun setContent(exes: ArrayList<Exercise>) {
             initialExesInAdapter = exes
@@ -235,10 +264,23 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         }
 
         override fun onBindViewHolder(holderExercise: MyExerciseViewHolder, position: Int) {
-            holderExercise.name.text = currentExesInAdapter[position].name
+            var exercise = currentExesInAdapter[position]
+            holderExercise.name.text = exercise.name
+            holderExercise.descriptionText.text = exercise.description
+            holderExercise.name.setOnClickListener {
+                holderExercise.toggleExpand()
+            }
+            holderExercise.checkBox.setOnClickListener {
+                if (holderExercise.checkBox.isChecked && !checkedExercises.contains(exercise)) {
+                    checkedExercises.add(exercise)
+                } else {
+                    checkedExercises.remove(exercise)
+                }
+            }
         }
 
         fun filter(newText: String?) {
+//            checkedExercises.clear()
             var filteredExes = arrayListOf<Exercise>()
             Timber.d("Filtering text: $newText")
             if (newText != null) {
@@ -260,12 +302,30 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
     }
 
     class MyExerciseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        var expanded: Boolean = false
+
         var name = v.titleTextExerciseHolder
+        var collapsibleLinearLayout = v.collapsibleLinearLayout
+        var descriptionText = v.descriptionTextExerciseHolder
+        var checkBox = v.checkboxLeftExerciseHolder
+
+        fun toggleExpand() {
+            if (!expanded) {
+                collapsibleLinearLayout!!.visibility = View.VISIBLE
+                expanded = true
+            } else {
+                collapsibleLinearLayout!!.visibility = View.GONE
+                expanded = false
+            }
+        }
     }
 
     class MyCategoryViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+
         var name = v.titleTextCategoryHolder
         var checkBox = v.checkBox2
+
+
     }
 
 //    override fun onCreateOptionsMenu(menu: Menu?): Boolean {

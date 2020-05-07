@@ -75,8 +75,8 @@ class AppRepository(
         exerciseDao.deleteTable()
     }
 
-    suspend fun insertExercises(exercises:List<Exercise>){
-        exerciseDao.insertAll(exercises)
+    suspend fun insertExercises(exercises:List<Exercise>) : List<Long>{
+        return exerciseDao.insertAll(exercises)
     }
 
     private suspend fun updateBlocksContainingExercise(actionCode:Int, exercise: Exercise) {
