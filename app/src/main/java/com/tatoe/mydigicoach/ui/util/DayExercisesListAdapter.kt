@@ -104,13 +104,20 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
         } else {
 
             for (i in 1 until resultsMap.size) {
+                //todo here - check if key is a plottable result in which case get readable
                 var fieldLayout =
                     inflater.inflate(R.layout.inflate_results_collapsible_textview_layout, null)
                 //the reason I use iterator().next() is because when I load resultsmap[i]
                 //even though I have a hashmap of size 1, it is still a hashmap of undefined size (and order, thats why i use ints), so to
                 //iterate through the entries and get the first one I use that, otherwise could get entries
-                fieldLayout.fieldKey7.text = resultsMap[i]!!.iterator().next().key
-                fieldLayout.fieldValueTextView8.text = resultsMap[i]!!.iterator().next().value
+                var keyString = resultsMap[i]!!.iterator().next().key
+                var valueString = resultsMap[i]!!.iterator().next().value
+                fieldLayout.fieldKey7.text = keyString
+                if (ExerciseResults.isANumericEntry(keyString)) {
+                    fieldLayout.fieldValueTextView8.text = ExerciseResults.toReadableFormat(valueString, keyString)
+                } else {
+                    fieldLayout.fieldValueTextView8.text = valueString
+                }
                 collapsibleLinearLayout.addView(fieldLayout)
             }
         }

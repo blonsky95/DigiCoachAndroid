@@ -229,7 +229,8 @@ class HomeScreen : AppCompatActivity() {
         }
 
         R.id.upload_store_exercises -> {
-        loginSignUpViewModel.addBunchOfStubStoreExercises()
+            //uncomment this to be able to add stub exercises to store
+//        loginSignUpViewModel.addBunchOfStubStoreExercises()
             true
         }
 

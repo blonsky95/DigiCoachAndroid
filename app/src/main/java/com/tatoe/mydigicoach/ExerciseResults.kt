@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach
 
+import android.content.Context
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
@@ -34,12 +35,20 @@ class ExerciseResults {
         const val PLOTTABLE_VALUE = "plottable"
         const val DATE_KEY = "Date"
 
+        const val TIME_1 = "Time (s)"
+        const val TIME_2 = "Time (mins)"
+        const val DISTANCE_1 = "Distance (km)"
+        const val DISTANCE_2 = "Distance (m)"
+        const val WEIGHT_1 = "Weight (kg)"
+        const val WEIGHT_2 = "Weight 1RM"
+
+
         fun getGenericFields(): HashMap<Int, HashMap<String, String>> {
             val genericResultFields = HashMap<Int, HashMap<String, String>>()
 
             genericResultFields[0] = hashMapOf(DATE_KEY to "04-03-1995")
             genericResultFields[1] = hashMapOf(NOTE_KEY to "String")
-            genericResultFields[2] = hashMapOf(PLOTTABLE_KEY to PLOTTABLE_VALUE)
+//            genericResultFields[2] = hashMapOf(PLOTTABLE_KEY to PLOTTABLE_VALUE)
 
             return genericResultFields
         }
@@ -51,6 +60,117 @@ class ExerciseResults {
         fun stringToDate(sString: String): Date {
             val format = SimpleDateFormat("dd-MM-yy")
             return format.parse(sString) as Date
+        }
+
+        fun isANumericEntry(entryName: String): Boolean {
+            return entryName == TIME_1 || entryName == TIME_2 || entryName == DISTANCE_1 || entryName == DISTANCE_2 || entryName == WEIGHT_1 || entryName == WEIGHT_2
+        }
+
+        fun toReadableFormat(fieldEntryValue: String, fieldEntryKey: String): String {
+            var string = fieldEntryValue
+            when (fieldEntryKey) {
+                //todo continue here
+                TIME_1 -> {
+                    string = "${fieldEntryValue}s"
+                }
+                TIME_2 -> {
+                    string = "${fieldEntryValue.substring(
+                        0,
+                        fieldEntryValue.indexOf("-")
+                    )} mins ${fieldEntryValue.substring(
+                        fieldEntryValue.indexOf("-") + 1,
+                        fieldEntryValue.length
+                    )} s"
+                }
+                DISTANCE_1 -> {
+                    string = "${fieldEntryValue}km"
+                }
+                DISTANCE_2 -> {
+                    string = "${fieldEntryValue}m"
+                }
+                WEIGHT_1 -> {
+                    string = "${fieldEntryValue}kg"
+                }
+                WEIGHT_2 -> {
+                    string = "${fieldEntryValue.substring(
+                        0,
+                        fieldEntryValue.indexOf("-")
+                    )} reps ${fieldEntryValue.substring(
+                        fieldEntryValue.indexOf("-") + 1,
+                        fieldEntryValue.indexOf("-", fieldEntryValue.indexOf("-") + 1)
+                    )}kg - 1RM = ${fieldEntryValue.substring(
+                        fieldEntryValue.indexOf(
+                            "-",
+                            fieldEntryValue.indexOf("-") + 1
+                        ) + 1, fieldEntryValue.length
+                    )}kg"
+                }
+            }
+
+            return string
+        }
+
+        fun toNumericFormat(fieldEntryValue: String, fieldEntryKey: String): ArrayList<Long> {
+            var long = arrayListOf<Long>()
+            when (fieldEntryKey) {
+                TIME_1 -> {
+                    long.add(fieldEntryValue.toLong())
+                }
+                TIME_2 -> {
+                    long.add(
+                        fieldEntryValue.substring(
+                            0, fieldEntryValue.indexOf("-")
+                        ).toLong()
+                    )
+                    long.add(
+                        fieldEntryValue.substring(
+                            fieldEntryValue.indexOf("-") + 1,
+                            fieldEntryValue.length
+                        ).toLong()
+                    )
+                }
+                DISTANCE_1 -> {
+                    long.add(fieldEntryValue.toLong())
+                }
+                DISTANCE_2 -> {
+                    long.add(fieldEntryValue.toLong())
+                }
+                WEIGHT_1 -> {
+                    long.add(fieldEntryValue.toLong())
+                }
+                WEIGHT_2 -> {
+                    long.add(
+                        fieldEntryValue.substring(
+                            0,
+                            fieldEntryValue.indexOf("-")
+                        ).toLong())
+
+                    long.add(fieldEntryValue.substring(
+                        fieldEntryValue.indexOf("-") + 1,
+                        fieldEntryValue.indexOf("-", fieldEntryValue.indexOf("-") + 1)
+                    ).toLong())
+
+                    long.add(
+                        fieldEntryValue.substring(
+                            fieldEntryValue.indexOf(
+                                "-",
+                                fieldEntryValue.indexOf("-") + 1
+                            ) + 1, fieldEntryValue.length
+                        ).toDouble().toLong())
+                }
+            }
+
+            return long
+        }
+
+        fun getFieldTypePosition(fieldEntryKey: String, context: Context): Int {
+            var typesArray = context.resources.getStringArray(R.array.units_array)
+            for (i in typesArray.indices) {
+                if (fieldEntryKey == typesArray[i]) {
+                    return i
+                }
+            }
+            return -1
         }
     }
 
@@ -64,18 +184,18 @@ class ExerciseResults {
 
     fun getArrayListOfResults(): ArrayList<HashMap<Int, HashMap<String, String>>> {
         var arrayList = ArrayList<HashMap<Int, HashMap<String, String>>>()
-        resultsArrayList.forEach{
+        resultsArrayList.forEach {
             arrayList.add(Exercise.stringMapToIntMap(it))
         }
         return arrayList
     }
 
-    fun setArrayListOfResults( arrayList: ArrayList<HashMap<Int, HashMap<String, String>>>) {
+    fun setArrayListOfResults(arrayList: ArrayList<HashMap<Int, HashMap<String, String>>>) {
         var stringArrayList = ArrayList<HashMap<String, HashMap<String, String>>>()
-        arrayList.forEach{
+        arrayList.forEach {
             stringArrayList.add(Exercise.intMapToStringMap(it))
         }
-        resultsArrayList=stringArrayList
+        resultsArrayList = stringArrayList
     }
 
     fun addResult(resultFieldsMap: HashMap<Int, HashMap<String, String>>) {
@@ -185,9 +305,9 @@ class ExerciseResults {
         return getArrayListOfResults()[position][0]!![DATE_KEY]!!
     }
 
-    fun getResultFromDate(date:String): HashMap<Int, HashMap<String, String>> {
+    fun getResultFromDate(date: String): HashMap<Int, HashMap<String, String>> {
         var resultsMap = hashMapOf<Int, HashMap<String, String>>()
-        if (containsResult(date)){
+        if (containsResult(date)) {
             resultsMap = getArrayListOfResults()[getResultPosition(date)]
         }
         return resultsMap
