@@ -56,7 +56,6 @@ class ResultsViewer : AppCompatActivity() {
 
         activeExercise = DataHolder.activeExerciseHolder
         sResults = activeExercise!!.exerciseResults.getArrayListOfResults()
-
         loadLayout()
         loadData()
     }
@@ -77,13 +76,13 @@ class ResultsViewer : AppCompatActivity() {
 
     private fun loadData() {
 
-            adapter = ResultListAdapter(this)
-            plottableBundles = activeExercise!!.exerciseResults.getPlottableArrays()
+        adapter = ResultListAdapter(this)
+        plottableBundles = activeExercise!!.exerciseResults.getPlottableArrays()
 
-            ResultsRecyclerView.adapter = adapter
-            ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
-            configureSpinner()
-            adapter.setContent(activeExercise)
+        ResultsRecyclerView.adapter = adapter
+        ResultsRecyclerView.layoutManager = LinearLayoutManager(this)
+        configureSpinner()
+        adapter.setContent(activeExercise)
     }
 
     override fun onRestart() {
@@ -91,9 +90,6 @@ class ResultsViewer : AppCompatActivity() {
         loadLayout()
         Timber.d("RESTART GOOOOO")
     }
-
-    //todo - set initial value to spinner
-    //todo - see if onitemselected listener is triggered at the start, in which case remove the call to displaydata in onCreate
 
     private fun getPlottableBundleFromName(pBundleName: String): PlottableBundle? {
         for (pBundle in plottableBundles) {

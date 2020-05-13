@@ -70,6 +70,7 @@ class ExerciseCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_creator)
+        addFieldBtn.visibility=View.GONE
         title = "Exercise Creator"
 
         setSupportActionBar(findViewById(R.id.my_toolbar))

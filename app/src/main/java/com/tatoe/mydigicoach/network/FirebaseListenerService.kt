@@ -55,17 +55,6 @@ class FirebaseListenerService :
         }
     }
 
-//    private fun updateExeState(
-//        documentReference: DocumentReference,
-//        exercisePackage: ExercisePackage
-//    ) {
-//        exercisePackage.mState = ExercisePackage.STATE_RECEIVED
-//        documentReference
-//            .update("mstate", ExercisePackage.STATE_RECEIVED)
-//            .addOnSuccessListener { Timber.d("DocumentSnapshot successfully updated!") }
-//            .addOnFailureListener { e -> Timber.w("Error updating document: $e") }
-//    }
-
     override fun onBind(intent: Intent?): IBinder? {
         return binder
     }

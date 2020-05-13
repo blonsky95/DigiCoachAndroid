@@ -6,7 +6,7 @@ import kotlin.collections.ArrayList
 class PlottableBundle(
     name: String,
     valuesX: ArrayList<Date>,
-    valuesY: ArrayList<Double>,
+    valuesY: ArrayList<Float>,
     containsZeros: Boolean = false
 ) {
     var sName = name

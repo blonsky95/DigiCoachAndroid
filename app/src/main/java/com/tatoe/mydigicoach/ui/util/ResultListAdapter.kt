@@ -78,8 +78,10 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
             //the reason I use iterator().next() is because when I load resultsmap[i]
             //even though I have a hashmap of size 1, it is still a hashmap of undefined size (and order, thats why i use ints), so to
             //iterate through the entries and get the first one I use that, otherwise could get entries
-            fieldLayout.fieldKey7.text = bindingResult[i]!!.iterator().next().key
-            fieldLayout.fieldValueTextView8.text = bindingResult[i]!!.iterator().next().value
+            val resultKey= bindingResult[i]!!.iterator().next().key
+            val resultValue = bindingResult[i]!!.iterator().next().value
+            fieldLayout.fieldKey7.text = resultKey
+            fieldLayout.fieldValueTextView8.text = ExerciseResults.toReadableFormat(resultValue, resultKey)
             collapsibleLinearLayout?.addView(fieldLayout)
         }
     }

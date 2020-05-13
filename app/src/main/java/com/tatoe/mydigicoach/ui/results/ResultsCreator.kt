@@ -37,13 +37,12 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     private lateinit var rightButton: TextView
     private lateinit var leftButton: TextView
-    private lateinit var centreButton: TextView
 
     private lateinit var linearLayout: LinearLayout
     private lateinit var unitSelectorView: View
     private lateinit var oneRmTextView: TextView
     private var oneRmReps = 0
-    private var oneRmWeight = 0L
+    private var oneRmWeight = 0.toFloat()
 
     //contains the key and the type - so string or plottable
     private var sResultFieldsTypes = HashMap<Int, HashMap<String, String>>()
@@ -63,12 +62,6 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private var resultDate = "unknown date"
     private var resultIndex = -1
 
-    var NEW_FIELD_VALUE = ""
-
-    private var LAYOUT_TYPE_TITLE_TV = 1
-    private var LAYOUT_TYPE_TITLE_ET = 2
-    private var LAYOUT_TYPE_DESCRIPTION_TV = 3
-    private var LAYOUT_TYPE_DESCRIPTION_ET = 4
     private var LAYOUT_TYPE_EXTRAFIELD_TV = 5
     private var LAYOUT_TYPE_EXTRAFIELD_ET = 6
     private var LAYOUT_TYPE_DATE_TV = 7
@@ -97,9 +90,8 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         rightButton = right_button
         leftButton = left_button
-        centreButton = centre_button
-        centreButton.visibility = View.INVISIBLE
 
+        centre_button.visibility = View.GONE
         if (intent.hasExtra(OBJECT_ACTION)) { //can only reach this with an intent extra
             mAction = intent.getStringExtra(OBJECT_ACTION)
 
@@ -124,8 +116,6 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 sResultsArrayList = activeExercise?.exerciseResults!!.getArrayListOfResults()
             }
 
-            Timber.d("ACTIVE EXERCISE IN CREATOR ${activeExercise!!}")
-
             createExerciseFieldsLayout()
             updateButtonUI(mAction)
 
@@ -141,15 +131,12 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
             leftButton.visibility = View.INVISIBLE
 
-            centreButton.visibility = View.GONE
-            centreButton.text = "Add Field"
-            centreButton.setOnClickListener(addFieldButtonListener)
             return
         } else {
 
             if (actionType == OBJECT_EDIT) {
-//                activeExercise!!.exerciseResults.getResultFromDate(resultDate).size<3 ||
-                if (sResultsArrayList[resultIndex].size < 3) {
+                val sizeOfResultWithAtLeastOneResult = 3
+                if (sResultsArrayList[resultIndex].size < sizeOfResultWithAtLeastOneResult) {
                     addFieldBtn.visibility = View.VISIBLE
                 } else {
                     addFieldBtn.visibility = View.GONE
@@ -159,9 +146,6 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 rightButton.text = "Update"
                 rightButton.setOnClickListener(updateButtonListener)
 //
-                centreButton.visibility = View.GONE
-                centreButton.text = "Add Field"
-                centreButton.setOnClickListener(addFieldButtonListener)
 
                 leftButton.visibility = View.VISIBLE
                 leftButton.text = "Delete"
@@ -171,7 +155,6 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 addFieldBtn.visibility = View.GONE
                 rightButton.visibility = View.INVISIBLE
                 leftButton.visibility = View.INVISIBLE
-                centreButton.visibility = View.INVISIBLE
             }
         }
     }
@@ -208,19 +191,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             addLayout(null, null, LAYOUT_TYPE_NEW_FIELD_EDIT)
             addFieldBtn.visibility = View.GONE
         }
-
-//        addAddFieldLayout()
     }
-
-//    private fun addAddFieldLayout() {
-//        var fieldLayout =
-//            layoutInflater.inflate(R.layout.inflate_add_new_result_field, null)
-//        fieldLayout.addFieldBtn.setOnClickListener {
-//            addLayout(null, null, LAYOUT_TYPE_NEW_FIELD)
-//        }
-//        linearLayout.addView(fieldLayout)
-//
-//    }
 
     private fun getLayoutType(fieldPosition: Int): Int {
         if (fieldPosition == 0 && mAction == OBJECT_NEW) {
@@ -244,9 +215,6 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 LAYOUT_TYPE_EXTRAFIELD_TV
             }
 
-
-
-        Timber.d("LAYOUT TYPE: $layoutType")
         return layoutType
     }
 
@@ -315,48 +283,22 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     }
 
-    private val addFieldButtonListener = View.OnClickListener {
-        generateDialog()
-    }
-
-    private fun generateDialog() {
-        val mDialogView =
-            LayoutInflater.from(this).inflate(R.layout.plottable_dialog_window, null)
-        mDialogView.dialogTextTextView.visibility = View.GONE
-        mDialogView.dialogEditText.hint = "New field name"
-        mDialogView.dialogEditText.inputType = InputType.TYPE_CLASS_TEXT
-//        mDialogView.checkBox.text="Measurable parameter"
-//        mDialogView.checkBox.isChecked=false
-        val mBuilder = AlertDialog.Builder(this)
-            .setView(mDialogView)
-            .setTitle("Add Field")
-        val mAlertDialog = mBuilder.show()
-        mDialogView.dialogEnterBtn.setOnClickListener {
-            mAlertDialog.dismiss()
-            addFieldLayout(
-                mDialogView.dialogEditText.text.toString().trim(),
-                mDialogView.checkBox.isChecked
-            )
-        }
-        mDialogView.dialogCancelBtn.setOnClickListener {
-            mAlertDialog.dismiss()
-        }
-    }
-
-    private fun addFieldLayout(fieldName: String, isPlottable: Boolean) {
-        var newFieldValue = "String"
-        if (isPlottable) {
-            newFieldValue = ExerciseResults.PLOTTABLE_VALUE
-        }
-        addLayout(fieldName, newFieldValue, LAYOUT_TYPE_EXTRAFIELD_ET)
-
-    }
-
     private val addButtonListener = View.OnClickListener {
 
         var newResultFields = getFieldContents()
 
-        activeExercise?.exerciseResults!!.setFieldsMap(sResultFieldsTypes)
+        //check if a new result field has been added
+//        var resultTypes = activeExercise!!.exerciseResults
+        var defaultExerciseFieldsSize = 2
+        if (newResultFields.size>defaultExerciseFieldsSize) {
+            for (i in defaultExerciseFieldsSize until newResultFields.size ) {
+                var newResultKey = newResultFields[i]!!.entries.iterator().next().key
+                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)){
+                    activeExercise!!.exerciseResults.resultsTypes.add(newResultKey)
+                }
+            }
+        }
+//        activeExercise?.exerciseResults!!.setFieldsMap(sResultFieldsTypes)
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         activeExercise?.exerciseResults!!.addResult(
@@ -374,8 +316,18 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private val updateButtonListener = View.OnClickListener {
         var newResultFields = getFieldContents()
 
-        activeExercise?.exerciseResults!!.setFieldsMap(sResultFieldsTypes)
+//        activeExercise?.exerciseResults!!.setFieldsMap(sResultFieldsTypes)
         //this updates the new field skeleton of the result (if new fields per e.g.)
+
+        var defaultExerciseFieldsSize = 2
+        if (newResultFields.size - defaultExerciseFieldsSize>activeExercise!!.exerciseResults.resultsTypes.size) {
+            for (i in defaultExerciseFieldsSize.. newResultFields.size ) {
+                var newResultKey = newResultFields[i]!!.entries.iterator().next().key
+                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)){
+                    activeExercise!!.exerciseResults.resultsTypes.add(newResultKey)
+                }
+            }
+        }
 
         activeExercise?.exerciseResults!!.updateResult(newResultFields, resultIndex)
         //this adds the result with a date to the list of results in form of hashmaps
@@ -389,7 +341,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     }
 
     private val deleteButtonListener = View.OnClickListener {
-        //        activeExercise!!.exerciseResults.getArrayListOfResults().removeAt(resultIndex)
+
         activeExercise!!.exerciseResults.removeResult(resultIndex)
         dataViewModel.updateExerciseResult(activeExercise!!)
         DataHolder.activeExerciseHolder = activeExercise
@@ -401,9 +353,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
         var fieldsMap = java.util.HashMap<Int, java.util.HashMap<String, String>>()
         for (i in 0 until linearLayout.childCount) {
-//            Timber.d("child at $i is ${linearLayout.getChildAt(i)}")
-            //todo get description
-            //get the measured result
+
             var layout = linearLayout.getChildAt(i) as LinearLayout
 
             var fieldName = ""
@@ -436,9 +386,6 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     (layout.getChildAt(1) as EditText).text.trim().toString()
                 }
             }
-
-
-            //extra fields have a layout inside the layout - check the respective inflate files
 
             fieldsMap[i] = hashMapOf(fieldName to fieldValue)
         }
@@ -527,9 +474,6 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         var linearLayout = unitSelectorView.units_container
         linearLayout.removeAllViews()
 
-        //todo in read mode I cant see shit spinner
-        ///todo change values of RM and mins secs, and get rid of units for the others
-
         when (position) {
             0 -> {
                 var unitsView = layoutInflater.inflate(
@@ -602,7 +546,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                     layoutInflater.inflate(R.layout.inflate_units_field_one_rm, null)
 
                 if (mAction== OBJECT_EDIT) {
-                    oneRmLayout.unit_value_et_reps.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toString())
+                    oneRmLayout.unit_value_et_reps.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toInt().toString())
                     oneRmLayout.unit_value_et_kg.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[1].toString())
                     oneRmLayout.one_rm_kg.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[2].toString())
                     oneRmReps = ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toInt()
@@ -623,7 +567,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 }
                 oneRmLayout.unit_value_et_kg.doAfterTextChanged { text ->
                     if (!text.isNullOrEmpty()) {
-                        oneRmWeight = text.toString().toLong()
+                        oneRmWeight = text.toString().toFloat()
                         updateOneRmValue()
                     }
                 }
