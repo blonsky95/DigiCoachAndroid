@@ -2,15 +2,12 @@ package com.tatoe.mydigicoach.ui.results
 
 import android.content.Intent
 import android.os.Bundle
-import android.text.InputType
 import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.*
-import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProviders
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
@@ -20,6 +17,8 @@ import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_EDIT
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_NEW
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_VIEW
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.viewmodels.MyResultsViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.ResultsViewModel
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.activity_results_creator.left_button
 import kotlinx.android.synthetic.main.activity_results_creator.right_button
@@ -29,8 +28,6 @@ import kotlinx.android.synthetic.main.inflate_spinner_units_selector.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_mins_secs.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_one_rm.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_secs.view.*
-import kotlinx.android.synthetic.main.plottable_dialog_window.view.*
-import timber.log.Timber
 import java.util.ArrayList
 
 class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
@@ -51,7 +48,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private lateinit var unitsKey:String
     private lateinit var unitsValue:String
 
-    private lateinit var dataViewModel: DataViewModel
+    private lateinit var resultsViewModel: ResultsViewModel
 
     var menuItemRead: MenuItem? = null
     var menuItemEdit: MenuItem? = null
@@ -85,7 +82,8 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar!!.setDisplayShowTitleEnabled(false)
 
-        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        resultsViewModel = ViewModelProviders.of(this, MyResultsViewModelFactory(application)).get(ResultsViewModel::class.java)
+
         linearLayout = exercise_properties as LinearLayout
 
         rightButton = right_button
@@ -307,7 +305,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         //this adds the result with a date to the list of results in form of hashmaps
 
         if (activeExercise != null) {
-            dataViewModel.updateExerciseResult(activeExercise!!)
+            resultsViewModel.updateExerciseResult(activeExercise!!)
             DataHolder.activeExerciseHolder = activeExercise
         }
         refreshCreator()
@@ -333,7 +331,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         //this adds the result with a date to the list of results in form of hashmaps
 
         if (activeExercise != null) {
-            dataViewModel.updateExerciseResult(activeExercise!!)
+            resultsViewModel.updateExerciseResult(activeExercise!!)
             DataHolder.activeExerciseHolder = activeExercise
         }
 
@@ -343,7 +341,7 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private val deleteButtonListener = View.OnClickListener {
 
         activeExercise!!.exerciseResults.removeResult(resultIndex)
-        dataViewModel.updateExerciseResult(activeExercise!!)
+        resultsViewModel.updateExerciseResult(activeExercise!!)
         DataHolder.activeExerciseHolder = activeExercise
 
         backToViewer()

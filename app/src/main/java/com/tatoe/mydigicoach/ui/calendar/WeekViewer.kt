@@ -14,8 +14,8 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
-import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.DayViewModel
+import com.tatoe.mydigicoach.viewmodels.MyDayViewModelFactory
 import kotlinx.android.synthetic.main.activity_week_viewer.*
 import timber.log.Timber
 import java.util.*
@@ -25,7 +25,7 @@ class WeekViewer : AppCompatActivity() {
 
     private lateinit var mPager: ViewPager
     private lateinit var pagerAdapter: ScreenSlidePagerAdapter
-    private lateinit var dataViewModel: DayViewerViewModel
+    private lateinit var dataViewModel: DayViewModel
     private var weekDaysViewHashMap = hashMapOf<Int,TextView>()
 
     private var activeDay: Day? = null
@@ -64,8 +64,8 @@ class WeekViewer : AppCompatActivity() {
 
         mPager = findViewById(R.id.pager)
 
-        dataViewModel = ViewModelProviders.of(this, MyDayViewerViewModelFactory(application))
-            .get(DayViewerViewModel::class.java)
+        dataViewModel = ViewModelProviders.of(this, MyDayViewModelFactory(application))
+            .get(DayViewModel::class.java)
 
         addTrainingViewContainer.setOnClickListener(updateDayTrainingListener)
 

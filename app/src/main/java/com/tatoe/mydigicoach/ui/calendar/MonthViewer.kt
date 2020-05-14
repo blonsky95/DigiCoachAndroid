@@ -2,7 +2,6 @@ package com.tatoe.mydigicoach.ui.calendar
 
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import com.prolificinteractive.materialcalendarview.CalendarDay
@@ -12,8 +11,8 @@ import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.HomeScreen
 import com.tatoe.mydigicoach.ui.util.CurrentDayDecorator
 import com.tatoe.mydigicoach.ui.util.DatesWithTrainingDecorator
-import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
-import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.DayViewModel
+import com.tatoe.mydigicoach.viewmodels.MyDayViewModelFactory
 import kotlinx.android.synthetic.main.activity_month_viewer.*
 import timber.log.Timber
 import kotlin.collections.ArrayList
@@ -23,7 +22,7 @@ class MonthViewer : AppCompatActivity() {
     companion object {
         const val DAY_ID_KEY = "day_id"
     }
-    private lateinit var dataViewModel: DayViewerViewModel
+    private lateinit var dataViewModel: DayViewModel
 
     private lateinit var calendar:MaterialCalendarView
     var calendarDaysWithTraining = arrayListOf<CalendarDay>()
@@ -33,8 +32,8 @@ class MonthViewer : AppCompatActivity() {
         setContentView(R.layout.activity_month_viewer)
         title = "Exercise Result"
 
-        dataViewModel = ViewModelProviders.of(this, MyDayViewerViewModelFactory(application))
-            .get(DayViewerViewModel::class.java)
+        dataViewModel = ViewModelProviders.of(this, MyDayViewModelFactory(application))
+            .get(DayViewModel::class.java)
 
         calendar = calendarView
 

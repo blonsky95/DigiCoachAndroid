@@ -1,35 +1,24 @@
 package com.tatoe.mydigicoach.ui.results
 
-import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
 import android.view.View
 import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import android.widget.Spinner
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
-import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
-import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
-import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import com.github.mikephil.charting.charts.LineChart
 import com.tatoe.mydigicoach.PlottableBundle
-import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
-import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
+import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.ui.util.ResultListAdapter
 import com.tatoe.mydigicoach.utils.ChartManager
 import kotlinx.android.synthetic.main.activity_results_viewer.*
 import timber.log.Timber
 
 
 class ResultsViewer : AppCompatActivity() {
-
-//    private lateinit var dataViewModel: DataViewModel
 
     private var activeExercise: Exercise? = null
     lateinit var adapter: ResultListAdapter
@@ -40,8 +29,6 @@ class ResultsViewer : AppCompatActivity() {
     private lateinit var sSpinner: Spinner
 
     var exerciseId = -1
-
-    private var allExercises = listOf<Exercise>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

@@ -16,7 +16,7 @@ import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
 import kotlinx.coroutines.*
 import timber.log.Timber
 
-class ExerciseViewerViewModel(application: Application) :
+class ExerciseViewModel(application: Application) :
     AndroidViewModel(application) {
 
     private val repository: AppRepository

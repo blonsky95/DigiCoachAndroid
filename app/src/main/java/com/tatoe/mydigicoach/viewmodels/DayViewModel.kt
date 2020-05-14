@@ -14,7 +14,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-class DayViewerViewModel(application: Application) :
+class DayViewModel(application: Application) :
     AndroidViewModel(application) {
 
     private val repository: AppRepository

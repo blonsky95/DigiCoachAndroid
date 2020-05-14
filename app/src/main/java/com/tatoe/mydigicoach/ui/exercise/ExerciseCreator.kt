@@ -10,7 +10,6 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
 import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
@@ -18,8 +17,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
-import com.tatoe.mydigicoach.viewmodels.MyExerciseViewerViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.ExerciseViewModel
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.inflate_description_edittext_layout.view.*
 import kotlinx.android.synthetic.main.inflate_description_textview_layout.view.*
@@ -40,7 +38,7 @@ class ExerciseCreator : AppCompatActivity() {
     private lateinit var leftButton: TextView
     private lateinit var centreButton: TextView
 
-    private lateinit var dataViewModel: ExerciseViewerViewModel
+    private lateinit var exerciseViewModel: ExerciseViewModel
 
     private var activeExercise: Exercise? = null
     private var exerciseFieldsMap = HashMap<Int, HashMap<String, String>>()
@@ -79,7 +77,7 @@ class ExerciseCreator : AppCompatActivity() {
             super.onBackPressed()
         }
 
-        dataViewModel = ViewModelProviders.of(this).get(ExerciseViewerViewModel::class.java)
+        exerciseViewModel = ViewModelProviders.of(this).get(ExerciseViewModel::class.java)
         linearLayout = exercise_properties as LinearLayout
 
         rightButton = right_button
@@ -300,7 +298,7 @@ class ExerciseCreator : AppCompatActivity() {
 
         newExercise.setFieldsMap(newExerciseFields)
 
-        dataViewModel.insertExercise(newExercise)
+        exerciseViewModel.insertExercise(newExercise)
 //        backToViewer()
         activeExercise=newExercise //new exercise are not fetched from SQLite from creator
         Toast.makeText(this,"${activeExercise?.name} has been added",Toast.LENGTH_SHORT).show()
@@ -314,7 +312,7 @@ class ExerciseCreator : AppCompatActivity() {
         activeExercise!!.description = updatingExerciseFields[1]!!["Description"]!!
         activeExercise!!.setFieldsMap(updatingExerciseFields)
 
-        dataViewModel.updateExercise(activeExercise!!)
+        exerciseViewModel.updateExercise(activeExercise!!)
         Toast.makeText(this,"${activeExercise?.name} has been updated",Toast.LENGTH_SHORT).show()
 //        backToViewer()
         refreshCreator()
@@ -330,7 +328,7 @@ class ExerciseCreator : AppCompatActivity() {
 
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
-                    dataViewModel.deleteExercise(activeExercise!!)
+                    exerciseViewModel.deleteExercise(activeExercise!!)
                     Toast.makeText(applicationContext,"${activeExercise?.name} has been deleted",Toast.LENGTH_SHORT).show()
                     backToViewer()
                 }
@@ -377,7 +375,7 @@ class ExerciseCreator : AppCompatActivity() {
         Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
             object : DialogPositiveNegativeHandler {
                 override fun onPositiveButton(username: String) {
-                    dataViewModel.sendExerciseToUser(activeExercise, username)
+                    exerciseViewModel.sendExerciseToUser(activeExercise, username)
                 }
 
             })

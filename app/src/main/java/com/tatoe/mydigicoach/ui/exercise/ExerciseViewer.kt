@@ -25,13 +25,13 @@ import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.ui.HomeScreen
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.utils.FirestoreReceiver
-import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
-import com.tatoe.mydigicoach.viewmodels.MyExerciseViewerViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.ExerciseViewModel
+import com.tatoe.mydigicoach.viewmodels.MyExerciseViewModelFactory
 import java.util.ArrayList
 
 
 class ExerciseViewer : AppCompatActivity() {
-    private lateinit var exerciseViewerViewModel: ExerciseViewerViewModel
+    private lateinit var exerciseViewModel: ExerciseViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
 
@@ -119,11 +119,11 @@ class ExerciseViewer : AppCompatActivity() {
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
-        exerciseViewerViewModel =
-            ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application))
-                .get(ExerciseViewerViewModel::class.java)
+        exerciseViewModel =
+            ViewModelProviders.of(this, MyExerciseViewModelFactory(application))
+                .get(ExerciseViewModel::class.java)
 
-        exerciseViewerViewModel.allExercises.observe(this, Observer { exercises ->
+        exerciseViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
                 //                Timber.d("I WANNA SEE THIS: $exercises")
 
@@ -142,7 +142,7 @@ class ExerciseViewer : AppCompatActivity() {
 
         val dialog = setProgressDialog(this, "Talking with cloud...")
 
-        exerciseViewerViewModel.getIsLoading().observe(this, Observer { isLoading ->
+        exerciseViewModel.getIsLoading().observe(this, Observer { isLoading ->
             if (isLoading) {
                 dialog.show()
 
@@ -200,8 +200,8 @@ class ExerciseViewer : AppCompatActivity() {
                 dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
-                        exerciseViewerViewModel.insertExercise(exePackage.firestoreExercise.toExercise())
-                        exerciseViewerViewModel.updateTransferExercise(
+                        exerciseViewModel.insertExercise(exePackage.firestoreExercise.toExercise())
+                        exerciseViewModel.updateTransferExercise(
                             exePackage,
                             ExercisePackage.STATE_SAVED
                         )
@@ -210,7 +210,7 @@ class ExerciseViewer : AppCompatActivity() {
 
                     override fun onNegativeButton() {
                         super.onNegativeButton()
-                        exerciseViewerViewModel.updateTransferExercise(
+                        exerciseViewModel.updateTransferExercise(
                             exePackage,
                             ExercisePackage.STATE_REJECTED
                         )
@@ -255,7 +255,7 @@ class ExerciseViewer : AppCompatActivity() {
 
     private fun updateUpdatingExercise(position: Int) {
 
-        var clickedExercise = exerciseViewerViewModel.allExercises.value?.get(position)
+        var clickedExercise = exerciseViewModel.allExercises.value?.get(position)
 
         if (clickedExercise != null) {
             DataHolder.activeExerciseHolder = clickedExercise

@@ -5,12 +5,10 @@ import android.os.Bundle
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
@@ -19,10 +17,9 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.EditableItemViewHolder
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
-import com.tatoe.mydigicoach.viewmodels.DayViewerViewModel
-import com.tatoe.mydigicoach.viewmodels.MyDayViewerViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.DayViewModel
+import com.tatoe.mydigicoach.viewmodels.MyDayViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_creator.*
-import kotlinx.android.synthetic.main.item_holder_exercise.view.*
 import timber.log.Timber
 import java.util.*
 import kotlin.collections.ArrayList
@@ -39,7 +36,7 @@ class DayCreator : AppCompatActivity() {
     private var selectedIndexes = arrayListOf<Int>()
 
 
-    private lateinit var dataViewModel: DayViewerViewModel
+    private lateinit var dataViewModel: DayViewModel
     private var currentDayBlocks: ArrayList<Block> = arrayListOf()
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
@@ -72,8 +69,8 @@ class DayCreator : AppCompatActivity() {
         weekDaysViewHashMap[Day.SATURDAY]=saturday_btn
         weekDaysViewHashMap[Day.SUNDAY]=sunday_btn
 
-        dataViewModel = ViewModelProviders.of(this, MyDayViewerViewModelFactory(application))
-            .get(DayViewerViewModel::class.java)
+        dataViewModel = ViewModelProviders.of(this, MyDayViewModelFactory(application))
+            .get(DayViewModel::class.java)
 
         initObservers()
 
