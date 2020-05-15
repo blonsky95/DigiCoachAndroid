@@ -112,7 +112,14 @@ class ExerciseResults {
         }
 
         fun toNumericFormat(fieldEntryValue: String, fieldEntryKey: String): ArrayList<Float> {
-            var float = arrayListOf<Float>()
+            val float = arrayListOf<Float>()
+            if (fieldEntryValue.isEmpty()) {
+                //return array of 0s to fill in the maximum of 3 empty edit texts
+                while (float.size<3) {
+                    float.add(0.toFloat())
+                }
+                return float
+            }
             when (fieldEntryKey) {
                 TIME_1 -> {
                     float.add(fieldEntryValue.toFloat())
@@ -176,6 +183,11 @@ class ExerciseResults {
                 }
             }
             return -1
+        }
+
+        fun getPositionFromKey(position:Int, context: Context): String {
+            var typesArray = context.resources.getStringArray(R.array.units_array)
+            return typesArray[position]
         }
     }
 

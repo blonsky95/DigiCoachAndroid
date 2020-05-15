@@ -6,6 +6,7 @@ import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.size
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.ExerciseResults
@@ -20,6 +21,8 @@ import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.MyResultsViewModelFactory
 import com.tatoe.mydigicoach.viewmodels.ResultsViewModel
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
+import kotlinx.android.synthetic.main.activity_exercise_creator.backBtn
+import kotlinx.android.synthetic.main.activity_exercise_creator.toolbar_title
 import kotlinx.android.synthetic.main.activity_results_creator.left_button
 import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import kotlinx.android.synthetic.main.inflate_extrafield_edittext_layout.view.*
@@ -28,25 +31,20 @@ import kotlinx.android.synthetic.main.inflate_spinner_units_selector.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_mins_secs.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_one_rm.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_secs.view.*
+import timber.log.Timber
 import java.util.ArrayList
 
-class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
+class ResultsCreator : AppCompatActivity() {
 
+    private val MAX_NUMBER_ENTRIES = 5
     private lateinit var rightButton: TextView
     private lateinit var leftButton: TextView
 
     private lateinit var linearLayout: LinearLayout
-    private lateinit var unitSelectorView: View
-    private lateinit var oneRmTextView: TextView
-    private var oneRmReps = 0
-    private var oneRmWeight = 0.toFloat()
 
     //contains the key and the type - so string or plottable
     private var sResultFieldsTypes = HashMap<Int, HashMap<String, String>>()
     private var sResultsArrayList: ArrayList<HashMap<Int, HashMap<String, String>>> = arrayListOf()
-
-    private lateinit var unitsKey:String
-    private lateinit var unitsValue:String
 
     private lateinit var resultsViewModel: ResultsViewModel
 
@@ -82,7 +80,8 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar!!.setDisplayShowTitleEnabled(false)
 
-        resultsViewModel = ViewModelProviders.of(this, MyResultsViewModelFactory(application)).get(ResultsViewModel::class.java)
+        resultsViewModel = ViewModelProviders.of(this, MyResultsViewModelFactory(application))
+            .get(ResultsViewModel::class.java)
 
         linearLayout = exercise_properties as LinearLayout
 
@@ -113,47 +112,8 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             if (activeExercise?.exerciseResults!!.getArrayListOfResults().isNotEmpty()) {
                 sResultsArrayList = activeExercise?.exerciseResults!!.getArrayListOfResults()
             }
-
             createExerciseFieldsLayout()
             updateButtonUI(mAction)
-
-        }
-    }
-
-    private fun updateButtonUI(actionType: String) {
-        if (actionType == OBJECT_NEW) {
-            addFieldBtn.visibility = View.VISIBLE
-            rightButton.visibility = View.VISIBLE
-            rightButton.text = "Add"
-            rightButton.setOnClickListener(addButtonListener)
-
-            leftButton.visibility = View.INVISIBLE
-
-            return
-        } else {
-
-            if (actionType == OBJECT_EDIT) {
-                val sizeOfResultWithAtLeastOneResult = 3
-                if (sResultsArrayList[resultIndex].size < sizeOfResultWithAtLeastOneResult) {
-                    addFieldBtn.visibility = View.VISIBLE
-                } else {
-                    addFieldBtn.visibility = View.GONE
-                }
-
-                rightButton.visibility = View.VISIBLE
-                rightButton.text = "Update"
-                rightButton.setOnClickListener(updateButtonListener)
-//
-
-                leftButton.visibility = View.VISIBLE
-                leftButton.text = "Delete"
-                leftButton.setOnClickListener(deleteButtonListener)
-            }
-            if (actionType == OBJECT_VIEW) {
-                addFieldBtn.visibility = View.GONE
-                rightButton.visibility = View.INVISIBLE
-                leftButton.visibility = View.INVISIBLE
-            }
         }
     }
 
@@ -169,25 +129,26 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             }
         for (fieldPosition in 0 until hashMapHashMap.size) {
 
-            var currentField = hashMapHashMap[fieldPosition]
+            val currentField = hashMapHashMap[fieldPosition]
+            val firstEntry = currentField!!.entries.iterator().next()
+            val fieldEntryKey = firstEntry.key //first of pair - title of entry
+            val fieldEntryValue = firstEntry.value //second of pair - value of entry
 
-            var firstEntry = currentField!!.entries.iterator().next()
-
-            var fieldEntryKey = firstEntry.key //first of pair - title of entry
-            var fieldEntryValue = firstEntry.value //second of pair - value of entry
-
-            // check if its a number result
-            if (fieldPosition>1){
-                unitsKey=fieldEntryKey
-                unitsValue=fieldEntryValue
-                fieldEntryValue = ExerciseResults.toReadableFormat(fieldEntryValue,fieldEntryKey)
-            }
             addLayout(fieldEntryKey, fieldEntryValue, getLayoutType(fieldPosition))
 
         }
+        Timber.d("LINEAR LAYOUT CHILD COUNT: ${linearLayout.childCount}")
         addFieldBtn.setOnClickListener {
             addLayout(null, null, LAYOUT_TYPE_NEW_FIELD_EDIT)
+            updateAddFieldBtnVisibility()
+        }
+    }
+
+    private fun updateAddFieldBtnVisibility() {
+        if (linearLayout.childCount >= MAX_NUMBER_ENTRIES) {
             addFieldBtn.visibility = View.GONE
+        } else {
+            addFieldBtn.visibility = View.VISIBLE
         }
     }
 
@@ -196,11 +157,11 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
             return LAYOUT_TYPE_DATE_TV
         }
 
-        if (fieldPosition>1) {
-            if (mAction==OBJECT_EDIT) {
+        if (fieldPosition > 1) {
+            if (mAction == OBJECT_EDIT) {
                 return LAYOUT_TYPE_NEW_FIELD_EDIT
             }
-            if (mAction== OBJECT_VIEW) {
+            if (mAction == OBJECT_VIEW) {
                 return LAYOUT_TYPE_NEW_FIELD_READ
             }
 
@@ -225,12 +186,12 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
             fieldLayout.fieldKey5.text = fieldEntryKey
 
-            fieldLayout.fieldValueTextView5.text = fieldEntryValue!!
+            fieldLayout.fieldValueTextView5.text =
+                ExerciseResults.toReadableFormat(fieldEntryValue!!, fieldEntryKey!!)
         }
 
         if (layoutType == LAYOUT_TYPE_NEW_FIELD_EDIT) {
             fieldLayout = layoutInflater.inflate(R.layout.inflate_spinner_units_selector, null)
-            //todo customize the layout to my needs
             ArrayAdapter.createFromResource(
                 this,
                 R.array.units_array,
@@ -239,12 +200,16 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
                 vAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 fieldLayout.units_spinner.adapter = vAdapter
             }
-            unitSelectorView = fieldLayout
 
             var maSpinner = fieldLayout.units_spinner
-            maSpinner.onItemSelectedListener = this
-            if (fieldEntryKey!=null) {
-                maSpinner.setSelection(ExerciseResults.getFieldTypePosition(fieldEntryKey,this))
+            var myWeirdSpinner = MySpinnerConfigurator(maSpinner, fieldLayout)
+
+            //if its editing an existing, the key and value wont be null
+            if (fieldEntryKey != null) {
+                myWeirdSpinner.loadValues(
+                    fieldEntryKey,
+                    fieldEntryValue!!
+                )
             }
         }
 
@@ -281,6 +246,255 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
 
     }
 
+    private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
+
+        var fieldsMap = java.util.HashMap<Int, java.util.HashMap<String, String>>()
+        for (i in 0 until linearLayout.childCount) {
+
+            var layout = linearLayout.getChildAt(i) as LinearLayout
+
+            var fieldName = ""
+            var fieldValue = ""
+
+            if (i > 1) {
+                if (layout.getChildAt(0) is Spinner) {
+                    fieldName = (layout.getChildAt(0) as Spinner).selectedItem.toString()
+
+                    var nextLayout =
+                        (layout.getChildAt(1) as LinearLayout).getChildAt(0) as LinearLayout
+                    var dash = ""
+                    for (ite in 0 until (nextLayout.childCount - 1) step 2) {
+                        fieldValue += "$dash${(nextLayout.getChildAt(ite) as EditText).text.trim()}"
+                        dash = "-"
+                    }
+                    if (nextLayout.childCount == 5) {
+                        fieldValue += "$dash${(nextLayout.getChildAt(4) as TextView).text.trim()}"
+                    }
+                }
+            } else {
+                if (layout.getChildAt(0) is LinearLayout) {
+                    layout = layout.getChildAt(0) as LinearLayout
+                }
+
+                fieldName = (layout.getChildAt(0) as TextView).text.toString()
+                fieldValue = if (i == 0) {
+                    (layout.getChildAt(1) as TextView).text.trim().toString()
+                } else {
+                    (layout.getChildAt(1) as EditText).text.trim().toString()
+                }
+            }
+
+            fieldsMap[i] = hashMapOf(fieldName to fieldValue)
+        }
+        return fieldsMap
+
+    }
+
+    inner class MySpinnerConfigurator(
+        var spinner: Spinner,
+        var fieldLayout: View
+    ) :
+        AdapterView.OnItemSelectedListener {
+
+        lateinit var oneRmTextView: TextView
+        var fieldEntryValue = ""
+        var fieldEntryKey = ""
+        private var oneRmReps = 0
+        private var oneRmWeight = 0.toFloat()
+
+        init {
+            spinner.onItemSelectedListener = this
+        }
+
+        override fun onNothingSelected(parent: AdapterView<*>?) {
+        }
+
+        fun loadValues(sFieldEntryKey: String, sFieldEntryValue: String) {
+            spinner.setSelection(
+                ExerciseResults.getFieldTypePosition(
+                    sFieldEntryKey,
+                    this@ResultsCreator
+                )
+            )
+            fieldEntryValue = sFieldEntryValue
+            fieldEntryKey = sFieldEntryKey
+        }
+
+        private fun resetFieldValues() {
+            fieldEntryValue = ""
+            fieldEntryKey = ""
+        }
+
+        private fun updateOneRmValue() {
+            oneRmTextView.text =
+                String.format("%.1f", (100 * oneRmWeight) / (102.78 - 2.78 * oneRmReps))
+        }
+
+        override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
+            var linearLayout = fieldLayout.units_container
+            linearLayout.removeAllViews()
+
+            //if editing spinner key, check if the spinner value is the same before resetting the values
+            //basically, if changing to new field from an edit, reset the values inside this class
+            if (ExerciseResults.getPositionFromKey(position, applicationContext) != fieldEntryKey) {
+                resetFieldValues()
+            }
+
+            when (position) {
+                0 -> {
+                    var unitsView = layoutInflater.inflate(
+                        R.layout.inflate_units_field_secs,
+                        null
+                    )
+                    if (mAction == OBJECT_EDIT) {
+                        unitsView.unit_value_et.text = SpannableStringBuilder(
+                            ExerciseResults.toNumericFormat(
+                                fieldEntryValue,
+                                fieldEntryKey
+                            )[0].toString()
+                        )
+                    }
+                    linearLayout.addView(
+                        unitsView
+                    )
+                    return
+                }
+                1 -> {
+                    var unitsView = layoutInflater.inflate(
+                        R.layout.inflate_units_field_mins_secs,
+                        null
+                    )
+                    if (mAction == OBJECT_EDIT) {
+                        var valuesArray = ExerciseResults.toNumericFormat(
+                            fieldEntryValue,
+                            fieldEntryKey
+                        )
+
+                        unitsView.unit_value_et_mins.text = SpannableStringBuilder(
+                            valuesArray[0].toString()
+                        )
+                        unitsView.unit_value_et_secs.text = SpannableStringBuilder(
+                            valuesArray[1].toString()
+                        )
+                    }
+                    linearLayout.addView(
+                        unitsView
+                    )
+                    return
+                }
+
+                2 -> {
+                    var unitsView = layoutInflater.inflate(
+                        R.layout.inflate_units_field_km,
+                        null
+                    )
+                    if (mAction == OBJECT_EDIT) {
+                        unitsView.unit_value_et.text = SpannableStringBuilder(
+                            ExerciseResults.toNumericFormat(
+                                fieldEntryValue,
+                                fieldEntryKey
+                            )[0].toString()
+                        )
+                    }
+                    linearLayout.addView(
+                        unitsView
+                    )
+                    return
+                }
+                3 -> {
+                    var unitsView = layoutInflater.inflate(
+                        R.layout.inflate_units_field_m,
+                        null
+                    )
+                    if (mAction == OBJECT_EDIT) {
+                        unitsView.unit_value_et.text = SpannableStringBuilder(
+                            ExerciseResults.toNumericFormat(
+                                fieldEntryValue,
+                                fieldEntryKey
+                            )[0].toString()
+                        )
+                    }
+                    linearLayout.addView(
+                        unitsView
+                    )
+                    return
+                }
+                4 -> {
+                    var unitsView = layoutInflater.inflate(
+                        R.layout.inflate_units_field_kg,
+                        null
+                    )
+                    if (mAction == OBJECT_EDIT) {
+                        unitsView.unit_value_et.text = SpannableStringBuilder(
+                            ExerciseResults.toNumericFormat(
+                                fieldEntryValue,
+                                fieldEntryKey
+                            )[0].toString()
+                        )
+                    }
+                    linearLayout.addView(
+                        unitsView
+                    )
+                    return
+                }
+                5 -> {
+                    var oneRmLayout =
+                        layoutInflater.inflate(R.layout.inflate_units_field_one_rm, null)
+
+                    if (mAction == OBJECT_EDIT) {
+                        oneRmLayout.unit_value_et_reps.text = SpannableStringBuilder(
+                            ExerciseResults.toNumericFormat(
+                                fieldEntryValue,
+                                fieldEntryKey
+                            )[0].toInt().toString()
+                        )
+                        oneRmLayout.unit_value_et_kg.text = SpannableStringBuilder(
+                            ExerciseResults.toNumericFormat(
+                                fieldEntryValue,
+                                fieldEntryKey
+                            )[1].toString()
+                        )
+                        oneRmLayout.one_rm_kg.text = SpannableStringBuilder(
+                            ExerciseResults.toNumericFormat(
+                                fieldEntryValue,
+                                fieldEntryKey
+                            )[2].toString()
+                        )
+                        oneRmReps = ExerciseResults.toNumericFormat(
+                            fieldEntryValue,
+                            fieldEntryKey
+                        )[0].toInt()
+                        oneRmWeight =
+                            ExerciseResults.toNumericFormat(fieldEntryValue, fieldEntryKey)[1]
+                        oneRmTextView = oneRmLayout.one_rm_kg
+
+                        updateOneRmValue()
+                    }
+
+                    oneRmTextView = oneRmLayout.one_rm_kg
+
+
+                    oneRmLayout.unit_value_et_reps.doAfterTextChanged { text ->
+                        if (!text.isNullOrEmpty()) {
+                            oneRmReps = text.toString().toInt()
+                            updateOneRmValue()
+                        }
+                    }
+                    oneRmLayout.unit_value_et_kg.doAfterTextChanged { text ->
+                        if (!text.isNullOrEmpty()) {
+                            oneRmWeight = text.toString().toFloat()
+                            updateOneRmValue()
+                        }
+                    }
+                    linearLayout.addView(oneRmLayout)
+                    return
+                }
+
+            }
+        }
+
+    }
+
     private val addButtonListener = View.OnClickListener {
 
         var newResultFields = getFieldContents()
@@ -288,10 +502,10 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         //check if a new result field has been added
 //        var resultTypes = activeExercise!!.exerciseResults
         var defaultExerciseFieldsSize = 2
-        if (newResultFields.size>defaultExerciseFieldsSize) {
-            for (i in defaultExerciseFieldsSize until newResultFields.size ) {
+        if (newResultFields.size > defaultExerciseFieldsSize) {
+            for (i in defaultExerciseFieldsSize until newResultFields.size) {
                 var newResultKey = newResultFields[i]!!.entries.iterator().next().key
-                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)){
+                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)) {
                     activeExercise!!.exerciseResults.resultsTypes.add(newResultKey)
                 }
             }
@@ -318,10 +532,10 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         var defaultExerciseFieldsSize = 2
-        if (newResultFields.size - defaultExerciseFieldsSize>activeExercise!!.exerciseResults.resultsTypes.size) {
-            for (i in defaultExerciseFieldsSize.. newResultFields.size ) {
+        if (newResultFields.size - defaultExerciseFieldsSize > activeExercise!!.exerciseResults.resultsTypes.size) {
+            for (i in defaultExerciseFieldsSize..newResultFields.size) {
                 var newResultKey = newResultFields[i]!!.entries.iterator().next().key
-                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)){
+                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)) {
                     activeExercise!!.exerciseResults.resultsTypes.add(newResultKey)
                 }
             }
@@ -347,48 +561,36 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
         backToViewer()
     }
 
-    private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
 
-        var fieldsMap = java.util.HashMap<Int, java.util.HashMap<String, String>>()
-        for (i in 0 until linearLayout.childCount) {
+    private fun updateButtonUI(actionType: String) {
+        if (actionType == OBJECT_NEW) {
+            addFieldBtn.visibility = View.VISIBLE
+            rightButton.visibility = View.VISIBLE
+            rightButton.text = "Add"
+            rightButton.setOnClickListener(addButtonListener)
 
-            var layout = linearLayout.getChildAt(i) as LinearLayout
+            leftButton.visibility = View.INVISIBLE
 
-            var fieldName = ""
-            var fieldValue = ""
+            return
+        } else {
 
-            if (i == 2) {
-                if (layout.getChildAt(0) is Spinner) {
-                    fieldName = (layout.getChildAt(0) as Spinner).selectedItem.toString()
+            if (actionType == OBJECT_EDIT) {
+                updateAddFieldBtnVisibility()
 
-                    var nextLayout =
-                        (layout.getChildAt(1) as LinearLayout).getChildAt(0) as LinearLayout
-                    var dash = ""
-                    for (ite in 0 until (nextLayout.childCount-1) step 2) {
-                        fieldValue += "$dash${(nextLayout.getChildAt(ite) as EditText).text.trim()}"
-                        dash = "-"
-                    }
-                    if (nextLayout.childCount == 5) {
-                        fieldValue += "$dash${(nextLayout.getChildAt(4) as TextView).text.trim()}"
-                    }
-                }
-            } else {
-                if (layout.getChildAt(0) is LinearLayout) {
-                    layout = layout.getChildAt(0) as LinearLayout
-                }
+                rightButton.visibility = View.VISIBLE
+                rightButton.text = "Update"
+                rightButton.setOnClickListener(updateButtonListener)
 
-                fieldName = (layout.getChildAt(0) as TextView).text.toString()
-                fieldValue = if (i == 0) {
-                    (layout.getChildAt(1) as TextView).text.trim().toString()
-                } else {
-                    (layout.getChildAt(1) as EditText).text.trim().toString()
-                }
+                leftButton.visibility = View.VISIBLE
+                leftButton.text = "Delete"
+                leftButton.setOnClickListener(deleteButtonListener)
             }
-
-            fieldsMap[i] = hashMapOf(fieldName to fieldValue)
+            if (actionType == OBJECT_VIEW) {
+                addFieldBtn.visibility = View.GONE
+                rightButton.visibility = View.INVISIBLE
+                leftButton.visibility = View.INVISIBLE
+            }
         }
-        return fieldsMap
-
     }
 
     private fun refreshCreator() {
@@ -460,126 +662,4 @@ class ResultsCreator : AppCompatActivity(), AdapterView.OnItemSelectedListener {
     private fun updateToolbarItemVisibility(menuItem: MenuItem?, isVisible: Boolean) {
         menuItem?.isVisible = isVisible
     }
-
-    override fun onNothingSelected(parent: AdapterView<*>?) {
-        var linearLayout = unitSelectorView.units_container
-        var tv = TextView(this)
-        tv.text = "Select units"
-        linearLayout.addView(tv)
-    }
-
-    override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
-        var linearLayout = unitSelectorView.units_container
-        linearLayout.removeAllViews()
-
-        when (position) {
-            0 -> {
-                var unitsView = layoutInflater.inflate(
-                    R.layout.inflate_units_field_secs,
-                    null
-                )
-                if (mAction== OBJECT_EDIT) {
-                    unitsView.unit_value_et.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toString())
-                }
-                linearLayout.addView(
-                    unitsView
-                )
-                return
-            }
-            1 -> {
-                var unitsView = layoutInflater.inflate(
-                    R.layout.inflate_units_field_mins_secs,
-                    null
-                )
-                if (mAction== OBJECT_EDIT) {
-                    unitsView.unit_value_et_mins.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toString())
-                    unitsView.unit_value_et_secs.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[1].toString())
-                }
-                linearLayout.addView(unitsView
-                )
-                return
-            }
-
-            2 -> {
-                var unitsView = layoutInflater.inflate(
-                    R.layout.inflate_units_field_km,
-                    null
-                )
-                if (mAction== OBJECT_EDIT) {
-                    unitsView.unit_value_et.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toString())
-                }
-                linearLayout.addView(
-                    unitsView
-                )
-                return
-            }
-            3 -> {
-                var unitsView = layoutInflater.inflate(
-                    R.layout.inflate_units_field_m,
-                    null
-                )
-                if (mAction== OBJECT_EDIT) {
-                    unitsView.unit_value_et.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toString())
-                }
-                linearLayout.addView(
-                    unitsView
-                )
-                return
-            }
-            4 -> {
-                var unitsView = layoutInflater.inflate(
-                    R.layout.inflate_units_field_kg,
-                    null
-                )
-                if (mAction== OBJECT_EDIT) {
-                    unitsView.unit_value_et.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toString())
-                }
-                linearLayout.addView(
-                    unitsView
-                )
-                return
-            }
-            5 -> {
-                var oneRmLayout =
-                    layoutInflater.inflate(R.layout.inflate_units_field_one_rm, null)
-
-                if (mAction== OBJECT_EDIT) {
-                    oneRmLayout.unit_value_et_reps.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toInt().toString())
-                    oneRmLayout.unit_value_et_kg.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[1].toString())
-                    oneRmLayout.one_rm_kg.text=SpannableStringBuilder(ExerciseResults.toNumericFormat(unitsValue,unitsKey)[2].toString())
-                    oneRmReps = ExerciseResults.toNumericFormat(unitsValue,unitsKey)[0].toInt()
-                    oneRmWeight = ExerciseResults.toNumericFormat(unitsValue,unitsKey)[1]
-                    oneRmTextView = oneRmLayout.one_rm_kg
-
-                    updateOneRmValue()
-                }
-
-                oneRmTextView = oneRmLayout.one_rm_kg
-
-
-                oneRmLayout.unit_value_et_reps.doAfterTextChanged { text ->
-                    if (!text.isNullOrEmpty()) {
-                        oneRmReps = text.toString().toInt()
-                        updateOneRmValue()
-                    }
-                }
-                oneRmLayout.unit_value_et_kg.doAfterTextChanged { text ->
-                    if (!text.isNullOrEmpty()) {
-                        oneRmWeight = text.toString().toFloat()
-                        updateOneRmValue()
-                    }
-                }
-                linearLayout.addView(oneRmLayout)
-                return
-            }
-
-        }
-    }
-
-    private fun updateOneRmValue() {
-        oneRmTextView.text =
-            String.format("%.1f", (100 * oneRmWeight) / (102.78 - 2.78 * oneRmReps))
-    }
-
-
 }
