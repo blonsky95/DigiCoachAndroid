@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.viewmodels
 
 import android.app.Application
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -10,20 +11,19 @@ import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
+import com.tatoe.mydigicoach.network.MyCustomStoreExercise
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class LibraryViewModel(var application: Application, var db: FirebaseFirestore) : ViewModel() {
-
-    private var auth: FirebaseAuth = FirebaseAuth.getInstance()
 
     val isDoingBackgroundTask = MutableLiveData<Boolean>(true)
     val isInsertingExercises = MutableLiveData<Boolean>(false)
 
     private val repository: AppRepository
     val categoriesList = MutableLiveData<ArrayList<String>>(arrayListOf())
-    val exercisesPairsList = MutableLiveData<ArrayList<Pair<String, Exercise>>>(arrayListOf())
-
+    val storeExercisesList = MutableLiveData<ArrayList<MyCustomStoreExercise>>(arrayListOf())
+    val myExercises: LiveData<List<Exercise>>
 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
@@ -34,17 +34,19 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
         repository =
             AppRepository(exerciseDao, blockDao, dayDao)
 
+        myExercises = repository.allExercises
+
         getLibraryExercises()
     }
 
-    private fun getLibraryExercises() {
+    fun getLibraryExercises() {
         isDoingBackgroundTask.postValue(true)
         var docRef = db.collection("store_exercises")
 
         docRef.get().addOnSuccessListener { docs ->
 
             var categoryList = arrayListOf<String>()
-            var exercisePairList = arrayListOf<Pair<String, Exercise>>()
+            var exercisePairList = arrayListOf<MyCustomStoreExercise>()
 
             for (document in docs) {
                 var exerciseCategory = document["name"] as String
@@ -54,21 +56,17 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
                 docRef2.get().addOnSuccessListener { docs2 ->
                     for (doc in docs2) {
                         exercisePairList.add(
-                            Pair(
-                                exerciseCategory,
-                                doc.toObject(MyCustomFirestoreExercise::class.java).toExercise()
-                            )
+                            MyCustomStoreExercise(doc.toObject(MyCustomFirestoreExercise::class.java).toExercise(),exerciseCategory)
                         )
                     }
                     //little cheat to only trigger observers when all categories are present
                     if (exercisePairList.size == 16) {
                         Timber.d("posting to observers ")
                         categoriesList.value = categoryList
-                        exercisesPairsList.value = exercisePairList
+                        storeExercisesList.postValue(exercisePairList)
                         isDoingBackgroundTask.postValue(false)
                     }
                 }
-
             }
 
         }.addOnFailureListener { e ->
@@ -99,10 +97,14 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
 
     }
 
-    fun importExercises(toImportExercises: java.util.ArrayList<Exercise>) = viewModelScope.launch {
+    fun importExercises(toImportStoreExercises: java.util.ArrayList<MyCustomStoreExercise>) = viewModelScope.launch {
         isInsertingExercises.postValue(true)
-
+        val toImportExercises = arrayListOf<Exercise>()
+        for (storeExe in toImportStoreExercises) {
+            toImportExercises.add(storeExe.mExercise)
+        }
         repository.insertExercises(toImportExercises.toList()).let {
+            //when operation is done post that inserting is finiished --- isinserting = false
             isInsertingExercises.postValue(false)
         }
 

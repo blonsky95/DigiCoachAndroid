@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.MyCustomStoreExercise
 import com.tatoe.mydigicoach.viewmodels.LibraryViewModel
 import com.tatoe.mydigicoach.viewmodels.MyLibraryViewModelFactory
 import kotlinx.android.synthetic.main.activity_library.*
@@ -23,14 +24,13 @@ import kotlinx.android.synthetic.main.item_holder_filter_library.view.*
 import timber.log.Timber
 
 class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
-    private lateinit var recyclerView: RecyclerView
     private lateinit var myExercisesAdapter: MyCustomExercisesAdapter
     private lateinit var libraryViewModel: LibraryViewModel
 
-    private var allExercisePairs = arrayListOf<Pair<String, Exercise>>()
-    //    private var allCategories = arrayListOf<String>()
+    private var allMyCustomStoreExercises = arrayListOf<MyCustomStoreExercise>()
+    private var allMyExercises = listOf<Exercise>()
     var filterCategories = arrayListOf<Pair<String, Boolean>>()
-    var toImportExercises = arrayListOf<Exercise>()
+    var toImportExercises = arrayListOf<MyCustomStoreExercise>()
 
     private var db = FirebaseFirestore.getInstance()
 
@@ -39,7 +39,6 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         setContentView(R.layout.activity_library)
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-//        supportActionBar?.setDisplayHomeAsUpEnabled(true)
         supportActionBar?.setDisplayShowTitleEnabled(false)
 
         libraryViewModel = ViewModelProviders.of(
@@ -60,6 +59,7 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             Timber.d("exercises to import ${toImportExercises.size}")
 
             libraryViewModel.importExercises(toImportExercises)
+            allExesLoaded=false
         }
 
         initObservers()
@@ -68,8 +68,6 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
     lateinit var mAlertDialog: AlertDialog
 
     private fun showFilterDialog() {
-
-//        var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
 
         val mDialogView =
             LayoutInflater.from(this).inflate(R.layout.dialog_window_library_filter, null)
@@ -82,12 +80,10 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         }
         mDialogView.clear_btn.setOnClickListener {
             customCategoriesAdapter.clearFilters()
-            //            customCategoriesAdapter= MyCustomCategoriesAdapter(this, allCategories)
         }
 
 
         val mBuilder = AlertDialog.Builder(this).setView(mDialogView)
-//        mBuilder.setP
         mBuilder.setCancelable(true)
         mAlertDialog = mBuilder.show()
     }
@@ -96,10 +92,10 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         Timber.d("Filter by:  and size is ${checkedCategories.size}")
         active_categories.visibility = View.GONE
 
-        var filteredExes = arrayListOf<Exercise>()
-        for (exePair in allExercisePairs) {
+        var filteredExes = arrayListOf<MyCustomStoreExercise>()
+        for (myCustomStoreExercise in allMyCustomStoreExercises) {
             if (checkedCategories.isEmpty()) {
-                filteredExes.add(exePair.second)
+                filteredExes.add(myCustomStoreExercise)
             } else {
                 var catsString = ""
                 var i = 0
@@ -109,8 +105,8 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
                     if (i < checkedCategories.size) {
                         catsString += "  -  "
                     }
-                    if (exePair.first == categ) {
-                        filteredExes.add(exePair.second)
+                    if (myCustomStoreExercise.mCategory == categ) {
+                        filteredExes.add(myCustomStoreExercise)
                         continue
                     }
                 }
@@ -139,15 +135,14 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             if (isInserting && !it) {
                 progressBar_cyclic.visibility = View.GONE
                 Toast.makeText(this, "Exercises imported", Toast.LENGTH_SHORT).show()
-                val allExercises = arrayListOf<Exercise>()
-                for (exe in allExercisePairs) {
-                    allExercises.add(exe.second)
+                val allExercises = arrayListOf<MyCustomStoreExercise>()
+                for (exe in allMyCustomStoreExercises) {
+                    allExercises.add(exe)
                 }
                 myExercisesAdapter = MyCustomExercisesAdapter(this)
                 libraryExercisesList.adapter = myExercisesAdapter
 
                 myExercisesAdapter.setContent(allExercises)
-//                myExercisesAdapter.resetCheckedExes()
             } else {
                 isInserting = true
                 progressBar_cyclic.visibility = View.VISIBLE
@@ -163,17 +158,46 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
                 showFilterDialog()
             }
         })
-        libraryViewModel.exercisesPairsList.observe(this, Observer {
-            Timber.d("got my info of exercisePairslist: ${it.size} ")
 
-            allExercisePairs = it
-            val allExercises = arrayListOf<Exercise>()
-            for (exe in allExercisePairs) {
-                allExercises.add(exe.second)
+        libraryViewModel.myExercises.observe(this, Observer {
+            Timber.d("got my info of exercises: ${it.size} ")
+            allMyExercises = it
+            allExesLoaded = true
+            if (storeExercisesLoaded) {
+                setContentToAdapter()
             }
-            myExercisesAdapter.setContent(allExercises)
+        })
+
+        libraryViewModel.storeExercisesList.observe(this, Observer {
+            Timber.d("got my info of store exercise: ${it.size} ")
+
+            allMyCustomStoreExercises = it
+            for (exe in allMyCustomStoreExercises) {
+                if (allMyExercises.contains(exe.mExercise)) {
+                    exe.isOwned = true
+                }
+            }
+
+            storeExercisesLoaded=true
+            if (allExesLoaded) {
+                setContentToAdapter()
+            } else {
+            }
+
             search_view.setOnQueryTextListener(this)
         })
+    }
+
+    var allExesLoaded = false
+    var storeExercisesLoaded = false
+
+    private fun setContentToAdapter() {
+        for (exe in allMyCustomStoreExercises) {
+            if (allMyExercises.contains(exe.mExercise)) {
+                exe.isOwned = true
+            }
+        }
+        myExercisesAdapter.setContent(allMyCustomStoreExercises)
     }
 
     override fun onQueryTextSubmit(query: String?): Boolean {
@@ -190,7 +214,6 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         context: Context
     ) :
         RecyclerView.Adapter<MyCategoryViewHolder>() {
-        //todo get rid of checked categories - build custom class with methods to check if contains ???
         private val inflater: LayoutInflater = LayoutInflater.from(context)
         var checkedCategories = buildCheckedCats()
 
@@ -246,18 +269,14 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         private val inflater: LayoutInflater = LayoutInflater.from(context)
 
-        var currentExesInAdapter: ArrayList<Exercise> = arrayListOf()
-        var initialExesInAdapter: ArrayList<Exercise> = arrayListOf()
-        var checkedExercises: ArrayList<Exercise> = arrayListOf()
+        var currentExesInAdapter: ArrayList<MyCustomStoreExercise> = arrayListOf()
+        var initialExesInAdapter: ArrayList<MyCustomStoreExercise> = arrayListOf()
+        var checkedExercises: ArrayList<MyCustomStoreExercise> = arrayListOf()
+//        var allMyExercises = arrayListOf<Exercise>()
 
-        fun setContent(exes: ArrayList<Exercise>) {
+        fun setContent(exes: ArrayList<MyCustomStoreExercise>) {
             initialExesInAdapter = exes
             currentExesInAdapter = exes
-            notifyDataSetChanged()
-        }
-
-        fun resetCheckedExes() {
-            checkedExercises = arrayListOf()
             notifyDataSetChanged()
         }
 
@@ -271,32 +290,50 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         }
 
         override fun onBindViewHolder(holderExercise: MyExerciseViewHolder, position: Int) {
-            Timber.d("Checked exercises: ${checkedExercises} is $position checked: ${holderExercise.checkBox.isChecked}")
-            var exercise = currentExesInAdapter[position]
-            holderExercise.name.text = exercise.name
-            holderExercise.descriptionText.text = exercise.description
+//            Timber.d("Checked exercises: ${checkedExercises} is $position checked: ${holderExercise.checkBox.isChecked}")
+            var myCustomStoreExercise = currentExesInAdapter[position]
+            val nameDisplay = if (myCustomStoreExercise.isOwned) {
+                "${myCustomStoreExercise.mExercise.name} (OWNED)"
+            } else {
+                myCustomStoreExercise.mExercise.name
+            }
+
+            holderExercise.name.text = nameDisplay
+            holderExercise.descriptionText.text = myCustomStoreExercise.mExercise.description
             holderExercise.name.setOnClickListener {
                 holderExercise.toggleExpand()
             }
+
+            holderExercise.checkBox.isChecked=checkedExercises.contains(myCustomStoreExercise)
+//            holderExercise.checkBox.setOnCheckedChangeListener { _, isChecked ->
+//                if (isChecked && !checkedExercises.contains(myCustomStoreExercise)) {
+//                    checkedExercises.add(myCustomStoreExercise)
+//                } else {
+//                    checkedExercises.remove(myCustomStoreExercise)
+//
+//                }
+//            }
             holderExercise.checkBox.setOnClickListener {
-                if (holderExercise.checkBox.isChecked && !checkedExercises.contains(exercise)) {
-                    checkedExercises.add(exercise)
+                if (holderExercise.checkBox.isChecked && !checkedExercises.contains(
+                        myCustomStoreExercise
+                    )
+                ) {
+                    checkedExercises.add(myCustomStoreExercise)
                 } else {
-                    checkedExercises.remove(exercise)
+                    checkedExercises.remove(myCustomStoreExercise)
                 }
             }
         }
 
         fun filter(newText: String?) {
-//            checkedExercises.clear()
-            var filteredExes = arrayListOf<Exercise>()
+            var filteredExes = arrayListOf<MyCustomStoreExercise>()
             Timber.d("Filtering text: $newText")
             if (newText != null) {
                 if (newText.isEmpty()) {
                     filteredExes = initialExesInAdapter
                 } else {
                     for (exe in initialExesInAdapter) {
-                        if (exe.name.toLowerCase().contains(newText.toLowerCase())) {
+                        if (exe.mExercise.name.toLowerCase().contains(newText.toLowerCase())) {
                             filteredExes.add(exe)
                         }
                     }
@@ -335,24 +372,5 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
 
     }
-
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.library_toolbar_menu, menu)
-//
-//        return super.onCreateOptionsMenu(menu)
-//    }
-//
-//    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-//
-//        android.R.id.home -> {
-//            onBackPressed()
-//            true
-//        }
-//
-//        else -> {
-//            super.onOptionsItemSelected(item)
-//        }
-//    }
-
 
 }
