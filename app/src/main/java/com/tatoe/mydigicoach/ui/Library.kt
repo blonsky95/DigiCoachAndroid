@@ -60,8 +60,6 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             Timber.d("exercises to import ${toImportExercises.size}")
 
             libraryViewModel.importExercises(toImportExercises)
-            //todo add something to check if succesfully imported + reset checked state
-            //start an observer, when you receive that the imported were imported unregister observer?
         }
 
         initObservers()
@@ -145,10 +143,14 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
                 for (exe in allExercisePairs) {
                     allExercises.add(exe.second)
                 }
+                myExercisesAdapter = MyCustomExercisesAdapter(this)
+                libraryExercisesList.adapter = myExercisesAdapter
+
                 myExercisesAdapter.setContent(allExercises)
+//                myExercisesAdapter.resetCheckedExes()
             } else {
-                isInserting=true
-                progressBar_cyclic.visibility=View.VISIBLE
+                isInserting = true
+                progressBar_cyclic.visibility = View.VISIBLE
             }
         })
 
@@ -254,6 +256,11 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             notifyDataSetChanged()
         }
 
+        fun resetCheckedExes() {
+            checkedExercises = arrayListOf()
+            notifyDataSetChanged()
+        }
+
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyExerciseViewHolder {
             val itemView = inflater.inflate(R.layout.item_holder_exercise_library, parent, false)
             return MyExerciseViewHolder(itemView)
@@ -264,6 +271,7 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         }
 
         override fun onBindViewHolder(holderExercise: MyExerciseViewHolder, position: Int) {
+            Timber.d("Checked exercises: ${checkedExercises} is $position checked: ${holderExercise.checkBox.isChecked}")
             var exercise = currentExesInAdapter[position]
             holderExercise.name.text = exercise.name
             holderExercise.descriptionText.text = exercise.description

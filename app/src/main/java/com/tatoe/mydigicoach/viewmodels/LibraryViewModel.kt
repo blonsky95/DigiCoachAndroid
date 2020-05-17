@@ -100,10 +100,10 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
     }
 
     fun importExercises(toImportExercises: java.util.ArrayList<Exercise>) = viewModelScope.launch {
-        isInsertingExercises.value=true
+        isInsertingExercises.postValue(true)
 
         repository.insertExercises(toImportExercises.toList()).let {
-            isInsertingExercises.value=false
+            isInsertingExercises.postValue(false)
         }
 
     }
