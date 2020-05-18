@@ -34,6 +34,9 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private var db = FirebaseFirestore.getInstance()
 
+    private var allExesLoaded = false
+    private var storeExercisesLoaded = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_library)
@@ -187,9 +190,6 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             search_view.setOnQueryTextListener(this)
         })
     }
-
-    var allExesLoaded = false
-    var storeExercisesLoaded = false
 
     private fun setContentToAdapter() {
         for (exe in allMyCustomStoreExercises) {

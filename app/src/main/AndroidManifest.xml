@@ -49,6 +49,10 @@
                 android:windowSoftInputMode="adjustPan"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
+                android:name=".ui.Profile"
+                android:windowSoftInputMode="adjustPan"
+                android:parentActivityName=".ui.HomeScreen" />
+        <activity
                 android:name=".ui.exercise.ExerciseViewer"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity

@@ -36,8 +36,6 @@ class HomeScreen : AppCompatActivity() {
 
     private lateinit var loginSignUpViewModel: LoginSignUpViewModel
     private var dayToday: Day? = null
-    private lateinit var recyclerViewExercises: RecyclerView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -111,7 +109,7 @@ class HomeScreen : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-            var classVar: Class<*> = ExerciseViewer::class.java
+            var classVar: Class<*>? = null
             when (position) {
                 0 -> {
                     holder.name.text = "Exercises"
@@ -125,10 +123,16 @@ class HomeScreen : AppCompatActivity() {
                     holder.name.text = "Store"
                     classVar = Library::class.java
                 }
-                3 -> holder.name.text = "Profile"
+                3 -> {
+                    holder.name.text = "Profile"
+                    classVar = Profile::class.java
+
+                }
             }
             holder.container.setOnClickListener {
-                context.startActivity(Intent(context, classVar))
+                if (classVar!=null){
+                    context.startActivity(Intent(context, classVar))
+                }
             }
         }
 
