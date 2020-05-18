@@ -94,8 +94,8 @@ class LoginSignUp : AppCompatActivity() {
         if (BuildConfig.DEBUG) {
             magic_btn.visibility = View.VISIBLE
             magic_btn.setOnClickListener {
-                userEditText.text = SpannableStringBuilder("pablo.trescoli@gmail.com")
-                passwordEditText.text = SpannableStringBuilder("123456")
+                userEditText.text = SpannableStringBuilder("johnnnyboy")
+                passwordEditText.text = SpannableStringBuilder("12345678")
             }
         }
     }
