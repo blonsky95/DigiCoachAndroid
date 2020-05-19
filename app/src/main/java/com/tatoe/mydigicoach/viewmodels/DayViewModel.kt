@@ -13,6 +13,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.ArrayList
 
 class DayViewModel(application: Application) :
     AndroidViewModel(application) {
@@ -65,5 +66,9 @@ class DayViewModel(application: Application) :
     fun changeActivePosition(position:Int) {
         activePosition.value=position
 //        activeDay.value= Day.positionToDayId(position)
+    }
+
+    fun sendDaysToUser(calendarDatesToShare: ArrayList<Day>, username: String) {
+        Timber.d("Size of the tpack: ${calendarDatesToShare.size}")
     }
 }

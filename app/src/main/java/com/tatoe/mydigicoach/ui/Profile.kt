@@ -35,6 +35,10 @@ class Profile : AppCompatActivity() {
             finish()
         }
 
+        backup_button.setOnClickListener{
+            //do the fragment or whatever
+        }
+
         profileViewModel = ViewModelProviders.of(
             this,
             MyProfileViewModelFactory(db)

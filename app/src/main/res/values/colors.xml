@@ -25,6 +25,7 @@
     <color name="transpGrey">#409D9D9C</color>
     <color name="darkGrey">#6B6B6B</color>
 
+    <color name="lightestGreen">#95ABEBAB</color>
     <color name="lightGreen">#99CC99</color>
     <color name="darkGreen">#669966</color>
     <color name="evenDarkerGreen">#516451</color>

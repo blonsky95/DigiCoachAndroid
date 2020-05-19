@@ -26,6 +26,22 @@ data class Day(
 
     //todo move this big chunky companion object to a utils file
 
+    fun hasExercises():Boolean{
+        return exercises.isNotEmpty()
+    }
+
+    fun allExercisesHaveResult(): Boolean {
+        if (exercises.isEmpty()) {
+            return false
+        }
+        for (exercise in exercises) {
+            if (!exercise.exerciseResults.containsResult(dayId)) {
+                return false
+            }
+        }
+        return true
+    }
+
     companion object {
         fun intDatetoDayId(day: Int, month: Int, year: Int): String {
             val format = DecimalFormat("00")
@@ -54,13 +70,27 @@ data class Day(
             return Calendar.getInstance().time
         }
 
-        fun dayToCalendarDay(day:Day):CalendarDay{
+//        fun calendarDayToDay(calD: CalendarDay): Day {
+//            var date = dayIDToDate(day.dayId)
+//            var calendar = Calendar.getInstance()
+//            calendar.time = date
+//            return CalendarDay.from(
+//                calendar.get(Calendar.YEAR),
+//                calendar.get(Calendar.MONTH) + 1,
+//                calendar.get(Calendar.DAY_OF_MONTH)
+//            )
+//        }
+
+        fun dayToCalendarDay(day: Day): CalendarDay {
             var date = dayIDToDate(day.dayId)
             var calendar = Calendar.getInstance()
-            calendar.time=date
-            return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)+1,calendar.get(Calendar.DAY_OF_MONTH))
+            calendar.time = date
+            return CalendarDay.from(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
         }
-
 
 
         fun getDayDifference(date1: Date, date2: Date): Int {
@@ -73,7 +103,7 @@ data class Day(
             return newCalendar!!.get(Calendar.YEAR) % 4 == 0
         }
 
-//        const val MAX_DAYS = 7
+        //        const val MAX_DAYS = 7
         const val DEFAULT_POS = 1
 
         fun dayIdToPosition(dayId: String): Int {
@@ -112,7 +142,7 @@ data class Day(
                 }
             }
             //day of week varies 1-7 but pager positions are 0-6 so subtract 1:
-            return mDayOfWeek -1
+            return mDayOfWeek - 1
         }
 
 
@@ -124,13 +154,13 @@ data class Day(
         var dayFragmentFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
         const val MS_IN_DAY: Long = 86400000
-        const val MONDAY=0
-        const val TUESDAY=1
-        const val WEDNESDAY=2
-        const val THURSDAY=3
-        const val FRIDAY=4
-        const val SATURDAY=5
-        const val SUNDAY=6
+        const val MONDAY = 0
+        const val TUESDAY = 1
+        const val WEDNESDAY = 2
+        const val THURSDAY = 3
+        const val FRIDAY = 4
+        const val SATURDAY = 5
+        const val SUNDAY = 6
 
 
     }
