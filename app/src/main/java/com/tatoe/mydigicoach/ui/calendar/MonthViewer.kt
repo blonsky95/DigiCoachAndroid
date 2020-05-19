@@ -165,17 +165,10 @@ class MonthViewer : AppCompatActivity() {
         Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
             object : DialogPositiveNegativeHandler {
                 override fun onPositiveButton(username: String) {
-
-                    dayViewModel.sendDaysToUser(datesToDays(calendarDatesToShare), username)
+                    dayViewModel.sendDaysToUser(calendarDatesToShare,daysWithTraining, username)
                 }
 
             })
-    }
-
-    private fun datesToDays(calendarDatesToShare: java.util.ArrayList<String>): java.util.ArrayList<Day> {
-        var days = arrayListOf<Day>()
-        return days
-        //todo do this next
     }
 
     private fun getDaysWithTraining(days: List<Day>): ArrayList<Day> {

@@ -5,6 +5,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
@@ -13,7 +14,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.ArrayList
+import kotlin.collections.ArrayList
 
 class DayViewModel(application: Application) :
     AndroidViewModel(application) {
@@ -27,6 +28,9 @@ class DayViewModel(application: Application) :
     val activeDayIdStr: MutableLiveData<String> =  MutableLiveData()
     val activePosition: MutableLiveData<Int> =  MutableLiveData()
 //    val oldActivePosition: MutableLiveData<Int> =  MutableLiveData()
+
+    private var db = FirebaseFirestore.getInstance()
+
 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
@@ -68,7 +72,25 @@ class DayViewModel(application: Application) :
 //        activeDay.value= Day.positionToDayId(position)
     }
 
-    fun sendDaysToUser(calendarDatesToShare: ArrayList<Day>, username: String) {
+    fun sendDaysToUser(
+        calendarDatesToShare: ArrayList<String>,
+        allDays: ArrayList<Day>,
+        username: String
+    ) {
+
+        //todo continue here next
+        var daysToSend = arrayListOf<Day>()
+        for (dayId in calendarDatesToShare) {
+            for (day in allDays) {
+                if (day.dayId==dayId) {
+                    daysToSend.add(day)
+                }
+            }
+        }
+
+        val docRef2 = db.collection("users").whereEqualTo("username", username)
+        //do shit
+
         Timber.d("Size of the tpack: ${calendarDatesToShare.size}")
     }
 }
