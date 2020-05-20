@@ -55,17 +55,12 @@
         <activity
                 android:name=".ui.exercise.ExerciseViewer"
                 android:parentActivityName=".ui.HomeScreen" />
-        <activity
-                android:name=".ui.block.BlockViewer"
-                android:parentActivityName=".ui.HomeScreen" />
+
         <activity
                 android:name=".ui.calendar.WeekViewer"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseCreator"
-                android:windowSoftInputMode="adjustPan" />
-        <activity
-                android:name=".ui.block.BlockCreator"
                 android:windowSoftInputMode="adjustPan" />
         <activity
                 android:name=".ui.calendar.DayCreator"

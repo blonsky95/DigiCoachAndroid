@@ -148,10 +148,10 @@ class ExerciseViewModel(application: Application) :
         return myCustomFirestoreExercise.toExercise()
     }
 
-    fun insertBlock(block: Block) = viewModelScope.launch {
-        Timber.d("ptg - data view model - insert block called")
-        repository.insertBlock(block)
-    }
+//    fun insertBlock(block: Block) = viewModelScope.launch {
+//        Timber.d("ptg - data view model - insert block called")
+//        repository.insertBlock(block)
+//    }
 
     override fun onCleared() {
         super.onCleared()

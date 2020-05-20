@@ -59,7 +59,8 @@ class DayFragment : Fragment() {
 
         val recyclerViewExercises = fragmentView.dayExercisesRecyclerView as RecyclerView
 
-        if (day == null || (day!!.blocks.isEmpty() && day!!.exercises.isEmpty())) {
+//        day!!.blocks.isEmpty() &&
+        if (day == null || ( day!!.exercises.isEmpty())) {
             fragmentView.ifEmptyDaytext.visibility = View.VISIBLE
             recyclerViewExercises.visibility = View.GONE
         } else {

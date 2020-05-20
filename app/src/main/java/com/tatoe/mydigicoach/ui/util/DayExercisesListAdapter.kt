@@ -145,7 +145,7 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
 
     internal fun setContent(day: Day?) {
         if (day != null) {
-            this.blocks = day.blocks
+//            this.blocks = day.blocks
             this.exercises = day.exercises
             this.sDay = day
             notifyDataSetChanged()

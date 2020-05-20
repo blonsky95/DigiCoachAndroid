@@ -92,26 +92,26 @@ class DataViewModel(application: Application) : AndroidViewModel(application) {
 //        repository.insertExercises(exercises)
 //    }
 
-    fun insertBlock(block: Block) = viewModelScope.launch{
-        Timber.d("ptg - data view model - insert block called")
-        repository.insertBlock(block)
-    }
-
-    fun updateBlock(block: Block) = viewModelScope.launch {
-        Timber.d("ptg - data view model - update block called")
-        repository.updateBlock(block)
-    }
-
-    //todo if I use foreign keys, so when exercise deleted, dissapears from everywhere(?)
-    fun deleteBlock(block: Block, deleteExercises:Boolean = false) = viewModelScope.launch {
-        Timber.d("ptg - data view model - delete block called")
-        if (deleteExercises) {
-            for (exercise in block.components) {
-                deleteExercise(exercise)
-            }
-        }
-        repository.deleteBlock(block)
-    }
+//    fun insertBlock(block: Block) = viewModelScope.launch{
+//        Timber.d("ptg - data view model - insert block called")
+//        repository.insertBlock(block)
+//    }
+//
+//    fun updateBlock(block: Block) = viewModelScope.launch {
+//        Timber.d("ptg - data view model - update block called")
+//        repository.updateBlock(block)
+//    }
+//
+//    //todo if I use foreign keys, so when exercise deleted, dissapears from everywhere(?)
+//    fun deleteBlock(block: Block, deleteExercises:Boolean = false) = viewModelScope.launch {
+//        Timber.d("ptg - data view model - delete block called")
+//        if (deleteExercises) {
+//            for (exercise in block.components) {
+//                deleteExercise(exercise)
+//            }
+//        }
+//        repository.deleteBlock(block)
+//    }
 
     fun getDayById(currentDayId : String) : Day? {
 //        Timber.d("ptg - data view model - getDayById called")

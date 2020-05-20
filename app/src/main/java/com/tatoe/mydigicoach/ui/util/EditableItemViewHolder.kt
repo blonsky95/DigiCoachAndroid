@@ -20,7 +20,6 @@ class EditableItemViewHolder(
     private val rightImage: ImageView = v.findViewById(R.id.imageRightExerciseHolder)
     var isChecked = false
 
-    // 2. In a BlockCreator activity, where it is temporarily added until block saved: in this usage, delete button is the listener and there is no listener in the textview
 
     //this class can have 2 usages
     // 1. In a read only mode, where clicking takes you to a exerciseCreator activity where you can delete, update...

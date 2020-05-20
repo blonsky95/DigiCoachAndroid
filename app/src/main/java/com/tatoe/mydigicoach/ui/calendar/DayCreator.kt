@@ -173,12 +173,12 @@ class DayCreator : AppCompatActivity() {
 
         if (DataHolder.activeDayHolder != null) {
             //update
-            activeDay.blocks = currentDayBlocks
+//            activeDay.blocks = currentDayBlocks
             activeDay.exercises = currentDayExercises
             dataViewModel.updateDay(activeDay)
         } else {
             //new day
-            dataViewModel.insertDay(Day(activeDayId, currentDayBlocks, currentDayExercises))
+            dataViewModel.insertDay(Day(activeDayId, currentDayExercises))
         }
         backToViewer()
     }
