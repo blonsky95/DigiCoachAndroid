@@ -1,7 +1,7 @@
 package com.tatoe.mydigicoach.network
 
-class ExercisePackage(
-    mFirestoreTransferExercise: MyCustomFirestoreTransferExercise? = null,
+class DayPackage(
+    mFirestoreTransferDay: MyCustomFirestoreTransferDay? = null,
     removeResults: Boolean = false,
     sender: String? = null,
     receiver: String? = null
@@ -13,7 +13,7 @@ class ExercisePackage(
 //    var mState: String = STATE_SENT
 //    var documentPath: String? = null
 
-    val firestoreExercise = mFirestoreTransferExercise
+    val firestoreDay = mFirestoreTransferDay
 
     override var documentPath: String? = null
     override var mState: String = STATE_SENT
@@ -26,6 +26,8 @@ class ExercisePackage(
     }
 
     override fun removeResults() {
-        firestoreExercise?.resultsArrayList = arrayListOf()
+        for (i in 0 until firestoreDay!!.mDayExercises.size) {
+            firestoreDay.mDayExercises[i].resultsArrayList= arrayListOf()
+        }
     }
 }

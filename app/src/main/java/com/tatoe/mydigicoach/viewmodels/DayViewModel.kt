@@ -1,16 +1,21 @@
 package com.tatoe.mydigicoach.viewmodels
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.DayPackage
+import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferDay
+import com.tatoe.mydigicoach.network.TransferPackage
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -25,8 +30,8 @@ class DayViewModel(application: Application) :
     val allExercises: LiveData<List<Exercise>>
     val allUserBlocks: LiveData<List<Block>>
 
-    val activeDayIdStr: MutableLiveData<String> =  MutableLiveData()
-    val activePosition: MutableLiveData<Int> =  MutableLiveData()
+    val activeDayIdStr: MutableLiveData<String> = MutableLiveData()
+    val activePosition: MutableLiveData<Int> = MutableLiveData()
 //    val oldActivePosition: MutableLiveData<Int> =  MutableLiveData()
 
     private var db = FirebaseFirestore.getInstance()
@@ -47,7 +52,7 @@ class DayViewModel(application: Application) :
 
     }
 
-    fun insertDay(day: Day) = viewModelScope.launch{
+    fun insertDay(day: Day) = viewModelScope.launch {
         Timber.d("ptg - data view model - insert day called $day")
         repository.insertDay(day)
     }
@@ -62,13 +67,13 @@ class DayViewModel(application: Application) :
         viewModelJob.cancel()
     }
 
-    fun changeActiveDay(dayId:String) {
+    fun changeActiveDay(dayId: String) {
 //        activePosition.value=Day.dayIdToPosition(dayId)
-        activeDayIdStr.value= dayId
+        activeDayIdStr.value = dayId
     }
 
-    fun changeActivePosition(position:Int) {
-        activePosition.value=position
+    fun changeActivePosition(position: Int) {
+        activePosition.value = position
 //        activeDay.value= Day.positionToDayId(position)
     }
 
@@ -78,19 +83,64 @@ class DayViewModel(application: Application) :
         username: String
     ) {
 
-        //todo continue here next
         var daysToSend = arrayListOf<Day>()
         for (dayId in calendarDatesToShare) {
             for (day in allDays) {
-                if (day.dayId==dayId) {
+                if (day.dayId == dayId) {
                     daysToSend.add(day)
                 }
             }
         }
 
-        val docRef2 = db.collection("users").whereEqualTo("username", username)
-        //do shit
+        var docUid: String
 
-        Timber.d("Size of the tpack: ${calendarDatesToShare.size}")
+        val docRef2 = db.collection("users").whereEqualTo("username", username)
+        docRef2.get().addOnSuccessListener { docs ->
+            if (docs.isEmpty) {
+                //no user with this name exists
+                Toast.makeText(
+                    getApplication(), " User doesn't exist",
+                    Toast.LENGTH_SHORT
+                ).show()
+            } else {
+                docUid = docs.documents[0].id
+
+                val docRef = db.collection("users").document(docUid).collection("day_transfers")
+                for (dayToSend in daysToSend) {
+                    docRef.get()
+                        .addOnSuccessListener {
+                            docRef.add(
+                                DayPackage(
+                                    MyCustomFirestoreTransferDay(dayToSend),
+                                    true,
+                                    FirebaseAuth.getInstance().currentUser!!.email!!,
+                                    username
+                                )
+                            )
+                            Toast.makeText(
+                                getApplication(), "Day sent",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            repository.isLoading.value = false
+
+                        }
+                        .addOnFailureListener { exception ->
+                            repository.isLoading.value = false
+                            Timber.d("get failed with: $exception ")
+                        }
+
+                }
+            }
+
+        }
+    }
+
+    fun updateTransferExercise(dayPackage: DayPackage, newState: String) {
+        dayPackage.mState = TransferPackage.STATE_SAVED
+        val docRef = db.document(dayPackage.documentPath!!)
+        docRef
+            .update("mstate", newState)
+            .addOnSuccessListener { Timber.d("DocumentSnapshot successfully updated!") }
+            .addOnFailureListener { e -> Timber.w("Error updating document: $e") }
     }
 }

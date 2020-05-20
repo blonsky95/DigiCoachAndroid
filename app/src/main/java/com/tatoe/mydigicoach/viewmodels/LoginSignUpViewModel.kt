@@ -3,22 +3,18 @@ package com.tatoe.mydigicoach.viewmodels
 import android.app.Activity
 import android.app.Application
 import android.content.Context
-import android.view.View
 import android.widget.Toast
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
+import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.HashMap
 
@@ -243,7 +239,7 @@ class LoginSignUpViewModel(var application: Application, var db: FirebaseFiresto
 
         for (exercise in olympicLiftingExes) {
             db.collection("store_exercises").document("olympic_lifting").collection("exercises").document(exercise.name)
-                .set(MyCustomFirestoreExercise(exercise))
+                .set(MyCustomFirestoreTransferExercise(exercise))
                 .addOnSuccessListener {
                     Timber.d("DocumentSnapshot successfully written!")
                 }
@@ -254,21 +250,21 @@ class LoginSignUpViewModel(var application: Application, var db: FirebaseFiresto
 
         for (exercise in longDistRuns) {
             db.collection("store_exercises").document("long_distance_running").collection("exercises").document(exercise.name)
-                .set(MyCustomFirestoreExercise(exercise))
+                .set(MyCustomFirestoreTransferExercise(exercise))
                 .addOnSuccessListener { Timber.d("DocumentSnapshot successfully written!") }
                 .addOnFailureListener { e -> Timber.d("Error writing document: $e") }
         }
 
         for (exercise in sprints) {
             db.collection("store_exercises").document("sprinting").collection("exercises").document(exercise.name)
-                .set(MyCustomFirestoreExercise(exercise))
+                .set(MyCustomFirestoreTransferExercise(exercise))
                 .addOnSuccessListener { Timber.d("DocumentSnapshot successfully written!") }
                 .addOnFailureListener { e -> Timber.d("Error writing document: $e") }
         }
 
         for (exercise in powerlifting) {
             db.collection("store_exercises").document("powerlifting").collection("exercises").document(exercise.name)
-                .set(MyCustomFirestoreExercise(exercise))
+                .set(MyCustomFirestoreTransferExercise(exercise))
                 .addOnSuccessListener { Timber.d("DocumentSnapshot successfully written!") }
                 .addOnFailureListener { e -> Timber.d("Error writing document: $e") }
         }

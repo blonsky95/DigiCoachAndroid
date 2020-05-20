@@ -4,15 +4,14 @@ import android.app.Application
 import android.widget.Toast
 import androidx.lifecycle.*
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
-import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
+import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
+import com.tatoe.mydigicoach.network.TransferPackage
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -92,7 +91,7 @@ class ExerciseViewModel(application: Application) :
                 if (documents != null && !documents.isEmpty) {
                     for (document in documents) {
                         Timber.d("DocumentSnapshot data: ${document.data}")
-                        exercises.add(document.toObject(MyCustomFirestoreExercise::class.java).toExercise())
+                        exercises.add(document.toObject(MyCustomFirestoreTransferExercise::class.java).toExercise())
                     }
                 } else {
                     Timber.d("documents is empty or null")
@@ -125,8 +124,8 @@ class ExerciseViewModel(application: Application) :
 
     }
 
-    private fun exerciseToFirestoreFormat(exercise: Exercise): MyCustomFirestoreExercise {
-        return MyCustomFirestoreExercise(exercise)
+    private fun exerciseToFirestoreFormat(exercise: Exercise): MyCustomFirestoreTransferExercise {
+        return MyCustomFirestoreTransferExercise(exercise)
     }
 
     fun insertExercise(newExercise: Exercise) = viewModelScope.launch {
@@ -144,8 +143,8 @@ class ExerciseViewModel(application: Application) :
         repository.deleteExercise(exercise)
     }
 
-    private fun firestoreFormatToExercise(myCustomFirestoreExercise: MyCustomFirestoreExercise): Exercise {
-        return myCustomFirestoreExercise.toExercise()
+    private fun firestoreFormatToExercise(myCustomFirestoreTransferExercise: MyCustomFirestoreTransferExercise): Exercise {
+        return myCustomFirestoreTransferExercise.toExercise()
     }
 
 //    fun insertBlock(block: Block) = viewModelScope.launch {
@@ -161,7 +160,7 @@ class ExerciseViewModel(application: Application) :
     fun sendExerciseToUser(exercise: Exercise?, username: String) {
         repository.isLoading.value = true
 
-        var docUid:String
+        var docUid: String
         val docRef2 = db.collection("users").whereEqualTo("username", username)
         docRef2.get().addOnSuccessListener { docs ->
             if (docs.isEmpty) {
@@ -171,17 +170,17 @@ class ExerciseViewModel(application: Application) :
                     Toast.LENGTH_SHORT
                 ).show()
             } else {
-                docUid=docs.documents[0].id
+                docUid = docs.documents[0].id
 
-                val docRef = db.collection("users").document(docUid).collection("transfers")
+                val docRef = db.collection("users").document(docUid).collection("exercise_transfers")
                 docRef.get()
                     .addOnSuccessListener { documents ->
                         docRef.add(
                             ExercisePackage(
                                 exerciseToFirestoreFormat(exercise!!),
+                                true,
                                 FirebaseAuth.getInstance().currentUser!!.email!!,
-                                username,
-                                true
+                                username
                             )
                         )
                         Toast.makeText(
@@ -202,7 +201,7 @@ class ExerciseViewModel(application: Application) :
     }
 
     fun updateTransferExercise(exercisePackage: ExercisePackage, newState: String) {
-        exercisePackage.mState = ExercisePackage.STATE_SAVED
+        exercisePackage.mState = TransferPackage.STATE_SAVED
         val docRef = db.document(exercisePackage.documentPath!!)
 //        val docRef = db.collection("users").document(exercisePackage.mReceiver!!).collection("transfers")
 //            .whereEqualTo("mstate", ExercisePackage.STATE_SENT)

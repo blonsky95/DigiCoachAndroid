@@ -2,8 +2,9 @@ package com.tatoe.mydigicoach.network
 
 import com.tatoe.mydigicoach.entity.Exercise
 
-class MyCustomFirestoreExercise(exercise: Exercise) {
+class MyCustomFirestoreTransferExercise(exercise: Exercise) {
 
+    //empty constructor needed to deserialize object and have it in Firestore
     constructor() : this(Exercise("No name", "No description"))
 
     var mName: String = exercise.name

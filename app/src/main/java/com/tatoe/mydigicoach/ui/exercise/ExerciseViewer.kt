@@ -22,6 +22,7 @@ import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.HomeScreen
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.utils.FirestoreReceiver
@@ -36,59 +37,13 @@ class ExerciseViewer : AppCompatActivity() {
     private lateinit var adapter: ExerciseListAdapter
 
     private lateinit var goToCreatorListener: ClickListenerRecyclerView
-    private lateinit var itemSelectorListener: ClickListenerRecyclerView
-    private var selectedIndexes = arrayListOf<Int>()
 
     private lateinit var allExercises: List<Exercise>
     private lateinit var receivedExercises: ArrayList<ExercisePackage>
     private lateinit var mReceiver: FirestoreReceiver
     private lateinit var mService: FirebaseListenerService
 
-//    private var db = FirebaseFirestore.getInstance()
-
-    //    override fun onRestart() {
-//        receivedExercises = DataHolder.receivedExercises
-//        super.onRestart()
-//    }
     var mBound = false
-    private val connection = object : ServiceConnection {
-
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-
-            val binder = service as FirebaseListenerService.LocalBinder
-            mService = binder.getService()
-            mBound = true
-            observe()
-
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
-    }
-
-    private fun observe() {
-        mService.receivedExercisesLiveData.observe(this, Observer { lol ->
-            receivedExercises = lol
-            updateSocialButtonListener()
-            updateSocialButtonNumber()
-        })
-    }
-
-    override fun onStart() {
-        super.onStart()
-        // Bind to LocalService
-        Intent(this, FirebaseListenerService::class.java).also { intent ->
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        unbindService(connection)
-        mBound = false
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,11 +62,9 @@ class ExerciseViewer : AppCompatActivity() {
         if (!FirebaseListenerService.isServiceRunning && firebaseUser != null) {
             startService(Intent(this, FirebaseListenerService::class.java))
         }
-//        receivedExercises = DataHolder.receivedExercises
         mReceiver = FirestoreReceiver()
 
         recyclerView = libraryExercisesList as RecyclerView
-//        exportBtn.visibility = View.GONE
         initAdapterListeners()
 
         adapter = ExerciseListAdapter(this)
@@ -186,6 +139,45 @@ class ExerciseViewer : AppCompatActivity() {
 //        }
     }
 
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+
+            val binder = service as FirebaseListenerService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+            observe()
+
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
+    private fun observe() {
+        mService.receivedExercisesLiveData.observe(this, Observer { lol ->
+            receivedExercises = lol
+            updateSocialButtonListener()
+            updateSocialButtonNumber()
+        })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Bind to LocalService
+        Intent(this, FirebaseListenerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        mBound = false
+    }
+
     private fun updateSocialButtonListener() {
         social_button.setOnClickListener {
             //            var receivedExercises = DataHolder.receivedExercises
@@ -203,7 +195,7 @@ class ExerciseViewer : AppCompatActivity() {
                         exerciseViewModel.insertExercise(exePackage.firestoreExercise.toExercise())
                         exerciseViewModel.updateTransferExercise(
                             exePackage,
-                            ExercisePackage.STATE_SAVED
+                            TransferPackage.STATE_SAVED
                         )
                         //update state in firestore to SAVED
                     }
@@ -212,7 +204,7 @@ class ExerciseViewer : AppCompatActivity() {
                         super.onNegativeButton()
                         exerciseViewModel.updateTransferExercise(
                             exePackage,
-                            ExercisePackage.STATE_REJECTED
+                            TransferPackage.STATE_REJECTED
                         )
                     }
 

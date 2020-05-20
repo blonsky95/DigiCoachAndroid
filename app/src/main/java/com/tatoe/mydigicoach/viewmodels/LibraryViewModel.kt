@@ -5,12 +5,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.network.MyCustomFirestoreExercise
+import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.network.MyCustomStoreExercise
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -56,7 +55,7 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
                 docRef2.get().addOnSuccessListener { docs2 ->
                     for (doc in docs2) {
                         exercisePairList.add(
-                            MyCustomStoreExercise(doc.toObject(MyCustomFirestoreExercise::class.java).toExercise(),exerciseCategory)
+                            MyCustomStoreExercise(doc.toObject(MyCustomFirestoreTransferExercise::class.java).toExercise(),exerciseCategory)
                         )
                     }
                     //little cheat to only trigger observers when all categories are present
@@ -89,7 +88,7 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
         for (exercise in powerlifting) {
             db.collection("store_exercises").document("powerlifting").collection("exercises")
                 .document(exercise.name)
-                .set(MyCustomFirestoreExercise(exercise))
+                .set(MyCustomFirestoreTransferExercise(exercise))
                 .addOnSuccessListener { Timber.d("DocumentSnapshot successfully written!") }
                 .addOnFailureListener { e -> Timber.d("Error writing document: $e") }
         }
