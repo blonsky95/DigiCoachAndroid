@@ -12,8 +12,11 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.network.MyCustomStoreExercise
 import com.tatoe.mydigicoach.viewmodels.LibraryViewModel
 import com.tatoe.mydigicoach.viewmodels.MyLibraryViewModelFactory
@@ -60,12 +63,56 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
         addToTrainingBtn.setOnClickListener {
             toImportExercises = myExercisesAdapter.checkedExercises
             Timber.d("exercises to import ${toImportExercises.size}")
+            attemptImportExercises()
 
-            libraryViewModel.importExercises(toImportExercises)
-            allExesLoaded=false
         }
 
         initObservers()
+    }
+
+    private fun attemptImportExercises() {
+        var toRemoveExes= arrayListOf<MyCustomStoreExercise>()
+        for (exe in toImportExercises) {
+            if (theSameExercise(exe.mExercise) != null) {
+                val title = "Overwrite"
+                val text = "You already have this exercise, do you want to overwrite it?"
+                val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                    override fun onPositiveButton(inputText: String) {
+                        super.onPositiveButton(inputText)
+                        removeExercise(theSameExercise(exe.mExercise)!!)
+                        insertExercise(exe.mExercise)
+                    }
+
+                }
+                Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
+                toRemoveExes.add(exe)
+//                toImportExercises.remove(exe)
+            }
+        }
+        for (removableEx in toRemoveExes) {
+            toImportExercises.remove(removableEx)
+        }
+        if (toImportExercises.isNotEmpty()) {
+            libraryViewModel.importExercises(toImportExercises)
+            allExesLoaded = false
+        }
+    }
+
+    private fun insertExercise(mExercise: Exercise) {
+        libraryViewModel.insertExercise(mExercise)
+    }
+
+    private fun removeExercise(theSameExercise: Exercise) {
+        libraryViewModel.removeExercise(theSameExercise)
+    }
+
+    private fun theSameExercise(exe: Exercise): Exercise? {
+        for (exercise in allMyExercises) {
+            if (exe.md5 == exercise.md5) {
+                return exercise
+            }
+        }
+        return null
     }
 
     lateinit var mAlertDialog: AlertDialog
@@ -176,12 +223,14 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
             allMyCustomStoreExercises = it
             for (exe in allMyCustomStoreExercises) {
-                if (allMyExercises.contains(exe.mExercise)) {
-                    exe.isOwned = true
+                for (myExe in allMyExercises) {
+                    if (myExe.md5==exe.mExercise.md5) {
+                        exe.isOwned = true
+                    }
                 }
             }
 
-            storeExercisesLoaded=true
+            storeExercisesLoaded = true
             if (allExesLoaded) {
                 setContentToAdapter()
             } else {
@@ -193,8 +242,10 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private fun setContentToAdapter() {
         for (exe in allMyCustomStoreExercises) {
-            if (allMyExercises.contains(exe.mExercise)) {
-                exe.isOwned = true
+            for (myExe in allMyExercises) {
+                if (myExe.md5==exe.mExercise.md5) {
+                    exe.isOwned = true
+                }
             }
         }
         myExercisesAdapter.setContent(allMyCustomStoreExercises)
@@ -304,7 +355,7 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
                 holderExercise.toggleExpand()
             }
 
-            holderExercise.checkBox.isChecked=checkedExercises.contains(myCustomStoreExercise)
+            holderExercise.checkBox.isChecked = checkedExercises.contains(myCustomStoreExercise)
 //            holderExercise.checkBox.setOnCheckedChangeListener { _, isChecked ->
 //                if (isChecked && !checkedExercises.contains(myCustomStoreExercise)) {
 //                    checkedExercises.add(myCustomStoreExercise)

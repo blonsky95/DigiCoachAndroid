@@ -21,6 +21,9 @@ data class Exercise(
 
     //ROOM and PRIMARY KEY - If you set the id to 0, Room will assume this class instance hasn't been
     //inserted into the db. So if it's 0 and you insert, it will assign a new ID (autogenerate).
+    @ColumnInfo(name = "md5")
+    @field: SerializedName("md5")
+    var md5:String=""
 
     @ColumnInfo(name = "result")
     @field: SerializedName("result")
@@ -30,12 +33,7 @@ data class Exercise(
     @ColumnInfo(name = "fieldsHashMap")
     @field: SerializedName("fieldsHashMap")
     var fieldsHashMap: HashMap<String, HashMap<String,String>> =
-        HashMap() //todo eventually this will get rid of saving name and description in database
-
-    //todo find a way of making the constructor, and instance data retrieval more efficient by
-    //todo finding synergy between the LinkedHashMap including name and description and having a method here
-
-    //todo think about constructor, should I always use the LinkedHashMap, and not the other one?
+        HashMap()
 
 
     //I only want name and description as constructors, so primary key id is outside

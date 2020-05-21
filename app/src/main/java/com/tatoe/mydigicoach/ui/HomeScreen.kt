@@ -22,12 +22,15 @@ import com.tatoe.mydigicoach.ui.calendar.DayCreator
 import com.tatoe.mydigicoach.ui.calendar.MonthViewer
 import com.tatoe.mydigicoach.ui.calendar.WeekViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
 import com.tatoe.mydigicoach.viewmodels.LoginSignUpViewModel
 import com.tatoe.mydigicoach.viewmodels.MyLoginSignUpViewModelFactory
 import kotlinx.android.synthetic.main.activity_home_2.*
 import kotlinx.android.synthetic.main.item_holder_home_slider.view.*
 import timber.log.Timber
+import java.lang.StringBuilder
+import java.security.MessageDigest
 
 class HomeScreen : AppCompatActivity() {
 
@@ -88,9 +91,7 @@ class HomeScreen : AppCompatActivity() {
 //        recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
 
         initObservers()
-
     }
-
 
     class CustomPagerAdapter(homeScreen: HomeScreen) :
         RecyclerView.Adapter<CustomPagerAdapter.MyViewHolder>() {

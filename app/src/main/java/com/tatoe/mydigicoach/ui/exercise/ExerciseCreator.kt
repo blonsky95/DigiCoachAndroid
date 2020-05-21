@@ -17,6 +17,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.utils.MD5Encrypter
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewModel
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.inflate_description_edittext_layout.view.*
@@ -297,7 +298,7 @@ class ExerciseCreator : AppCompatActivity() {
         var newExercise = Exercise(newExerciseFields)
 
         newExercise.setFieldsMap(newExerciseFields)
-
+        newExercise.md5=MD5Encrypter.getMD5(newExercise)
         exerciseViewModel.insertExercise(newExercise)
 //        backToViewer()
         activeExercise=newExercise //new exercise are not fetched from SQLite from creator

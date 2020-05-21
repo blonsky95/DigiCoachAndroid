@@ -181,7 +181,7 @@ class ExerciseViewer : AppCompatActivity() {
     private fun updateSocialButtonListener() {
         social_button.setOnClickListener {
             //            var receivedExercises = DataHolder.receivedExercises
-            var title = "New Exercises"
+            val title = "New Exercises"
             var text = "You have not received any new exercises"
             var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
 
@@ -192,12 +192,7 @@ class ExerciseViewer : AppCompatActivity() {
                 dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
-                        exerciseViewModel.insertExercise(exePackage.firestoreExercise.toExercise())
-                        exerciseViewModel.updateTransferExercise(
-                            exePackage,
-                            TransferPackage.STATE_SAVED
-                        )
-                        //update state in firestore to SAVED
+                        attemptImportExercise(exePackage)
                     }
 
                     override fun onNegativeButton() {
@@ -207,12 +202,66 @@ class ExerciseViewer : AppCompatActivity() {
                             TransferPackage.STATE_REJECTED
                         )
                     }
-
                 }
-
             }
             Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
         }
+    }
+    //todo think that most of this stuff should be moved to the view model
+    private fun attemptImportExercise(exePackage: ExercisePackage) {
+        val exe = exePackage.firestoreExercise!!.toExercise()
+        if (theSameExercise(exe)!=null) {
+            val title = "Overwrite"
+            val text = "You already have this exercise, do you want to overwrite it?"
+            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    removeExercise(theSameExercise(exe)!!)
+                    insertExercise(exePackage)
+                }
+
+                override fun onNegativeButton() {
+                    super.onNegativeButton()
+                    rejectExercisePackage(exePackage)
+                }
+            }
+            Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
+        } else {
+            insertExercise(exePackage)
+        }
+    }
+
+
+
+
+    private fun theSameExercise(exe: Exercise): Exercise? {
+        for (exercise in allExercises) {
+            if (exe.md5 == exercise.md5) {
+                return exercise
+            }
+        }
+        return null
+    }
+
+    private fun insertExercise(exePackage: ExercisePackage) {
+        exerciseViewModel.insertExercise(exePackage.firestoreExercise!!.toExercise())
+        exerciseViewModel.updateTransferExercise(
+            exePackage,
+            TransferPackage.STATE_SAVED
+        )
+        //update state in firestore to SAVED
+    }
+
+    private fun removeExercise(theSameExercise: Exercise) {
+        exerciseViewModel.deleteExercise(theSameExercise)
+    }
+
+    private fun rejectExercisePackage(exePackage: ExercisePackage) {
+        exerciseViewModel.updateTransferExercise(
+            exePackage,
+            TransferPackage.STATE_REJECTED
+        )
+        //update state in firestore to REJECTED
     }
 
     private fun updateSocialButtonNumber() {

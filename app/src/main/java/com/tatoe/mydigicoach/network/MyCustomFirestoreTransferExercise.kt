@@ -16,10 +16,13 @@ class MyCustomFirestoreTransferExercise(exercise: Exercise) {
 
     var resultsArrayList: ArrayList<HashMap<String, HashMap<String, String>>> =exercise.exerciseResults.resultsArrayList
 
+    var sMD5:String = exercise.md5
+
     fun toExercise(): Exercise {
         var exercise = Exercise(Exercise.stringMapToIntMap(fieldsMap))
         exercise.exerciseResults.resultFieldsMap = resultsFieldsMap
         exercise.exerciseResults.resultsArrayList = resultsArrayList
+        exercise.md5=sMD5
         return exercise
     }
 
