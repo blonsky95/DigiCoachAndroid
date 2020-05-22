@@ -19,6 +19,8 @@ import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.entity.Day.Companion.dayIDToDate
+import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.DayPackage
 import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.TransferPackage
@@ -41,6 +43,8 @@ class MonthViewer : AppCompatActivity() {
     var daysWithTraining = arrayListOf<Day>()
     var calendarDaysWithTraining = arrayListOf<CalendarDay>()
     var calendarDaysWithTrainingCompleted = arrayListOf<CalendarDay>()
+
+    var allExercises= listOf<Exercise>()
 
     var calendarDatesToShare = arrayListOf<String>()
 
@@ -95,43 +99,22 @@ class MonthViewer : AppCompatActivity() {
         }
     }
 
-    private val connection = object : ServiceConnection {
+    private fun initObservers() {
+        dayViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
+            days?.let {
+                daysWithTraining = getDaysWithTraining(days)
+                daysToCalendarDays(daysWithTraining)
+                updateDaysWithTrainingDecorator()
+                updateDaysWithTrainingWithResultsDecorator()
+                //put it here so it doesnt get overlayered by the other decorators
+                updateCurrentDayDecorator()
 
-        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-            // We've bound to LocalService, cast the IBinder and get LocalService instance
-
-            val binder = service as FirebaseListenerService.LocalBinder
-            mService = binder.getService()
-            mBound = true
-            observe()
-
-        }
-
-        override fun onServiceDisconnected(arg0: ComponentName) {
-            mBound = false
-        }
-    }
-
-    private fun observe() {
-        mService.receivedDaysLiveData.observe(this, Observer { lol ->
-            receivedDays = lol
-            updateSocialButtonListener()
-            updateSocialButtonNumber()
+            }
         })
-    }
 
-    override fun onStart() {
-        super.onStart()
-        // Bind to LocalService
-        Intent(this, FirebaseListenerService::class.java).also { intent ->
-            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-        }
-    }
-
-    override fun onStop() {
-        super.onStop()
-        unbindService(connection)
-        mBound = false
+        dayViewModel.allExercises.observe(this, Observer { exes ->
+            allExercises=exes
+        })
     }
 
     private fun updateSocialButtonListener() {
@@ -144,21 +127,21 @@ class MonthViewer : AppCompatActivity() {
             if (receivedDays.isNotEmpty()) {
                 val dayPackage = receivedDays[0]
                 text =
-                    "Import ${dayPackage.firestoreDay!!.mDayId} from your friend ${dayPackage.mSender}"
+                    "Import ${Day.toReadableFormat(dayIDToDate(dayPackage.firestoreDay!!.mDayId)!!)} from your friend ${dayPackage.mSender}?" +
+                            "\n new exercises will be imported, existing exercises will be recycled"
                 dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
-                        dayViewModel.updateDay(dayPackage.firestoreDay.toDay())
-                        dayViewModel.updateTransferExercise(
+                        getExercisesFirst(dayPackage.firestoreDay.toDay())
+                        dayViewModel.updateTransferDay(
                             dayPackage,
                             TransferPackage.STATE_SAVED
                         )
-                        //update state in firestore to SAVED
                     }
 
                     override fun onNegativeButton() {
                         super.onNegativeButton()
-                        dayViewModel.updateTransferExercise(
+                        dayViewModel.updateTransferDay(
                             dayPackage,
                             TransferPackage.STATE_REJECTED
                         )
@@ -169,6 +152,31 @@ class MonthViewer : AppCompatActivity() {
             }
             Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
         }
+    }
+
+    private fun getExercisesFirst(toImportDay: Day) {
+//        var exes = toImportDay.exercises
+        var modExes= arrayListOf<Exercise>()
+        for (exe in toImportDay.exercises) {
+            if (theSameExercise(exe)==null) {
+                dayViewModel.insertExercise(exe)
+                modExes.add(exe)
+            } else {
+                //replace it for yours
+                modExes.add(theSameExercise(exe)!!)
+            }
+        }
+        toImportDay.exercises=modExes
+        dayViewModel.updateDay(toImportDay)
+    }
+
+    private fun theSameExercise(exe: Exercise): Exercise? {
+        for (exercise in allExercises) {
+            if (exe.md5 == exercise.md5) {
+                return exercise
+            }
+        }
+        return null
     }
 
     private fun updateSocialButtonNumber() {
@@ -247,21 +255,6 @@ class MonthViewer : AppCompatActivity() {
         )
     }
 
-
-    private fun initObservers() {
-        dayViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
-            days?.let {
-                daysWithTraining = getDaysWithTraining(days)
-                daysToCalendarDays(daysWithTraining)
-                updateDaysWithTrainingDecorator()
-                updateDaysWithTrainingWithResultsDecorator()
-                //put it here so it doesnt get overlayered by the other decorators
-                updateCurrentDayDecorator()
-
-            }
-        })
-    }
-
     private val sendToUserListener = View.OnClickListener {
         Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
             object : DialogPositiveNegativeHandler {
@@ -294,6 +287,45 @@ class MonthViewer : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+
+            val binder = service as FirebaseListenerService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+            observe()
+
+        }
+
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
+        }
+    }
+
+    private fun observe() {
+        mService.receivedDaysLiveData.observe(this, Observer { lol ->
+            receivedDays = lol
+            updateSocialButtonListener()
+            updateSocialButtonNumber()
+        })
+    }
+
+    override fun onStart() {
+        super.onStart()
+        // Bind to LocalService
+        Intent(this, FirebaseListenerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        mBound = false
     }
 
     class DatesWithDecorator(var dates: ArrayList<CalendarDay>, var drawable: Drawable) :

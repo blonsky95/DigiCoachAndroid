@@ -52,14 +52,20 @@ class DayViewModel(application: Application) :
 
     }
 
+    fun insertExercise(newExercise: Exercise) = viewModelScope.launch {
+        repository.insertExercise(newExercise)
+    }
+
     fun insertDay(day: Day) = viewModelScope.launch {
-        Timber.d("ptg - data view model - insert day called $day")
         repository.insertDay(day)
     }
 
     fun updateDay(day: Day) = viewModelScope.launch {
-        Timber.d("ptg - data view model - update day called $day")
-        repository.updateDay(day)
+        if (repository.allDays.value!=null && !repository.allDays.value!!.contains(day)) {
+            insertDay(day)
+        } else {
+            repository.updateDay(day)
+        }
     }
 
     override fun onCleared() {
@@ -135,7 +141,7 @@ class DayViewModel(application: Application) :
         }
     }
 
-    fun updateTransferExercise(dayPackage: DayPackage, newState: String) {
+    fun updateTransferDay(dayPackage: DayPackage, newState: String) {
         dayPackage.mState = TransferPackage.STATE_SAVED
         val docRef = db.document(dayPackage.documentPath!!)
         docRef

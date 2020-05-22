@@ -42,6 +42,11 @@ data class Day(
     }
 
     companion object {
+
+        fun toReadableFormat(date:Date) :String {
+            val readableFormat = SimpleDateFormat("EEEE MMMM dd", Locale.getDefault())
+            return readableFormat.format(date)
+        }
         fun intDatetoDayId(day: Int, month: Int, year: Int): String {
             val format = DecimalFormat("00")
             return "${format.format(day)}${format.format(month)}$year"
