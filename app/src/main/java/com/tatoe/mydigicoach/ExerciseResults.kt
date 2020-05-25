@@ -189,6 +189,14 @@ class ExerciseResults {
             var typesArray = context.resources.getStringArray(R.array.units_array)
             return typesArray[position]
         }
+
+        //use when you want to add a one click result, so without going to results creator, it simply generates the map with a date field (parameter) and a note saying "completed"
+        fun getQuickResultMap(dayId: String): java.util.HashMap<Int, java.util.HashMap<String, String>> {
+            return  hashMapOf(
+                0 to hashMapOf("Date" to Day.dayIDtoDashSeparator(dayId)),
+                1 to hashMapOf("Note" to "Completed!")
+            )
+        }
     }
 
     fun getFieldsMap(): HashMap<Int, HashMap<String, String>> {

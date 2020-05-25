@@ -11,6 +11,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
 import kotlinx.android.synthetic.main.fragment_day_view.view.*
 
@@ -59,16 +60,12 @@ class DayFragment : Fragment() {
 
         val recyclerViewExercises = fragmentView.dayExercisesRecyclerView as RecyclerView
 
-//        day!!.blocks.isEmpty() &&
         if (day == null || ( day!!.exercises.isEmpty())) {
             fragmentView.ifEmptyDaytext.visibility = View.VISIBLE
             recyclerViewExercises.visibility = View.GONE
         } else {
             fragmentView.ifEmptyDaytext.visibility = View.GONE
             recyclerViewExercises.visibility = View.VISIBLE
-//            val dayContentAdapterBlocks =
-//                DayContentAdapter(context!!, date, CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
-//            dayContentAdapterBlocks.setContent(day)
 
             val dayContentAdapterExercises =
                 DayExercisesListAdapter(context!!, date, CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
@@ -79,5 +76,9 @@ class DayFragment : Fragment() {
 
         return fragmentView
     }
+
+//    fun updateBlankResult(exercise: Exercise) {
+//        (activity as WeekViewer).updateBlankResult(exercise)
+//    }
 
 }

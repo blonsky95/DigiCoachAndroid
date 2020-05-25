@@ -11,10 +11,10 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
+import com.tatoe.mydigicoach.ui.calendar.WeekViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import kotlinx.android.synthetic.main.inflate_results_collapsible_textview_layout.view.*
@@ -24,7 +24,6 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
     RecyclerView.Adapter<DayExerciseViewHolder>() {
 
     private val inflater: LayoutInflater = LayoutInflater.from(context)
-    private var blocks = emptyList<Block>()
     private var exercises = emptyList<Exercise>()
     private var sDay: Day? = null
 
@@ -60,26 +59,39 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
     }
 
     private fun updateExerciseLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
-
+        val showDONEButton: Boolean
         if (exercise.exerciseResults.containsResult(dayId)) {
             holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGreen))
+            showDONEButton = false
         } else {
             holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGrey))
+            showDONEButton=true
+            holder.exerciseDoneButton!!.setOnClickListener(exerciseDoneListener(exercise))
         }
+
         loadResultsLayout(holder.collapsibleLinearLayout, exercise.exerciseResults)
 
         holder.exerciseTextView!!.text = exercise.name
         holder.exerciseTextView.setOnClickListener {
-            holder.toggleExpand()
+            holder.toggleExpand(exerciseDoneBtnVisibility = showDONEButton)
         }
 
         holder.exerciseResultButton!!.setOnClickListener {
-//            Toast.makeText(context, "result pressed", Toast.LENGTH_SHORT).show()
             goToExerciseResults(exercise)
         }
 
+//        holder.exerciseDoneButton!!.setOnClickListener(exerciseDoneListener(exercise))
+
         holder.questionBtn!!.setOnClickListener {
             goToExercise(exercise)
+        }
+    }
+
+    private fun exerciseDoneListener(exercise: Exercise) = View.OnClickListener {
+        if (context is WeekViewer) {
+            var quickResultMap = ExerciseResults.getQuickResultMap(dayId)
+            exercise.exerciseResults.addResult(quickResultMap)
+            (context as WeekViewer).updateBlankResult(exercise)
         }
     }
 
@@ -100,7 +112,12 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
         collapsibleLinearLayout!!.removeAllViews()
         var resultsMap = exerciseResults.getResultFromDate(dayId)
         if (resultsMap.isEmpty()) {
-            collapsibleLinearLayout.addView(inflater.inflate(R.layout.inflate_noresults_collapsible_textview_layout, null))
+            collapsibleLinearLayout.addView(
+                inflater.inflate(
+                    R.layout.inflate_noresults_collapsible_textview_layout,
+                    null
+                )
+            )
         } else {
 
             for (i in 1 until resultsMap.size) {
@@ -114,7 +131,8 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
                 var valueString = resultsMap[i]!!.iterator().next().value
                 fieldLayout.fieldKey7.text = keyString
                 if (ExerciseResults.isANumericEntry(keyString)) {
-                    fieldLayout.fieldValueTextView8.text = ExerciseResults.toReadableFormat(valueString, keyString)
+                    fieldLayout.fieldValueTextView8.text =
+                        ExerciseResults.toReadableFormat(valueString, keyString)
                 } else {
                     fieldLayout.fieldValueTextView8.text = valueString
                 }

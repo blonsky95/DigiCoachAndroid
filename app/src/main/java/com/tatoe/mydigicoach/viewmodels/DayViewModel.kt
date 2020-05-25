@@ -56,6 +56,10 @@ class DayViewModel(application: Application) :
         repository.insertExercise(newExercise)
     }
 
+    fun updateExercise(newExercise: Exercise) = viewModelScope.launch {
+        repository.updateExercise(newExercise)
+    }
+
     fun insertDay(day: Day) = viewModelScope.launch {
         repository.insertDay(day)
     }
