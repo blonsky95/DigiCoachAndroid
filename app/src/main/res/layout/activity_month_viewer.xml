@@ -85,7 +85,7 @@
             app:mcv_dateTextAppearance="@style/CalendarWidgetNumberDays"
             app:mcv_firstDayOfWeek="monday"
             app:mcv_headerTextAppearance="@style/CalendarWidgetHeader"
-            app:mcv_selectionColor="@color/darkGreen"
+            app:mcv_selectionColor="@color/lightOrange"
             app:mcv_selectionMode="multiple"
             app:mcv_tileHeight="42dp"
             app:mcv_weekDayLabels="@array/week_days_array"
