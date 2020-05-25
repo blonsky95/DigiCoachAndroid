@@ -557,8 +557,8 @@ class ResultsCreator : AppCompatActivity() {
         activeExercise!!.exerciseResults.removeResult(resultIndex)
         resultsViewModel.updateExerciseResult(activeExercise!!)
         DataHolder.activeExerciseHolder = activeExercise
-
-        backToViewer()
+        super.onBackPressed()
+//        backToViewer()
     }
 
 
