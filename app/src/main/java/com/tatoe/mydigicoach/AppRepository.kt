@@ -18,15 +18,28 @@ class AppRepository(
     private val blockDao: BlockDao,
     private val dayDao: DayDao
 ) {
+    lateinit var allExercises: List<Exercise>
+    lateinit var allDays: List<Day>
 
-    val allExercises: LiveData<List<Exercise>> = exerciseDao.getAll()
+//    init {
+//        startSuspendFuns()
+//    }
+
+//    private fun startSuspendFuns() {
+//        allExercises=exerciseDao.getAll()
+//    }
+
+    val allExercisesLiveData: LiveData<List<Exercise>> = exerciseDao.getAllLiveData()
+//    val allExercises: List<Exercise> = exerciseDao.getAll()
 
     val allUserBlocks: LiveData<List<Block>> = blockDao.getUserMadeLive()
     val allAppBlocks: LiveData<List<Block>> = blockDao.getPremadeBlocksLive()
     val allImportBlocks: LiveData<List<Block>> = blockDao.getImportBlocksLive()
     val allExportBlocks: LiveData<List<Block>> = blockDao.getExportBlocksLive()
 
-    val allDays: LiveData<List<Day>> = dayDao.getAll()
+    val allDaysLiveData: LiveData<List<Day>> = dayDao.getAllLiveData()
+//    val allDays: List<Day> = dayDao.getAll()
+
     val dayToday: LiveData<Day> = dayDao.findByName(Day.dateToDayID(Day.getTodayDate()))
 
     var isLoading = MutableLiveData<Boolean>()
@@ -42,6 +55,14 @@ class AppRepository(
 
     fun removeDataSource(data: LiveData<ArrayList<ExercisePackage>>) {
         receivedExercisesMediator.removeSource(data)
+    }
+
+    suspend fun getAllExercises():List<Exercise> {
+        return exerciseDao.getAll()
+    }
+
+    suspend fun getAllDays():List<Day> {
+        return dayDao.getAll()
     }
 
     suspend fun insertExercise(exercise: Exercise) {
@@ -79,34 +100,8 @@ class AppRepository(
         return exerciseDao.insertAll(exercises)
     }
 
-//    private suspend fun updateBlocksContainingExercise(actionCode:Int, exercise: Exercise) {
-//        Timber.d("updating blocks containing exercise: $exercise)")
-//
-//        val blocks = blockDao.getUserMadeBlocks()
-//
-//        if (blocks.isNotEmpty()) {
-//            for (block in blocks) { //todo make here a contains function in block class, and return position
-//                for (tmpExercise in block.components) {
-//                    Timber.d("looking for ${exercise.exerciseId} and this is ${tmpExercise.exerciseId}")
-//
-//                    if (tmpExercise.exerciseId == exercise.exerciseId) {
-////                        Timber.d("MATCH FOUND bef block: $block")
-//                        if (actionCode==ACTION_UPDATE) {
-//                            block.components[block.components.indexOf(tmpExercise)] = exercise
-//                            updateBlock(block)
-//                        }
-//                        if (actionCode==ACTION_DELETE) {
-//                            block.components.removeAt(block.components.indexOf(tmpExercise))
-//                            updateBlock(block)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
     private suspend fun updateDaysContainingExercise(actionCode:Int, exercise: Exercise) {
-        val days = dayDao.getDays()
+        val days = dayDao.getAll()
 
         if (days.isNotEmpty()) {
             for (day in days) {
@@ -129,56 +124,19 @@ class AppRepository(
         }
     }
 
-//    suspend fun insertBlock(block: Block) {
-//        var rowId = blockDao.addBlock(block)
-//        Timber.d("new block, row: $rowId")
-//    }
-//
-//    suspend fun updateBlock(block: Block) {
-//        blockDao.update(block)
-//        updateDaysContainingBlocks(ACTION_UPDATE,block)
-//        Timber.d("updated currentBlock")
-//    }
-//
-//    suspend fun deleteBlock(block: Block) {
-//        blockDao.delete(block)
-//        updateDaysContainingBlocks(ACTION_DELETE,block)
-//        Timber.d("deleted: ${block.name}")
-//    }
-
-//    private suspend fun updateDaysContainingBlocks(actionCode:Int, block: Block) {
-//        val days = dayDao.getDays()
-//
-//        if (days.isNotEmpty()) {
-//            for (day in days) {
-//                for (tmpBlock in day.blocks) {
-//                    if (tmpBlock.blockId == block.blockId) {
-//
-//                        if (actionCode==ACTION_UPDATE) {
-//                            day.blocks[day.blocks.indexOf(tmpBlock)] = block
-//                            updateDay(day)
-//                        }
-//                        if (actionCode==ACTION_DELETE) {
-//                            day.blocks.removeAt(day.blocks.indexOf(tmpBlock))
-//                            updateDay(day)
-//                        }
-//                    }
-//                }
-//            }
-//        }
-//    }
-
-//    suspend fun getDayById(dayId: String): Day? {
-//        var day = dayDao.findByName(dayId)
-//        Timber.d("activeDay exists?, row: $day")
-//        return day
-//    }
-
     suspend fun insertDay(day: Day) {
         dayDao.insert(day)
     }
 
+    suspend fun insertDays(days:List<Day>) : List<Long> {
+        return dayDao.insertAll(days)
+    }
+
     suspend fun updateDay(day: Day) {
         dayDao.update(day)
+    }
+
+    suspend fun deleteDaysTable() {
+        dayDao.deleteTable()
     }
 }

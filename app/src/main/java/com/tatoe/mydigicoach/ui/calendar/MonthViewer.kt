@@ -66,7 +66,7 @@ class MonthViewer : AppCompatActivity() {
 
         setUpNormalCalendar()
 
-        initObservers()
+//        initObservers()
 
         home_button.setOnClickListener {
             startActivity(Intent(this, HomeScreen::class.java))
@@ -102,6 +102,7 @@ class MonthViewer : AppCompatActivity() {
     //reset selection in calendar, when pressing back button from week viewer to month viewer it restores
     //the calendar state with the month day selected (its decorator is displayed)
     override fun onResume() {
+        initObservers()
         calendar.clearSelection()
         super.onResume()
     }

@@ -9,7 +9,6 @@ import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.ExercisePackage
-import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.network.TransferPackage
 import kotlinx.coroutines.*
@@ -40,7 +39,7 @@ class ExerciseViewModel(application: Application) :
         repository =
             AppRepository(exerciseDao, blockDao, dayDao)
 
-        allExercises = repository.allExercises
+        allExercises = repository.allExercisesLiveData
 
         repository.isLoading.value = false
 
@@ -48,81 +47,13 @@ class ExerciseViewModel(application: Application) :
 
     }
 
-    fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
-        repository.isLoading.value = true
 
-        val docRef = db.collection("users").document(DataHolder.userDocId).collection("exercises")
-        docRef.get()
-            .addOnSuccessListener { documents ->
-                for (document in documents) {
-                    document.reference.delete()
-                }
-
-                for (exercise in listExercises) {
-//                    docRef.add(exercise.exerciseResults.resultsArrayList.toList())
-//                    var list = mutableListOf<Map<String,Pair<String,String>>>()
-//                    var theMap = exerciseToFirestoreMap(exercise)
-//                    var pair=Pair("1","POWER")
-//                    var map1 = hashMapOf("pair1" to pair)
-//                    var map2 = hashMapOf("pair2" to pair)
-//                    var arrayList = arrayListOf(map1,map2)
-//                    var map = HashMap<String,ArrayList<HashMap<String,Pair<String,String>>>>()
-//                    map["da_list"] = arrayList
-
-//                    list.add(map)
-                    docRef.add(exerciseToFirestoreFormat(exercise))
-                }
-                repository.isLoading.value = false
-
-            }
-            .addOnFailureListener { exception ->
-                repository.isLoading.value = false
-                Timber.d("get failed with: $exception ")
-            }
-    }
-
-    fun getExercisesFromFirestore() = viewModelScope.launch {
-        repository.isLoading.value = true
-        val docRef = db.collection("users").document(DataHolder.userDocId)
-            .collection("exercises")
-        var exercises = mutableListOf<Exercise>()
-        docRef.get()
-            .addOnSuccessListener { documents ->
-                if (documents != null && !documents.isEmpty) {
-                    for (document in documents) {
-                        Timber.d("DocumentSnapshot data: ${document.data}")
-                        exercises.add(document.toObject(MyCustomFirestoreTransferExercise::class.java).toExercise())
-                    }
-                } else {
-                    Timber.d("documents is empty or null")
-                }
-                modifyLocalTable(exercises)
-                repository.isLoading.value = false
-            }
-            .addOnFailureListener { exception ->
-                repository.isLoading.value = false
-                Timber.d("get failed with: $exception ")
-            }
-
-
-    }
 
     fun getIsLoading(): MutableLiveData<Boolean> {
         return repository.isLoading
     }
 
-    private fun modifyLocalTable(exercises: MutableList<Exercise>) = viewModelScope.launch {
-        //collect exercises from here
 
-        withContext(Dispatchers.Default)
-        {
-            Timber.d("About to delete exercises table")
-            repository.deleteExercisesTable()
-            Timber.d("About to insert firestore exercises")
-            repository.insertExercises(exercises)
-        }
-
-    }
 
     private fun exerciseToFirestoreFormat(exercise: Exercise): MyCustomFirestoreTransferExercise {
         return MyCustomFirestoreTransferExercise(exercise)
@@ -143,9 +74,7 @@ class ExerciseViewModel(application: Application) :
         repository.deleteExercise(exercise)
     }
 
-    private fun firestoreFormatToExercise(myCustomFirestoreTransferExercise: MyCustomFirestoreTransferExercise): Exercise {
-        return myCustomFirestoreTransferExercise.toExercise()
-    }
+
 
 //    fun insertBlock(block: Block) = viewModelScope.launch {
 //        Timber.d("ptg - data view model - insert block called")

@@ -46,8 +46,8 @@ class DayViewModel(application: Application) :
         repository =
             AppRepository(exerciseDao, blockDao, dayDao)
 
-        allDays = repository.allDays
-        allExercises = repository.allExercises
+        allDays = repository.allDaysLiveData
+        allExercises = repository.allExercisesLiveData
         allUserBlocks = repository.allUserBlocks
 
     }
@@ -65,7 +65,7 @@ class DayViewModel(application: Application) :
     }
 
     fun updateDay(day: Day) = viewModelScope.launch {
-        if (repository.allDays.value!=null && !repository.allDays.value!!.contains(day)) {
+        if (repository.allDaysLiveData.value!=null && !repository.allDaysLiveData.value!!.contains(day)) {
             insertDay(day)
         } else {
             repository.updateDay(day)

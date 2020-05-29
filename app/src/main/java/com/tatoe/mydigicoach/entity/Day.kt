@@ -153,6 +153,7 @@ data class Day(
         var dayIdFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
         var dashSeparatedDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         var presentableDateFormat = SimpleDateFormat("EEE dd MMM", Locale.getDefault())
+        var hoursMinutesDateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
         var dayOfWeekDateFormat = SimpleDateFormat("EEE", Locale.getDefault())
         var numberAndMonthDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
         var dayFragmentFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())

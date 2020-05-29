@@ -35,7 +35,7 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
         repository =
             AppRepository(exerciseDao, blockDao, dayDao)
 
-        myExercises = repository.allExercises
+        myExercises = repository.allExercisesLiveData
 
         getLibraryExercises()
     }

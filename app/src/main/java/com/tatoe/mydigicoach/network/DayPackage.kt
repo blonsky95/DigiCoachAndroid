@@ -20,7 +20,10 @@ class DayPackage(
 
     init {
         if (mSender == null) {
-            mSender = "unknown_user_ptg"
+            mSender = "no_sender"
+        }
+        if (mReceiver == null) {
+            mReceiver = "no_receiver"
         }
         this.checkIfAndRemoveResults()
     }

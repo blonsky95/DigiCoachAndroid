@@ -238,7 +238,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
                 android:gravity="center_vertical"
-                android:text="Add to diary" />
+                android:text="Save" />
 
 
     </LinearLayout>
