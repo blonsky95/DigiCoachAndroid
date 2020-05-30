@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.ui
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
@@ -65,6 +66,11 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             Timber.d("exercises to import ${toImportExercises.size}")
             attemptImportExercises()
 
+        }
+
+        home_button.setOnClickListener{
+            startActivity(Intent(this, HomeScreen::class.java))
+            finish()
         }
 
         initObservers()
