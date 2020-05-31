@@ -33,8 +33,6 @@ class ExerciseCreator : AppCompatActivity() {
 
     private lateinit var linearLayout: LinearLayout
 
-    private lateinit var newField: String
-
     private lateinit var rightButton: TextView
     private lateinit var leftButton: TextView
     private lateinit var centreButton: TextView
@@ -43,7 +41,6 @@ class ExerciseCreator : AppCompatActivity() {
 
     private var activeExercise: Exercise? = null
     private var exerciseFieldsMap = HashMap<Int, HashMap<String, String>>()
-
 
     var menuItemRead: MenuItem? = null
     var menuItemEdit: MenuItem? = null
@@ -69,7 +66,7 @@ class ExerciseCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_creator)
-        addFieldBtn.visibility=View.GONE
+        addFieldBtn.visibility = View.GONE
         title = "Exercise Creator"
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
@@ -97,12 +94,8 @@ class ExerciseCreator : AppCompatActivity() {
                     Timber.d("field map $exerciseFieldsMap")
 
                 }
-//                }
             } else {
-//                exerciseFieldsMap[0]!!["Name"] = ""
-
                 exerciseFieldsMap[0] = hashMapOf("Name" to "")
-//                exerciseFieldsMap[1]!!["Description"] = ""
                 exerciseFieldsMap[1] = hashMapOf("Description" to "")
             }
             createExerciseFieldsLayout()
@@ -285,8 +278,13 @@ class ExerciseCreator : AppCompatActivity() {
                 layout = layout.getChildAt(0) as LinearLayout
             }
 
-            var fieldName = (layout.getChildAt(0) as TextView).text.toString()
+            val fieldName = (layout.getChildAt(0) as TextView).text.toString()
             var fieldValue = (layout.getChildAt(1) as EditText).text.trim().toString()
+            if (fieldValue.isEmpty()) {
+                fieldValue =
+                    "You can edit this text"
+            }
+
             fieldsMap[i] = hashMapOf(fieldName to fieldValue)
         }
         return fieldsMap
@@ -298,11 +296,11 @@ class ExerciseCreator : AppCompatActivity() {
         var newExercise = Exercise(newExerciseFields)
 
         newExercise.setFieldsMap(newExerciseFields)
-        newExercise.md5=MD5Encrypter.getMD5(newExercise)
+        newExercise.md5 = MD5Encrypter.getMD5(newExercise)
         exerciseViewModel.insertExercise(newExercise)
 //        backToViewer()
-        activeExercise=newExercise //new exercise are not fetched from SQLite from creator
-        Toast.makeText(this,"${activeExercise?.name} has been added",Toast.LENGTH_SHORT).show()
+        activeExercise = newExercise //new exercise are not fetched from SQLite from creator
+        Toast.makeText(this, "${activeExercise?.name} has been added", Toast.LENGTH_SHORT).show()
         refreshCreator()
     }
     private val updateButtonListener = View.OnClickListener {
@@ -314,7 +312,7 @@ class ExerciseCreator : AppCompatActivity() {
         activeExercise!!.setFieldsMap(updatingExerciseFields)
 
         exerciseViewModel.updateExercise(activeExercise!!)
-        Toast.makeText(this,"${activeExercise?.name} has been updated",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "${activeExercise?.name} has been updated", Toast.LENGTH_SHORT).show()
 //        backToViewer()
         refreshCreator()
     }
@@ -330,7 +328,11 @@ class ExerciseCreator : AppCompatActivity() {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     exerciseViewModel.deleteExercise(activeExercise!!)
-                    Toast.makeText(applicationContext,"${activeExercise?.name} has been deleted",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "${activeExercise?.name} has been deleted",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     backToViewer()
                 }
             })

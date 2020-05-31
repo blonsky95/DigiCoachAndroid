@@ -28,6 +28,6 @@
             android:hint="e.g. hint"
             android:padding="8dp"
             android:background="@drawable/edittext_background"
-            android:inputType="textPersonName" />
+            android:inputType="textPersonName|textCapSentences" />
 
 </LinearLayout>
