@@ -167,7 +167,7 @@ class ResultsCreator : AppCompatActivity() {
 
         }
 
-        var layoutType: Int =
+        val layoutType: Int =
             if ((mAction == OBJECT_NEW || mAction == OBJECT_EDIT) && fieldPosition != 0) {
                 LAYOUT_TYPE_EXTRAFIELD_ET
             } else {
@@ -201,6 +201,10 @@ class ResultsCreator : AppCompatActivity() {
                 fieldLayout.units_spinner.adapter = vAdapter
             }
 
+            var deleteBtn=fieldLayout.delete_extra_field_btn
+            deleteBtn.setOnClickListener {
+                linearLayout.removeView(fieldLayout)
+            }
             var maSpinner = fieldLayout.units_spinner
             var myWeirdSpinner = MySpinnerConfigurator(maSpinner, fieldLayout)
 
@@ -532,14 +536,20 @@ class ResultsCreator : AppCompatActivity() {
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         var defaultExerciseFieldsSize = 2
-        if (newResultFields.size - defaultExerciseFieldsSize > activeExercise!!.exerciseResults.resultsTypes.size) {
-            for (i in defaultExerciseFieldsSize..newResultFields.size) {
+        var newExtraFields=newResultFields.size-defaultExerciseFieldsSize
+//        var oldExtraFields = activeExercise!!.exerciseResults.resultsTypes.size
+        activeExercise!!.exerciseResults.resultsTypes.clear()
+        if (newExtraFields > 0) {
+            for (i in defaultExerciseFieldsSize until newResultFields.size) {
                 var newResultKey = newResultFields[i]!!.entries.iterator().next().key
                 if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)) {
                     activeExercise!!.exerciseResults.resultsTypes.add(newResultKey)
                 }
             }
         }
+//        if (newExtraFields < oldExtraFields ) {
+//
+//        }
 
         activeExercise?.exerciseResults!!.updateResult(newResultFields, resultIndex)
         //this adds the result with a date to the list of results in form of hashmaps

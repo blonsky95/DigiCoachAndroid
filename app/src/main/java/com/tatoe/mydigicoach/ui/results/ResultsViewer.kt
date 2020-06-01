@@ -74,7 +74,10 @@ class ResultsViewer : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
+        activeExercise = DataHolder.activeExerciseHolder
+        sResults = activeExercise!!.exerciseResults.getArrayListOfResults()
         loadLayout()
+        loadData()
         Timber.d("RESTART GOOOOO")
     }
 
