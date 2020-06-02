@@ -18,7 +18,7 @@ interface DayDao {
     fun findByName(dayId: String): androidx.lifecycle.LiveData<Day>
 
     @Update
-    suspend fun update(exercise: Day)
+    suspend fun update(day: Day)
 
 //    @Insert
 ////    fun insertAll(vararg exercise: Day)
@@ -27,13 +27,13 @@ interface DayDao {
     suspend fun insertAll( days: List<Day>) : List<Long>
 
     @Insert
-    suspend fun insert(exercise: Day) : Long
+    suspend fun insert(day: Day) : Long
 
     @Delete
-    suspend fun delete(exercise: Day)
+    suspend fun delete(day: Day)
 
     @Update
-    fun updateTodo(vararg exercises: Day)
+    fun updateTodo(vararg days: Day)
 
 //    @Query("SELECT * FROM day_table ORDER BY dayId ASC")
 //    suspend fun getDays(): List<Day>

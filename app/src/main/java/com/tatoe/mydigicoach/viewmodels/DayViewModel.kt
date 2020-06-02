@@ -28,7 +28,6 @@ class DayViewModel(application: Application) :
     private val viewModelJob = SupervisorJob()
     val allDays: LiveData<List<Day>>
     val allExercises: LiveData<List<Exercise>>
-    val allUserBlocks: LiveData<List<Block>>
 
     val activeDayIdStr: MutableLiveData<String> = MutableLiveData()
     val activePosition: MutableLiveData<Int> = MutableLiveData()
@@ -40,15 +39,14 @@ class DayViewModel(application: Application) :
     init {
         val appDB = AppRoomDatabase.getInstance(application)
         val exerciseDao = appDB.exercisesDao()
-        val blockDao = appDB.blockDao()
+        val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()
 
         repository =
-            AppRepository(exerciseDao, blockDao, dayDao)
+            AppRepository(exerciseDao, friendDao, dayDao)
 
         allDays = repository.allDaysLiveData
         allExercises = repository.allExercisesLiveData
-        allUserBlocks = repository.allUserBlocks
 
     }
 

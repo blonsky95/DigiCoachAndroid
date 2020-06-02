@@ -37,13 +37,13 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
         val appDB = AppRoomDatabase.getInstance(application)
 //        Timber.d("Database has been created")
         val exerciseDao = appDB.exercisesDao()
-        val blockDao = appDB.blockDao()
+        val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()
 
         Timber.d("Dataviewmodel initialised")
 
         repository =
-            AppRepository(exerciseDao, blockDao, dayDao)
+            AppRepository(exerciseDao, friendDao, dayDao)
 
         repository.isLoading.value = false
 

@@ -6,36 +6,27 @@ import androidx.lifecycle.MutableLiveData
 import com.tatoe.mydigicoach.database.BlockDao
 import com.tatoe.mydigicoach.database.DayDao
 import com.tatoe.mydigicoach.database.ExerciseDao
+import com.tatoe.mydigicoach.database.FriendDao
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.ExercisePackage
 import timber.log.Timber
 
 
 class AppRepository(
     private val exerciseDao: ExerciseDao,
-    private val blockDao: BlockDao,
+    private val friendDao: FriendDao,
     private val dayDao: DayDao
 ) {
     lateinit var allExercises: List<Exercise>
     lateinit var allDays: List<Day>
 
-//    init {
-//        startSuspendFuns()
-//    }
-
-//    private fun startSuspendFuns() {
-//        allExercises=exerciseDao.getAll()
-//    }
+    val allFriends:LiveData<List<Friend>> = friendDao.getAllLiveData()
 
     val allExercisesLiveData: LiveData<List<Exercise>> = exerciseDao.getAllLiveData()
 //    val allExercises: List<Exercise> = exerciseDao.getAll()
-
-    val allUserBlocks: LiveData<List<Block>> = blockDao.getUserMadeLive()
-    val allAppBlocks: LiveData<List<Block>> = blockDao.getPremadeBlocksLive()
-    val allImportBlocks: LiveData<List<Block>> = blockDao.getImportBlocksLive()
-    val allExportBlocks: LiveData<List<Block>> = blockDao.getExportBlocksLive()
 
     val allDaysLiveData: LiveData<List<Day>> = dayDao.getAllLiveData()
 //    val allDays: List<Day> = dayDao.getAll()

@@ -31,11 +31,11 @@ class LoginSignUpViewModel(var application: Application, var db: FirebaseFiresto
     init {
         val appDB = AppRoomDatabase.getInstance(application)
         val exerciseDao = appDB.exercisesDao()
-        val blockDao = appDB.blockDao()
+        val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()
 
         repository =
-            AppRepository(exerciseDao, blockDao, dayDao)
+            AppRepository(exerciseDao, friendDao, dayDao)
 
         dayToday = repository.dayToday
         if (auth.currentUser!=null){

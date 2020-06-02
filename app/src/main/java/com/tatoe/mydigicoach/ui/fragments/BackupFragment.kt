@@ -1,4 +1,4 @@
-package com.tatoe.mydigicoach.ui
+package com.tatoe.mydigicoach.ui.fragments
 
 import android.content.Context
 import android.os.Bundle
@@ -11,16 +11,14 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.HandleCloudActionsInterface
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.viewmodels.MyProfileFragmentViewModelFactory
-import com.tatoe.mydigicoach.viewmodels.MyProfileViewModelFactory
-import com.tatoe.mydigicoach.viewmodels.ProfileFragmentViewModel
-import com.tatoe.mydigicoach.viewmodels.ProfileViewModel
+import com.tatoe.mydigicoach.viewmodels.MyBackupFragmentViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.BackupFragmentViewModel
 import kotlinx.android.synthetic.main.fragment_backup_screen.*
 
 class BackupFragment : Fragment() {
 
     private lateinit var cloudActionInterface: HandleCloudActionsInterface
-    private lateinit var profileFragmentViewModel: ProfileFragmentViewModel
+    private lateinit var backupFragmentViewModel: BackupFragmentViewModel
     private var db = FirebaseFirestore.getInstance()
 
     //So I have the profile view model here, meaning there was no need for me to implement the interface
@@ -43,11 +41,11 @@ class BackupFragment : Fragment() {
             cloudActionInterface = context
         }
 
-        profileFragmentViewModel = ViewModelProviders.of(
+        backupFragmentViewModel = ViewModelProviders.of(
             this,
-            MyProfileFragmentViewModelFactory(db, activity!!.application)
+            MyBackupFragmentViewModelFactory(db, activity!!.application)
         ).get(
-            ProfileFragmentViewModel::
+            BackupFragmentViewModel::
             class.java
         )
     }
@@ -66,7 +64,7 @@ class BackupFragment : Fragment() {
     }
 
     private fun lastBackupTimeObserve() {
-        profileFragmentViewModel.lastUploadTime.observe(this, Observer {
+        backupFragmentViewModel.lastUploadTime.observe(this, Observer {
             updateBackUpTimeText(it)
         })
     }

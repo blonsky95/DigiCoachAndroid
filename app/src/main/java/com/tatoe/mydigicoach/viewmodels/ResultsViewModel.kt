@@ -20,13 +20,13 @@ class ResultsViewModel(application: Application) :
     init {
         val appDB = AppRoomDatabase.getInstance(application)
         val exerciseDao = appDB.exercisesDao()
-        val blockDao = appDB.blockDao()
+        val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()
 
         Timber.d("Dataviewmodel initialised")
 
         repository =
-            AppRepository(exerciseDao, blockDao, dayDao)
+            AppRepository(exerciseDao, friendDao, dayDao)
 
     }
 

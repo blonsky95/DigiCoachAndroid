@@ -29,11 +29,11 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
         val exerciseDao = appDB.exercisesDao()
-        val blockDao = appDB.blockDao()
+        val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()
 
         repository =
-            AppRepository(exerciseDao, blockDao, dayDao)
+            AppRepository(exerciseDao, friendDao, dayDao)
 
         myExercises = repository.allExercisesLiveData
 

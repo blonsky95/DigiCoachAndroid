@@ -14,10 +14,11 @@ import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.HandleCloudActionsInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
+import com.tatoe.mydigicoach.ui.fragments.BackupFragment
+import com.tatoe.mydigicoach.ui.fragments.FriendsFragment
 import com.tatoe.mydigicoach.viewmodels.MyProfileViewModelFactory
 import com.tatoe.mydigicoach.viewmodels.ProfileViewModel
 import kotlinx.android.synthetic.main.activity_profile.*
-import timber.log.Timber
 
 class Profile : AppCompatActivity(), HandleCloudActionsInterface {
 
@@ -25,6 +26,7 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
     private var db = FirebaseFirestore.getInstance()
     private lateinit var fragmentManager: FragmentManager
     private lateinit var backupFragment: Fragment
+    private lateinit var friendsFragment: Fragment
     private lateinit var fragmentTransaction: FragmentTransaction
     //    private var lastTimeBackup="eee"
     private var isFragmentOpen = false
@@ -45,10 +47,14 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
 
         fragmentManager = supportFragmentManager
         backupFragment = BackupFragment()
+        friendsFragment = FriendsFragment()
 
         backup_button.setOnClickListener {
-            setUpFragment()
+            setUpFragment(backupFragment)
+        }
 
+        friends_button.setOnClickListener {
+            setUpFragment(friendsFragment)
         }
 
         profileViewModel = ViewModelProviders.of(
@@ -64,7 +70,7 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
         initObservers()
     }
 
-    private fun setUpFragment() {
+    private fun setUpFragment(fragment: Fragment) {
         if (!isFragmentOpen) {
 
             fragmentTransaction = fragmentManager.beginTransaction()
@@ -76,7 +82,7 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
                 R.anim.slide_out_up
             )
 
-            fragmentTransaction.addToBackStack("A").replace(R.id.frame_layout, backupFragment)
+            fragmentTransaction.addToBackStack("A").replace(R.id.frame_layout, fragment)
             fragmentTransaction.commit()
 
             isFragmentOpen = true
