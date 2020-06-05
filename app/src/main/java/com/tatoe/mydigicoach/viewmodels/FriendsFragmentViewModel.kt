@@ -15,6 +15,9 @@ import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.FriendPackage
 import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
@@ -27,7 +30,13 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
     var receivedRequestsLiveData = MutableLiveData<ArrayList<FriendPackage>>(arrayListOf())
 
     private val repository: AppRepository
+    private val viewModelJob = SupervisorJob()
+    private val uiScope = CoroutineScope(Dispatchers.Main + viewModelJob)
 
+    override fun onCleared() {
+        super.onCleared()
+        viewModelJob.cancel()
+    }
 
     init {
         val appDB = AppRoomDatabase.getInstance(application)
@@ -54,6 +63,13 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
                     for (request in snapshot.documents) {
                         val friendPackage = request.toObject(FriendPackage::class.java)
                         insertFriend(Friend(friendPackage!!.mReceiver!!))
+
+                        //WEIRD ALERT - so if there is no pause between bthe insert and the mstate update the insert fails?
+                        uiScope.launch {
+                            Thread.sleep(3000)
+                            request.reference.update("mstate","accepted - solved")
+                        }
+
                     }
                 }
             }
@@ -87,8 +103,14 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
         updateSendingUserFirebase(friendUsername)
     }
 
+
+
     fun insertFriend(friend: Friend) = viewModelScope.launch {
-        repository.insertFriend(friend)
+//        in case both users send a request to each other and one of them accepts first
+        if (!friends.value!!.contains(friend)) {
+            repository.insertFriend(friend)
+        }
+
     }
 
     //todo run network actions from viewmodelscope if they block ui

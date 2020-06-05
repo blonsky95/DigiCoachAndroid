@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -31,6 +32,7 @@ class FriendsFragment : Fragment() {
     private lateinit var friendsAdapter: MyCustomFriendsAdapter
     private lateinit var recyclerView:RecyclerView
     private var receivedRequestsArray = arrayListOf<FriendPackage>()
+    private var allFriends = listOf<Friend>()
 
 
     //So I have the profile view model here, meaning there was no need for me to implement the interface
@@ -75,6 +77,12 @@ class FriendsFragment : Fragment() {
             val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
+                    for (friend in allFriends) {
+                        if (friend.username==inputText) {
+                            Toast.makeText(activity, "$inputText is already a friend", Toast.LENGTH_SHORT).show()
+                            return
+                        }
+                    }
                     friendsFragmentViewModel.sendFriendRequest(inputText)
                 }
             }
@@ -85,7 +93,7 @@ class FriendsFragment : Fragment() {
 
     private fun initObservers() {
         friendsFragmentViewModel.friends.observe(this, Observer {
-
+            allFriends=it
             friendsAdapter.setContent(it)
         })
 
