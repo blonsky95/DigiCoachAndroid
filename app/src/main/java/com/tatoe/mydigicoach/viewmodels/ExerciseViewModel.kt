@@ -25,8 +25,6 @@ class ExerciseViewModel(application: Application) :
 
     private var db = FirebaseFirestore.getInstance()
 
-    var receivedExercises = MutableLiveData<ArrayList<ExercisePackage>>(arrayListOf())
-
     init {
         val appDB = AppRoomDatabase.getInstance(application)
 //        Timber.d("Database has been created")
@@ -42,9 +40,6 @@ class ExerciseViewModel(application: Application) :
         allExercises = repository.allExercisesLiveData
 
         repository.isLoading.value = false
-
-        receivedExercises = repository.receivedExercisesMediator
-
     }
 
 

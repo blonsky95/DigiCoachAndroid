@@ -72,6 +72,18 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
+    <TextView
+            android:id="@+id/friend_requests_number"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="@+id/friends_button"
+            app:layout_constraintTop_toTopOf="@+id/friends_button"
+            android:text="9+"
+            android:textColor="#FFF"
+            android:textSize="12sp"
+            android:textStyle="bold"
+            android:background="@drawable/badge_circle"/>
+
     <View
             android:id="@+id/view3"
             android:layout_width="307dp"

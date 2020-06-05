@@ -35,17 +35,11 @@ class AppRepository(
 
     var isLoading = MutableLiveData<Boolean>()
 
-    val receivedExercisesMediator = MediatorLiveData<ArrayList<ExercisePackage>>()
-
     private val ACTION_UPDATE = 1
     private val ACTION_DELETE = 2
 
-    fun addDataSource(data: LiveData<ArrayList<ExercisePackage>>) {
-        receivedExercisesMediator.addSource(data, receivedExercisesMediator::setValue)
-    }
-
-    fun removeDataSource(data: LiveData<ArrayList<ExercisePackage>>) {
-        receivedExercisesMediator.removeSource(data)
+    suspend fun insertFriend(friend:Friend) {
+        friendDao.insert(friend)
     }
 
     suspend fun getAllExercises():List<Exercise> {

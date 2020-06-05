@@ -8,15 +8,19 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
+import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Friend
-import com.tatoe.mydigicoach.ui.Library
+import com.tatoe.mydigicoach.network.FriendPackage
+import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.viewmodels.FriendsFragmentViewModel
 import com.tatoe.mydigicoach.viewmodels.MyFriendsFragmentViewModelFactory
-import kotlinx.android.synthetic.main.fragment_backup_screen.*
 import kotlinx.android.synthetic.main.fragment_friends_screen.*
+import kotlinx.android.synthetic.main.fragment_friends_screen.view.*
 import kotlinx.android.synthetic.main.item_holder_friends.view.*
 
 class FriendsFragment : Fragment() {
@@ -25,6 +29,8 @@ class FriendsFragment : Fragment() {
     private lateinit var friendsFragmentViewModel: FriendsFragmentViewModel
     private var db = FirebaseFirestore.getInstance()
     private lateinit var friendsAdapter: MyCustomFriendsAdapter
+    private lateinit var recyclerView:RecyclerView
+    private var receivedRequestsArray = arrayListOf<FriendPackage>()
 
 
     //So I have the profile view model here, meaning there was no need for me to implement the interface
@@ -55,16 +61,69 @@ class FriendsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
 //        myExercisesAdapter = Library.MyCustomExercisesAdapter(this)
-        friendsAdapter = MyCustomFriendsAdapter(activity!!.applicationContext)
-        friendsRecyclerView.adapter=friendsAdapter
+//        friendsAdapter = MyCustomFriendsAdapter(activity!!)
+//        friendsRecyclerView.adapter = friendsAdapter
+        recyclerView=view.friendsRecyclerView
+        friendsAdapter = MyCustomFriendsAdapter(activity!!)
+        recyclerView.layoutManager=LinearLayoutManager(activity)
+        recyclerView.adapter = friendsAdapter
         initObservers()
+
+        add_friend_btn.setOnClickListener {
+            val title = "New friend request"
+            val text = "Type friend username"
+            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    friendsFragmentViewModel.sendFriendRequest(inputText)
+                }
+            }
+            Utils.getDialogViewWithEditText(activity!!,title,text,"username",dialogPositiveNegativeHandler)
+        }
 
     }
 
     private fun initObservers() {
         friendsFragmentViewModel.friends.observe(this, Observer {
+
             friendsAdapter.setContent(it)
         })
+
+        friendsFragmentViewModel.receivedRequestsLiveData.observe(this, Observer {
+            receivedRequestsArray = it
+            updateAcceptButton()
+        })
+    }
+
+    private fun updateAcceptButton() {
+        if (receivedRequestsArray.isEmpty()) {
+            request_received_btn.text = "No friend requests"
+        } else {
+            request_received_btn.text = "New Friend Request!"
+
+            var currentFriendRequest = receivedRequestsArray[0]
+            var requestFriendName = currentFriendRequest.mSender
+            val title = "New friend request"
+            val text = "accept request from $requestFriendName"
+            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    friendsFragmentViewModel.insertFriend(Friend(currentFriendRequest.mSender!!)) //GOOD
+                    friendsFragmentViewModel.updateRequestStateReceiver(currentFriendRequest, TransferPackage.STATE_ACCEPTED)
+                    friendsFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_ACCEPTED)
+//                    friendsFragmentViewModel.popFriendRequest()
+                }
+
+                override fun onNegativeButton() {
+                    super.onNegativeButton()
+                    friendsFragmentViewModel.updateRequestStateReceiver(currentFriendRequest,TransferPackage.STATE_REJECTED)
+                    friendsFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_REJECTED)
+                }
+            }
+            request_received_btn.setOnClickListener {
+                Utils.getInfoDialogView(activity!!, title ,text,dialogPositiveNegativeHandler)
+            }
+        }
     }
 
 
@@ -84,11 +143,11 @@ class FriendsFragment : Fragment() {
         }
 
         override fun onBindViewHolder(holder: MyFriendViewHolder, position: Int) {
-            holder.usernameTextView.text=allFriends[position].username
+            holder.usernameTextView.text = allFriends[position].username
         }
 
-        fun setContent(friends:List<Friend>) {
-            allFriends=friends
+        fun setContent(friends: List<Friend>) {
+            allFriends = friends
             notifyDataSetChanged()
         }
 

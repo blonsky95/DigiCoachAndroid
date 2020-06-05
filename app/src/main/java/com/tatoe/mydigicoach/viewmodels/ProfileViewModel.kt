@@ -11,8 +11,10 @@ import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.network.FriendPackage
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferDay
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
+import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
@@ -25,6 +27,8 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
     val userName = MutableLiveData<String>("")
     val userEmail = MutableLiveData<String>(user.email)
     val lastUploadTime = MutableLiveData<String>("-")
+    var receivedRequestsNumber = MutableLiveData(0)
+
 
     private val repository: AppRepository
 //    val allExercises: List<Exercise>
@@ -48,6 +52,23 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
         repository.isLoading.value = false
 
         observeLastUploadValue()
+        loadFriendRequests()
+    }
+
+    private fun loadFriendRequests() {
+        val docRef = db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
+            .whereEqualTo("mstate", TransferPackage.STATE_SENT)
+        //todo check if this is triggered when something removed
+
+        docRef.addSnapshotListener { snapshot, e ->
+            if (snapshot != null) {
+                var i = 0
+                if (snapshot.documents.isNotEmpty()) {
+                    i=snapshot.documents.size
+                }
+                receivedRequestsNumber.value = i
+            }
+        }
     }
 
     private fun observeLastUploadValue() {
@@ -70,15 +91,17 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
     }
 
     private fun getUsername() {
-        val docRef = db.collection("users").whereEqualTo("email", userEmail.value)
-        docRef.get().addOnSuccessListener { docs ->
-            if (docs.isEmpty) {
-                return@addOnSuccessListener
-            } else {
-                val doc = docs.documents[0]
-                userName.postValue(doc["username"].toString())
-            }
-        }
+//        val docRef = db.collection("users").whereEqualTo("email", userEmail.value)
+//        docRef.get().addOnSuccessListener { docs ->
+//            if (docs.isEmpty) {
+//                return@addOnSuccessListener
+//            } else {
+//                val doc = docs.documents[0]
+//                userName.postValue(doc["username"].toString())
+//            }
+//        }
+
+        userName.postValue(DataHolder.userName)
     }
 
     fun uploadBackup() = viewModelScope.launch {
@@ -111,13 +134,6 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
                         repository.isLoading.value = false
                         Timber.d("Yay worked") }
                     .addOnFailureListener { Timber.d("damnnnn didnt") }
-
-//                doc.update("capital", true)
-//                    .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully updated!") }
-//                    .addOnFailureListener { e -> Log.w(TAG, "Error updating document", e) }
-//                if (doc["last_upload"] != null) {
-//                    lastUploadTime.postValue(doc["last_upload"].toString())
-//                }
             }
         }
               Timber.d("time W is ${System.currentTimeMillis()-timenow} ")

@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.ui
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -28,7 +29,6 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
     private lateinit var backupFragment: Fragment
     private lateinit var friendsFragment: Fragment
     private lateinit var fragmentTransaction: FragmentTransaction
-    //    private var lastTimeBackup="eee"
     private var isFragmentOpen = false
 
     private lateinit var dialog: Dialog
@@ -115,6 +115,19 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
                 dialog.hide()
             }
         })
+
+        profileViewModel.receivedRequestsNumber.observe(this, Observer {
+            updateFriendRequestsNum(it)
+        })
+    }
+
+    private fun updateFriendRequestsNum(numberRequests: Int) {
+        if (numberRequests>0) {
+            friend_requests_number.visibility= View.VISIBLE
+            friend_requests_number.text=numberRequests.toString()
+        } else {
+            friend_requests_number.visibility= View.GONE
+        }
     }
 
     override fun uploadToCloud() {
