@@ -1,15 +1,21 @@
 package com.tatoe.mydigicoach.ui
 
+import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.view.View
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.viewmodels.MyUserAccessViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.UserAccessViewModel
 import kotlinx.android.synthetic.main.activity_login_screen.login_button
 import kotlinx.android.synthetic.main.activity_login_screen.register_button
 
@@ -20,6 +26,9 @@ class UserAccess : AppCompatActivity() {
         const val ACCESS_LOGIN = 0
         const val ACCESS_REGISTER = 1
     }
+
+    private var db = FirebaseFirestore.getInstance()
+    private lateinit var userAccessViewModel: UserAccessViewModel
 
     private var hasPermissions = false
     private val PERMISSION_REQUEST_CODE = 123
@@ -33,7 +42,16 @@ class UserAccess : AppCompatActivity() {
 
         checkPermissions()
 
-        attemptLogIn(auth.currentUser)
+        val sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
+
+        userAccessViewModel = ViewModelProviders.of(
+            this,
+            MyUserAccessViewModelFactory(application, db, sharedPreferences)
+        ).get(
+            UserAccessViewModel::class.java
+        )
+        initObservers()
+            //todo might need to add here the waiting/loading sign or whatever
 
         register_button.setOnClickListener {
             val intent = Intent(this, LoginSignUp::class.java)
@@ -48,8 +66,14 @@ class UserAccess : AppCompatActivity() {
         }
     }
 
-    private fun attemptLogIn(user: FirebaseUser?) {
-        if (user != null) {
+    private fun initObservers() {
+        userAccessViewModel.hasAccess.observe(this, Observer {
+            attemptLogIn(it)
+        })
+    }
+
+    private fun attemptLogIn(hasAccess:Boolean) {
+        if (hasAccess) {
             if (hasPermissions) {
                 val intent = Intent(this, HomeScreen::class.java)
                 startActivity(intent)
@@ -57,6 +81,15 @@ class UserAccess : AppCompatActivity() {
             }
         }
     }
+//    private fun attemptLogIn(user: FirebaseUser?) {
+//        if (user != null) {
+//            if (hasPermissions) {
+//                val intent = Intent(this, HomeScreen::class.java)
+//                startActivity(intent)
+//                finish()
+//            }
+//        }
+//    }
 
     private fun checkPermissions() {
         //todo add more info in to why i need access to storage

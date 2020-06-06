@@ -8,7 +8,6 @@ import android.view.*
 import androidx.annotation.DimenRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.firebase.auth.FirebaseAuth
@@ -17,27 +16,22 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.entity.Day
 //import com.google.firebase.iid.FirebaseInstanceId
-import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.calendar.DayCreator
 import com.tatoe.mydigicoach.ui.calendar.MonthViewer
 import com.tatoe.mydigicoach.ui.calendar.WeekViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
-import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
-import com.tatoe.mydigicoach.viewmodels.LoginSignUpViewModel
-import com.tatoe.mydigicoach.viewmodels.MyLoginSignUpViewModelFactory
+import com.tatoe.mydigicoach.viewmodels.HomeViewModel
+import com.tatoe.mydigicoach.viewmodels.MyHomeViewModelFactory
 import kotlinx.android.synthetic.main.activity_home_2.*
 import kotlinx.android.synthetic.main.item_holder_home_slider.view.*
 import timber.log.Timber
-import java.lang.StringBuilder
-import java.security.MessageDigest
 
 class HomeScreen : AppCompatActivity() {
 
     private var firebaseUser: FirebaseUser? = null
     private var db = FirebaseFirestore.getInstance()
 
-    private lateinit var loginSignUpViewModel: LoginSignUpViewModel
+    private lateinit var homeViewModel: HomeViewModel
     private var dayToday: Day? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,17 +42,17 @@ class HomeScreen : AppCompatActivity() {
             Timber.plant(Timber.DebugTree())
         }
 
-        loginSignUpViewModel = ViewModelProviders.of(
+        homeViewModel = ViewModelProviders.of(
             this,
-            MyLoginSignUpViewModelFactory(application, db)
+            MyHomeViewModelFactory(application, db)
         ).get(
-            LoginSignUpViewModel::class.java
+            HomeViewModel::class.java
         )
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
 
         if (firebaseUser != null) {
-            loginSignUpViewModel.saveUserToDataholder()
+            homeViewModel.saveUserToDataholder()
 
         }
 
@@ -161,7 +155,7 @@ class HomeScreen : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        loginSignUpViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
+        homeViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
             dayToday = day
             var isDayEmpty =
                 dayToday == null || dayToday?.exercises!!.isEmpty()
@@ -226,6 +220,7 @@ class HomeScreen : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
         R.id.action_logout -> {
+            homeViewModel.closeDbInstance()
             FirebaseAuth.getInstance().signOut()
             val intent = Intent(this, UserAccess::class.java)
             startActivity(intent)

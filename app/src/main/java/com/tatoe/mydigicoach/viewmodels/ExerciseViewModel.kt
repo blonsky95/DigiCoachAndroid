@@ -11,6 +11,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.network.TransferPackage
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.*
 import timber.log.Timber
 
@@ -26,7 +27,7 @@ class ExerciseViewModel(application: Application) :
     private var db = FirebaseFirestore.getInstance()
 
     init {
-        val appDB = AppRoomDatabase.getInstance(application)
+        val appDB = AppRoomDatabase.getInstance(application, DataHolder.userName)
 //        Timber.d("Database has been created")
         val exerciseDao = appDB.exercisesDao()
         val friendDao = appDB.friendDao()

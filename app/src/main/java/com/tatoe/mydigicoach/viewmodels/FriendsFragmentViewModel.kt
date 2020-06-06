@@ -39,7 +39,7 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
     }
 
     init {
-        val appDB = AppRoomDatabase.getInstance(application)
+        val appDB = AppRoomDatabase.getInstance(application,DataHolder.userName)
         val exerciseDao = appDB.exercisesDao()
         val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()

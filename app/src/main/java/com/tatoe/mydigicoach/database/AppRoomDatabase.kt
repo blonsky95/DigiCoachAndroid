@@ -39,20 +39,31 @@ abstract class AppRoomDatabase : RoomDatabase() {
 //            }
 //        }
 
-        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
-            instance ?: buildDatabase(context).also { instance = it }
+        operator fun invoke(context: Context, userId:String) = instance ?: synchronized(LOCK) {
+            instance ?: buildDatabase(context, userId).also { instance = it }
         }
 
-        fun getInstance(context: Context): AppRoomDatabase =
+        fun getInstance(context: Context, userId:String): AppRoomDatabase =
             instance ?: synchronized(this) {
-                instance ?: buildDatabase(context).also { instance = it }
+                instance ?: buildDatabase(context, userId).also { instance = it }
             }
 
-        fun buildDatabase(context: Context) = Room.databaseBuilder(
+        fun buildDatabase(context: Context, userId: String) = Room.databaseBuilder(
             context,
-            AppRoomDatabase::class.java, "digital_coach.db"
+            AppRoomDatabase::class.java, "${userId}_digital_coach.db"
         ).addCallback(object : Callback() {
         }).fallbackToDestructiveMigration().build()
+
+        /**
+        *call this function to close the db instance - called when log out -
+         * so different user can access their own db - even when not closing app
+         */
+        fun destroyInstance() {
+            if (instance?.isOpen==true) {
+                instance?.close()
+            }
+            instance=null
+        }
 
     }
 

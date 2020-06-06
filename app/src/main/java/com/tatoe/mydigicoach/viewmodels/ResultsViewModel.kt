@@ -7,6 +7,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -18,7 +19,7 @@ class ResultsViewModel(application: Application) :
     private val viewModelJob = SupervisorJob()
 
     init {
-        val appDB = AppRoomDatabase.getInstance(application)
+        val appDB = AppRoomDatabase.getInstance(application, DataHolder.userName)
         val exerciseDao = appDB.exercisesDao()
         val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()

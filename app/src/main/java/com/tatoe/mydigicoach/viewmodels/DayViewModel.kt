@@ -16,6 +16,7 @@ import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.DayPackage
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferDay
 import com.tatoe.mydigicoach.network.TransferPackage
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -37,7 +38,7 @@ class DayViewModel(application: Application) :
 
 
     init {
-        val appDB = AppRoomDatabase.getInstance(application)
+        val appDB = AppRoomDatabase.getInstance(application, DataHolder.userName)
         val exerciseDao = appDB.exercisesDao()
         val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()

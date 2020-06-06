@@ -38,7 +38,7 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
     init {
         getUsername()
 
-        val appDB = AppRoomDatabase.getInstance(application)
+        val appDB = AppRoomDatabase.getInstance(application,DataHolder.userName)
 //        Timber.d("Database has been created")
         val exerciseDao = appDB.exercisesDao()
         val friendDao = appDB.friendDao()

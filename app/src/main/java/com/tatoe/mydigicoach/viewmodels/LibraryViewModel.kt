@@ -11,6 +11,7 @@ import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.network.MyCustomStoreExercise
+import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.utils.MD5Encrypter
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -27,7 +28,7 @@ class LibraryViewModel(var application: Application, var db: FirebaseFirestore) 
     val myExercises: LiveData<List<Exercise>>
 
     init {
-        val appDB = AppRoomDatabase.getInstance(application)
+        val appDB = AppRoomDatabase.getInstance(application, DataHolder.userName)
         val exerciseDao = appDB.exercisesDao()
         val friendDao = appDB.friendDao()
         val dayDao = appDB.dayDao()
