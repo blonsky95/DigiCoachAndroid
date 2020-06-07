@@ -11,7 +11,6 @@ import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.network.FriendPackage
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferDay
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.network.TransferPackage

@@ -16,7 +16,7 @@ import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Friend
-import com.tatoe.mydigicoach.network.FriendPackage
+import com.tatoe.mydigicoach.network.FriendRequestPackage
 import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.viewmodels.FriendsFragmentViewModel
 import com.tatoe.mydigicoach.viewmodels.MyFriendsFragmentViewModelFactory
@@ -31,7 +31,7 @@ class FriendsFragment : Fragment() {
     private var db = FirebaseFirestore.getInstance()
     private lateinit var friendsAdapter: MyCustomFriendsAdapter
     private lateinit var recyclerView:RecyclerView
-    private var receivedRequestsArray = arrayListOf<FriendPackage>()
+    private var receivedRequestsArray = arrayListOf<FriendRequestPackage>()
     private var allFriends = listOf<Friend>()
 
 
@@ -116,7 +116,9 @@ class FriendsFragment : Fragment() {
             val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
-                    friendsFragmentViewModel.insertFriend(Friend(currentFriendRequest.mSender!!)) //GOOD
+                    val newFriend = Friend(currentFriendRequest.mSender!!,currentFriendRequest.senderDocId!!)
+//                    newFriend.docId=currentFriendRequest.senderDocId!!
+                    friendsFragmentViewModel.insertFriend(newFriend) //GOOD
                     friendsFragmentViewModel.updateRequestStateReceiver(currentFriendRequest, TransferPackage.STATE_ACCEPTED)
                     friendsFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_ACCEPTED)
 //                    friendsFragmentViewModel.popFriendRequest()

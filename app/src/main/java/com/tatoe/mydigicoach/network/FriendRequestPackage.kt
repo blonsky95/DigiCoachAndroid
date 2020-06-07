@@ -1,6 +1,6 @@
 package com.tatoe.mydigicoach.network
 
-class FriendPackage(
+class FriendRequestPackage(
     removeResults: Boolean = false,
     sender: String? = null,
     receiver: String? = null
@@ -18,6 +18,8 @@ class FriendPackage(
     override var mState: String = STATE_SENT
 
     var senderDocId: String? = null
+    var receiverDocId: String? = null
+
 
     init {
         if (mSender == null) {

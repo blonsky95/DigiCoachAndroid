@@ -6,13 +6,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Friend
-import com.tatoe.mydigicoach.network.FriendPackage
+import com.tatoe.mydigicoach.network.FriendRequestPackage
 import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.CoroutineScope
@@ -25,9 +23,8 @@ import timber.log.Timber
 class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Application) :
     ViewModel() {
 
-    private var user: FirebaseUser = FirebaseAuth.getInstance().currentUser!!
     val friends: LiveData<List<Friend>>
-    var receivedRequestsLiveData = MutableLiveData<ArrayList<FriendPackage>>(arrayListOf())
+    var receivedRequestsLiveData = MutableLiveData<ArrayList<FriendRequestPackage>>(arrayListOf())
 
     private val repository: AppRepository
     private val viewModelJob = SupervisorJob()
@@ -61,10 +58,12 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
             if (snapshot != null) {
                 if (snapshot.documents.isNotEmpty()) {
                     for (request in snapshot.documents) {
-                        val friendPackage = request.toObject(FriendPackage::class.java)
-                        insertFriend(Friend(friendPackage!!.mReceiver!!))
+                        val friendPackage = request.toObject(FriendRequestPackage::class.java)
+                        val newFriend = Friend(friendPackage!!.mReceiver!!,friendPackage.receiverDocId!!)
+//                        newFriend.docId=friendPackage.receiverDocId!!
+                        insertFriend(newFriend)
 
-                        //WEIRD ALERT - so if there is no pause between bthe insert and the mstate update the insert fails?
+                        //WEIRD ALERT - so if there is no pause between the insert and the mstate update the insert fails?
                         uiScope.launch {
                             Thread.sleep(3000)
                             request.reference.update("mstate","accepted - solved")
@@ -83,10 +82,10 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
 
         docRefSent.addSnapshotListener { snapshot, e ->
             if (snapshot != null) {
-                val requests = arrayListOf<FriendPackage>()
+                val requests = arrayListOf<FriendRequestPackage>()
                 if (snapshot.documents.isNotEmpty()) {
                     for (request in snapshot.documents) {
-                        val friendPackage = request.toObject(FriendPackage::class.java)
+                        val friendPackage = request.toObject(FriendRequestPackage::class.java)
                         friendPackage!!.documentPath = request.reference.path
                         requests.add(friendPackage)
 
@@ -99,7 +98,7 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
 
     fun sendFriendRequest(friendUsername: String) {
         //updates the friend requests of sender and receiver
-        updateReceivingUserFirebase(friendUsername)
+        informReceivingUserFirebase(friendUsername)
         updateSendingUserFirebase(friendUsername)
     }
 
@@ -114,24 +113,29 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
     }
 
     //todo run network actions from viewmodelscope if they block ui
-
-    fun updateRequestStateSender(friendPackage: FriendPackage, newState: String) {
+    /**
+    * Updates the mstate field of the request in f_requests_out for the sender
+     */
+    fun updateRequestStateSender(friendRequestPackage: FriendRequestPackage, newState: String) {
         //tells sender its accepted (state changes to ACCEPTED) so it will trigger the accepted snapshot, and accept the friend
 
-        val docRef = db.collection("users").document(friendPackage.senderDocId!!).collection("f_requests_out")
+        val docRef = db.collection("users").document(friendRequestPackage.senderDocId!!).collection("f_requests_out")
             .whereEqualTo("mreceiver", DataHolder.userName)
         docRef.get().addOnSuccessListener { docs ->
             if (!docs.isEmpty) {
-                docs.documents[0].reference.update("mstate", newState)
+                docs.documents[0].reference.update("mstate", newState, "receiverDocId",DataHolder.userDocId)
             }
         }
     }
 
-    fun updateRequestStateReceiver(friendPackage: FriendPackage, newState: String) {
+    /**
+     * Updates the mstate field of the request in f_requests_in for the receiver
+     */
+    fun updateRequestStateReceiver(friendRequestPackage: FriendRequestPackage, newState: String) {
         //receiver requests get modified so the state of the request moves to SOLVED (aka ignored)
 //        val docRef = db.document(friendPackage.documentPath!!)
         val docRef = db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
-            .whereEqualTo("msender", friendPackage.mSender)
+            .whereEqualTo("msender", friendRequestPackage.mSender)
         docRef.get().addOnSuccessListener { docs ->
             if (!docs.isEmpty) {
                 docs.documents[0].reference.update("mstate", newState)
@@ -139,8 +143,10 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
         }
     }
 
-
-    private fun updateReceivingUserFirebase(friendUsername: String) {
+    /**
+     * Generates a request in the f_requests_in for the receiver of the request
+     */
+    private fun informReceivingUserFirebase(friendUsername: String) {
         //receiver gets a friend request with STATE SENT (default) which will trigger the SENT snapshot listener
         var docUid: String
         val docRef2 = db.collection("users").whereEqualTo("username", friendUsername)
@@ -157,10 +163,11 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
                     db.collection("users").document(docUid).collection("f_requests_in")
                 docRef.get()
                     .addOnSuccessListener { documents ->
-                        val friendPackage = FriendPackage(
+                        val friendPackage = FriendRequestPackage(
                             false, DataHolder.userName, friendUsername
                         )
                         friendPackage.senderDocId=DataHolder.userDocId
+                        friendPackage.receiverDocId=docUid
                         docRef.add(
                             friendPackage
                         )
@@ -177,11 +184,15 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
         }
     }
 
+    /**
+     * Generates a request in the f_requests_out for the sender
+     */
     private fun updateSendingUserFirebase(friendUsername: String) {
         //updates the senders firebase to sent, this will be modified by the receiver to accepted or rejected
-        val friendPackage = FriendPackage(
+        val friendPackage = FriendRequestPackage(
             false, DataHolder.userName, friendUsername
         )
+        friendPackage.senderDocId=DataHolder.userDocId
         db.collection("users").document(DataHolder.userDocId).collection("f_requests_out").add(friendPackage)
     }
 
