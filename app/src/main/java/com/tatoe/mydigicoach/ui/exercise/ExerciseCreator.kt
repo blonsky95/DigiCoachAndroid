@@ -137,9 +137,9 @@ class ExerciseCreator : AppCompatActivity() {
 
                 centreButton.visibility = View.INVISIBLE
 
-                leftButton.visibility = View.VISIBLE
-                leftButton.text = "Send"
-                leftButton.setOnClickListener(sendToUserListener)
+                leftButton.visibility = View.GONE
+//                leftButton.text = "Send"
+//                leftButton.setOnClickListener(sendToUserListener)
             }
         }
     }
@@ -373,16 +373,16 @@ class ExerciseCreator : AppCompatActivity() {
 
         startActivity(intent)
     }
-
-    private val sendToUserListener = View.OnClickListener {
-        Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
-            object : DialogPositiveNegativeHandler {
-                override fun onPositiveButton(username: String) {
-                    exerciseViewModel.sendExerciseToUser(activeExercise, username)
-                }
-
-            })
-    }
+//
+//    private val sendToUserListener = View.OnClickListener {
+//        Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
+//            object : DialogPositiveNegativeHandler {
+//                override fun onPositiveButton(username: String) {
+////                    exerciseViewModel.sendExerciseToUser(activeExercise, username)
+//                }
+//
+//            })
+//    }
 
     private fun backToViewer() {
         val intent = Intent(this, ExerciseViewer::class.java)

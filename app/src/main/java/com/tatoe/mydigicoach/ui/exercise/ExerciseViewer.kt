@@ -7,7 +7,10 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -20,18 +23,25 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerR
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.HomeScreen
+import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.utils.FirestoreReceiver
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewModel
 import com.tatoe.mydigicoach.viewmodels.MyExerciseViewModelFactory
+import kotlinx.android.synthetic.main.activity_exercise_viewer.home_button
+import kotlinx.android.synthetic.main.activity_exercise_viewer.share_button
+import kotlinx.android.synthetic.main.activity_exercise_viewer.social_button
+import kotlinx.android.synthetic.main.activity_exercise_viewer.textOne
 import java.util.ArrayList
 
 
-class ExerciseViewer : AppCompatActivity() {
+class ExerciseViewer : AppCompatActivity(),
+    ShareToFriendsFragment.OnFriendSelectedListenerInterface {
     private lateinit var exerciseViewModel: ExerciseViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
@@ -43,6 +53,11 @@ class ExerciseViewer : AppCompatActivity() {
     private lateinit var mReceiver: FirestoreReceiver
     private lateinit var mService: FirebaseListenerService
 
+    private lateinit var fragmentManager: FragmentManager
+    var allFriends = listOf<Friend>()
+    var selectedExercises = listOf<Exercise>()
+
+    lateinit var dialog:AlertDialog
     var mBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -76,6 +91,52 @@ class ExerciseViewer : AppCompatActivity() {
             ViewModelProviders.of(this, MyExerciseViewModelFactory(application))
                 .get(ExerciseViewModel::class.java)
 
+        initObservers()
+
+
+        share_button.setOnClickListener {
+            //todo make this analogous to MonthViewer and simple to read
+
+            share_button.visibility = View.GONE
+
+            addExerciseLayout.visibility = View.GONE
+
+            cancel_btn.visibility = View.VISIBLE
+
+            cancel_btn.setOnClickListener {
+                modifyUIChangename()
+            }
+
+
+            share_btn.visibility = View.VISIBLE
+            share_btn.setOnClickListener {
+                fragmentManager = supportFragmentManager
+                setUpFragment()
+            }
+
+        }
+
+        dialog = setProgressDialog(this, "Talking with cloud...")
+
+        addExerciseLayout.setOnClickListener {
+            Timber.d("Exercise Viewer --> Exercise creator")
+
+            val intent = Intent(this, ExerciseCreator::class.java)
+            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
+            startActivity(intent)
+
+        }
+    }
+
+    fun modifyUIChangename() {
+        //todo fix this shit
+        addExerciseLayout.visibility = View.VISIBLE
+        share_button.visibility = View.VISIBLE
+        cancel_btn.visibility = View.GONE
+        share_btn.visibility = View.GONE
+    }
+
+    private fun initObservers() {
         exerciseViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
                 //                Timber.d("I WANNA SEE THIS: $exercises")
@@ -92,9 +153,6 @@ class ExerciseViewer : AppCompatActivity() {
             }
         })
 
-
-        val dialog = setProgressDialog(this, "Talking with cloud...")
-
         exerciseViewModel.getIsLoading().observe(this, Observer { isLoading ->
             if (isLoading) {
                 dialog.show()
@@ -104,39 +162,39 @@ class ExerciseViewer : AppCompatActivity() {
             }
         })
 
-        addExerciseBtn.setOnClickListener {
-            Timber.d("Exercise Viewer --> Exercise creator")
+        exerciseViewModel.allFriends.observe(this, Observer {friends ->
+            allFriends=friends
+        })
+    }
 
-            val intent = Intent(this, ExerciseCreator::class.java)
-            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
-            startActivity(intent)
+    override fun onFriendSelected(friend: Friend) {
+        Toast.makeText(this, "Sending to ${friend.username}!", Toast.LENGTH_SHORT).show()
+        exerciseViewModel.sendExercisesToUser(selectedExercises, friend)
+        fragmentManager.popBackStack()
+        modifyUIChangename()
+    }
 
-        }
+    override fun onCancelSelected() {
+        fragmentManager.popBackStack()
+        modifyUIChangename()
+        //back to normal
+    }
 
-//        getButton.setOnClickListener {
-//
-//
-//            //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
-//            Utils.getInfoDialogView(this,title.toString(),"Replace for your cloud exercises?",object:
-//                DialogPositiveNegativeHandler {
-//                override fun onPositiveButton(editTextText:String) {
-//                    super.onPositiveButton(editTextText)
-//                    exerciseViewerViewModel.getExercisesFromFirestore()
-//                }
-//            })
-//        }
-//
-//        postButton.setOnClickListener {
-//            //post stuff to firestore
-//            Utils.getInfoDialogView(this,title.toString(),"Make this your cloud exercises?",object:
-//                DialogPositiveNegativeHandler {
-//
-//                override fun onPositiveButton(editTextText:String) {
-//                    super.onPositiveButton(editTextText)
-//                    exerciseViewerViewModel.postExercisesToFirestore(allExercises)
-//                }
-//            })
-//        }
+    private fun setUpFragment() {
+
+        var fragmentTransaction = fragmentManager.beginTransaction()
+
+        fragmentTransaction.setCustomAnimations(
+            R.anim.slide_in_up,
+            R.anim.slide_in_down,
+            R.anim.slide_out_down,
+            R.anim.slide_out_up
+        )
+
+        fragmentTransaction.addToBackStack("A")
+            .replace(R.id.frame_layout, ShareToFriendsFragment.newInstance(allFriends))
+        fragmentTransaction.commit()
+
     }
 
     private val connection = object : ServiceConnection {
@@ -207,10 +265,11 @@ class ExerciseViewer : AppCompatActivity() {
             Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
         }
     }
+
     //todo think that most of this stuff should be moved to the view model
     private fun attemptImportExercise(exePackage: ExercisePackage) {
         val exe = exePackage.firestoreExercise!!.toExercise()
-        if (theSameExercise(exe)!=null) {
+        if (theSameExercise(exe) != null) {
             val title = "Overwrite"
             val text = "You already have this exercise, do you want to overwrite it?"
             val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
@@ -230,8 +289,6 @@ class ExerciseViewer : AppCompatActivity() {
             insertExercise(exePackage)
         }
     }
-
-
 
 
     private fun theSameExercise(exe: Exercise): Exercise? {
@@ -305,5 +362,4 @@ class ExerciseViewer : AppCompatActivity() {
         }
 
     }
-
 }

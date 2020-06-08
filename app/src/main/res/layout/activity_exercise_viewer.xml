@@ -6,6 +6,17 @@
         android:layout_height="match_parent"
         tools:context=".ui.exercise.ExerciseViewer">
 
+    <FrameLayout
+            android:id="@+id/frame_layout"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view2" />
+
+
+
     <View
             android:id="@+id/view3"
             android:layout_width="110dp"
@@ -58,6 +69,16 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0" />
 
+    <View
+            android:id="@+id/share_button"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/ic_share_white_24dp"
+            app:layout_constraintStart_toEndOf="@+id/home_button"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.0" />
     <!--    <View-->
 <!--            android:id="@+id/social_button"-->
 <!--            android:layout_width="36dp"-->
@@ -71,33 +92,35 @@
 <!--            app:layout_constraintVertical_bias="0.0" />-->
 
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout
             android:id="@+id/social_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toEndOf="@+id/home_button"
+            app:layout_constraintStart_toEndOf="@id/share_button"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintVertical_bias="0.0">
+
         <View
                 android:id="@+id/social_icon"
                 android:layout_width="36dp"
                 android:layout_height="36dp"
                 android:background="@drawable/ic_account_box_black_24dp"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintBottom_toBottomOf="parent" />
+
         <TextView
                 android:id="@+id/textOne"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignTop="@id/social_icon"
                 android:layout_alignRight="@id/social_icon"
+                android:background="@drawable/badge_circle"
                 android:text="9+"
                 android:textColor="#FFF"
                 android:textSize="12sp"
-                android:textStyle="bold"
-                android:background="@drawable/badge_circle"/>
+                android:textStyle="bold" />
     </RelativeLayout>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -108,7 +131,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="32dp"
-            app:layout_constraintBottom_toTopOf="@+id/addExerciseBtn"
+            app:layout_constraintBottom_toTopOf="@+id/addExerciseLayout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="parent"
@@ -125,7 +148,7 @@
             android:visibility="gone" />
 
     <LinearLayout
-            android:id="@+id/addExerciseBtn"
+            android:id="@+id/addExerciseLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:paddingTop="14dp"
@@ -142,17 +165,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pager">
 
-<!--        <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="16dp"-->
-<!--                android:fontFamily="@font/open_sans_bold"-->
-<!--                android:gravity="start|center_vertical"-->
-<!--                android:text="+"-->
-<!--                android:textColor="@color/white"-->
-<!--                android:textSize="30sp" />-->
-
-
         <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -166,62 +178,50 @@
 
     </LinearLayout>
 
-<!--    <RelativeLayout-->
-<!--            android:id="@+id/linearLayout"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:orientation="horizontal"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent">-->
+    <TextView
+            android:id="@+id/cancel_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/rounded_border_background"
+            android:fontFamily="@font/open_sans_regular"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"
+            android:text="Cancel"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.2"
+            app:layout_constraintStart_toStartOf="parent" />
 
-<!--        <Button-->
-<!--                android:id="@+id/addExerciseBtn"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:layout_marginTop="0dp"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:layout_marginBottom="0dp"-->
-<!--                android:layout_alignParentStart="true"-->
-<!--                android:text="Add Exercise" />-->
+    <TextView
+            android:id="@+id/share_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="24dp"
+            android:background="@drawable/rounded_border_background"
+            android:fontFamily="@font/open_sans_regular"
+            android:gravity="center_vertical"
+            android:paddingStart="16dp"
+            android:paddingTop="8dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="8dp"
+            android:text="Share"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:textSize="18sp"
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.8"
+            app:layout_constraintStart_toStartOf="parent" />
 
-<!--        <Button-->
-<!--                android:id="@+id/exportBtn"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_marginStart="8dp"-->
-<!--                android:layout_marginTop="0dp"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:layout_marginBottom="0dp"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:text="Export"-->
-<!--                tools:visibility="gone" />-->
 
-<!--        <Button-->
-<!--                android:id="@+id/getButton"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_alignParentTop="true"-->
-<!--                android:layout_alignParentEnd="true"-->
-<!--                android:layout_marginTop="0dp"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:visibility="gone"-->
-<!--                android:text="get" />-->
-
-<!--        <Button-->
-<!--                android:id="@+id/postButton"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_alignParentTop="true"-->
-<!--                android:layout_marginTop="0dp"-->
-<!--                android:layout_marginEnd="8dp"-->
-<!--                android:visibility="gone"-->
-
-<!--                android:layout_toStartOf="@+id/getButton"-->
-<!--                android:text="post" />-->
-
-<!--    </RelativeLayout>-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

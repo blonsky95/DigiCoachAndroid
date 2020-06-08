@@ -8,6 +8,7 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.network.TransferPackage
@@ -23,6 +24,7 @@ class ExerciseViewModel(application: Application) :
     private val viewModelJob = SupervisorJob()
 
     val allExercises: LiveData<List<Exercise>>
+    val allFriends: LiveData<List<Friend>>
 
     private var db = FirebaseFirestore.getInstance()
 
@@ -39,16 +41,15 @@ class ExerciseViewModel(application: Application) :
             AppRepository(exerciseDao, friendDao, dayDao)
 
         allExercises = repository.allExercisesLiveData
+        allFriends = repository.allFriends
 
         repository.isLoading.value = false
     }
 
 
-
     fun getIsLoading(): MutableLiveData<Boolean> {
         return repository.isLoading
     }
-
 
 
     private fun exerciseToFirestoreFormat(exercise: Exercise): MyCustomFirestoreTransferExercise {
@@ -71,7 +72,6 @@ class ExerciseViewModel(application: Application) :
     }
 
 
-
 //    fun insertBlock(block: Block) = viewModelScope.launch {
 //        Timber.d("ptg - data view model - insert block called")
 //        repository.insertBlock(block)
@@ -82,45 +82,30 @@ class ExerciseViewModel(application: Application) :
         viewModelJob.cancel()
     }
 
-    fun sendExerciseToUser(exercise: Exercise?, username: String) {
+    fun sendExercisesToUser(exes: List<Exercise>, friend: Friend) {
         repository.isLoading.value = true
+//        var docUid: String
 
-        var docUid: String
-        val docRef2 = db.collection("users").whereEqualTo("username", username)
-        docRef2.get().addOnSuccessListener { docs ->
-            if (docs.isEmpty) {
-                //no user with this name exists
-                Toast.makeText(
-                    getApplication(), " User doesn't exist",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                docUid = docs.documents[0].id
-
-                val docRef = db.collection("users").document(docUid).collection("exercise_transfers")
-                docRef.get()
-                    .addOnSuccessListener { documents ->
-                        docRef.add(
-                            ExercisePackage(
-                                exerciseToFirestoreFormat(exercise!!),
-                                true,
-                                FirebaseAuth.getInstance().currentUser!!.email!!,
-                                username
-                            )
+        val docRef =
+            db.collection("users").document(friend.docId!!).collection("exercise_transfers")
+        for (exerciseToSend in exes) {
+            docRef.get()
+                .addOnSuccessListener {
+                    docRef.add(
+                        ExercisePackage(
+                            exerciseToFirestoreFormat(exerciseToSend),
+                            true,
+                            DataHolder.userName,
+                            friend.username
                         )
-                        Toast.makeText(
-                            getApplication(), "Exercise sent",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        repository.isLoading.value = false
+                    )
+                    repository.isLoading.value = false
 
-                    }
-                    .addOnFailureListener { exception ->
-                        repository.isLoading.value = false
-                        Timber.d("get failed with: $exception ")
-                    }
-            }
-
+                }
+                .addOnFailureListener { exception ->
+                    repository.isLoading.value = false
+                    Timber.d("get failed with: $exception ")
+                }
         }
 
     }

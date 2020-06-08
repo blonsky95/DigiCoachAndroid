@@ -13,6 +13,7 @@ import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.DayPackage
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferDay
 import com.tatoe.mydigicoach.network.TransferPackage
@@ -29,13 +30,11 @@ class DayViewModel(application: Application) :
     private val viewModelJob = SupervisorJob()
     val allDays: LiveData<List<Day>>
     val allExercises: LiveData<List<Exercise>>
+    val allFriends: LiveData<List<Friend>>
 
     val activeDayIdStr: MutableLiveData<String> = MutableLiveData()
-    val activePosition: MutableLiveData<Int> = MutableLiveData()
-//    val oldActivePosition: MutableLiveData<Int> =  MutableLiveData()
 
     private var db = FirebaseFirestore.getInstance()
-
 
     init {
         val appDB = AppRoomDatabase.getInstance(application, DataHolder.userName)
@@ -48,6 +47,7 @@ class DayViewModel(application: Application) :
 
         allDays = repository.allDaysLiveData
         allExercises = repository.allExercisesLiveData
+        allFriends = repository.allFriends
 
     }
 
@@ -64,7 +64,10 @@ class DayViewModel(application: Application) :
     }
 
     fun updateDay(day: Day) = viewModelScope.launch {
-        if (repository.allDaysLiveData.value!=null && !repository.allDaysLiveData.value!!.contains(day)) {
+        if (repository.allDaysLiveData.value != null && !repository.allDaysLiveData.value!!.contains(
+                day
+            )
+        ) {
             insertDay(day)
         } else {
             repository.updateDay(day)
@@ -81,15 +84,10 @@ class DayViewModel(application: Application) :
         activeDayIdStr.value = dayId
     }
 
-    fun changeActivePosition(position: Int) {
-        activePosition.value = position
-//        activeDay.value= Day.positionToDayId(position)
-    }
-
-    fun sendDaysToUser(
+    fun sendDaysToFriend(
         calendarDatesToShare: ArrayList<String>,
         allDays: ArrayList<Day>,
-        username: String
+        friend: Friend
     ) {
 
         var daysToSend = arrayListOf<Day>()
@@ -101,47 +99,74 @@ class DayViewModel(application: Application) :
             }
         }
 
-        var docUid: String
-
-        val docRef2 = db.collection("users").whereEqualTo("username", username)
-        docRef2.get().addOnSuccessListener { docs ->
-            if (docs.isEmpty) {
-                //no user with this name exists
-                Toast.makeText(
-                    getApplication(), " User doesn't exist",
-                    Toast.LENGTH_SHORT
-                ).show()
-            } else {
-                docUid = docs.documents[0].id
-
-                val docRef = db.collection("users").document(docUid).collection("day_transfers")
-                for (dayToSend in daysToSend) {
-                    docRef.get()
-                        .addOnSuccessListener {
-                            docRef.add(
-                                DayPackage(
-                                    MyCustomFirestoreTransferDay(dayToSend),
-                                    true,
-                                    FirebaseAuth.getInstance().currentUser!!.email!!,
-                                    username
-                                )
-                            )
-                            Toast.makeText(
-                                getApplication(), "Day sent",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                            repository.isLoading.value = false
-
-                        }
-                        .addOnFailureListener { exception ->
-                            repository.isLoading.value = false
-                            Timber.d("get failed with: $exception ")
-                        }
+        val docRef = db.collection("users").document(friend.docId!!).collection("day_transfers")
+        for (dayToSend in daysToSend) {
+            docRef.get()
+                .addOnSuccessListener {
+                    docRef.add(
+                        DayPackage(
+                            MyCustomFirestoreTransferDay(dayToSend),
+                            true,
+                            DataHolder.userName,
+                            friend.username
+                        )
+                    )
+                    Toast.makeText(
+                        getApplication(), "Day sent",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    repository.isLoading.value = false
 
                 }
-            }
-
+                .addOnFailureListener { exception ->
+                    repository.isLoading.value = false
+                    Timber.d("get failed with: $exception ")
+                }
         }
+
+//        var docUid: String
+
+//        val docRef2 = db.collection("users").whereEqualTo("username", username)
+//        docRef2.get().addOnSuccessListener { docs ->
+//            if (docs.isEmpty) {
+//                //no user with this name exists
+//                Toast.makeText(
+//                    getApplication(), " User doesn't exist",
+//                    Toast.LENGTH_SHORT
+//                ).show()
+//            } else {
+//                docUid = docs.documents[0].id
+//
+//                val docRef = db.collection("users").document(docUid).collection("day_transfers")
+//                for (dayToSend in daysToSend) {
+//                    docRef.get()
+//                        .addOnSuccessListener {
+//                            docRef.add(
+//                                DayPackage(
+//                                    MyCustomFirestoreTransferDay(dayToSend),
+//                                    true,
+//                                    FirebaseAuth.getInstance().currentUser!!.email!!,
+//                                    username
+//                                )
+//                            )
+//                            Toast.makeText(
+//                                getApplication(), "Day sent",
+//                                Toast.LENGTH_SHORT
+//                            ).show()
+//                            repository.isLoading.value = false
+//
+//                        }
+//                        .addOnFailureListener { exception ->
+//                            repository.isLoading.value = false
+//                            Timber.d("get failed with: $exception ")
+//                        }
+//
+//                }
+//            }
+//
+//        }
+
+
     }
 
     fun updateTransferDay(dayPackage: DayPackage, newState: String) {

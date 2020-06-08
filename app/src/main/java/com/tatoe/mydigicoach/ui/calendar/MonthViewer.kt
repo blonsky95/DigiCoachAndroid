@@ -8,9 +8,13 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.android.gms.dynamic.SupportFragmentWrapper
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
@@ -21,16 +25,18 @@ import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Day.Companion.dayIDToDate
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.DayPackage
 import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.HomeScreen
+import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.viewmodels.DayViewModel
 import com.tatoe.mydigicoach.viewmodels.MyDayViewModelFactory
 import kotlinx.android.synthetic.main.activity_month_viewer.*
 import kotlin.collections.ArrayList
 
-class MonthViewer : AppCompatActivity() {
+class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface {
 
     companion object {
         const val DAY_ID_KEY = "day_id"
@@ -44,7 +50,9 @@ class MonthViewer : AppCompatActivity() {
     var calendarDaysWithTraining = arrayListOf<CalendarDay>()
     var calendarDaysWithTrainingCompleted = arrayListOf<CalendarDay>()
 
-    var allExercises= listOf<Exercise>()
+    var allExercises = listOf<Exercise>()
+    var allFriends = listOf<Friend>()
+
 
     var calendarDatesToShare = arrayListOf<String>()
 
@@ -53,6 +61,8 @@ class MonthViewer : AppCompatActivity() {
     private lateinit var mService: FirebaseListenerService
 
     var mBound = false
+
+    private lateinit var fragmentManager:FragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +76,7 @@ class MonthViewer : AppCompatActivity() {
 
         setUpNormalCalendar()
 
-//        initObservers()
+        initObservers()
 
         home_button.setOnClickListener {
             startActivity(Intent(this, HomeScreen::class.java))
@@ -85,18 +95,40 @@ class MonthViewer : AppCompatActivity() {
 
             //add button for dialog
             share_btn.visibility = View.VISIBLE
-            share_btn.setOnClickListener(sendToUserListener)
+            share_btn.setOnClickListener {
+                fragmentManager=supportFragmentManager
+                setUpFragment()
+            }
 
             //add button to cancel and make it back to normal
             cancel_btn.visibility = View.VISIBLE
             cancel_btn.setOnClickListener {
                 setUpNormalCalendar()
-                textView4.visibility = View.GONE
-                share_btn.visibility = View.GONE
-                cancel_btn.visibility = View.GONE
-                share_button.visibility = View.VISIBLE
+                setUpNormalViews()
             }
         }
+    }
+
+    private fun setUpNormalViews() {
+        textView4.visibility = View.GONE
+        share_btn.visibility = View.GONE
+        cancel_btn.visibility = View.GONE
+        share_button.visibility = View.VISIBLE    }
+
+    private fun setUpFragment() {
+
+        var fragmentTransaction = fragmentManager.beginTransaction()
+
+        fragmentTransaction.setCustomAnimations(
+            R.anim.slide_in_up,
+            R.anim.slide_in_down,
+            R.anim.slide_out_down,
+            R.anim.slide_out_up
+        )
+
+        fragmentTransaction.addToBackStack("A").replace(R.id.frame_layout, ShareToFriendsFragment.newInstance(allFriends))
+        fragmentTransaction.commit()
+
     }
 
     //reset selection in calendar, when pressing back button from week viewer to month viewer it restores
@@ -121,8 +153,28 @@ class MonthViewer : AppCompatActivity() {
         })
 
         dayViewModel.allExercises.observe(this, Observer { exes ->
-            allExercises=exes
+            allExercises = exes
         })
+
+        dayViewModel.allFriends.observe(this, Observer {friends ->
+            allFriends=friends
+        })
+    }
+
+    override fun onFriendSelected(friend: Friend) {
+        Toast.makeText(this, "Sending to ${friend.username}!", Toast.LENGTH_SHORT).show()
+        dayViewModel.sendDaysToFriend(calendarDatesToShare, daysWithTraining, friend)
+        fragmentManager.popBackStack()
+        calendar.clearSelection()
+        setUpNormalCalendar()
+        setUpNormalViews()
+    }
+
+    override fun onCancelSelected() {
+        fragmentManager.popBackStack()
+        calendar.clearSelection()
+        setUpNormalCalendar()
+        setUpNormalViews()
     }
 
     private fun updateSocialButtonListener() {
@@ -164,9 +216,9 @@ class MonthViewer : AppCompatActivity() {
 
     private fun getExercisesFirst(toImportDay: Day) {
 //        var exes = toImportDay.exercises
-        var modExes= arrayListOf<Exercise>()
+        var modExes = arrayListOf<Exercise>()
         for (exe in toImportDay.exercises) {
-            if (theSameExercise(exe)==null) {
+            if (theSameExercise(exe) == null) {
                 dayViewModel.insertExercise(exe)
                 modExes.add(exe)
             } else {
@@ -174,7 +226,7 @@ class MonthViewer : AppCompatActivity() {
                 modExes.add(theSameExercise(exe)!!)
             }
         }
-        toImportDay.exercises=modExes
+        toImportDay.exercises = modExes
         dayViewModel.updateDay(toImportDay)
     }
 
@@ -262,16 +314,6 @@ class MonthViewer : AppCompatActivity() {
                 this.getDrawable(R.drawable.rounded_border_background)!!
             )
         )
-    }
-
-    private val sendToUserListener = View.OnClickListener {
-        Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
-            object : DialogPositiveNegativeHandler {
-                override fun onPositiveButton(username: String) {
-                    dayViewModel.sendDaysToUser(calendarDatesToShare,daysWithTraining, username)
-                }
-
-            })
     }
 
     private fun getDaysWithTraining(days: List<Day>): ArrayList<Day> {
@@ -362,5 +404,6 @@ class MonthViewer : AppCompatActivity() {
             view.setBackgroundDrawable(drawable)
         }
     }
+
 
 }
