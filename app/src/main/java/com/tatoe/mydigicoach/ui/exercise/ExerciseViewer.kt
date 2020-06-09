@@ -37,6 +37,8 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.home_button
 import kotlinx.android.synthetic.main.activity_exercise_viewer.share_button
 import kotlinx.android.synthetic.main.activity_exercise_viewer.social_button
 import kotlinx.android.synthetic.main.activity_exercise_viewer.textOne
+import kotlinx.android.synthetic.main.item_holder_exercise.*
+import kotlinx.android.synthetic.main.item_holder_exercise.view.*
 import java.util.ArrayList
 
 
@@ -47,15 +49,17 @@ class ExerciseViewer : AppCompatActivity(),
     private lateinit var adapter: ExerciseListAdapter
 
     private lateinit var goToCreatorListener: ClickListenerRecyclerView
+    private lateinit var selectorListener: ClickListenerRecyclerView
 
-    private lateinit var allExercises: List<Exercise>
+
+    private var allExercises = listOf<Exercise>()
     private lateinit var receivedExercises: ArrayList<ExercisePackage>
     private lateinit var mReceiver: FirestoreReceiver
     private lateinit var mService: FirebaseListenerService
 
     private lateinit var fragmentManager: FragmentManager
     var allFriends = listOf<Friend>()
-    var selectedExercises = listOf<Exercise>()
+    private lateinit var selectedExercises:ArrayList<Exercise>
 
     lateinit var dialog:AlertDialog
     var mBound = false
@@ -73,7 +77,7 @@ class ExerciseViewer : AppCompatActivity(),
             finish()
         }
 
-        var firebaseUser = FirebaseAuth.getInstance().currentUser
+        val firebaseUser = FirebaseAuth.getInstance().currentUser
         if (!FirebaseListenerService.isServiceRunning && firebaseUser != null) {
             startService(Intent(this, FirebaseListenerService::class.java))
         }
@@ -82,10 +86,7 @@ class ExerciseViewer : AppCompatActivity(),
         recyclerView = libraryExercisesList as RecyclerView
         initAdapterListeners()
 
-        adapter = ExerciseListAdapter(this)
-        adapter.setOnClickInterface(goToCreatorListener)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
 
         exerciseViewModel =
             ViewModelProviders.of(this, MyExerciseViewModelFactory(application))
@@ -95,6 +96,7 @@ class ExerciseViewer : AppCompatActivity(),
 
         share_button.setOnClickListener {
             modifyToSelectorUI(true)
+            setUpAdapter(ExerciseListAdapter.SELECTOR_LAYOUT)
         }
 
         dialog = setProgressDialog(this, "Talking with cloud...")
@@ -107,6 +109,24 @@ class ExerciseViewer : AppCompatActivity(),
             startActivity(intent)
 
         }
+    }
+
+    private fun setUpAdapter(layoutType: Int = ExerciseListAdapter.DEFAULT_LAYOUT) {
+        adapter = ExerciseListAdapter(this)
+
+        when (layoutType) {
+            ExerciseListAdapter.DEFAULT_LAYOUT -> {
+                adapter.setOnClickInterface(goToCreatorListener)
+            }
+            ExerciseListAdapter.SELECTOR_LAYOUT -> {
+                selectedExercises= arrayListOf()
+                adapter.setOnClickInterface(selectorListener)
+            }
+        }
+
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter.setExercises(allExercises)
     }
 
     private fun modifyToSelectorUI(selectorUI: Boolean) {
@@ -123,7 +143,10 @@ class ExerciseViewer : AppCompatActivity(),
 
             cancel_btn.setOnClickListener {
                 modifyToSelectorUI(false)
+                setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
             }
+
+//            makeAdapterSelectable()
 
         } else {
             addExerciseLayout.visibility = View.VISIBLE
@@ -170,11 +193,13 @@ class ExerciseViewer : AppCompatActivity(),
         exerciseViewModel.sendExercisesToUser(selectedExercises, friend)
         fragmentManager.popBackStack()
         modifyToSelectorUI(false)
+        setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
     }
 
     override fun onCancelSelected() {
         fragmentManager.popBackStack()
         modifyToSelectorUI(false)
+        setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
     }
 
     private fun setUpFragment() {
@@ -263,7 +288,6 @@ class ExerciseViewer : AppCompatActivity(),
         }
     }
 
-    //todo think that most of this stuff should be moved to the view model
     private fun attemptImportExercise(exePackage: ExercisePackage) {
         val exe = exePackage.firestoreExercise!!.toExercise()
         if (theSameExercise(exe) != null) {
@@ -343,6 +367,21 @@ class ExerciseViewer : AppCompatActivity(),
 
                 startActivity(intent)
 
+            }
+        }
+
+        selectorListener = object :ClickListenerRecyclerView {
+            override fun onClick(view: View, position: Int) {
+                super.onClick(view, position)
+                val clickedExe = allExercises[position]
+                if (!selectedExercises.contains(clickedExe)) {
+                    view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.lightestBlue)) //dis ting is not working
+                    selectedExercises.add(clickedExe)
+                } else {
+                    // (0x00000000) mean fully transparent
+                    view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.white))
+                    selectedExercises.remove(clickedExe)
+                }
             }
         }
 

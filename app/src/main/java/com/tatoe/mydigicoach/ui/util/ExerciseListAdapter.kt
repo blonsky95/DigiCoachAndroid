@@ -26,6 +26,7 @@ class ExerciseListAdapter(var context: Context, var layout:Int=0, var rightImage
 
     companion object{
         var DEFAULT_LAYOUT=0
+        var SELECTOR_LAYOUT = 1
     }
 
 
