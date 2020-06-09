@@ -93,27 +93,8 @@ class ExerciseViewer : AppCompatActivity(),
 
         initObservers()
 
-
         share_button.setOnClickListener {
-            //todo make this analogous to MonthViewer and simple to read
-
-            share_button.visibility = View.GONE
-
-            addExerciseLayout.visibility = View.GONE
-
-            cancel_btn.visibility = View.VISIBLE
-
-            cancel_btn.setOnClickListener {
-                modifyUIChangename()
-            }
-
-
-            share_btn.visibility = View.VISIBLE
-            share_btn.setOnClickListener {
-                fragmentManager = supportFragmentManager
-                setUpFragment()
-            }
-
+            modifyToSelectorUI(true)
         }
 
         dialog = setProgressDialog(this, "Talking with cloud...")
@@ -128,12 +109,29 @@ class ExerciseViewer : AppCompatActivity(),
         }
     }
 
-    fun modifyUIChangename() {
-        //todo fix this shit
-        addExerciseLayout.visibility = View.VISIBLE
-        share_button.visibility = View.VISIBLE
-        cancel_btn.visibility = View.GONE
-        share_btn.visibility = View.GONE
+    private fun modifyToSelectorUI(selectorUI: Boolean) {
+        if (selectorUI){
+            addExerciseLayout.visibility = View.GONE
+            share_button.visibility = View.GONE
+            cancel_btn.visibility = View.VISIBLE
+            share_btn.visibility = View.VISIBLE
+
+            share_btn.setOnClickListener {
+                fragmentManager = supportFragmentManager
+                setUpFragment()
+            }
+
+            cancel_btn.setOnClickListener {
+                modifyToSelectorUI(false)
+            }
+
+        } else {
+            addExerciseLayout.visibility = View.VISIBLE
+            share_button.visibility = View.VISIBLE
+            cancel_btn.visibility = View.GONE
+            share_btn.visibility = View.GONE
+        }
+
     }
 
     private fun initObservers() {
@@ -171,13 +169,12 @@ class ExerciseViewer : AppCompatActivity(),
         Toast.makeText(this, "Sending to ${friend.username}!", Toast.LENGTH_SHORT).show()
         exerciseViewModel.sendExercisesToUser(selectedExercises, friend)
         fragmentManager.popBackStack()
-        modifyUIChangename()
+        modifyToSelectorUI(false)
     }
 
     override fun onCancelSelected() {
         fragmentManager.popBackStack()
-        modifyUIChangename()
-        //back to normal
+        modifyToSelectorUI(false)
     }
 
     private fun setUpFragment() {

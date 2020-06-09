@@ -10,11 +10,9 @@ import android.os.IBinder
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import com.google.android.gms.dynamic.SupportFragmentWrapper
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
@@ -62,7 +60,7 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
 
     var mBound = false
 
-    private lateinit var fragmentManager:FragmentManager
+    private lateinit var fragmentManager: FragmentManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -84,7 +82,12 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
         }
 
         share_button.setOnClickListener {
+            setUpSelectorUI(true)
+        }
+    }
 
+    private fun setUpSelectorUI(toSelectorUI: Boolean) {
+        if (toSelectorUI) {
             share_button.visibility = View.GONE
 
             //reformat calendar
@@ -96,7 +99,7 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
             //add button for dialog
             share_btn.visibility = View.VISIBLE
             share_btn.setOnClickListener {
-                fragmentManager=supportFragmentManager
+                fragmentManager = supportFragmentManager
                 setUpFragment()
             }
 
@@ -104,16 +107,15 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
             cancel_btn.visibility = View.VISIBLE
             cancel_btn.setOnClickListener {
                 setUpNormalCalendar()
-                setUpNormalViews()
+                setUpSelectorUI(false)
             }
+        } else {
+            textView4.visibility = View.GONE
+            share_btn.visibility = View.GONE
+            cancel_btn.visibility = View.GONE
+            share_button.visibility = View.VISIBLE
         }
     }
-
-    private fun setUpNormalViews() {
-        textView4.visibility = View.GONE
-        share_btn.visibility = View.GONE
-        cancel_btn.visibility = View.GONE
-        share_button.visibility = View.VISIBLE    }
 
     private fun setUpFragment() {
 
@@ -126,7 +128,8 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
             R.anim.slide_out_up
         )
 
-        fragmentTransaction.addToBackStack("A").replace(R.id.frame_layout, ShareToFriendsFragment.newInstance(allFriends))
+        fragmentTransaction.addToBackStack("A")
+            .replace(R.id.frame_layout, ShareToFriendsFragment.newInstance(allFriends))
         fragmentTransaction.commit()
 
     }
@@ -156,8 +159,8 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
             allExercises = exes
         })
 
-        dayViewModel.allFriends.observe(this, Observer {friends ->
-            allFriends=friends
+        dayViewModel.allFriends.observe(this, Observer { friends ->
+            allFriends = friends
         })
     }
 
@@ -167,14 +170,14 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
         fragmentManager.popBackStack()
         calendar.clearSelection()
         setUpNormalCalendar()
-        setUpNormalViews()
+        setUpSelectorUI(false)
     }
 
     override fun onCancelSelected() {
         fragmentManager.popBackStack()
         calendar.clearSelection()
         setUpNormalCalendar()
-        setUpNormalViews()
+        setUpSelectorUI(false)
     }
 
     private fun updateSocialButtonListener() {

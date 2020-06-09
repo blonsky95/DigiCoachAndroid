@@ -83,7 +83,7 @@ class ExerciseViewModel(application: Application) :
     }
 
     fun sendExercisesToUser(exes: List<Exercise>, friend: Friend) {
-        repository.isLoading.value = true
+//        repository.isLoading.value = true
 //        var docUid: String
 
         val docRef =
@@ -99,11 +99,11 @@ class ExerciseViewModel(application: Application) :
                             friend.username
                         )
                     )
-                    repository.isLoading.value = false
+//                    repository.isLoading.value = false
 
                 }
                 .addOnFailureListener { exception ->
-                    repository.isLoading.value = false
+//                    repository.isLoading.value = false
                     Timber.d("get failed with: $exception ")
                 }
         }
