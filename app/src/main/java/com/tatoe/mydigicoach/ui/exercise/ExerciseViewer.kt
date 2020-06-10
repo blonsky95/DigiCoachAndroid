@@ -135,7 +135,8 @@ class ExerciseViewer : AppCompatActivity(),
             share_button.visibility = View.GONE
             cancel_btn.visibility = View.VISIBLE
             share_btn.visibility = View.VISIBLE
-
+            textView4.visibility = View.VISIBLE
+            textView4.text = "Tap exercises you want to send"
             share_btn.setOnClickListener {
                 fragmentManager = supportFragmentManager
                 setUpFragment()
@@ -153,6 +154,7 @@ class ExerciseViewer : AppCompatActivity(),
             share_button.visibility = View.VISIBLE
             cancel_btn.visibility = View.GONE
             share_btn.visibility = View.GONE
+            textView4.visibility = View.GONE
         }
 
     }
@@ -377,11 +379,14 @@ class ExerciseViewer : AppCompatActivity(),
                 if (!selectedExercises.contains(clickedExe)) {
                     view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.lightestBlue)) //dis ting is not working
                     selectedExercises.add(clickedExe)
+
                 } else {
                     // (0x00000000) mean fully transparent
                     view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.white))
                     selectedExercises.remove(clickedExe)
                 }
+                var string = "Exercise count: ${selectedExercises.size}"
+                textView4.text=string
             }
         }
 
