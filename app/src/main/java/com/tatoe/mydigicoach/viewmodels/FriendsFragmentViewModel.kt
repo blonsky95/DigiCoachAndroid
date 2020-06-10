@@ -61,13 +61,17 @@ class FriendsFragmentViewModel(var db: FirebaseFirestore, var application: Appli
                         val friendPackage = request.toObject(FriendRequestPackage::class.java)
                         val newFriend = Friend(friendPackage!!.mReceiver!!,friendPackage.receiverDocId!!)
 //                        newFriend.docId=friendPackage.receiverDocId!!
-                        insertFriend(newFriend)
-
-                        //WEIRD ALERT - so if there is no pause between the insert and the mstate update the insert fails?
-                        uiScope.launch {
-                            Thread.sleep(3000)
+                        viewModelScope.launch {
+                            insertFriend(newFriend)
                             request.reference.update("mstate","accepted - solved")
                         }
+
+
+
+                        //WEIRD ALERT - so if there is no pause between the insert and the mstate update the insert fails?
+//                        uiScope.launch {
+//                            Thread.sleep(3000)
+//                        }
 
                     }
                 }
