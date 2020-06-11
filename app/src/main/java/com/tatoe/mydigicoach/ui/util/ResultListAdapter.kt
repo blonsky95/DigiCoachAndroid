@@ -34,6 +34,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
 
     override fun onBindViewHolder(holder: DayExerciseViewHolder, position: Int) {
         val bindingResult = sResults[position]
+        holder.exerciseResultButton?.text="MODIFY"
         updateExerciseLayout(holder, bindingResult)
     }
 
