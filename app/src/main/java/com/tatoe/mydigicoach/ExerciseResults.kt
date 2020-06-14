@@ -60,7 +60,7 @@ class ExerciseResults {
         }
 
         fun stringToDate(sString: String): Date {
-            val format = SimpleDateFormat("dd-MM-yy")
+            val format = SimpleDateFormat("dd-MM-yy", Locale.getDefault())
             return format.parse(sString) as Date
         }
 
@@ -291,6 +291,8 @@ class ExerciseResults {
         while (i < intResultsArrayList.size) {
             try {
                 val newDate = stringToDate(newResultMap[0]!![DATE_KEY]!!)
+                Timber.d("X AXIS results new date: ${newDate}")
+
                 val oldDate =
                     stringToDate(intResultsArrayList[i][0]!![DATE_KEY]!!) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
                 if (newDate.after(oldDate)) {
