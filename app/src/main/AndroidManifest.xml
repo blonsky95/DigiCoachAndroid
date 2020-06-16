@@ -54,6 +54,7 @@
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseViewer"
+                android:windowSoftInputMode="adjustPan"
                 android:parentActivityName=".ui.HomeScreen" />
 
         <activity

@@ -38,8 +38,6 @@ class ShareToFriendsFragment : Fragment() {
     companion object {
 
         const val BUNDLE_ALLFRIENDS_KEY = "allfriends_object"
-        const val BUNDLE_EXERCISES_KEY = "exercises_object"
-        const val BUNDLE_DAYS_KEY = "days_object"
 
         fun newInstance(
             allFriends: List<Friend>

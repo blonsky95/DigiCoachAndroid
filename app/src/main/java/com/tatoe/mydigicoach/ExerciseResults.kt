@@ -273,7 +273,7 @@ class ExerciseResults {
 
         if (resultType == TIME_2) {
             var x = toNumericFormat(string, TIME_2)
-            return (x[0]*60 + x[1]).toFloat()
+            return (x[0]*60 + x[1])
         }
         if (resultType == WEIGHT_2) {
             return toNumericFormat(string, WEIGHT_2)[2]

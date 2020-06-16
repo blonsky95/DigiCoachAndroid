@@ -7,6 +7,7 @@ import android.content.ServiceConnection
 import android.os.Bundle
 import android.os.IBinder
 import android.view.View
+import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -37,13 +38,12 @@ import kotlinx.android.synthetic.main.activity_exercise_viewer.home_button
 import kotlinx.android.synthetic.main.activity_exercise_viewer.share_button
 import kotlinx.android.synthetic.main.activity_exercise_viewer.social_button
 import kotlinx.android.synthetic.main.activity_exercise_viewer.textOne
-import kotlinx.android.synthetic.main.item_holder_exercise.*
 import kotlinx.android.synthetic.main.item_holder_exercise.view.*
 import java.util.ArrayList
 
 
 class ExerciseViewer : AppCompatActivity(),
-    ShareToFriendsFragment.OnFriendSelectedListenerInterface {
+    ShareToFriendsFragment.OnFriendSelectedListenerInterface, SearchView.OnQueryTextListener {
     private lateinit var exerciseViewModel: ExerciseViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
@@ -51,8 +51,9 @@ class ExerciseViewer : AppCompatActivity(),
     private lateinit var goToCreatorListener: ClickListenerRecyclerView
     private lateinit var selectorListener: ClickListenerRecyclerView
 
-
     private var allExercises = listOf<Exercise>()
+    private var filteredExes = mutableListOf<Exercise>()
+
     private lateinit var receivedExercises: ArrayList<ExercisePackage>
     private lateinit var mReceiver: FirestoreReceiver
     private lateinit var mService: FirebaseListenerService
@@ -101,6 +102,9 @@ class ExerciseViewer : AppCompatActivity(),
 
         dialog = setProgressDialog(this, "Talking with cloud...")
 
+        search_view.setOnQueryTextListener(this)
+
+
         addExerciseLayout.setOnClickListener {
             Timber.d("Exercise Viewer --> Exercise creator")
 
@@ -126,7 +130,7 @@ class ExerciseViewer : AppCompatActivity(),
 
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
-        adapter.setExercises(allExercises)
+        adapter.setExercises(filteredExes)
     }
 
     private fun modifyToSelectorUI(selectorUI: Boolean) {
@@ -138,16 +142,18 @@ class ExerciseViewer : AppCompatActivity(),
             textView4.visibility = View.VISIBLE
             textView4.text = "Tap exercises you want to send"
             share_btn.setOnClickListener {
-                fragmentManager = supportFragmentManager
-                setUpFragment()
+                if (filteredExes.isNotEmpty()) {
+                    fragmentManager = supportFragmentManager
+                    setUpFragment()
+                } else {
+                    Toast.makeText(this,"No exes selected",Toast.LENGTH_SHORT).show()
+                }
             }
 
             cancel_btn.setOnClickListener {
                 modifyToSelectorUI(false)
                 setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
             }
-
-//            makeAdapterSelectable()
 
         } else {
             addExerciseLayout.visibility = View.VISIBLE
@@ -172,6 +178,7 @@ class ExerciseViewer : AppCompatActivity(),
                     recyclerView.visibility = View.VISIBLE
                     adapter.setExercises(it)
                     allExercises = it
+                    filteredExes.addAll(allExercises)
                 }
             }
         })
@@ -375,7 +382,7 @@ class ExerciseViewer : AppCompatActivity(),
         selectorListener = object :ClickListenerRecyclerView {
             override fun onClick(view: View, position: Int) {
                 super.onClick(view, position)
-                val clickedExe = allExercises[position]
+                val clickedExe = filteredExes[position]
                 if (!selectedExercises.contains(clickedExe)) {
                     view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.lightestBlue)) //dis ting is not working
                     selectedExercises.add(clickedExe)
@@ -385,7 +392,7 @@ class ExerciseViewer : AppCompatActivity(),
                     view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.white))
                     selectedExercises.remove(clickedExe)
                 }
-                var string = "Exercise count: ${selectedExercises.size}"
+                val string = "Exercise count: ${selectedExercises.size}"
                 textView4.text=string
             }
         }
@@ -393,14 +400,31 @@ class ExerciseViewer : AppCompatActivity(),
     }
 
     private fun updateUpdatingExercise(position: Int) {
+        DataHolder.activeExerciseHolder = filteredExes[position]
+    }
 
-        var clickedExercise = exerciseViewModel.allExercises.value?.get(position)
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
 
-        if (clickedExercise != null) {
-            DataHolder.activeExerciseHolder = clickedExercise
+    override fun onQueryTextChange(filterText: String?): Boolean {
+        adapter.setExercises(getFilteredExes(filterText))
+        return true
+    }
+
+    private fun getFilteredExes(filterText: String?): List<Exercise> {
+        if (filterText!=null && filterText.isNotEmpty()) {
+            filteredExes.clear()
+
+            val text=filterText.toLowerCase()
+            for (exe in allExercises) {
+                if (exe.name.toLowerCase().contains(text)){
+                    filteredExes.add(exe)
+                }
+            }
+            return filteredExes
         } else {
-            Timber.d("upsy error")
+            return allExercises
         }
-
     }
 }
