@@ -185,6 +185,15 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             }
         })
 
+        libraryViewModel.infoText.observe(this, Observer {
+            if (it.isNotEmpty()) {
+                info_textview.text=it
+                info_textview.visibility=View.VISIBLE
+            } else {
+                info_textview.visibility=View.GONE
+            }
+        })
+
         var isInserting = false
 
         libraryViewModel.isInsertingExercises.observe(this, Observer {

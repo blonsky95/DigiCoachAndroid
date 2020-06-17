@@ -64,8 +64,8 @@ class UserAccessViewModel(
                     getLocalUserDataToDataholder()
                 }
             }.addOnFailureListener {
-                isDoingBackgroundTask.value=false
-                hasAccess.value=false
+                isDoingBackgroundTask.value = false
+                hasAccess.value = false
             }
         }
     }
@@ -94,15 +94,22 @@ class UserAccessViewModel(
         val docRef = db.collection("users").whereEqualTo("username", username)
         docRef.get().addOnSuccessListener { docs ->
             if (docs.isEmpty) {
+
+                val toastMsg: String =
+                    if (com.tatoe.mydigicoach.Utils.isConnectedToInternet(application)) {
+                        "User doesn't exist"
+                    } else {
+                        "There is no Internet connection, connect to Internet to login"
+                    }
                 isDoingBackgroundTask.value = false
 
-                Timber.d("signInWithEmail:failure: unexistent")
                 Toast.makeText(
-                    activity, " User doesn't exist",
+                    activity, toastMsg,
                     Toast.LENGTH_SHORT
                 ).show()
+
             } else {
-                var doc = docs.documents[0]
+                val doc = docs.documents[0]
                 val userEmail = doc["email"].toString()
 
                 auth.signInWithEmailAndPassword(
@@ -122,7 +129,7 @@ class UserAccessViewModel(
                             getLocalUserDataToDataholder()
                         } else {
                             // If sign in fails, display a message to the user.
-                            isDoingBackgroundTask.value = false
+//                            isDoingBackgroundTask.value = false
                             Timber.w("signInWithEmail:failure exception: ${task.exception}")
                             Toast.makeText(
                                 activity, "Authentication login failed.",
@@ -139,7 +146,7 @@ class UserAccessViewModel(
 
                 Timber.d("signInWithEmail:failure: $e")
                 Toast.makeText(
-                    activity, " Weird error",
+                    activity, "signInWithEmail:failure: $e",
                     Toast.LENGTH_SHORT
                 ).show()
             }

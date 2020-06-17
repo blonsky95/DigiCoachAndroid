@@ -4,6 +4,7 @@ import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -137,7 +138,11 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
             dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
-                    profileViewModel.uploadBackup()
+                    if (Utils.isConnectedToInternet(this@Profile)) {
+                        profileViewModel.uploadBackup()
+                    } else {
+                        Toast.makeText(application, "No Internet connection", Toast.LENGTH_SHORT).show()
+                    }
                 }
             })
     }
@@ -149,8 +154,11 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
             dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
-                    profileViewModel.downloadBackup()
-                }
+                    if (Utils.isConnectedToInternet(this@Profile)) {
+                        profileViewModel.downloadBackup()
+                    } else {
+                        Toast.makeText(application, "No Internet connection", Toast.LENGTH_SHORT).show()
+                    }                }
             })
     }
 

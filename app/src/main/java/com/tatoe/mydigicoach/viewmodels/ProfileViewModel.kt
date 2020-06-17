@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.viewmodels
 
 import android.app.Application
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -37,7 +38,7 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
     init {
         getUsername()
 
-        val appDB = AppRoomDatabase.getInstance(application,DataHolder.userName)
+        val appDB = AppRoomDatabase.getInstance(application, DataHolder.userName)
 //        Timber.d("Database has been created")
         val exerciseDao = appDB.exercisesDao()
         val friendDao = appDB.friendDao()
@@ -55,15 +56,16 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
     }
 
     private fun loadFriendRequests() {
-        val docRef = db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
-            .whereEqualTo("mstate", TransferPackage.STATE_SENT)
+        val docRef =
+            db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
+                .whereEqualTo("mstate", TransferPackage.STATE_SENT)
         //todo check if this is triggered when something removed
 
         docRef.addSnapshotListener { snapshot, e ->
             if (snapshot != null) {
                 var i = 0
                 if (snapshot.documents.isNotEmpty()) {
-                    i=snapshot.documents.size
+                    i = snapshot.documents.size
                 }
                 receivedRequestsNumber.value = i
             }
@@ -104,8 +106,8 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
     }
 
     fun uploadBackup() = viewModelScope.launch {
+
         repository.isLoading.value = true
-        Timber.d("time upload reset is 0 ")
 
         //using asynchronous functions, so by using this you create a deffered class which you can call the
         //.await() method, once its done it will carry out that code
@@ -122,20 +124,42 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
 
         val docRef = db.collection("users").whereEqualTo("email", userEmail.value)
         docRef.get().addOnSuccessListener { docs ->
-            if (docs.isEmpty) {
-                return@addOnSuccessListener
-            } else {
+            if (!docs.isEmpty) {
                 val doc = docs.documents[0]
-                doc.reference.update("last_upload",Day.hoursMinutesDateFormat.format(Date(System.currentTimeMillis())))
+                doc.reference.update(
+                    "last_upload",
+                    Day.hoursMinutesDateFormat.format(Date(System.currentTimeMillis()))
+                )
                     .addOnSuccessListener {
-                        Timber.d("time X is ${System.currentTimeMillis()-timenow} ")
+                        Toast.makeText(application, "last upload updated", Toast.LENGTH_SHORT)
+                            .show()
 
                         repository.isLoading.value = false
-                        Timber.d("Yay worked") }
-                    .addOnFailureListener { Timber.d("damnnnn didnt") }
+                        Timber.d("Yay worked")
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(
+                            application,
+                            "ups something wrong updating",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        repository.isLoading.value = false
+                    }
+            } else {
+                Toast.makeText(application, "No Internet - action denied", Toast.LENGTH_SHORT)
+                    .show()
+                repository.isLoading.value = false
             }
+
+        }.addOnFailureListener {
+            Toast.makeText(application, "ups something wrong fetching email", Toast.LENGTH_SHORT)
+                .show()
+
+            Timber.d("Something went wrong - this user reference doesnt exist")
+            repository.isLoading.value = false
+
         }
-              Timber.d("time W is ${System.currentTimeMillis()-timenow} ")
+
 
     }
 
@@ -176,16 +200,12 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
                 Timber.d("get failed with: $exception ")
             }
     }
-    var timenow= 555L
+
     fun downloadBackup() {
         repository.isLoading.value = true
-        Timber.d("time downlaod reset is 0 ")
-        timenow = System.currentTimeMillis()
 
         getExercisesFromFirestore()
         getDaysFromFirestore()
-        Timber.d("time F is ${System.currentTimeMillis()-timenow} ")
-
 
     }
 
@@ -203,15 +223,10 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
                 } else {
                     Timber.d("documents is empty or null")
                 }
-                Timber.d("time D is ${System.currentTimeMillis()-timenow} ")
 
                 modifyLocalExercisesTable(exercises)
-                Timber.d("time E is ${System.currentTimeMillis()-timenow} ")
-
-//                repository.isLoading.value = false
             }
             .addOnFailureListener { exception ->
-//                repository.isLoading.value = false
                 Timber.d("get failed with: $exception ")
             }
     }
@@ -230,40 +245,27 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
                 } else {
                     Timber.d("documents is empty or null")
                 }
-                Timber.d("time B is ${System.currentTimeMillis()-timenow} ")
 
                 modifyLocalDaysTable(days)
-//                repository.isLoading.value = false
-                Timber.d("time C is ${System.currentTimeMillis()-timenow} ")
 
             }
             .addOnFailureListener { exception ->
-//                repository.isLoading.value = false
+                //                repository.isLoading.value = false
                 Timber.d("get failed with: $exception ")
             }
     }
 
     private fun modifyLocalExercisesTable(exercises: MutableList<Exercise>) =
         viewModelScope.launch {
-            //        withContext(Dispatchers.Default)
-//        {
-            Timber.d("time N is ${System.currentTimeMillis()-timenow} ")
-
             Timber.d("About to delete exercises table")
             repository.deleteExercisesTable()
             Timber.d("About to insert firestore exercises")
             repository.insertExercises(exercises)
 
-            Timber.d("time NN is ${System.currentTimeMillis()-timenow} ")
             repository.isLoading.value = false
-
-//        }
         }
 
     private fun modifyLocalDaysTable(days: MutableList<Day>) = viewModelScope.launch {
-        //        withContext(Dispatchers.Default)
-//        {
-        Timber.d("time M is ${System.currentTimeMillis()-timenow} ")
 
         Timber.d("About to delete days table")
         repository.deleteDaysTable()
@@ -271,7 +273,6 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
         repository.insertDays(days)
         repository.isLoading.value = false
 
-//        }
     }
 
     private fun firestoreFormatToExercise(myCustomFirestoreTransferExercise: MyCustomFirestoreTransferExercise): Exercise {
