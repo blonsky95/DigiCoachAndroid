@@ -12,6 +12,8 @@ import com.tatoe.mydigicoach.AppRepository
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
+import com.tatoe.mydigicoach.network.MyCustomFirestoreFriend
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferDay
 import com.tatoe.mydigicoach.network.MyCustomFirestoreTransferExercise
 import com.tatoe.mydigicoach.network.TransferPackage
@@ -111,8 +113,9 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
 
         //using asynchronous functions, so by using this you create a deffered class which you can call the
         //.await() method, once its done it will carry out that code
-        var allExes = async { repository.getAllExercises() }
-        var allDays = async { repository.getAllDays() }
+        val allExes = async { repository.getAllExercises() }
+        val allDays = async { repository.getAllDays() }
+        val allFriends = async { repository.getAllFriends() }
 
         if (!allExes.await().isNullOrEmpty()) {
             postExercisesToFirestore(allExes.await())
@@ -120,6 +123,10 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
 
         if (!allDays.await().isNullOrEmpty()) {
             postDaysToFirestore(allDays.await())
+        }
+
+        if (!allFriends.await().isNullOrEmpty()) {
+            postFriendsToFirestore(allFriends.await())
         }
 
         val docRef = db.collection("users").whereEqualTo("email", userEmail.value)
@@ -201,13 +208,34 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
             }
     }
 
+    private fun postFriendsToFirestore(friends: List<Friend>) {
+        val docRef = db.collection("users").document(DataHolder.userDocId).collection("my_friends")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    document.reference.delete()
+                }
+
+                for (friend in friends) {
+                    docRef.add(MyCustomFirestoreFriend(friend))
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
     fun downloadBackup() {
         repository.isLoading.value = true
 
         getExercisesFromFirestore()
         getDaysFromFirestore()
+        getFriendsFromFirestore()
 
     }
+
+
 
     fun getExercisesFromFirestore() = viewModelScope.launch {
         val docRef = db.collection("users").document(DataHolder.userDocId)
@@ -255,6 +283,32 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
             }
     }
 
+    private fun getFriendsFromFirestore() {
+        val docRef = db.collection("users").document(DataHolder.userDocId)
+            .collection("my_friends")
+        val friends = mutableListOf<Friend>()
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                if (documents != null && !documents.isEmpty) {
+                    for (document in documents) {
+                        Timber.d("DocumentSnapshot data: ${document.data}")
+                        friends.add(document.toObject(MyCustomFirestoreFriend::class.java).toFriend())
+                    }
+                } else {
+                    Timber.d("documents is empty or null")
+                }
+
+                modifyLocalFriendsTable(friends)
+
+            }
+            .addOnFailureListener { exception ->
+                //                repository.isLoading.value = false
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+
+
     private fun modifyLocalExercisesTable(exercises: MutableList<Exercise>) =
         viewModelScope.launch {
             Timber.d("About to delete exercises table")
@@ -271,6 +325,15 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
         repository.deleteDaysTable()
         Timber.d("About to insert firestore days")
         repository.insertDays(days)
+        repository.isLoading.value = false
+
+    }
+
+    private fun modifyLocalFriendsTable(friends: MutableList<Friend>)= viewModelScope.launch {
+        Timber.d("About to delete friends table")
+        repository.deleteFriendsTable()
+        Timber.d("About to insert firestore days")
+        repository.insertFriends(friends)
         repository.isLoading.value = false
 
     }

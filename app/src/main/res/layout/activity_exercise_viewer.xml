@@ -130,9 +130,15 @@
             android:id="@+id/ifEmptyText"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_marginStart="48dp"
+            android:layout_marginEnd="48dp"
             android:gravity="center"
             android:text="No exercises found, create new exercises to view them here"
-            android:visibility="gone" />
+            android:visibility="gone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
             android:id="@+id/addExerciseLayout"

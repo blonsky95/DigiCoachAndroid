@@ -42,12 +42,20 @@ class AppRepository(
         friendDao.insert(friend)
     }
 
+    suspend fun insertFriends(friends:List<Friend>){
+        friendDao.insertAll(friends)
+    }
+
     suspend fun getAllExercises():List<Exercise> {
         return exerciseDao.getAll()
     }
 
     suspend fun getAllDays():List<Day> {
         return dayDao.getAll()
+    }
+
+    suspend fun getAllFriends():List<Friend> {
+        return friendDao.getAll()
     }
 
     suspend fun insertExercise(exercise: Exercise) {
@@ -123,5 +131,9 @@ class AppRepository(
 
     suspend fun deleteDaysTable() {
         dayDao.deleteTable()
+    }
+
+    suspend fun deleteFriendsTable() {
+        friendDao.deleteTable()
     }
 }

@@ -13,6 +13,15 @@ interface FriendDao {
     @Query("SELECT * FROM friend_table ORDER BY username ASC")
     fun getAllLiveData(): androidx.lifecycle.LiveData<List<Friend>>
 
+    @Query("SELECT * FROM friend_table ORDER BY username ASC")
+    suspend fun getAll(): List<Friend>
+
+    @Query("DELETE FROM friend_table")
+    suspend fun deleteTable()
+
+    @Insert
+    suspend fun insertAll( friends: List<Friend>) : List<Long>
+
     @Insert
     suspend fun insert(friend : Friend) : Long
 
