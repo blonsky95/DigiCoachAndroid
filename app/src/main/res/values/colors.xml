@@ -32,8 +32,19 @@
     <color name="evenDarkerGreen">#516451</color>
 
     <color name="white">#FFFFFF</color>
+    <color name="white_70">#B3FFFFFF</color>
+
     <color name="black">#000000</color>
     <color name="transparent_black">#54000000</color>
+
+    <color name="palette1">#4873A6</color>
+    <color name="palette2">#3fa9f5</color>
+    <color name="palette2_40">#663FA9F5</color>
+    <color name="palette3">#40C9C5</color>
+    <color name="palette4">#FFC0BE</color>
+    <color name="palette5">#FFEBE7</color>
+    <color name="palette5_30">#4DFFEBE7</color>
+
 
 
 

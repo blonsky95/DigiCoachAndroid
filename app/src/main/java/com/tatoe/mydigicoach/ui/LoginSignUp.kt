@@ -20,8 +20,8 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.viewmodels.UserAccessViewModel
 import com.tatoe.mydigicoach.viewmodels.MyUserAccessViewModelFactory
-import kotlinx.android.synthetic.main.activity_login_screen_2.login_button
-import kotlinx.android.synthetic.main.activity_login_screen_2.register_button
+import kotlinx.android.synthetic.main.activity_login_screen.login_button
+import kotlinx.android.synthetic.main.activity_login_screen.register_button
 import kotlinx.android.synthetic.main.activity_login_signup.*
 //import org.junit.experimental.results.ResultMatchers.isSuccessful
 
@@ -93,10 +93,9 @@ class LoginSignUp : AppCompatActivity() {
 //        checkPermissions()
 
         if (BuildConfig.DEBUG) {
-            magic_btn.visibility = View.VISIBLE
             magic_btn.setOnClickListener {
-                userEditText.text = SpannableStringBuilder("johnnnyboy")
-                passwordEditText.text = SpannableStringBuilder("12345678")
+                userEditText.text = SpannableStringBuilder("pablo")
+                passwordEditText.text = SpannableStringBuilder("123456")
             }
         }
     }
