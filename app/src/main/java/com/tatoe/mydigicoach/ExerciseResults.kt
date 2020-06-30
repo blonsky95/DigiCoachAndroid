@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach
 
+import android.content.Context
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import timber.log.Timber
@@ -8,7 +9,7 @@ import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
-import kotlin.collections.LinkedHashMap
+import kotlin.collections.HashMap
 import kotlin.collections.arrayListOf
 import kotlin.collections.set
 
@@ -18,11 +19,13 @@ class ExerciseResults {
     //contains all the results
 
     //when you want to access this use the getter, as this data type is string and not int - to store in firestore
-    var resultsArrayList: ArrayList<HashMap<String, Pair<String, String>>> = arrayListOf()
+    var resultsArrayList: ArrayList<HashMap<String, HashMap<String, String>>> = arrayListOf()
 
     //when you want to access this use the getter, as this data type is string and not int - to store in firestore
     //contains all the names of fields and the first time text/hints
-    var resultFieldsMap = HashMap<String, Pair<String, String>>()
+    var resultFieldsMap = HashMap<String, HashMap<String, String>>()
+
+    var resultsTypes = arrayListOf<String>()
 
     //todo ResultSet should be based on the resultFieldsMap
     //so result set should be modified to accord the LinkedHashMap - think about this - make an array of linked hash maps?
@@ -34,12 +37,20 @@ class ExerciseResults {
         const val PLOTTABLE_VALUE = "plottable"
         const val DATE_KEY = "Date"
 
-        fun getGenericFields(): HashMap<Int, Pair<String, String>> {
-            val genericResultFields = HashMap<Int, Pair<String, String>>()
+        const val TIME_1 = "Time (s)"
+        const val TIME_2 = "Time (mins)"
+        const val DISTANCE_1 = "Distance (km)"
+        const val DISTANCE_2 = "Distance (m)"
+        const val WEIGHT_1 = "Weight (kg)"
+        const val WEIGHT_2 = "Weight 1RM"
 
-            genericResultFields[0] = Pair(DATE_KEY, "04-03-1995")
-            genericResultFields[1] = Pair(NOTE_KEY, "String")
-            genericResultFields[2] = Pair(PLOTTABLE_KEY, PLOTTABLE_VALUE)
+
+        fun getGenericFields(): HashMap<Int, HashMap<String, String>> {
+            val genericResultFields = HashMap<Int, HashMap<String, String>>()
+
+            genericResultFields[0] = hashMapOf(DATE_KEY to "04-03-1995")
+            genericResultFields[1] = hashMapOf(NOTE_KEY to "String")
+//            genericResultFields[2] = hashMapOf(PLOTTABLE_KEY to PLOTTABLE_VALUE)
 
             return genericResultFields
         }
@@ -49,40 +60,174 @@ class ExerciseResults {
         }
 
         fun stringToDate(sString: String): Date {
-            val format = SimpleDateFormat("dd-MM-yy")
+            val format = SimpleDateFormat("dd-MM-yy", Locale.getDefault())
             return format.parse(sString) as Date
+        }
+
+        fun isANumericEntry(entryName: String): Boolean {
+            return entryName == TIME_1 || entryName == TIME_2 || entryName == DISTANCE_1 || entryName == DISTANCE_2 || entryName == WEIGHT_1 || entryName == WEIGHT_2
+        }
+
+        fun toReadableFormat(fieldEntryValue: String, fieldEntryKey: String): String {
+            var string = fieldEntryValue
+            when (fieldEntryKey) {
+                TIME_1 -> {
+                    string = "${fieldEntryValue}s"
+                }
+                TIME_2 -> {
+                    string = "${fieldEntryValue.substring(
+                        0,
+                        fieldEntryValue.indexOf("-")
+                    )} mins ${fieldEntryValue.substring(
+                        fieldEntryValue.indexOf("-") + 1,
+                        fieldEntryValue.length
+                    )} s"
+                }
+                DISTANCE_1 -> {
+                    string = "${fieldEntryValue}km"
+                }
+                DISTANCE_2 -> {
+                    string = "${fieldEntryValue}m"
+                }
+                WEIGHT_1 -> {
+                    string = "${fieldEntryValue}kg"
+                }
+                WEIGHT_2 -> {
+                    string = "${fieldEntryValue.substring(
+                        0,
+                        fieldEntryValue.indexOf("-")
+                    )} reps ${fieldEntryValue.substring(
+                        fieldEntryValue.indexOf("-") + 1,
+                        fieldEntryValue.indexOf("-", fieldEntryValue.indexOf("-") + 1)
+                    )}kg - 1RM = ${fieldEntryValue.substring(
+                        fieldEntryValue.indexOf(
+                            "-",
+                            fieldEntryValue.indexOf("-") + 1
+                        ) + 1, fieldEntryValue.length
+                    )}kg"
+                }
+            }
+
+            return string
+        }
+
+        fun toNumericFormat(fieldEntryValue: String, fieldEntryKey: String): ArrayList<Float> {
+            val float = arrayListOf<Float>()
+            if (fieldEntryValue.isEmpty()) {
+                //return array of 0s to fill in the maximum of 3 empty edit texts
+                while (float.size<3) {
+                    float.add(0.toFloat())
+                }
+                return float
+            }
+            when (fieldEntryKey) {
+                TIME_1 -> {
+                    float.add(fieldEntryValue.toFloat())
+                }
+                TIME_2 -> {
+                    float.add(
+                        fieldEntryValue.substring(
+                            0, fieldEntryValue.indexOf("-")
+                        ).toFloat()
+                    )
+                    float.add(
+                        fieldEntryValue.substring(
+                            fieldEntryValue.indexOf("-") + 1,
+                            fieldEntryValue.length
+                        ).toFloat()
+                    )
+                }
+                DISTANCE_1 -> {
+                    float.add(fieldEntryValue.toFloat())
+                }
+                DISTANCE_2 -> {
+                    float.add(fieldEntryValue.toFloat())
+                }
+                WEIGHT_1 -> {
+                    float.add(fieldEntryValue.toFloat())
+                }
+                WEIGHT_2 -> {
+                    float.add(
+                        fieldEntryValue.substring(
+                            0,
+                            fieldEntryValue.indexOf("-")
+                        ).toFloat()
+                    )
+
+                    float.add(
+                        fieldEntryValue.substring(
+                            fieldEntryValue.indexOf("-") + 1,
+                            fieldEntryValue.indexOf("-", fieldEntryValue.indexOf("-") + 1)
+                        ).toFloat()
+                    )
+
+                    float.add(
+                        fieldEntryValue.substring(
+                            fieldEntryValue.indexOf(
+                                "-",
+                                fieldEntryValue.indexOf("-") + 1
+                            ) + 1, fieldEntryValue.length
+                        ).toFloat()
+                    )
+                }
+            }
+
+            return float
+        }
+
+        fun getFieldTypePosition(fieldEntryKey: String, context: Context): Int {
+            var typesArray = context.resources.getStringArray(R.array.units_array)
+            for (i in typesArray.indices) {
+                if (fieldEntryKey == typesArray[i]) {
+                    return i
+                }
+            }
+            return -1
+        }
+
+        fun getPositionFromKey(position:Int, context: Context): String {
+            var typesArray = context.resources.getStringArray(R.array.units_array)
+            return typesArray[position]
+        }
+
+        //use when you want to add a one click result, so without going to results creator, it simply generates the map with a date field (parameter) and a note saying "completed"
+        fun getQuickResultMap(dayId: String): java.util.HashMap<Int, java.util.HashMap<String, String>> {
+            return  hashMapOf(
+                0 to hashMapOf("Date" to Day.dayIDtoDashSeparator(dayId)),
+                1 to hashMapOf("Note" to "Completed!")
+            )
         }
     }
 
-    fun getFieldsMap(): HashMap<Int, Pair<String, String>> {
+    fun getFieldsMap(): HashMap<Int, HashMap<String, String>> {
         return Exercise.stringMapToIntMap(resultFieldsMap)
     }
 
-    fun setFieldsMap(mFieldsHashMap: HashMap<Int, Pair<String, String>>) {
+    fun setFieldsMap(mFieldsHashMap: HashMap<Int, HashMap<String, String>>) {
         resultFieldsMap = Exercise.intMapToStringMap(mFieldsHashMap)
     }
 
-    fun getArrayListOfResults(): ArrayList<HashMap<Int, Pair<String, String>>> {
-        var arrayList = ArrayList<HashMap<Int, Pair<String, String>>>()
-        resultsArrayList.forEach{
+    fun getArrayListOfResults(): ArrayList<HashMap<Int, HashMap<String, String>>> {
+        var arrayList = ArrayList<HashMap<Int, HashMap<String, String>>>()
+        resultsArrayList.forEach {
             arrayList.add(Exercise.stringMapToIntMap(it))
         }
         return arrayList
     }
 
-    fun setArrayListOfResults( arrayList: ArrayList<HashMap<Int, Pair<String, String>>>) {
-        var stringArrayList = ArrayList<HashMap<String, Pair<String, String>>>()
-        arrayList.forEach{
+    fun setArrayListOfResults(arrayList: ArrayList<HashMap<Int, HashMap<String, String>>>) {
+        var stringArrayList = ArrayList<HashMap<String, HashMap<String, String>>>()
+        arrayList.forEach {
             stringArrayList.add(Exercise.intMapToStringMap(it))
         }
-        resultsArrayList=stringArrayList
+        resultsArrayList = stringArrayList
     }
 
-    fun addResult(resultFieldsMap: HashMap<Int, Pair<String, String>>) {
+    fun addResult(resultFieldsMap: HashMap<Int, HashMap<String, String>>) {
         addToArrayByDate(resultFieldsMap)
     }
 
-    fun updateResult(resultFieldsMap: HashMap<Int, Pair<String, String>>, position: Int) {
+    fun updateResult(resultFieldsMap: HashMap<Int, HashMap<String, String>>, position: Int) {
 //        resultFieldsMap[DATE_KEY] = resultsArrayList[position][0]!!.second //getting the date (index 0), and the value of the pair (second)
         resultsArrayList[position] = Exercise.intMapToStringMap(resultFieldsMap)
     }
@@ -93,54 +238,66 @@ class ExerciseResults {
 
     fun getPlottableArrays(): ArrayList<PlottableBundle> {
         var plottableBundleArray = arrayListOf<PlottableBundle>()
-        var intResultsFieldsMap = Exercise.stringMapToIntMap(resultFieldsMap)
         var intResultsArrayList = getArrayListOfResults()
-        for (i in 0 until intResultsFieldsMap.size) {
-            var arrayX = arrayListOf<Date>()
-            var arrayY = arrayListOf<Double>()
-            var nameVariable = ""
-            if (intResultsFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
-                nameVariable = intResultsFieldsMap[i]!!.first
-                var containsEmptyValues = false
-                for (result in intResultsArrayList) {
-                    try {
-                        Timber.d("NUTS: $result")
-                        if (result[i] != null) {
-                            arrayX.add(stringToDate(result[0]!!.second))
-                            arrayY.add(result[i]!!.second.toDouble())
-                        }
-                    } catch (e: NumberFormatException) {
-                        arrayY.add(0.toDouble())
-                        containsEmptyValues = true
-                    }
 
+
+        for (resultType in resultsTypes) {
+            var arrayX = arrayListOf<Date>()
+            var arrayY = arrayListOf<Float>()
+            for (result in intResultsArrayList) {
+                try {
+                    //the position of the result im looking for starts from results which is 2(default size) + number of result you are looking for (j)
+                    for ((k, entry) in result)
+                        if (entry.entries.iterator().next().key == resultType) {
+
+//                            if (result[j+2] != null) {
+                            var yAxisEntry = result[k]?.entries?.iterator()?.next()
+                            var xAxisEntry = result[0]!!.entries.iterator().next()
+
+                            if (yAxisEntry != null) {
+                                arrayX.add(stringToDate(xAxisEntry.value))
+                                arrayY.add(convertUnitToFloat(yAxisEntry.value, resultType))
+                            }
+                        }
+                } catch (e: NumberFormatException) {
+                    Timber.d("Number format exception generating data for graph")
                 }
-                plottableBundleArray.add(
-                    PlottableBundle(
-                        nameVariable,
-                        arrayX,
-                        arrayY,
-                        containsEmptyValues
-                    )
-                )
             }
+            plottableBundleArray.add(PlottableBundle(resultType, arrayX, arrayY))
         }
 
         return plottableBundleArray
     }
 
-    private fun addToArrayByDate(newResultMap: HashMap<Int, Pair<String, String>>) {
+    private fun convertUnitToFloat(string: String, resultType: String): Float {
+
+        if (resultType == TIME_2) {
+            var x = toNumericFormat(string, TIME_2)
+            return (x[0]*60 + x[1])
+        }
+        if (resultType == WEIGHT_2) {
+            return toNumericFormat(string, WEIGHT_2)[2]
+        }
+
+        return string.toFloat()
+
+    }
+
+    private fun addToArrayByDate(newResultMap: HashMap<Int, HashMap<String, String>>) {
 
         var intResultsArrayList = getArrayListOfResults()
 
         var i = 0
         while (i < intResultsArrayList.size) {
             try {
-                val newDate = stringToDate(newResultMap[0]!!.second)
+                val newDate = stringToDate(newResultMap[0]!![DATE_KEY]!!)
+                Timber.d("X AXIS results new date: ${newDate}")
+
                 val oldDate =
-                    stringToDate(intResultsArrayList[i][0]!!.second) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
+                    stringToDate(intResultsArrayList[i][0]!![DATE_KEY]!!) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
                 if (newDate.after(oldDate)) {
                     intResultsArrayList.add(i, newResultMap)
+                    setArrayListOfResults(intResultsArrayList)
                     return
                 }
                 i++
@@ -153,9 +310,10 @@ class ExerciseResults {
 
     }
 
-    fun containsResult(date: String): Boolean {
+    fun containsResult(dayId: String): Boolean {
         for (result in getArrayListOfResults()) {
-            if (result[0]?.second == Day.dayIDtoDashSeparator(date)) {
+            Timber.d("dayid: ${Day.dayIDtoDashSeparator(dayId)} and the other thing${result[0]!![DATE_KEY]!!}")
+            if (result[0]!![DATE_KEY]!! == Day.dayIDtoDashSeparator(dayId)) {
                 return true
             }
         }
@@ -166,27 +324,40 @@ class ExerciseResults {
         var intResultsArrayList = getArrayListOfResults()
 
         for (result in intResultsArrayList) {
-            if (result[0]?.second == Day.dayIDtoDashSeparator(date)) {
+            var x = result[0]!![DATE_KEY]!!
+            var y = Day.dayIDtoDashSeparator(date)
+            if (result[0]!![DATE_KEY]!! == Day.dayIDtoDashSeparator(date)) {
                 return intResultsArrayList.indexOf(result)
             }
         }
-        return -1
+        return -2
     }
 
     fun getResultDate(position: Int): String {
-        return getArrayListOfResults()[position][0]!!.second
+        return getArrayListOfResults()[position][0]!![DATE_KEY]!!
+    }
+
+    fun getResultFromDate(date: String): HashMap<Int, HashMap<String, String>> {
+        var resultsMap = hashMapOf<Int, HashMap<String, String>>()
+        if (containsResult(date)) {
+            resultsMap = getArrayListOfResults()[getResultPosition(date)]
+        }
+        return resultsMap
+
     }
 
     fun getPlottableNames(): ArrayList<String> {
-        var intResultsFieldsMap = Exercise.stringMapToIntMap(resultFieldsMap)
-
-        var array = arrayListOf<String>()
-        for (i in 0 until intResultsFieldsMap.size) {
-            if (intResultsFieldsMap[i]!!.second == PLOTTABLE_VALUE) {
-                array.add(intResultsFieldsMap[i]!!.first)
-            }
-        }
-        return array
+        return resultsTypes
+//        var intResultsFieldsMap = Exercise.stringMapToIntMap(resultFieldsMap)
+//
+//        var array = arrayListOf<String>()
+//        for (i in 0 until intResultsFieldsMap.size) {
+//            var entry = intResultsFieldsMap[i]!!.entries.iterator().next()
+//            if (isANumericEntry(entry.key)) {
+//                array.add(entry.key)
+//            }
+//        }
+//        return array
     }
 
 

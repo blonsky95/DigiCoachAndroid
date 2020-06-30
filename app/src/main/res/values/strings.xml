@@ -1,4 +1,23 @@
 <resources>
     <string name="app_name">MyDigicoach</string>
     <string name="title_activity_block_creator">BlockCreator</string>
+
+    <string-array name="week_days_array">
+        <item>M</item>
+        <item>T</item>
+        <item>W</item>
+        <item>T</item>
+        <item>F</item>
+        <item>S</item>
+        <item>S</item>
+    </string-array>
+
+    <string-array name="units_array">
+        <item>Time (s)</item>
+        <item>Time (mins)</item>
+        <item>Distance (km)</item>
+        <item>Distance (m)</item>
+        <item>Weight (kg)</item>
+        <item>Weight 1RM</item>
+    </string-array>
 </resources>

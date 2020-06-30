@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal">
+
+        <EditText
+                android:id="@+id/unit_value_et"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/pinkTransparent"
+                android:gravity="start|center_vertical"
+                android:hint="0"
+                android:inputType="numberDecimal"
+                android:paddingStart="14dp"
+                android:paddingTop="6dp"
+                android:paddingEnd="14dp"
+                android:paddingBottom="6dp"
+                android:layout_marginEnd="2dp"
+                android:textColor="@color/black"
+                android:textSize="14sp" />
+
+        <TextView
+                android:id="@+id/unit_tv_m"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/open_sans_regular"
+                android:gravity="end|center_vertical"
+                android:text="m"
+                android:textSize="14sp" />
+
+</LinearLayout>

@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:orientation="vertical">
+
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/linearLayoutExerciseHolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+        <CheckBox
+                android:id="@+id/checkboxLeftExerciseHolder"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:minWidth="0dp"
+                android:minHeight="0dp"
+                android:layout_gravity="center"
+                android:buttonTint="@color/squareOrange" />
+
+        <TextView
+                android:id="@+id/titleTextExerciseHolder"
+                android:padding="14dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="4"
+                android:text="wadup im an exe"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="@font/open_sans_regular"
+                android:textSize="16sp"
+                android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <LinearLayout
+            android:id="@+id/collapsibleLinearLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:background="@color/squareOrange"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+        <TextView
+                android:id="@+id/descriptionTextExerciseHolder"
+                android:padding="14dp"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="wadup im an exe, a description, a way of expressing myself"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="@font/open_sans_regular"
+                android:textSize="10sp"
+                android:textColor="@color/black" />
+
+    </LinearLayout>
+
+    <!--    <View-->
+    <!--            android:id="@+id/divider"-->
+    <!--            android:layout_width="match_parent"-->
+    <!--            android:layout_height="2dp"-->
+    <!--            android:background="@android:color/darker_gray"/>-->
+
+</LinearLayout>
+

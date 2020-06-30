@@ -1,17 +1,22 @@
 package com.tatoe.mydigicoach.ui.exercise
 
+import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.content.ServiceConnection
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.os.IBinder
 import android.view.View
+import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.auth.FirebaseAuth
 import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import kotlinx.android.synthetic.main.activity_exercise_viewer.*
 import timber.log.Timber
@@ -19,25 +24,46 @@ import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerR
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
+import com.tatoe.mydigicoach.network.FirebaseListenerService
+import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.TransferPackage
+import com.tatoe.mydigicoach.ui.HomeScreen
+import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
-import com.tatoe.mydigicoach.viewmodels.ExerciseViewerViewModel
-import com.tatoe.mydigicoach.viewmodels.MyExerciseViewerViewModelFactory
+import com.tatoe.mydigicoach.utils.FirestoreReceiver
+import com.tatoe.mydigicoach.viewmodels.ExerciseViewModel
+import com.tatoe.mydigicoach.viewmodels.MyExerciseViewModelFactory
+import kotlinx.android.synthetic.main.activity_exercise_viewer.home_button
+import kotlinx.android.synthetic.main.activity_exercise_viewer.share_button
+import kotlinx.android.synthetic.main.activity_exercise_viewer.social_button
+import kotlinx.android.synthetic.main.activity_exercise_viewer.textOne
+import kotlinx.android.synthetic.main.item_holder_exercise.view.*
+import java.util.ArrayList
 
 
-class ExerciseViewer : AppCompatActivity() {
-    private lateinit var exerciseViewerViewModel: ExerciseViewerViewModel
+class ExerciseViewer : AppCompatActivity(),
+    ShareToFriendsFragment.OnFriendSelectedListenerInterface, SearchView.OnQueryTextListener {
+    private lateinit var exerciseViewModel: ExerciseViewModel
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: ExerciseListAdapter
 
     private lateinit var goToCreatorListener: ClickListenerRecyclerView
-    private lateinit var itemSelectorListener: ClickListenerRecyclerView
-    private var selectedIndexes = arrayListOf<Int>()
+    private lateinit var selectorListener: ClickListenerRecyclerView
 
-    private lateinit var allExercises: List<Exercise>
+    private var allExercises = listOf<Exercise>()
+    private var filteredExes = mutableListOf<Exercise>()
 
-    private var db = FirebaseFirestore.getInstance()
+    private lateinit var receivedExercises: ArrayList<ExercisePackage>
+    private lateinit var mReceiver: FirestoreReceiver
+    private lateinit var mService: FirebaseListenerService
 
+    private lateinit var fragmentManager: FragmentManager
+    var allFriends = listOf<Friend>()
+    private lateinit var selectedExercises:ArrayList<Exercise>
+
+    lateinit var dialog:AlertDialog
+    var mBound = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -47,21 +73,102 @@ class ExerciseViewer : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        recyclerView = recyclerview as RecyclerView
+        home_button.setOnClickListener {
+            startActivity(Intent(this, HomeScreen::class.java))
+            finish()
+        }
 
-        exportBtn.visibility = View.GONE
+        val firebaseUser = FirebaseAuth.getInstance().currentUser
+        if (!FirebaseListenerService.isServiceRunning && firebaseUser != null) {
+            startService(Intent(this, FirebaseListenerService::class.java))
+        }
+        mReceiver = FirestoreReceiver()
+
+        recyclerView = libraryExercisesList as RecyclerView
         initAdapterListeners()
 
+        setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
+
+        exerciseViewModel =
+            ViewModelProviders.of(this, MyExerciseViewModelFactory(application))
+                .get(ExerciseViewModel::class.java)
+
+        initObservers()
+
+        share_button.setOnClickListener {
+            modifyToSelectorUI(true)
+            setUpAdapter(ExerciseListAdapter.SELECTOR_LAYOUT)
+        }
+
+        dialog = setProgressDialog(this, "Talking with cloud...")
+
+        search_view.setOnQueryTextListener(this)
+
+
+        addExerciseLayout.setOnClickListener {
+            Timber.d("Exercise Viewer --> Exercise creator")
+
+            val intent = Intent(this, ExerciseCreator::class.java)
+            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
+            startActivity(intent)
+
+        }
+    }
+
+    private fun setUpAdapter(layoutType: Int = ExerciseListAdapter.DEFAULT_LAYOUT) {
         adapter = ExerciseListAdapter(this)
-        adapter.setOnClickInterface(goToCreatorListener)
+
+        when (layoutType) {
+            ExerciseListAdapter.DEFAULT_LAYOUT -> {
+                adapter.setOnClickInterface(goToCreatorListener)
+            }
+            ExerciseListAdapter.SELECTOR_LAYOUT -> {
+                selectedExercises= arrayListOf()
+                adapter.setOnClickInterface(selectorListener)
+            }
+        }
+
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
+        adapter.setExercises(filteredExes)
+    }
 
-        exerciseViewerViewModel = ViewModelProviders.of(this, MyExerciseViewerViewModelFactory(application,db)).get(ExerciseViewerViewModel::class.java)
+    private fun modifyToSelectorUI(selectorUI: Boolean) {
+        if (selectorUI){
+            addExerciseLayout.visibility = View.GONE
+            share_button.visibility = View.GONE
+            cancel_btn.visibility = View.VISIBLE
+            share_btn.visibility = View.VISIBLE
+            textView4.visibility = View.VISIBLE
+            textView4.text = "Tap exercises you want to send"
+            share_btn.setOnClickListener {
+                if (filteredExes.isNotEmpty()) {
+                    fragmentManager = supportFragmentManager
+                    setUpFragment()
+                } else {
+                    Toast.makeText(this,"No exes selected",Toast.LENGTH_SHORT).show()
+                }
+            }
 
-        exerciseViewerViewModel.allExercises.observe(this, Observer { exercises ->
+            cancel_btn.setOnClickListener {
+                modifyToSelectorUI(false)
+                setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
+            }
+
+        } else {
+            addExerciseLayout.visibility = View.VISIBLE
+            share_button.visibility = View.VISIBLE
+            cancel_btn.visibility = View.GONE
+            share_btn.visibility = View.GONE
+            textView4.visibility = View.GONE
+        }
+
+    }
+
+    private fun initObservers() {
+        exerciseViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
-                Timber.d("I WANNA SEE THIS: $exercises")
+                //                Timber.d("I WANNA SEE THIS: $exercises")
 
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
@@ -71,15 +178,13 @@ class ExerciseViewer : AppCompatActivity() {
                     recyclerView.visibility = View.VISIBLE
                     adapter.setExercises(it)
                     allExercises = it
+                    filteredExes.addAll(allExercises)
                 }
             }
         })
 
-
-        val dialog = setProgressDialog(this, "Talking with cloud...")
-
-        exerciseViewerViewModel.getIsLoading().observe(this, Observer { isLoading ->
-            if (isLoading){
+        exerciseViewModel.getIsLoading().observe(this, Observer { isLoading ->
+            if (isLoading) {
                 dialog.show()
 
             } else {
@@ -87,38 +192,176 @@ class ExerciseViewer : AppCompatActivity() {
             }
         })
 
-        addExerciseBtn.setOnClickListener {
-            Timber.d("Exercise Viewer --> Exercise creator")
+        exerciseViewModel.allFriends.observe(this, Observer {friends ->
+            allFriends=friends
+        })
+    }
 
-            val intent = Intent(this, ExerciseCreator::class.java)
-            intent.putExtra(ExerciseCreator.OBJECT_ACTION, ExerciseCreator.OBJECT_NEW)
-            startActivity(intent)
+    override fun onFriendSelected(friend: Friend) {
+        Toast.makeText(this, "Sending to ${friend.username}!", Toast.LENGTH_SHORT).show()
+        exerciseViewModel.sendExercisesToUser(selectedExercises, friend)
+        fragmentManager.popBackStack()
+        modifyToSelectorUI(false)
+        setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
+    }
+
+    override fun onCancelSelected() {
+        fragmentManager.popBackStack()
+        modifyToSelectorUI(false)
+        setUpAdapter(ExerciseListAdapter.DEFAULT_LAYOUT)
+    }
+
+    private fun setUpFragment() {
+
+        var fragmentTransaction = fragmentManager.beginTransaction()
+
+        fragmentTransaction.setCustomAnimations(
+            R.anim.slide_in_up,
+            R.anim.slide_in_down,
+            R.anim.slide_out_down,
+            R.anim.slide_out_up
+        )
+
+        fragmentTransaction.addToBackStack("A")
+            .replace(R.id.frame_layout, ShareToFriendsFragment.newInstance(allFriends))
+        fragmentTransaction.commit()
+
+    }
+
+    private val connection = object : ServiceConnection {
+
+        override fun onServiceConnected(className: ComponentName, service: IBinder) {
+            // We've bound to LocalService, cast the IBinder and get LocalService instance
+
+            val binder = service as FirebaseListenerService.LocalBinder
+            mService = binder.getService()
+            mBound = true
+            observe()
 
         }
 
-        getButton.setOnClickListener {
-
-
-            //if this works - think of exercises/blocks/days how to get references to exercises ( forget blocks)
-            Utils.getInfoDialogView(this,title.toString(),"Replace for your cloud exercises?",object:
-                DialogPositiveNegativeHandler {
-                override fun onPositiveButton(editTextText:String) {
-                    super.onPositiveButton(editTextText)
-                    exerciseViewerViewModel.getExercisesFromFirestore()
-                }
-            })
+        override fun onServiceDisconnected(arg0: ComponentName) {
+            mBound = false
         }
+    }
 
-        postButton.setOnClickListener {
-            //post stuff to firestore
-            Utils.getInfoDialogView(this,title.toString(),"Make this your cloud exercises?",object:
-                DialogPositiveNegativeHandler {
+    private fun observe() {
+        mService.receivedExercisesLiveData.observe(this, Observer { lol ->
+            receivedExercises = lol
+            updateSocialButtonListener()
+            updateSocialButtonNumber()
+        })
+    }
 
-                override fun onPositiveButton(editTextText:String) {
-                    super.onPositiveButton(editTextText)
-                    exerciseViewerViewModel.postExercisesToFirestore(allExercises)
+    override fun onStart() {
+        super.onStart()
+        // Bind to LocalService
+        Intent(this, FirebaseListenerService::class.java).also { intent ->
+            bindService(intent, connection, Context.BIND_AUTO_CREATE)
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        unbindService(connection)
+        mBound = false
+    }
+
+    private fun updateSocialButtonListener() {
+        social_button.setOnClickListener {
+            //            var receivedExercises = DataHolder.receivedExercises
+            val title = "New Exercises"
+            var text = "You have not received any new exercises"
+            var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+
+            if (receivedExercises.isNotEmpty()) {
+                val exePackage = receivedExercises[0]
+                text =
+                    "Import ${exePackage.firestoreExercise!!.mName} from your friend ${exePackage.mSender}"
+                dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                    override fun onPositiveButton(inputText: String) {
+                        super.onPositiveButton(inputText)
+                        attemptImportExercise(exePackage)
+                    }
+
+                    override fun onNegativeButton() {
+                        super.onNegativeButton()
+                        exerciseViewModel.updateTransferExercise(
+                            exePackage,
+                            TransferPackage.STATE_REJECTED
+                        )
+                    }
                 }
-            })
+            }
+            Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
+        }
+    }
+
+    private fun attemptImportExercise(exePackage: ExercisePackage) {
+        val exe = exePackage.firestoreExercise!!.toExercise()
+        if (theSameExercise(exe) != null) {
+            val title = "Overwrite"
+            val text = "You already have this exercise, do you want to overwrite it?"
+            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    removeExercise(theSameExercise(exe)!!)
+                    insertExercise(exePackage)
+                }
+
+                override fun onNegativeButton() {
+                    super.onNegativeButton()
+                    rejectExercisePackage(exePackage)
+                }
+            }
+            Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
+        } else {
+            insertExercise(exePackage)
+        }
+    }
+
+
+    private fun theSameExercise(exe: Exercise): Exercise? {
+        for (exercise in allExercises) {
+            if (exe.md5 == exercise.md5) {
+                return exercise
+            }
+        }
+        return null
+    }
+
+    private fun insertExercise(exePackage: ExercisePackage) {
+        exerciseViewModel.insertExercise(exePackage.firestoreExercise!!.toExercise())
+        exerciseViewModel.updateTransferExercise(
+            exePackage,
+            TransferPackage.STATE_SAVED
+        )
+        //update state in firestore to SAVED
+    }
+
+    private fun removeExercise(theSameExercise: Exercise) {
+        exerciseViewModel.deleteExercise(theSameExercise)
+    }
+
+    private fun rejectExercisePackage(exePackage: ExercisePackage) {
+        exerciseViewModel.updateTransferExercise(
+            exePackage,
+            TransferPackage.STATE_REJECTED
+        )
+        //update state in firestore to REJECTED
+    }
+
+    private fun updateSocialButtonNumber() {
+        if (receivedExercises.isEmpty()) {
+            textOne.visibility = View.GONE
+            return
+        }
+        if (receivedExercises.size > 9) {
+            textOne.visibility = View.VISIBLE
+            textOne.text = "9+"
+        } else {
+            textOne.visibility = View.VISIBLE
+            textOne.text = receivedExercises.size.toString()
         }
     }
 
@@ -136,142 +379,52 @@ class ExerciseViewer : AppCompatActivity() {
             }
         }
 
-        itemSelectorListener = object : ClickListenerRecyclerView {
+        selectorListener = object :ClickListenerRecyclerView {
             override fun onClick(view: View, position: Int) {
                 super.onClick(view, position)
-                Timber.d("$position was clicked, selected before: $selectedIndexes")
+                val clickedExe = filteredExes[position]
+                if (!selectedExercises.contains(clickedExe)) {
+                    view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.lightestBlue)) //dis ting is not working
+                    selectedExercises.add(clickedExe)
 
-                if (!selectedIndexes.contains(position)) {
-                    view.alpha = 0.5f
-                    selectedIndexes.add(position)
                 } else {
-
-                    val iterator = selectedIndexes.iterator()
-                    while (iterator.hasNext()) {
-                        val y = iterator.next()
-                        if (y == position) {
-                            view.alpha = 1.0f
-                            iterator.remove()
-                            break
-                        }
-                    }
-
+                    // (0x00000000) mean fully transparent
+                    view.linearLayoutExerciseHolder.setBackgroundColor(resources.getColor(R.color.white))
+                    selectedExercises.remove(clickedExe)
                 }
-                Timber.d("$position was clicked, selected after: $selectedIndexes")
-
-//                Timber.d("current selection: $selectedIndexes")
-
+                val string = "Exercise count: ${selectedExercises.size}"
+                textView4.text=string
             }
         }
-    }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.viewer_toolbar_menu, menu)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        android.R.id.home -> {
-            onBackPressed()
-            true
-        }
-
-        R.id.action_export -> {
-            //show dialog with instructions to select
-//            checkPermissions()
-//            managePermissions.checkPermissions()
-            showImportDialog()
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
-
-    private fun showImportDialog() {
-
-        Utils.getDialogViewWithEditText(
-            this,
-            title.toString(),
-            "Click the exercises you desire to select",
-            object :
-                DialogPositiveNegativeHandler {
-                override fun onPositiveButton(editTextText: String) {
-                    super.onPositiveButton(editTextText)
-                    if (editTextText.isEmpty()) {
-                        Toast.makeText(
-                            this@ExerciseViewer,
-                            "Block name must not be empty",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        makeListSelectable(editTextText)
-                    }
-                }
-            })
-//        val mDialogView = LayoutInflater.from(this).inflate(R.layout.dialog_window_export, null)
-//        mDialogView.text_info.text = "Click the exercises you desire to select"
-//
-//        val mBuilder = AlertDialog.Builder(this).setView(mDialogView).setTitle(title)
-//        mBuilder.setPositiveButton("OK") { _, _ ->
-//            val exportFileName = mDialogView.export_name_edittext.text.trim().toString()
-//            if (exportFileName.isEmpty()) {
-//                Toast.makeText(this, "Block name must not be empty", Toast.LENGTH_SHORT).show()
-//            } else {
-//                makeListSelectable(exportFileName)
-//            }
-//        }
-//        mBuilder.show()
-    }
-
-    private fun makeListSelectable(exportBlockName: String) {
-        selectedIndexes.clear()
-        addExerciseBtn.visibility = View.GONE
-        title = "Select Exercises"
-
-
-        updateAdapterListener(itemSelectorListener)
-        exportBtn.visibility = View.VISIBLE
-        exportBtn.setOnClickListener {
-            Timber.d("Final selection: $selectedIndexes")
-            exportBtn.visibility = View.GONE
-            exerciseViewerViewModel.insertBlock(
-                ImportExportUtils.makeExportBlock(
-                    allExercises,
-                    selectedIndexes,
-                    exportBlockName
-                )
-            )
-            addExerciseBtn.visibility = View.VISIBLE
-            title = "Exercise Viewer"
-            updateAdapterListener(goToCreatorListener)
-        }
-
-    }
-
-    private fun updateAdapterListener(newListener: ClickListenerRecyclerView) {
-        adapter = ExerciseListAdapter(this)
-        adapter.setOnClickInterface(newListener)
-        recyclerView.adapter = adapter
-        adapter.setExercises(allExercises)
     }
 
     private fun updateUpdatingExercise(position: Int) {
-
-        var clickedExercise = exerciseViewerViewModel.allExercises.value?.get(position)
-
-        if (clickedExercise != null) {
-            DataHolder.activeExerciseHolder = clickedExercise
-        } else {
-            Timber.d("upsy error")
-        }
-
+        DataHolder.activeExerciseHolder = filteredExes[position]
     }
 
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
 
+    override fun onQueryTextChange(filterText: String?): Boolean {
+        adapter.setExercises(getFilteredExes(filterText))
+        return true
+    }
+
+    private fun getFilteredExes(filterText: String?): List<Exercise> {
+        if (filterText!=null && filterText.isNotEmpty()) {
+            filteredExes.clear()
+
+            val text=filterText.toLowerCase()
+            for (exe in allExercises) {
+                if (exe.name.toLowerCase().contains(text)){
+                    filteredExes.add(exe)
+                }
+            }
+            return filteredExes
+        } else {
+            return allExercises
+        }
+    }
 }

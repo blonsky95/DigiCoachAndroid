@@ -5,63 +5,70 @@
 
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
     <application
             android:name=".MainApplication"
             android:allowBackup="true"
-            android:icon="@mipmap/ic_launcher"
+            android:icon="@mipmap/icon_launcher_test"
             android:label="@string/app_name"
-            android:roundIcon="@mipmap/ic_launcher_round"
+            android:roundIcon="@mipmap/icon_launcher_test"
             android:supportsRtl="true"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar"
             tools:ignore="GoogleAppIndexingWarning">
 
-<!--        <service-->
-<!--                android:name=".utils.MyFirebaseMessagingService"-->
-<!--                android:exported="false">-->
-<!--            <intent-filter>-->
-<!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
-<!--            </intent-filter>-->
-<!--        </service>-->
+        <!--        <service-->
+        <!--                android:name=".utils.MyFirebaseMessagingService"-->
+        <!--                android:exported="false">-->
+        <!--            <intent-filter>-->
+        <!--                <action android:name="com.google.firebase.MESSAGING_EVENT" />-->
+        <!--            </intent-filter>-->
+        <!--        </service>-->
 
         <meta-data
                 android:name="com.google.firebase.messaging.default_notification_channel_id"
                 android:value="Find me in the manifest" />
+        <meta-data
+                android:name="preloaded_fonts"
+                android:resource="@array/preloaded_fonts" />
 
-        <activity android:name=".ui.LoginScreen">
+        <activity android:name=".ui.UserAccess">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.HomeScreen">
-<!--            <intent-filter>-->
-<!--                <action android:name="android.intent.action.MAIN" />-->
-
-<!--                <category android:name="android.intent.category.LAUNCHER" />-->
-<!--            </intent-filter>-->
-        </activity>
+        <activity
+                android:name=".ui.LoginSignUp"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.HomeScreen"
+                android:launchMode="singleTask" />
         <activity
                 android:name=".ui.Library"
-                android:parentActivityName=".ui.HomeScreen" />
+                android:parentActivityName=".ui.HomeScreen"
+                android:windowSoftInputMode="adjustPan" />
+        <activity
+                android:name=".ui.Profile"
+                android:parentActivityName=".ui.HomeScreen"
+                android:windowSoftInputMode="adjustPan" />
         <activity
                 android:name=".ui.exercise.ExerciseViewer"
-                android:parentActivityName=".ui.HomeScreen" />
+                android:parentActivityName=".ui.HomeScreen"
+                android:windowSoftInputMode="adjustPan" />
+
         <activity
-                android:name=".ui.block.BlockViewer"
-                android:parentActivityName=".ui.HomeScreen" />
-        <activity
-                android:name=".ui.day.DayViewer"
+                android:name=".ui.calendar.WeekViewer"
                 android:parentActivityName=".ui.HomeScreen" />
         <activity
                 android:name=".ui.exercise.ExerciseCreator"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".ui.block.BlockCreator"
+                android:name=".ui.calendar.DayCreator"
                 android:windowSoftInputMode="adjustPan" />
         <activity
-                android:name=".ui.day.DayCreator"
+                android:name=".ui.calendar.MonthViewer"
                 android:windowSoftInputMode="adjustPan" />
         <activity
                 android:name=".ui.results.ResultsViewer"
@@ -69,6 +76,10 @@
         <activity
                 android:name=".ui.results.ResultsCreator"
                 android:windowSoftInputMode="adjustPan" />
+
+        <service
+                android:name=".network.FirebaseListenerService"
+                android:exported="false" />
     </application>
 
 </manifest>

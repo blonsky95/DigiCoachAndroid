@@ -11,69 +11,55 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="4dp"
             android:layout_marginEnd="8dp"
+            android:layout_marginBottom="24dp"
+            android:textAllCaps="true"
+            android:textColor="@color/textBlue"
             android:gravity="center"
-            android:padding="16dp"
+            android:padding="8dp"
+            android:textSize="20sp"
+            android:fontFamily="@font/open_sans_bold"
             android:text="what day am i"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
-    <!--    <ScrollView-->
-    <!--            android:id="@+id/content"-->
-    <!--            android:layout_width="match_parent"-->
-    <!--            android:layout_height="0dp"-->
-    <!--            android:layout_marginTop="8dp"-->
-    <!--            android:layout_marginBottom="8dp"-->
-    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@+id/weekDay"-->
-    <!--            app:layout_constraintVertical_bias="1.0"-->
-    <!--            tools:layout_editor_absoluteX="0dp">-->
-
     <TextView
             android:id="@+id/ifEmptyDaytext"
-            android:gravity="center"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginEnd="16dp"
+            android:background="@color/lightGrey"
+            android:gravity="center"
+            android:paddingStart="16dp"
+            android:paddingTop="72dp"
+            android:paddingEnd="16dp"
+            android:paddingBottom="72dp"
+            android:text="It seems your training diary is empty.\nDon't forget to add your training below"
+            android:fontFamily="@font/open_sans_regular"
+            android:textSize="16sp"
+            android:textColor="@color/darkGrey"
             android:visibility="visible"
-            android:text="No blocks/exercises have been added here yet, press add training"/>
-
-    <View
-            android:id="@+id/divider"
-            android:layout_width="0dp"
-            android:layout_height="3dp"
-            android:layout_marginStart="8dp"
-            android:background="#BFE0D8"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.55" />
-
-    <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/dayBlocksRecyclerView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:background="@android:color/darker_gray"
-            android:visibility="gone"
-            app:layout_constraintBottom_toTopOf="@+id/divider"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/weekDay"
-            tools:listitem="@layout/item_holder_block" />
+            app:layout_constraintTop_toBottomOf="@+id/weekDay" />
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dayExercisesRecyclerView"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:background="@android:color/darker_gray"
+            android:background="@color/white"
             android:visibility="gone"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="8dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/divider"
+            app:layout_constraintTop_toBottomOf="@+id/weekDay"
             tools:listitem="@layout/item_holder_exercise" />
 
     <!--    </ScrollView>-->

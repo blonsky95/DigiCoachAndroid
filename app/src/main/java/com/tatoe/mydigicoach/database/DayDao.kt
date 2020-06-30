@@ -6,26 +6,35 @@ import com.tatoe.mydigicoach.entity.Day
 @Dao
 interface DayDao {
     @Query("SELECT * FROM day_table ORDER BY dayId ASC")
-    fun getAll(): androidx.lifecycle.LiveData<List<Day>>
-
-    @Query("SELECT * FROM day_table WHERE dayId LIKE :dayId")
-    suspend fun findByName(dayId: String): Day
-
-    @Update
-    suspend fun update(exercise: Day)
-
-    @Insert
-    fun insertAll(vararg exercise: Day)
-
-    @Insert
-    suspend fun insert(exercise: Day) : Long
-
-    @Delete
-    suspend fun delete(exercise: Day)
-
-    @Update
-    fun updateTodo(vararg exercises: Day)
+    fun getAllLiveData(): androidx.lifecycle.LiveData<List<Day>>
 
     @Query("SELECT * FROM day_table ORDER BY dayId ASC")
-    suspend fun getDays(): List<Day>
+    suspend fun getAll(): List<Day>
+
+    @Query("DELETE FROM day_table")
+    suspend fun deleteTable()
+
+    @Query("SELECT * FROM day_table WHERE dayId LIKE :dayId")
+    fun findByName(dayId: String): androidx.lifecycle.LiveData<Day>
+
+    @Update
+    suspend fun update(day: Day)
+
+//    @Insert
+////    fun insertAll(vararg exercise: Day)
+
+    @Insert
+    suspend fun insertAll( days: List<Day>) : List<Long>
+
+    @Insert
+    suspend fun insert(day: Day) : Long
+
+    @Delete
+    suspend fun delete(day: Day)
+
+    @Update
+    fun updateTodo(vararg days: Day)
+
+//    @Query("SELECT * FROM day_table ORDER BY dayId ASC")
+//    suspend fun getDays(): List<Day>
 }

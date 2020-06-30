@@ -6,7 +6,10 @@ import com.tatoe.mydigicoach.entity.Exercise
 @Dao
 interface ExerciseDao {
     @Query("SELECT * FROM exercise_table ORDER BY name ASC")
-    fun getAll(): androidx.lifecycle.LiveData<List<Exercise>>
+    fun getAllLiveData(): androidx.lifecycle.LiveData<List<Exercise>>
+
+    @Query("SELECT * FROM exercise_table ORDER BY name ASC")
+    suspend fun getAll(): List<Exercise>
 
     @Query("DELETE FROM exercise_table")
     suspend fun deleteTable()
@@ -17,8 +20,9 @@ interface ExerciseDao {
     @Update
     suspend fun update(exercise: Exercise)
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertAll( exercises: List<Exercise>)
+//    (onConflict = OnConflictStrategy.REPLACE)
+    @Insert
+    suspend fun insertAll( exercises: List<Exercise>) : List<Long>
 
     @Insert
     suspend fun insert(exercise: Exercise) : Long

@@ -1,176 +1,238 @@
 package com.tatoe.mydigicoach.ui
 
+import android.content.Context
 import android.content.Intent
+import android.graphics.Rect
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
+import android.view.*
+import androidx.annotation.DimenRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.RecyclerView
+import androidx.viewpager2.widget.ViewPager2
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.*
+import com.tatoe.mydigicoach.entity.Day
 //import com.google.firebase.iid.FirebaseInstanceId
-import com.tatoe.mydigicoach.ui.block.BlockViewer
-import com.tatoe.mydigicoach.ui.day.DayViewer
+import com.tatoe.mydigicoach.ui.calendar.DayCreator
+import com.tatoe.mydigicoach.ui.calendar.MonthViewer
+import com.tatoe.mydigicoach.ui.calendar.WeekViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
-import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.viewmodels.HomeScreenViewModel
-import com.tatoe.mydigicoach.viewmodels.MyHomeScreenViewModelFactory
-import kotlinx.android.synthetic.main.activity_home.*
+import com.tatoe.mydigicoach.viewmodels.HomeViewModel
+import com.tatoe.mydigicoach.viewmodels.MyHomeViewModelFactory
+import kotlinx.android.synthetic.main.activity_home_2.*
+import kotlinx.android.synthetic.main.item_holder_home_slider.view.*
 import timber.log.Timber
-import java.util.*
 
 class HomeScreen : AppCompatActivity() {
 
-    private var firebaseUser:FirebaseUser? = null
+    private var firebaseUser: FirebaseUser? = null
     private var db = FirebaseFirestore.getInstance()
 
-
-    private lateinit var homeScreenViewModel: HomeScreenViewModel
-
+    private lateinit var homeViewModel: HomeViewModel
+    private var dayToday: Day? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        title = "Home"
+        setContentView(R.layout.activity_home_2)
+
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
-        } else {
         }
 
-//        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
-        homeScreenViewModel = ViewModelProviders.of(this,
-            MyHomeScreenViewModelFactory(db)
+        homeViewModel = ViewModelProviders.of(
+            this,
+            MyHomeViewModelFactory(application, db)
         ).get(
-            HomeScreenViewModel::class.java)
+            HomeViewModel::class.java
+        )
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
+
         if (firebaseUser != null) {
-            welcome_text.text = firebaseUser!!.email
-            DataHolder.userEmail=firebaseUser!!.email
-        } else {
-            // No user is signed in
+            homeViewModel.saveUserToDataholder()
+
         }
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        calendar_button.setOnClickListener {
-            var intent = Intent(this, DayViewer::class.java)
-            startActivity(intent)
+//        val viewpager = viewpager
+        viewpager2.adapter = CustomPagerAdapter(this)
+        viewpager2.offscreenPageLimit = 1
+
+        val nextItemVisiblePx = resources.getDimension(R.dimen.viewpager_next_item_visible)
+        val currentItemHorizontalMarginPx =
+            resources.getDimension(R.dimen.viewpager_current_item_horizontal_margin)
+        val pageTranslationX = nextItemVisiblePx + currentItemHorizontalMarginPx
+        val pageTransformer = ViewPager2.PageTransformer { page: View, position: Float ->
+            page.translationX = -pageTranslationX * position
+            // Next line scales the item's height. You can remove it if you don't want this effect
+//            page.scaleY = 1 - (0.1f * kotlin.math.abs(position))
+            // If you want a fading effect uncomment the next line:
+            // page.alpha = 0.25f + (1 - abs(position))
         }
+        viewpager2.setPageTransformer(pageTransformer)
 
-        block_button.setOnClickListener {
-            var intent = Intent(this, BlockViewer::class.java)
-            startActivity(intent)
-        }
+        val itemDecoration = HorizontalMarginItemDecoration(
+            this,
+            R.dimen.viewpager_current_item_horizontal_margin
+        )
+        viewpager2.addItemDecoration(itemDecoration)
 
-        exercise_button.setOnClickListener {
-            var intent = Intent(this, ExerciseViewer::class.java)
-            startActivity(intent)
-        }
+//        recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
 
-        library_button.setOnClickListener {
-            var intent = Intent(this, Library::class.java)
-            startActivity(intent)
-        }
-
-
-        val user1 = hashMapOf(
-            "username" to "${firebaseUser?.displayName}",
-            "email" to "${firebaseUser?.email}",
-            "last_contact" to Calendar.getInstance().time.toString()
-        ) as HashMap<String, Any>
-
-// Add a new document with a generated ID
-
-//        addUser(user1)
-        homeScreenViewModel.checkInUserFirestore(user1)
-
-//        val user2 = hashMapOf(
-//            "username" to "${firebaseUser?.displayName}",
-//            "email" to "${firebaseUser?.email}",
-//            "last_contact" to Calendar.getInstance().time.toString(),
-//            "android_version" to android.os.Build.VERSION.SDK_INT
-//        )
-
-//        addUser(user2)
-
-//        FirebaseInstanceId.getInstance().instanceId
-//            .addOnCompleteListener(OnCompleteListener { task ->
-//                if (!task.isSuccessful) {
-//                    Timber.d("getInstanceId failed ${task.exception}")
-//                    return@OnCompleteListener
-//                }
-//
-//                // Get new Instance ID token
-//                val token = task.result?.token
-//
-//                // Log and toast
-////                val msg = getString(R.string.msg_token_fmt, token)
-//                Timber.d(token.toString())
-//                Toast.makeText(baseContext, token.toString(), Toast.LENGTH_SHORT).show()
-//            })
-
-        viewData()
-
+        initObservers()
     }
 
-    private fun viewData() {
-        db.collection("users")
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    Timber.d( "${document.id} => ${document.data} ********** email: ${document["email"]}")
+    class CustomPagerAdapter(homeScreen: HomeScreen) :
+        RecyclerView.Adapter<CustomPagerAdapter.MyViewHolder>() {
+
+        private val inflater: LayoutInflater = LayoutInflater.from(homeScreen)
+        private val context = homeScreen
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
+            val itemView = inflater.inflate(R.layout.item_holder_home_slider, parent, false)
+            return MyViewHolder(itemView)
+        }
+
+        override fun getItemCount(): Int {
+            return 4
+        }
+
+        override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
+
+            var classVar: Class<*>? = null
+            when (position) {
+                0 -> {
+                    holder.name.text = "Exercises"
+                    classVar = ExerciseViewer::class.java
+                }
+                1 -> {
+                    holder.name.text = "Calendar"
+                    classVar = MonthViewer::class.java
+                }
+                2 -> {
+                    holder.name.text = "Store"
+                    classVar = Library::class.java
+                }
+                3 -> {
+                    holder.name.text = "Profile"
+                    classVar = Profile::class.java
+
                 }
             }
-            .addOnFailureListener { exception ->
-                Timber.d( "Error getting documents: $exception")
+            holder.container.setOnClickListener {
+                if (classVar!=null){
+                    context.startActivity(Intent(context, classVar))
+                }
             }
-    }
-
-    private fun addUser(user: HashMap<String, Any>) {
-        //todo run this in non UI thread
-        if (!userInCollection(user["email"] as String)) {
-            db.collection("users").document(user["email"] as String)
-                .set(user)
-                .addOnSuccessListener {
-                    Timber.d("DocumentSnapshot added!")
-                }
-                .addOnFailureListener { e ->
-                    Timber.d("Error adding document: $e")
-                }
         }
-        Timber.d("we gucci no need to add")
+
+        class MyViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+            var background = v.category_image
+            var name = v.category_name
+            var container = v.item_container
+        }
 
     }
 
-    private fun userInCollection(userEmail: String): Boolean {
-        // check if in users there is document
-        val docRef : DocumentReference = db.collection("users").document(userEmail)
-//        Timber.d("is docref succesfull: ${docRef.get().result?.exists()}")
+    class HorizontalMarginItemDecoration(context: Context, @DimenRes horizontalMarginInDp: Int) :
+        RecyclerView.ItemDecoration() {
 
-        return docRef.get().isSuccessful
+        private val horizontalMarginInPx: Int =
+            context.resources.getDimension(horizontalMarginInDp).toInt()
 
+        override fun getItemOffsets(
+            outRect: Rect, view: View, parent: RecyclerView, state: RecyclerView.State
+        ) {
+            outRect.right = horizontalMarginInPx
+            outRect.left = horizontalMarginInPx
+        }
+
+    }
+
+    private fun initObservers() {
+        homeViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
+            dayToday = day
+            var isDayEmpty =
+                dayToday == null || dayToday?.exercises!!.isEmpty()
+            updateUI(isDayEmpty)
+        })
+
+    }
+
+    private fun updateUI(isDayEmpty: Boolean) {
+        if (isDayEmpty) {
+            todayDiaryText.text = "Click here to add today's training!"
+            todayDairyImage.setOnClickListener {
+                val intent = Intent(this, DayCreator::class.java)
+                intent.putExtra(DayCreator.DAY_ID, Day.dateToDayID(Day.getTodayDate()))
+                startActivity(intent)
+            }
+//            ifEmptyTodaytext.visibility = View.VISIBLE
+//            recyclerViewExercises.visibility = View.GONE
+//            ifEmptyTodaytext.setOnClickListener {
+//                val intent = Intent(this, DayCreator::class.java)
+//                intent.putExtra(DayCreator.DAY_ID, Day.dateToDayID(Day.getTodayDate()))
+//                startActivity(intent)
+//            }
+        } else {
+//            ifEmptyTodaytext.visibility = View.GONE
+//            recyclerViewExercises.visibility = View.VISIBLE
+            var todayText = ""
+            val itemMax = 3
+            var i = 0
+            for (exercise in dayToday!!.exercises) {
+                if (i != itemMax) {
+                    todayText += "- ${exercise.name}\n"
+                    i++
+                } else {
+                    todayText += "- Tap here for full training"
+                    break
+                }
+            }
+            todayDiaryText.text = todayText
+            todayDairyImage.setOnClickListener {
+                val intent = Intent(this, WeekViewer::class.java)
+                intent.putExtra(MonthViewer.DAY_ID_KEY, Day.dateToDayID(Day.getTodayDate()))
+                startActivity(intent)
+            }
+//            val dayContentAdapterExercises =
+//                DayExercisesListAdapter(
+//                    this,
+//                    dayToday!!.dayId,
+//                    CustomAdapterFragment.EXERCISE_TYPE_ADAPTER
+//                )
+//            recyclerViewExercises.adapter = dayContentAdapterExercises
+//            recyclerViewExercises.layoutManager = LinearLayoutManager(this)
+//            dayContentAdapterExercises.setContent(dayToday)
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.home_toolbar_menu, menu)
-
         return super.onCreateOptionsMenu(menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
 
         R.id.action_logout -> {
+            homeViewModel.closeDbInstance()
             FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, LoginScreen::class.java)
+            val intent = Intent(this, UserAccess::class.java)
             startActivity(intent)
+            finish()
             true
         }
 
+        R.id.upload_store_exercises -> {
+            //uncomment this to be able to add stub exercises to store
+//        loginSignUpViewModel.addBunchOfStubStoreExercises()
+            true
+        }
 
         else -> {
             super.onOptionsItemSelected(item)

@@ -4,11 +4,50 @@
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
 
+    <color name="lightestBlue">#91D5DF</color>
     <color name="lightBlue">#9500BCD4</color>
     <color name="darkBlue">#95264DB4</color>
+    <color name="textBlue">#333366</color>
+
+    <color name="lightOrange">#FFA500</color>
+    <color name="darkOrange">#FF3C00</color>
 
     <color name="lightRed">#95FC3E3E</color>
     <color name="darkRed">#95F80404</color>
+
+    <color name="pink">#FFCCCC</color>
+    <color name="pinkTransparent">#80FFCCCC</color>
+
+    <color name="squareOrange">#99FFCC99</color>
+    <color name="squareDarkerOrange">#FFCC99</color>
+
+    <color name="lightGrey">#66E0E0E0</color>
+    <color name="lightGreyv2">#A8A5A5</color>
+    <color name="transpGrey">#409D9D9C</color>
+    <color name="darkGrey">#6B6B6B</color>
+
+    <color name="lightestGreen">#95ABEBAB</color>
+    <color name="lightGreen">#99CC99</color>
+    <color name="darkGreen">#669966</color>
+    <color name="evenDarkerGreen">#516451</color>
+
+    <color name="white">#FFFFFF</color>
+    <color name="white_70">#B3FFFFFF</color>
+
+    <color name="black">#000000</color>
+    <color name="transparent_black">#54000000</color>
+
+    <color name="palette1">#4873A6</color>
+    <color name="palette2">#3fa9f5</color>
+    <color name="palette2_40">#663FA9F5</color>
+    <color name="palette3">#40C9C5</color>
+    <color name="palette4">#FFC0BE</color>
+    <color name="palette5">#FFEBE7</color>
+    <color name="palette5_30">#4DFFEBE7</color>
+
+
+
+
 
 
 

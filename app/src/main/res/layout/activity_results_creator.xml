@@ -75,7 +75,7 @@
     </ScrollView>
 
 
-    <Button
+    <TextView
             android:id="@+id/right_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -101,7 +101,7 @@
 <!--            app:layout_constraintTop_toBottomOf="@+id/scrollView"-->
 <!--            app:layout_constraintVertical_bias="1.0" />-->
 
-    <Button
+    <TextView
             android:id="@+id/left_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

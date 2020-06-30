@@ -1,272 +1,442 @@
 package com.tatoe.mydigicoach.ui
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import android.view.View
+import android.view.*
+import android.widget.SearchView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.tatoe.mydigicoach.viewmodels.DataViewModel
+import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
-import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.ui.util.BlockV2ListAdapter
-import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
-import kotlinx.android.synthetic.main.activity_exercise_viewer.ifEmptyText
-import kotlinx.android.synthetic.main.activity_exercise_viewer.recyclerview
+import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.MyCustomStoreExercise
+import com.tatoe.mydigicoach.viewmodels.LibraryViewModel
+import com.tatoe.mydigicoach.viewmodels.MyLibraryViewModelFactory
+import kotlinx.android.synthetic.main.activity_library.*
+import kotlinx.android.synthetic.main.dialog_window_library_filter.view.*
+import kotlinx.android.synthetic.main.item_holder_exercise_library.view.*
+import kotlinx.android.synthetic.main.item_holder_filter_library.view.*
 import timber.log.Timber
 
-class Library : AppCompatActivity() {
-    private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: BlockV2ListAdapter
-    private lateinit var dataViewModel: DataViewModel
+class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
+    private lateinit var myExercisesAdapter: MyCustomExercisesAdapter
+    private lateinit var libraryViewModel: LibraryViewModel
 
-    private lateinit var blockActionHandler: ClickListenerRecyclerView
+    private var allMyCustomStoreExercises = arrayListOf<MyCustomStoreExercise>()
+    private var allMyExercises = listOf<Exercise>()
+    var filterCategories = arrayListOf<Pair<String, Boolean>>()
+    var toImportExercises = arrayListOf<MyCustomStoreExercise>()
 
-    //    private var userBlockList: List<Block> = listOf()
-    private var appBlockList: List<Block> = listOf()
-    private var importBlockList: List<Block> = listOf()
-    private var exportBlockList: List<Block> = listOf()
+    private var db = FirebaseFirestore.getInstance()
 
-    private var activeBlockList: List<Block> = mutableListOf()
-
-    private var loadDefaultBlockList = true //so display user blocks
-    private var blockNeedsInserting = false
-    lateinit var blockToBeUpdated: Block
-    private var allExercises = listOf<Exercise>()
-//    companion object {
-//
-//    }
+    private var allExesLoaded = false
+    private var storeExercisesLoaded = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_library)
-        title = "Library"
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
-        supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        supportActionBar?.setDisplayShowTitleEnabled(false)
 
-        dataViewModel = ViewModelProviders.of(this).get(DataViewModel::class.java)
+        libraryViewModel = ViewModelProviders.of(
+            this,
+            MyLibraryViewModelFactory(application, db)
+        ).get(
+            LibraryViewModel::class.java
+        )
 
-        recyclerView = recyclerview as RecyclerView
+        myExercisesAdapter = MyCustomExercisesAdapter(this)
+        search_view.isIconified = true
 
-        initAdapterListeners()
+        libraryExercisesList.layoutManager = LinearLayoutManager(this)
+        libraryExercisesList.adapter = myExercisesAdapter
 
-        adapter = BlockV2ListAdapter(this)
-        adapter.setOnClickInterface(blockActionHandler)
-        recyclerView.adapter = adapter
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        addToTrainingBtn.setOnClickListener {
+            toImportExercises = myExercisesAdapter.checkedExercises
+            Timber.d("exercises to import ${toImportExercises.size}")
+            attemptImportExercises()
 
-//        activeBlockList = userBlockList
+        }
+
+        home_button.setOnClickListener{
+            startActivity(Intent(this, HomeScreen::class.java))
+            finish()
+        }
 
         initObservers()
+    }
 
+    private fun attemptImportExercises() {
+        var toRemoveExes= arrayListOf<MyCustomStoreExercise>()
+        for (exe in toImportExercises) {
+            if (theSameExercise(exe.mExercise) != null) {
+                val title = "Overwrite"
+                val text = "You already have this exercise, do you want to overwrite it?"
+                val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                    override fun onPositiveButton(inputText: String) {
+                        super.onPositiveButton(inputText)
+                        removeExercise(theSameExercise(exe.mExercise)!!)
+                        insertExercise(exe.mExercise)
+                    }
+
+                }
+                Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
+                toRemoveExes.add(exe)
+//                toImportExercises.remove(exe)
+            }
+        }
+        for (removableEx in toRemoveExes) {
+            toImportExercises.remove(removableEx)
+        }
+        if (toImportExercises.isNotEmpty()) {
+            libraryViewModel.importExercises(toImportExercises)
+            allExesLoaded = false
+        }
+    }
+
+    private fun insertExercise(mExercise: Exercise) {
+        libraryViewModel.insertExercise(mExercise)
+    }
+
+    private fun removeExercise(theSameExercise: Exercise) {
+        libraryViewModel.removeExercise(theSameExercise)
+    }
+
+    private fun theSameExercise(exe: Exercise): Exercise? {
+        for (exercise in allMyExercises) {
+            if (exe.md5 == exercise.md5) {
+                return exercise
+            }
+        }
+        return null
+    }
+
+    lateinit var mAlertDialog: AlertDialog
+
+    private fun showFilterDialog() {
+
+        val mDialogView =
+            LayoutInflater.from(this).inflate(R.layout.dialog_window_library_filter, null)
+        var customCategoriesAdapter = MyCustomCategoriesAdapter(this)
+        mDialogView.libraryCategoriesList.layoutManager = LinearLayoutManager(this)
+        mDialogView.libraryCategoriesList.adapter = customCategoriesAdapter
+        mDialogView.filter_btn.setOnClickListener {
+
+            filterByCategory(customCategoriesAdapter.checkedCategories)
+        }
+        mDialogView.clear_btn.setOnClickListener {
+            customCategoriesAdapter.clearFilters()
+        }
+
+
+        val mBuilder = AlertDialog.Builder(this).setView(mDialogView)
+        mBuilder.setCancelable(true)
+        mAlertDialog = mBuilder.show()
+    }
+
+    private fun filterByCategory(checkedCategories: java.util.ArrayList<String>) {
+        Timber.d("Filter by:  and size is ${checkedCategories.size}")
+        active_categories.visibility = View.GONE
+
+        var filteredExes = arrayListOf<MyCustomStoreExercise>()
+        for (myCustomStoreExercise in allMyCustomStoreExercises) {
+            if (checkedCategories.isEmpty()) {
+                filteredExes.add(myCustomStoreExercise)
+            } else {
+                var catsString = ""
+                var i = 0
+                for (categ in checkedCategories) {
+                    i++
+                    catsString += categ
+                    if (i < checkedCategories.size) {
+                        catsString += "  -  "
+                    }
+                    if (myCustomStoreExercise.mCategory == categ) {
+                        filteredExes.add(myCustomStoreExercise)
+                        continue
+                    }
+                }
+                active_categories.visibility = View.VISIBLE
+                active_categories.text = catsString
+            }
+
+        }
+        mAlertDialog.dismiss()
+        myExercisesAdapter.setContent(filteredExes)
     }
 
     private fun initObservers() {
-        dataViewModel.allExercises.observe(this, Observer { exercises ->
-            exercises.let {
-                allExercises = it
-                //the following is run when a premade block has been inserted and needs non-IDied
-                //exercises to be swapped for exercises with ID
-                if (blockNeedsInserting) {
-                    insertBlockReExercises()
-                }
+        libraryViewModel.isDoingBackgroundTask.observe(this, Observer {
+            Timber.d("is doing background task: $it ")
+            if (it) {
+                progressBar_cyclic.visibility = View.VISIBLE
+            } else {
+                progressBar_cyclic.visibility = View.GONE
             }
         })
 
-        dataViewModel.allAppBlocks.observe(this, Observer { blocks ->
-            blocks?.let {
-                appBlockList = it
-
-                if (loadDefaultBlockList) {
-                    activeBlockList = appBlockList
-                    displayAdapter(activeBlockList, "you broke the system")
-                    loadDefaultBlockList = false
-                }
-                //todo check this block of comment
-                //when you delete the last user made block the adapter doesnt load the ifemptytext, but an empty adapter until you reopen Library
-                Timber.d("app blocks observer updated to: $appBlockList")
-
+        libraryViewModel.infoText.observe(this, Observer {
+            if (it.isNotEmpty()) {
+                info_textview.text=it
+                info_textview.visibility=View.VISIBLE
+            } else {
+                info_textview.visibility=View.GONE
             }
         })
-        dataViewModel.allImportBlocks.observe(this, Observer { blocks ->
-            blocks?.let {
-                importBlockList = it
+
+        var isInserting = false
+
+        libraryViewModel.isInsertingExercises.observe(this, Observer {
+            if (isInserting && !it) {
+                progressBar_cyclic.visibility = View.GONE
+                Toast.makeText(this, "Exercises imported", Toast.LENGTH_SHORT).show()
+                val allExercises = arrayListOf<MyCustomStoreExercise>()
+                for (exe in allMyCustomStoreExercises) {
+                    allExercises.add(exe)
+                }
+                myExercisesAdapter = MyCustomExercisesAdapter(this)
+                libraryExercisesList.adapter = myExercisesAdapter
+
+                myExercisesAdapter.setContent(allExercises)
+            } else {
+                isInserting = true
+                progressBar_cyclic.visibility = View.VISIBLE
             }
         })
-        dataViewModel.allExportBlocks.observe(this, Observer { blocks ->
-            blocks?.let {
-                exportBlockList = it
+
+        libraryViewModel.categoriesList.observe(this, Observer {
+            //            allCategories = it
+            for (cat in it) {
+                filterCategories.add(Pair(cat, false))
+            }
+            toolbar_filter.setOnClickListener {
+                showFilterDialog()
             }
         })
-    }
 
-    private fun insertBlockReExercises() {
-        for (i in 0 until blockToBeUpdated.components.size) {
-            //match it with list of all exercises and swap it round
-            for (existingExercise in allExercises) {
-                if (blockToBeUpdated.components[i].name == existingExercise.name && blockToBeUpdated.components[i].description == existingExercise.description) {
-                    Timber.d("HAS BEEN SWAPPED ${blockToBeUpdated.components[i]} for $existingExercise")
-                    blockToBeUpdated.components[i] = existingExercise
-                }
-
+        libraryViewModel.myExercises.observe(this, Observer {
+            Timber.d("got my info of exercises: ${it.size} ")
+            allMyExercises = it
+            allExesLoaded = true
+            if (storeExercisesLoaded) {
+                setContentToAdapter()
             }
-        }
-        dataViewModel.insertBlock(Block(blockToBeUpdated, Block.USER_GENERATED))
-        Toast.makeText(
-            this,
-            "${blockToBeUpdated.name} has been added to your blocks",
-            Toast.LENGTH_SHORT
-        ).show()
-    }
+        })
 
-    private fun displayAdapter(blocks: List<Block>, ifEmptyString: String = "") {
-        Timber.d("Display adapter empty: ${blocks.isEmpty()} - blocks to display: $blocks")
-        if (blocks.isEmpty()) {
-            ifEmptyText.visibility = View.VISIBLE
-            ifEmptyText.text = ifEmptyString
-            recyclerView.visibility = View.GONE
-        } else {
-            ifEmptyText.visibility = View.GONE
-            recyclerView.visibility = View.VISIBLE
-            adapter.loadBlocks(blocks)
-        }
-    }
+        libraryViewModel.storeExercisesList.observe(this, Observer {
+            Timber.d("got my info of store exercise: ${it.size} ")
 
-    private fun initAdapterListeners() {
-        blockActionHandler = object : ClickListenerRecyclerView {
-            override fun onClick(view: View, position: Int, actionId: Int) {
-                super.onClick(view, position, actionId)
-
-                when (actionId) {
-                    R.id.import_btn -> importBlock(position)
-                    R.id.export_btn -> sendBlock(position)
-                    R.id.delete_btn -> deleteBlock(position)
-                }
-
-            }
-        }
-    }
-
-    private fun importBlock(position: Int) {
-
-        Utils.getInfoDialogView(
-            this,
-            "Import Block",
-            "Are you sure you want to import this block?",
-            object :
-                DialogPositiveNegativeHandler {
-
-                override fun onPositiveButton(editTextText: String) {
-                    super.onPositiveButton(editTextText)
-                    val blockToImport = activeBlockList[position]
-                    blockToBeUpdated = activeBlockList[position]
-
-                    //import exercises of the block
-                    var i = 1
-                    for (exercise in blockToImport.components) {
-                        Timber.d("about to insert $exercise")
-                        dataViewModel.insertExercise(exercise)
-                        //this is some dirty shit
-                        if (i == blockToImport.components.size) {
-                            blockNeedsInserting = true
-                        } else {
-                            i++
-                        }
-
+            allMyCustomStoreExercises = it
+            for (exe in allMyCustomStoreExercises) {
+                for (myExe in allMyExercises) {
+                    if (myExe.md5==exe.mExercise.md5) {
+                        exe.isOwned = true
                     }
-                    Toast.makeText(
-                        this@Library,
-                        "${blockToImport.components.size} new exercises have been added",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
                 }
-            })
+            }
 
+            storeExercisesLoaded = true
+            if (allExesLoaded) {
+                setContentToAdapter()
+            } else {
+            }
 
+            search_view.setOnQueryTextListener(this)
+        })
     }
 
-    private fun deleteBlock(position: Int) {
-        val blockToDelete = activeBlockList[position]
-
-        if (blockToDelete.type != Block.APP_PREMADE) {
-            confirmExerciseDeletion(blockToDelete, position)
-        } else {
-            Toast.makeText(this, "Pre made blocks cant be deleted", Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-    private fun confirmExerciseDeletion(blockToDelete: Block, position: Int) {
-        Utils.getInfoDialogView(
-            this,
-            title.toString(),
-            "Are you sure you want to delete this block?",
-            object :
-                DialogPositiveNegativeHandler {
-
-                override fun onPositiveButton(editTextText: String) {
-                    super.onPositiveButton(editTextText)
-                    dataViewModel.deleteBlock(blockToDelete, false)
-                    (activeBlockList as MutableList).removeAt(position)
-                    displayAdapter(activeBlockList,"No blocks have been imported or exported")
+    private fun setContentToAdapter() {
+        for (exe in allMyCustomStoreExercises) {
+            for (myExe in allMyExercises) {
+                if (myExe.md5==exe.mExercise.md5) {
+                    exe.isOwned = true
                 }
+            }
+        }
+        myExercisesAdapter.setContent(allMyCustomStoreExercises)
+    }
 
-                override fun onNegativeButton() {
-                    super.onNegativeButton()
-                    dataViewModel.deleteBlock(blockToDelete, false)
-                    (activeBlockList as MutableList).removeAt(position)
-                    displayAdapter(activeBlockList)
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(newText: String?): Boolean {
+        myExercisesAdapter.filter(newText)
+        return true
+    }
+
+    //is an inner class because I want to acces the categoriesfilter variable which says which filters there is and if they are active (Pair<String, Boolean>)
+    inner class MyCustomCategoriesAdapter(
+        context: Context
+    ) :
+        RecyclerView.Adapter<MyCategoryViewHolder>() {
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+        var checkedCategories = buildCheckedCats()
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyCategoryViewHolder {
+            val itemView = inflater.inflate(R.layout.item_holder_filter_library, parent, false)
+            return MyCategoryViewHolder(itemView)
+        }
+
+        override fun getItemCount(): Int {
+            return filterCategories.size
+        }
+
+        override fun onBindViewHolder(holder: MyCategoryViewHolder, position: Int) {
+            var categoryName = filterCategories[position]
+            holder.name.text = categoryName.first
+            holder.checkBox.isChecked = categoryName.second
+            holder.checkBox.setOnClickListener {
+                if (holder.checkBox.isChecked && !checkedCategories.contains(categoryName.first)) {
+                    checkedCategories.add(categoryName.first)
+                    filterCategories[position] = Pair(categoryName.first, true)
+                } else {
+                    checkedCategories.remove(categoryName.first)
+                    filterCategories[position] = Pair(categoryName.first, false)
                 }
-            })
+            }
+        }
+
+        fun clearFilters() {
+            for (i in 0 until filterCategories.size) {
+                filterCategories[i] = Pair(filterCategories[i].first, false)
+            }
+            checkedCategories = buildCheckedCats()
+
+            notifyDataSetChanged()
+        }
+
+        private fun buildCheckedCats(): ArrayList<String> {
+            var array = arrayListOf<String>()
+            for (cat in filterCategories) {
+                if (cat.second) {
+                    array.add(cat.first)
+                }
+            }
+            return array
+        }
+
+
     }
 
+    class MyCustomExercisesAdapter(context: Context) :
+        RecyclerView.Adapter<MyExerciseViewHolder>() {
 
-    private fun sendBlock(position: Int) {
-        Timber.d("send at position: $position")
+
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+
+        var currentExesInAdapter: ArrayList<MyCustomStoreExercise> = arrayListOf()
+        var initialExesInAdapter: ArrayList<MyCustomStoreExercise> = arrayListOf()
+        var checkedExercises: ArrayList<MyCustomStoreExercise> = arrayListOf()
+//        var allMyExercises = arrayListOf<Exercise>()
+
+        fun setContent(exes: ArrayList<MyCustomStoreExercise>) {
+            initialExesInAdapter = exes
+            currentExesInAdapter = exes
+            notifyDataSetChanged()
+        }
+
+        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyExerciseViewHolder {
+            val itemView = inflater.inflate(R.layout.item_holder_exercise_library, parent, false)
+            return MyExerciseViewHolder(itemView)
+        }
+
+        override fun getItemCount(): Int {
+            return currentExesInAdapter.size
+        }
+
+        override fun onBindViewHolder(holderExercise: MyExerciseViewHolder, position: Int) {
+//            Timber.d("Checked exercises: ${checkedExercises} is $position checked: ${holderExercise.checkBox.isChecked}")
+            var myCustomStoreExercise = currentExesInAdapter[position]
+            val nameDisplay = if (myCustomStoreExercise.isOwned) {
+                "${myCustomStoreExercise.mExercise.name} (OWNED)"
+            } else {
+                myCustomStoreExercise.mExercise.name
+            }
+
+            holderExercise.name.text = nameDisplay
+            holderExercise.descriptionText.text = myCustomStoreExercise.mExercise.description
+            holderExercise.name.setOnClickListener {
+                holderExercise.toggleExpand()
+            }
+
+            holderExercise.checkBox.isChecked = checkedExercises.contains(myCustomStoreExercise)
+//            holderExercise.checkBox.setOnCheckedChangeListener { _, isChecked ->
+//                if (isChecked && !checkedExercises.contains(myCustomStoreExercise)) {
+//                    checkedExercises.add(myCustomStoreExercise)
+//                } else {
+//                    checkedExercises.remove(myCustomStoreExercise)
+//
+//                }
+//            }
+            holderExercise.checkBox.setOnClickListener {
+                if (holderExercise.checkBox.isChecked && !checkedExercises.contains(
+                        myCustomStoreExercise
+                    )
+                ) {
+                    checkedExercises.add(myCustomStoreExercise)
+                } else {
+                    checkedExercises.remove(myCustomStoreExercise)
+                }
+            }
+        }
+
+        fun filter(newText: String?) {
+            var filteredExes = arrayListOf<MyCustomStoreExercise>()
+            Timber.d("Filtering text: $newText")
+            if (newText != null) {
+                if (newText.isEmpty()) {
+                    filteredExes = initialExesInAdapter
+                } else {
+                    for (exe in initialExesInAdapter) {
+                        if (exe.mExercise.name.toLowerCase().contains(newText.toLowerCase())) {
+                            filteredExes.add(exe)
+                        }
+                    }
+                }
+                currentExesInAdapter = filteredExes
+
+                notifyDataSetChanged()
+            }
+        }
+
     }
 
+    class MyExerciseViewHolder(v: View) : RecyclerView.ViewHolder(v) {
+        var expanded: Boolean = false
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.library_toolbar_menu, menu)
+        var name = v.titleTextExerciseHolder
+        var collapsibleLinearLayout = v.collapsibleLinearLayout
+        var descriptionText = v.descriptionTextExerciseHolder
+        var checkBox = v.checkboxLeftExerciseHolder
 
-        return super.onCreateOptionsMenu(menu)
+        fun toggleExpand() {
+            if (!expanded) {
+                collapsibleLinearLayout!!.visibility = View.VISIBLE
+                expanded = true
+            } else {
+                collapsibleLinearLayout!!.visibility = View.GONE
+                expanded = false
+            }
+        }
     }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+    class MyCategoryViewHolder(v: View) : RecyclerView.ViewHolder(v) {
 
-        android.R.id.home -> {
-            onBackPressed()
-            true
-        }
+        var name = v.titleTextCategoryHolder
+        var checkBox = v.checkBox2
 
-        R.id.app_blocks -> {
-            displayAdapter(appBlockList, "You broke the system")
-            activeBlockList = appBlockList
-            true
-        }
-        R.id.import_blocks -> {
-            displayAdapter(importBlockList, "Import blocks/exercises to see them here")
-            activeBlockList = importBlockList
-            true
-        }
-        R.id.export_blocks -> {
-            displayAdapter(exportBlockList, "Export blocks/exercises to see them here")
-            activeBlockList = exportBlockList
-            true
-        }
 
-        else -> {
-            super.onOptionsItemSelected(item)
-        }
     }
 
 }

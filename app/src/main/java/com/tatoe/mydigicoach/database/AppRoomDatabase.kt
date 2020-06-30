@@ -6,6 +6,7 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
+import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.ioThread
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
@@ -14,7 +15,7 @@ import kotlinx.coroutines.runBlocking
 import timber.log.Timber
 
 @Database(
-    entities = [Exercise::class, Block::class, Day::class],
+    entities = [Exercise::class, Block::class, Day::class, Friend::class],
     version = 2
 )
 @TypeConverters(DataConverter::class)
@@ -23,6 +24,7 @@ abstract class AppRoomDatabase : RoomDatabase() {
     abstract fun exercisesDao(): ExerciseDao
     abstract fun blockDao(): BlockDao
     abstract fun dayDao(): DayDao
+    abstract fun friendDao(): FriendDao
 
     // do the migration change, change version and add the schema
     companion object {
@@ -37,42 +39,31 @@ abstract class AppRoomDatabase : RoomDatabase() {
 //            }
 //        }
 
-        operator fun invoke(context: Context) = instance ?: synchronized(LOCK) {
-            instance ?: buildDatabase(context).also { instance = it }
+        operator fun invoke(context: Context, userId:String) = instance ?: synchronized(LOCK) {
+            instance ?: buildDatabase(context, userId).also { instance = it }
         }
 
-        fun getInstance(context: Context): AppRoomDatabase =
+        fun getInstance(context: Context, userId:String): AppRoomDatabase =
             instance ?: synchronized(this) {
-                instance ?: buildDatabase(context).also { instance = it }
+                instance ?: buildDatabase(context, userId).also { instance = it }
             }
 
-        fun buildDatabase(context: Context) = Room.databaseBuilder(
+        fun buildDatabase(context: Context, userId: String) = Room.databaseBuilder(
             context,
-            AppRoomDatabase::class.java, "digital_coach.db"
+            AppRoomDatabase::class.java, "${userId}_digital_coach.db"
         ).addCallback(object : Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
-                super.onCreate(db)
-                val appBlocks = Block.getPremadeBlocks()
-
-                // should be replaced with coroutines
-//                ioThread {
-//                    for (block in appBlocks) {
-//                        getInstance(context).blockDao().addInitialBlock(block)
-//                    }
-//                }
-                //coroutine
-                runBlocking{
-                    GlobalScope.launch{
-                        Timber.d("Running coroutine")
-                        for (block in appBlocks) {
-                            getInstance(context).blockDao().addInitialBlock(block)
-                        }
-                    }
-                }
-
-
-            }
         }).fallbackToDestructiveMigration().build()
+
+        /**
+        *call this function to close the db instance - called when log out -
+         * so different user can access their own db - even when not closing app
+         */
+        fun destroyInstance() {
+            if (instance?.isOpen==true) {
+                instance?.close()
+            }
+            instance=null
+        }
 
     }
 

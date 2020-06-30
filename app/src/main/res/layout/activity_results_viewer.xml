@@ -11,77 +11,33 @@
             android:id="@+id/my_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
+            android:background="@color/lightGreen"
             android:elevation="4dp"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            android:theme="@style/Theme.MyFancyTheme"
             app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/creator_toolbar_menu"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+            app:menu="@menu/day_viewer_menu"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
-<!--    <EditText-->
-<!--            android:id="@+id/EditText1"-->
-<!--            android:visibility="visible"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginTop="32dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:ems="10"-->
-<!--            android:hint="Exercise Name"-->
-<!--            android:inputType="textPersonName"-->
-<!--            android:padding="12dp"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />-->
+        <ImageView
+                android:id="@+id/backBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="start"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_triangle_back_white_24dp" />
 
-<!--    <TextView-->
-<!--            android:id="@+id/TextView1"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginTop="32dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:text="sayy whaat"-->
-<!--            android:ems="10"-->
-<!--            android:padding="12dp"-->
-<!--            android:visibility="visible"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@id/my_toolbar" />-->
+        <TextView
+                android:id="@+id/toolbar_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/open_sans_bold"
+                android:text="EXERCISE RESULTS"
+                android:textColor="@color/white"
+                android:textSize="22sp" />
 
-<!--    <EditText-->
-<!--            android:id="@+id/EditText2"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginTop="24dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:ems="10"-->
-<!--            android:gravity="top"-->
-<!--            android:hint="Exercise Description"-->
-<!--            android:inputType="textMultiLine"-->
-<!--            android:padding="12dp"-->
-<!--            android:visibility="gone"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/right_button"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/my_toolbar"-->
-<!--            app:layout_constraintVertical_bias="1.0" />-->
+    </androidx.appcompat.widget.Toolbar>
 
-<!--    <TextView-->
-<!--            android:id="@+id/graphSection"-->
-<!--            android:layout_width="match_parent"-->
-<!--            android:layout_height="200dp"-->
-<!--            android:gravity="center"-->
-<!--            android:text="Here will be the measurable components in the results"-->
-<!--            android:visibility="visible"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/my_toolbar"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
 
     <com.github.mikephil.charting.charts.LineChart
             android:id="@+id/chart1"
@@ -94,19 +50,33 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/my_toolbar" />
 
+    <Spinner
+            android:id="@+id/spinner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:gravity="center"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/chart1" />
+
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ResultsRecyclerView"
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginBottom="24dp"
-            android:background="@android:color/darker_gray"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@color/white"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="@+id/ifEmptyResultsText"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/spinner"
-            tools:listitem="@layout/item_holder_result" />
+            tools:listitem="@layout/item_holder_exercise" />
 
     <TextView
             android:id="@+id/ifEmptyResultsText"
@@ -117,78 +87,8 @@
             android:visibility="visible"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    <Spinner
-            android:id="@+id/spinner"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="8dp"
-            android:layout_marginBottom="8dp"
-            android:gravity="center"
-            app:layout_constraintBottom_toTopOf="@+id/ResultsRecyclerView"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/chart1" />
+            app:layout_constraintTop_toBottomOf="@+id/my_toolbar" />
 
-    <!--    <TextView-->
-<!--            android:id="@+id/TextView2"-->
-<!--            android:visibility="gone"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginTop="24dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:layout_marginBottom="8dp"-->
-<!--            android:ems="10"-->
-<!--            android:gravity="top"-->
-<!--            android:padding="12dp"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/right_button"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/TextView1"-->
-<!--            app:layout_constraintVertical_bias="0.0" />-->
 
-<!--    <Button-->
-<!--            android:id="@+id/right_button"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="8dp"-->
-<!--            android:layout_marginEnd="24dp"-->
-<!--            android:layout_marginBottom="24dp"-->
-<!--            android:text="ADD"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="1.0"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
-
-<!--    <Button-->
-<!--            android:id="@+id/centre_button"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginBottom="24dp"-->
-<!--            android:text="EDIT"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toStartOf="@+id/right_button"-->
-<!--            app:layout_constraintStart_toEndOf="@+id/left_button"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/EditText2"-->
-<!--            app:layout_constraintVertical_bias="1.0" />-->
-
-<!--    <Button-->
-<!--            android:id="@+id/left_button"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="24dp"-->
-<!--            android:layout_marginEnd="8dp"-->
-<!--            android:layout_marginBottom="24dp"-->
-<!--            android:text="delete"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toStartOf="@+id/right_button"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/EditText2"-->
-<!--            app:layout_constraintVertical_bias="1.0" />-->
 </androidx.constraintlayout.widget.ConstraintLayout>
