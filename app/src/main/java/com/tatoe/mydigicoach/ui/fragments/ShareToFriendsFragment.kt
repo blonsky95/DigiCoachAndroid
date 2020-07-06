@@ -26,15 +26,9 @@ class ShareToFriendsFragment : Fragment() {
     private lateinit var shareFriendsAdapter: MyCustomShareFriendsAdapter
     private lateinit var recyclerView: RecyclerView
     private var allFriends = listOf<Friend>()
-    private lateinit var exesToShare:ArrayList<Exercise>
-    private lateinit var daysToShare:ArrayList<Day>
 
     var friendSelectorListener: OnFriendSelectedListenerInterface? = null
 
-
-    //So I have the profile view model here, meaning there was no need for me to implement the interface
-    //however I'd rather have the fragment specify on UI logic, and the activity on other stuff.
-    //Plus, I also use some interfaces.
     companion object {
 
         const val BUNDLE_ALLFRIENDS_KEY = "allfriends_object"
@@ -46,8 +40,6 @@ class ShareToFriendsFragment : Fragment() {
 
             shareToFriendsFragment.arguments = Bundle().apply {
                 putString(BUNDLE_ALLFRIENDS_KEY, Gson().toJson(allFriends))
-//                putString(BUNDLE_EXERCISES_KEY, Gson().toJson(exercises))
-//                putString(BUNDLE_DAYS_KEY, Gson().toJson(days))
             }
 
             return shareToFriendsFragment
@@ -83,7 +75,6 @@ class ShareToFriendsFragment : Fragment() {
         cancel_btn.setOnClickListener {
             friendSelectorListener?.onCancelSelected()
         }
-
 
     }
 
@@ -128,16 +119,4 @@ class ShareToFriendsFragment : Fragment() {
 
         fun onCancelSelected()
     }
-
-    class FriendsArrayList(friends:List<Friend>) {
-        var friendsList = friends
-    }
-    class ExercisesArrayList(exes:ArrayList<Exercise>) {
-        var exesList = exes
-    }
-    class DaysArrayList(days:ArrayList<Day>) {
-        var daysList = days
-    }
-
-
 }

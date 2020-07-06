@@ -73,7 +73,9 @@ class UserAccess : AppCompatActivity() {
     private fun attemptLogIn(hasAccess:Boolean) {
         if (hasAccess) {
             if (hasPermissions) {
-                val intent = Intent(this, HomeScreen::class.java)
+//                val intent = Intent(this, HomeScreen::class.java)
+                val intent = Intent(this, HomeActivity::class.java)
+
                 startActivity(intent)
                 finish()
             }

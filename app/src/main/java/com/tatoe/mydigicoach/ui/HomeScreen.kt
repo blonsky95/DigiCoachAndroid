@@ -22,7 +22,7 @@ import com.tatoe.mydigicoach.ui.calendar.WeekViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
 import com.tatoe.mydigicoach.viewmodels.HomeViewModel
 import com.tatoe.mydigicoach.viewmodels.MyHomeViewModelFactory
-import kotlinx.android.synthetic.main.activity_home_2.*
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.item_holder_home_slider.view.*
 import timber.log.Timber
 
@@ -36,7 +36,7 @@ class HomeScreen : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_2)
+        setContentView(R.layout.activity_home)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
@@ -44,7 +44,7 @@ class HomeScreen : AppCompatActivity() {
 
         homeViewModel = ViewModelProviders.of(
             this,
-            MyHomeViewModelFactory(application, db)
+            MyHomeViewModelFactory(db, application)
         ).get(
             HomeViewModel::class.java
         )
@@ -172,16 +172,8 @@ class HomeScreen : AppCompatActivity() {
                 intent.putExtra(DayCreator.DAY_ID, Day.dateToDayID(Day.getTodayDate()))
                 startActivity(intent)
             }
-//            ifEmptyTodaytext.visibility = View.VISIBLE
-//            recyclerViewExercises.visibility = View.GONE
-//            ifEmptyTodaytext.setOnClickListener {
-//                val intent = Intent(this, DayCreator::class.java)
-//                intent.putExtra(DayCreator.DAY_ID, Day.dateToDayID(Day.getTodayDate()))
-//                startActivity(intent)
-//            }
         } else {
-//            ifEmptyTodaytext.visibility = View.GONE
-//            recyclerViewExercises.visibility = View.VISIBLE
+
             var todayText = ""
             val itemMax = 3
             var i = 0
@@ -200,15 +192,6 @@ class HomeScreen : AppCompatActivity() {
                 intent.putExtra(MonthViewer.DAY_ID_KEY, Day.dateToDayID(Day.getTodayDate()))
                 startActivity(intent)
             }
-//            val dayContentAdapterExercises =
-//                DayExercisesListAdapter(
-//                    this,
-//                    dayToday!!.dayId,
-//                    CustomAdapterFragment.EXERCISE_TYPE_ADAPTER
-//                )
-//            recyclerViewExercises.adapter = dayContentAdapterExercises
-//            recyclerViewExercises.layoutManager = LinearLayoutManager(this)
-//            dayContentAdapterExercises.setContent(dayToday)
         }
     }
 

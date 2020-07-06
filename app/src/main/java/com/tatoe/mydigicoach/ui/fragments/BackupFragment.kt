@@ -36,7 +36,7 @@ class BackupFragment : Fragment() {
     override fun onAttach(context: Context) {
         super.onAttach(context)
         //so because the attaching activity implements the interface I can use its context directly to
-//        initialise the interface im using when the buttons selected!!!!!!!!
+//        use the interface implemented in the parent activity when the buttons selected!!!!!!!!
         if (context is HandleCloudActionsInterface) {
             cloudActionInterface = context
         }

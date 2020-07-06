@@ -5,7 +5,9 @@
     <color name="colorAccent">#D81B60</color>
 
     <color name="lightestBlue">#91D5DF</color>
-    <color name="lightBlue">#9500BCD4</color>
+    <color name="lightBlue58">#9500BCD4</color>
+    <color name="skyBlue">#208FDA</color>
+
     <color name="darkBlue">#95264DB4</color>
     <color name="textBlue">#333366</color>
 

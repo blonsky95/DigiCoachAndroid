@@ -61,7 +61,6 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
         val docRef =
             db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
                 .whereEqualTo("mstate", TransferPackage.STATE_SENT)
-        //todo check if this is triggered when something removed
 
         docRef.addSnapshotListener { snapshot, e ->
             if (snapshot != null) {

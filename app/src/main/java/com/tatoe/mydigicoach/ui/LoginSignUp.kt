@@ -139,7 +139,7 @@ class LoginSignUp : AppCompatActivity() {
     private fun attemptLogIn(hasAccess:Boolean) {
         //assuming you already have permissions if you're here
         if (hasAccess) {
-            val intent = Intent(this, HomeScreen::class.java)
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
         }

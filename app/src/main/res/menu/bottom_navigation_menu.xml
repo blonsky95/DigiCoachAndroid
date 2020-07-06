@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+            android:id="@+id/page_home"
+            android:enabled="true"
+            android:icon="@drawable/ic_home_black_24dp"
+            android:title="home"/>
+    <item
+            android:id="@+id/page_exes"
+            android:enabled="true"
+            android:icon="@drawable/ic_exercise"
+            android:title="Exercises"/>
+    <item
+            android:id="@+id/page_calendar"
+            android:enabled="true"
+            android:icon="@drawable/ic_business_and_finance"
+            android:title="Calendar"/>
+    <item
+            android:id="@+id/page_store"
+            android:enabled="true"
+            android:icon="@drawable/ic_library"
+            android:title="Store"/>
+    <item
+            android:id="@+id/page_profile"
+            android:enabled="true"
+            android:icon="@drawable/ic_person_white_96dp"
+            android:title="Profile"/>
+</menu>
