@@ -10,10 +10,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
-import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.entity.Day
-import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
 import kotlinx.android.synthetic.main.fragment_friends_screen.view.*
 import kotlinx.android.synthetic.main.fragment_share_to_friends_screen.*
@@ -27,7 +24,7 @@ class ShareToFriendsFragment : Fragment() {
     private lateinit var recyclerView: RecyclerView
     private var allFriends = listOf<Friend>()
 
-    var friendSelectorListener: OnFriendSelectedListenerInterface? = null
+    var friendSelectorListenerInterface: OnFriendSelectedListenerInterface? = null
 
     companion object {
 
@@ -56,8 +53,8 @@ class ShareToFriendsFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        friendSelectorListener = context as? OnFriendSelectedListenerInterface
-        if (friendSelectorListener == null) {
+        friendSelectorListenerInterface = context as? OnFriendSelectedListenerInterface
+        if (friendSelectorListenerInterface == null) {
             throw ClassCastException("$context must implement OnFriendSelectedListenerInterface")
         }
 
@@ -73,7 +70,7 @@ class ShareToFriendsFragment : Fragment() {
         recyclerView.layoutManager = LinearLayoutManager(activity)
         recyclerView.adapter = shareFriendsAdapter
         cancel_btn.setOnClickListener {
-            friendSelectorListener?.onCancelSelected()
+            friendSelectorListenerInterface?.onCancelSelected()
         }
 
     }
@@ -97,7 +94,7 @@ class ShareToFriendsFragment : Fragment() {
         override fun onBindViewHolder(holder: MyFriendViewHolder, position: Int) {
             holder.usernameTextView.text = allFriends[position].username
             holder.shareImageView.setOnClickListener {
-                friendSelectorListener?.onFriendSelected(allFriends[position])
+                friendSelectorListenerInterface?.onFriendSelected(allFriends[position])
             }
             //do listener on share icon
         }

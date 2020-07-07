@@ -9,14 +9,16 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
+import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.calendar.MonthViewerFragment
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewerFragment
+import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.viewmodels.MainViewModel
 import com.tatoe.mydigicoach.viewmodels.MyMainViewModelFactory
 import kotlinx.android.synthetic.main.parent_of_fragments_activity.*
 
-class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface {
+class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface, PackageReceivedFragment.OnPackageReceivedInterface {
 
     lateinit var mainViewModel: MainViewModel
     private var allFriends = listOf<Friend>()
@@ -167,6 +169,18 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     }
 
     override fun onCancelSelected() {
+        super.onBackPressed()
+    }
+
+    override fun onPackageAccepted(transferPackage: TransferPackage, packageType: Int) {
+        //todo do the insert for that package
+    }
+
+    override fun onPackageRejected(transferPackage: TransferPackage, packageType: Int) {
+        //update the package
+    }
+
+    override fun onBottomCancelSelected() {
         super.onBackPressed()
     }
 }
