@@ -1,11 +1,8 @@
 package com.tatoe.mydigicoach.ui.exercise
 
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -23,12 +20,12 @@ import timber.log.Timber
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView as ClickListenerRecyclerView
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.Utils.setProgressDialog
-import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.network.TransferPackage
+import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.utils.FirestoreReceiver
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewModel
@@ -109,6 +106,8 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
         dialog = setProgressDialog(activity!!, "Talking with cloud...")
 
         social_button.setOnClickListener {
+            mainViewModel.displayFragmentTriggerAndType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_EXERCISE)
+//            mainViewModel.displayFragmentById.postValue(MainViewModel.PACKAGE_DISPLAYER)
             //update a value in view model which makes mainactivity display the received packages framgnet
         }
 

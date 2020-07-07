@@ -9,6 +9,9 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
+import com.tatoe.mydigicoach.network.DayPackage
+import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.FriendRequestPackage
 import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.calendar.MonthViewerFragment
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewerFragment
@@ -18,7 +21,8 @@ import com.tatoe.mydigicoach.viewmodels.MainViewModel
 import com.tatoe.mydigicoach.viewmodels.MyMainViewModelFactory
 import kotlinx.android.synthetic.main.parent_of_fragments_activity.*
 
-class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface, PackageReceivedFragment.OnPackageReceivedInterface {
+class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface,
+    PackageReceivedFragment.OnPackageReceivedInterface {
 
     lateinit var mainViewModel: MainViewModel
     private var allFriends = listOf<Friend>()
@@ -26,6 +30,11 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     private var toSendExes: List<Exercise>? = null
     private var toSendDays: List<Day>? = null
 
+    private var packagesReceived: List<TransferPackage>? = null
+
+    private var exercisePackagesReceived: List<ExercisePackage>? = null
+    private var dayPackagesReceived: List<DayPackage>? = null
+    private var friendPackagesReceived: List<FriendRequestPackage>? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,13 +55,34 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     }
 
     private fun initObservers() {
-        mainViewModel.displayFragmentById.observe(this, Observer {
-            if (it!=0) {
-
-            }
-        })
+//        mainViewModel.displayFragmentById.observe(this, Observer {
+//            if (it != MainViewModel.NO_FRAGMENT) {
+//                displayFragment(it)
+//            }
+//        })
         mainViewModel.allFriends.observe(this, Observer { it ->
             allFriends = it
+        })
+
+
+        mainViewModel.receivedExercisesPackages.observe(this, Observer {
+            exercisePackagesReceived = it
+        })
+        mainViewModel.receivedDaysPackages.observe(this, Observer {
+            dayPackagesReceived = it
+        })
+        mainViewModel.receivedFriendRequestsPackages.observe(this, Observer {
+            friendPackagesReceived = it
+        })
+
+        mainViewModel.displayFragmentTriggerAndType.observe(this, Observer {
+            packagesReceived = when (it) {
+                PackageReceivedFragment.TRANSFER_PACKAGE_EXERCISE -> exercisePackagesReceived
+                PackageReceivedFragment.TRANSFER_PACKAGE_DAY -> dayPackagesReceived
+                PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND -> friendPackagesReceived
+                else -> listOf()
+            }
+            displayFragment(MainViewModel.PACKAGE_DISPLAYER)
         })
 
         mainViewModel.daysToSend.observe(this, Observer { it ->
@@ -119,7 +149,7 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
         }
     }
 
-    private fun displayFragment(fragmentId:Int) {
+    private fun displayFragment(fragmentId: Int) {
         val transaction = supportFragmentManager.beginTransaction()
         //todo add animation of swiping up/down
         when (fragmentId) {
@@ -135,7 +165,7 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
             MainViewModel.PACKAGE_DISPLAYER -> {
                 transaction.replace(
                     R.id.half_fragment_container,
-                    ShareToFriendsFragment.newInstance(allFriends)
+                    PackageReceivedFragment.newInstance(packagesReceived!!)
                 )
                 transaction.addToBackStack("friends")
             }
@@ -173,7 +203,23 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     }
 
     override fun onPackageAccepted(transferPackage: TransferPackage, packageType: Int) {
-        //todo do the insert for that package
+        when (packageType) {
+            PackageReceivedFragment.TRANSFER_PACKAGE_EXERCISE -> {
+                mainViewModel.attemptImportExercise((transferPackage as ExercisePackage).firestoreExercise!!.toExercise())
+            }
+            PackageReceivedFragment.TRANSFER_PACKAGE_DAY -> {
+                mainViewModel.insertDay((transferPackage as DayPackage).firestoreDay!!.toDay())
+            }
+            PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND -> {
+                val friendRequestPackage = transferPackage as FriendRequestPackage
+                mainViewModel.insertFriend(
+                    Friend(
+                        friendRequestPackage.mSender!!,
+                        friendRequestPackage.senderDocId
+                    )
+                )
+            }
+        }
     }
 
     override fun onPackageRejected(transferPackage: TransferPackage, packageType: Int) {

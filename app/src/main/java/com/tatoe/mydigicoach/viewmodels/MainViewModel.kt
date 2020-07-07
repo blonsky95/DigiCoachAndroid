@@ -5,6 +5,7 @@ import android.widget.Toast
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.tatoe.mydigicoach.AppRepository
@@ -15,6 +16,7 @@ import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.*
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
 import timber.log.Timber
 
 class MainViewModel(application: Application) :
@@ -40,6 +42,9 @@ class MainViewModel(application: Application) :
     var receivedFriendRequestsPackages = MutableLiveData(listOf<FriendRequestPackage>())
     var receivedExercisesPackages = MutableLiveData(listOf<ExercisePackage>())
     var receivedDaysPackages = MutableLiveData(listOf<DayPackage>())
+
+    var displayFragmentTriggerAndType = MutableLiveData(-1)
+
     var displayFragmentById = MutableLiveData(NO_FRAGMENT)
 
     lateinit var friendsSnapshot: ListenerRegistration
@@ -195,5 +200,24 @@ class MainViewModel(application: Application) :
         }
         //empty the days to send
         daysToSend.value = listOf()
+    }
+
+    fun attemptImportExercise(exercise: Exercise) {
+        //if exists - update live data for dialog - do the dialog object here? - the yes calls the insert
+        //to check if exists need to to run an async operation to get non live data allexercises, allfriends and alldays here and then use them
+
+
+    }
+
+    fun insertExercise(newExercise:Exercise) = viewModelScope.launch {
+        repository.insertExercise(newExercise)
+    }
+
+    fun insertDay(day: Day) {
+
+    }
+
+    fun insertFriend(friend: Friend) {
+
     }
 }
