@@ -1,29 +1,23 @@
 package com.tatoe.mydigicoach.ui
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.*
 import android.widget.SearchView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.network.MyCustomStoreExercise
-import com.tatoe.mydigicoach.viewmodels.HomeViewModel
 import com.tatoe.mydigicoach.viewmodels.LibraryViewModel
-import com.tatoe.mydigicoach.viewmodels.MyHomeViewModelFactory
 import com.tatoe.mydigicoach.viewmodels.MyLibraryViewModelFactory
 import kotlinx.android.synthetic.main.activity_library.*
 import kotlinx.android.synthetic.main.dialog_window_library_filter.view.*
@@ -90,7 +84,7 @@ class LibraryFragment : Fragment(), SearchView.OnQueryTextListener {
             if (theSameExercise(exe.mExercise) != null) {
                 val title = "Overwrite"
                 val text = "You already have this exercise, do you want to overwrite it?"
-                val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
                         removeExercise(theSameExercise(exe.mExercise)!!)

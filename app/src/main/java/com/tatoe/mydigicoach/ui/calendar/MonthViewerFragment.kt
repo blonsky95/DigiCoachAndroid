@@ -1,27 +1,20 @@
 package com.tatoe.mydigicoach.ui.calendar
 
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
-import android.content.ServiceConnection
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import android.os.IBinder
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
@@ -31,21 +24,15 @@ import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.DayPackage
 import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.TransferPackage
-import com.tatoe.mydigicoach.ui.HomeScreen
-import com.tatoe.mydigicoach.ui.LibraryFragment
-import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
+import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.viewmodels.*
-import kotlinx.android.synthetic.main.activity_library.*
 import kotlinx.android.synthetic.main.activity_month_viewer.*
 import kotlinx.android.synthetic.main.activity_month_viewer.cancel_btn
-import kotlinx.android.synthetic.main.activity_month_viewer.home_button
 import kotlinx.android.synthetic.main.activity_month_viewer.share_btn
 import kotlinx.android.synthetic.main.activity_month_viewer.share_button
 import kotlinx.android.synthetic.main.activity_month_viewer.social_button
 import kotlinx.android.synthetic.main.activity_month_viewer.textOne
 import kotlinx.android.synthetic.main.activity_month_viewer.textView4
-import kotlinx.android.synthetic.main.fragment_exercise_viewer.*
-import timber.log.Timber
 import kotlin.collections.ArrayList
 
 class MonthViewerFragment : Fragment(){
@@ -109,6 +96,8 @@ class MonthViewerFragment : Fragment(){
         }
 
         social_button.setOnClickListener {
+            mainViewModel.displayPackageReceiverFragmentType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_DAY)
+
             //update a value in view model which makes mainactivity display the received packages framgnet
         }
     }
@@ -245,14 +234,14 @@ class MonthViewerFragment : Fragment(){
             //            var receivedExercises = DataHolder.receivedExercises
             var title = "Training programmes"
             var text = "You have not received any new day programmes"
-            var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+            var dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
 
             if (receivedDays.isNotEmpty()) {
                 val dayPackage = receivedDays[0]
                 text =
                     "Import ${Day.toReadableFormat(dayIDToDate(dayPackage.firestoreDay!!.mDayId)!!)} from your friend ${dayPackage.mSender}?" +
                             "\n new exercises will be imported, existing exercises will be recycled"
-                dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
                         getExercisesFirst(dayPackage.firestoreDay.toDay())
@@ -273,7 +262,7 @@ class MonthViewerFragment : Fragment(){
                 }
 
             }
-            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeHandler)
+            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeInterface)
         }
     }
 

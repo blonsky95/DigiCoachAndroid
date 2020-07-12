@@ -2,33 +2,25 @@ package com.tatoe.mydigicoach.ui
 
 import android.app.Dialog
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tatoe.mydigicoach.HandleCloudActionsInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
-import com.tatoe.mydigicoach.ui.fragments.BackupFragment
-import com.tatoe.mydigicoach.ui.fragments.FriendsFragment
-import com.tatoe.mydigicoach.viewmodels.BackupFragmentViewModel
-import com.tatoe.mydigicoach.viewmodels.MyBackupFragmentViewModelFactory
-import com.tatoe.mydigicoach.viewmodels.MyProfileViewModelFactory
-import com.tatoe.mydigicoach.viewmodels.ProfileViewModel
-import kotlinx.android.synthetic.main.activity_month_viewer.*
-import kotlinx.android.synthetic.main.activity_profile.*
+import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
+import com.tatoe.mydigicoach.viewmodels.*
 import kotlinx.android.synthetic.main.activity_profile.backup_button
 import kotlinx.android.synthetic.main.activity_profile.friends_button
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : Fragment() {
 
+    private lateinit var mainViewModel: MainViewModel
     private lateinit var profileViewModel: ProfileViewModel
     private var db = FirebaseFirestore.getInstance()
 
@@ -52,6 +44,9 @@ class ProfileFragment : Fragment() {
             ProfileViewModel::
             class.java
         )
+        mainViewModel =
+            ViewModelProviders.of(activity!!, MyMainViewModelFactory(activity!!.application))
+                .get(MainViewModel::class.java)
 
         dialog = Utils.setProgressDialog(activity!!, "Talking with cloud...")
 
@@ -66,6 +61,8 @@ class ProfileFragment : Fragment() {
         }
 
         friends_button.setOnClickListener {
+            mainViewModel.displayPackageReceiverFragmentType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND)
+//            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
 //            setUpFragment(friendsFragment)
             //todo sort this one out
         }
@@ -90,12 +87,16 @@ class ProfileFragment : Fragment() {
             }
         })
 
-        profileViewModel.receivedRequestsNumber.observe(this, Observer {
-            updateFriendRequestsNum(it)
+        mainViewModel.receivedExercisesPackages.observe(this, Observer { exePackages ->
+            updateSocialButtonNumber(exePackages.size)
         })
+
+//        profileViewModel.receivedRequestsNumber.observe(this, Observer {
+//            updateFriendRequestsNum(it)
+//        })
     }
 
-    private fun updateFriendRequestsNum(numberRequests: Int) {
+    private fun updateSocialButtonNumber(numberRequests: Int) {
         if (numberRequests>0) {
             friend_requests_number_f.visibility= View.VISIBLE
             friend_requests_number_f.text=numberRequests.toString()

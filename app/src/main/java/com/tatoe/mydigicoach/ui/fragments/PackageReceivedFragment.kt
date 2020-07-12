@@ -34,6 +34,7 @@ class PackageReceivedFragment: Fragment() {
 
         const val BUNDLE_RECEIVED_PACKAGES_KEY = "received_packages_object"
 
+        const val TRANSFER_PACKAGE_NOT_VALUE = -1
         const val TRANSFER_PACKAGE_EXERCISE = 0
         const val TRANSFER_PACKAGE_DAY = 1
         const val TRANSFER_PACKAGE_FRIEND = 2
@@ -68,17 +69,20 @@ class PackageReceivedFragment: Fragment() {
         arguments?.getString(BUNDLE_RECEIVED_PACKAGES_KEY)?.let {
             transferPackages = Gson().fromJson(it, object : TypeToken<List<TransferPackage>>() {}.type)
         }
-        if (transferPackages[0] is ExercisePackage) {
-            transferPackageType=TRANSFER_PACKAGE_EXERCISE
-            return
+        if (transferPackages.isNotEmpty()) {
+            if (transferPackages[0] is ExercisePackage) {
+                transferPackageType=TRANSFER_PACKAGE_EXERCISE
+                return
+            }
+            if (transferPackages[0] is DayPackage) {
+                transferPackageType= TRANSFER_PACKAGE_DAY
+                return
+            }
+            if (transferPackages[0] is FriendRequestPackage) {
+                transferPackageType= TRANSFER_PACKAGE_FRIEND
+            }
         }
-        if (transferPackages[0] is DayPackage) {
-            transferPackageType= TRANSFER_PACKAGE_DAY
-            return
-        }
-        if (transferPackages[0] is FriendRequestPackage) {
-            transferPackageType= TRANSFER_PACKAGE_FRIEND
-        }
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

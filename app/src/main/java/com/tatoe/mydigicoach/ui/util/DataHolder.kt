@@ -3,7 +3,7 @@ package com.tatoe.mydigicoach.ui.util
 import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.TransferPackage
 
 object DataHolder {
     var activeExerciseHolder: Exercise? = null
@@ -13,13 +13,13 @@ object DataHolder {
     var activeDayHolder: Day? = null
 
 
-    var receivedExercises = arrayListOf<ExercisePackage>()
+    var receivedExercises = arrayListOf<TransferPackage>()
 
     var userEmail = ""
     var userDocId = ""
     var userName = ""
 
-    fun addReceivedExercise(newExercise: ExercisePackage) {
+    fun addReceivedExercise(newExercise: TransferPackage) {
         receivedExercises.add(newExercise)
     }
 

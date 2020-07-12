@@ -10,7 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Exercise
@@ -323,7 +323,7 @@ class ExerciseCreator : AppCompatActivity() {
             title.toString(),
             "Are you sure you want to delete this exercise?",
             object :
-                DialogPositiveNegativeHandler {
+                DialogPositiveNegativeInterface {
 
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
@@ -346,7 +346,7 @@ class ExerciseCreator : AppCompatActivity() {
     private fun generateDialog() {
 
         Utils.getDialogViewWithEditText(this, "Add Field", null, "Name of new field",
-            object : DialogPositiveNegativeHandler {
+            object : DialogPositiveNegativeInterface {
                 override fun onPositiveButton(inputText: String) {
                     addNewFieldLayout(inputText)
                 }

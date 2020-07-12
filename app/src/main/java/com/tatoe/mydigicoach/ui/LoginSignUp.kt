@@ -15,7 +15,7 @@ import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.BuildConfig
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.viewmodels.UserAccessViewModel
@@ -72,7 +72,7 @@ class LoginSignUp : AppCompatActivity() {
                 "Type your email below",
                 "Email",
                 object :
-                    DialogPositiveNegativeHandler {
+                    DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
                         userAccessViewModel.resetFirebaseUserPassword(inputText, context)
 //                    resetPassword(userEmail)

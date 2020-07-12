@@ -49,27 +49,45 @@
         android:paddingTop="8dp"
         android:paddingBottom="8dp"
         android:text="Add new friend"
-        app:layout_constraintBottom_toTopOf="@+id/request_received_btn"
+        app:layout_constraintBottom_toTopOf="@id/back_btn"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <TextView
-            android:id="@+id/request_received_btn"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="64dp"
-            android:layout_marginEnd="64dp"
-            android:layout_marginBottom="32dp"
-            android:background="@color/lightGrey"
-            android:fontFamily="@font/open_sans_bold"
-            android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="You have a friend request"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.0"
-            app:layout_constraintStart_toStartOf="parent" />
+        <TextView
+                android:id="@+id/back_btn"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="64dp"
+                android:layout_marginEnd="64dp"
+                android:layout_marginBottom="32dp"
+                android:background="@color/lightGrey"
+                android:fontFamily="@font/open_sans_bold"
+                android:gravity="center"
+                android:paddingTop="8dp"
+                android:paddingBottom="8dp"
+                android:text="Back"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent" />
+
+<!--    <TextView-->
+<!--            android:id="@+id/request_received_btn"-->
+<!--            android:layout_width="0dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_marginStart="64dp"-->
+<!--            android:layout_marginEnd="64dp"-->
+<!--            android:layout_marginBottom="32dp"-->
+<!--            android:background="@color/lightGrey"-->
+<!--            android:fontFamily="@font/open_sans_bold"-->
+<!--            android:gravity="center"-->
+<!--            android:paddingTop="8dp"-->
+<!--            android:paddingBottom="8dp"-->
+<!--            android:text="You have a friend request"-->
+<!--            app:layout_constraintBottom_toBottomOf="parent"-->
+<!--            app:layout_constraintEnd_toEndOf="parent"-->
+<!--            app:layout_constraintHorizontal_bias="0.0"-->
+<!--            app:layout_constraintStart_toStartOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

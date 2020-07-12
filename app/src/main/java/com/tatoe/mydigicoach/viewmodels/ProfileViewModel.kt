@@ -29,7 +29,7 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
     val userName = MutableLiveData<String>("")
     val userEmail = MutableLiveData<String>(user.email)
     val lastUploadTime = MutableLiveData<String>("-")
-    var receivedRequestsNumber = MutableLiveData(0)
+//    var receivedRequestsNumber = MutableLiveData(0)
 
 
     private val repository: AppRepository
@@ -54,24 +54,24 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
         repository.isLoading.value = false
 
         observeLastUploadValue()
-        loadFriendRequests()
+//        loadFriendRequests()
     }
 
-    private fun loadFriendRequests() {
-        val docRef =
-            db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
-                .whereEqualTo("mstate", TransferPackage.STATE_SENT)
-
-        docRef.addSnapshotListener { snapshot, e ->
-            if (snapshot != null) {
-                var i = 0
-                if (snapshot.documents.isNotEmpty()) {
-                    i = snapshot.documents.size
-                }
-                receivedRequestsNumber.value = i
-            }
-        }
-    }
+//    private fun loadFriendRequests() {
+//        val docRef =
+//            db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
+//                .whereEqualTo("mstate", TransferPackage.STATE_SENT)
+//
+//        docRef.addSnapshotListener { snapshot, e ->
+//            if (snapshot != null) {
+//                var i = 0
+//                if (snapshot.documents.isNotEmpty()) {
+//                    i = snapshot.documents.size
+//                }
+//                receivedRequestsNumber.value = i
+//            }
+//        }
+//    }
 
     private fun observeLastUploadValue() {
         val docRef = db.collection("users").whereEqualTo("email", userEmail.value)
@@ -336,10 +336,5 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
         repository.isLoading.value = false
 
     }
-
-    private fun firestoreFormatToExercise(myCustomFirestoreTransferExercise: MyCustomFirestoreTransferExercise): Exercise {
-        return myCustomFirestoreTransferExercise.toExercise()
-    }
-
 
 }

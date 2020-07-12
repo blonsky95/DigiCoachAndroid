@@ -110,7 +110,7 @@ class ExerciseViewModel(application: Application) :
 
     }
 
-    fun updateTransferExercise(exercisePackage: ExercisePackage, newState: String) {
+    fun updateTransferExercise(exercisePackage: TransferPackage, newState: String) {
         exercisePackage.mState = TransferPackage.STATE_SAVED
         val docRef = db.document(exercisePackage.documentPath!!)
 //        val docRef = db.collection("users").document(exercisePackage.mReceiver!!).collection("transfers")

@@ -12,7 +12,7 @@ class MyFriendsFragmentViewModelFactory(
 
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T {
-        return FriendsFragmentViewModel(
+        return FriendsDisplayerFragmentViewModel(
             firebaseFirestore, application
         ) as T
     }

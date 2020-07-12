@@ -3,7 +3,6 @@ package com.tatoe.mydigicoach.ui
 import android.app.Dialog
 import android.content.Intent
 import android.os.Bundle
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
@@ -12,12 +11,12 @@ import androidx.fragment.app.FragmentTransaction
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.HandleCloudActionsInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.ui.fragments.BackupFragment
-import com.tatoe.mydigicoach.ui.fragments.FriendsFragment
+import com.tatoe.mydigicoach.ui.fragments.FriendsDisplayerFragment
 import com.tatoe.mydigicoach.viewmodels.MyProfileViewModelFactory
 import com.tatoe.mydigicoach.viewmodels.ProfileViewModel
 import kotlinx.android.synthetic.main.activity_profile.*
@@ -48,7 +47,7 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
 
         fragmentManager = supportFragmentManager
         backupFragment = BackupFragment()
-        friendsFragment = FriendsFragment()
+        friendsFragment = FriendsDisplayerFragment()
 
         backup_button.setOnClickListener {
             setUpFragment(backupFragment)
@@ -117,25 +116,25 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
             }
         })
 
-        profileViewModel.receivedRequestsNumber.observe(this, Observer {
-            updateFriendRequestsNum(it)
-        })
+//        profileViewModel.receivedRequestsNumber.observe(this, Observer {
+//            updateFriendRequestsNum(it)
+//        })
     }
 
-    private fun updateFriendRequestsNum(numberRequests: Int) {
-        if (numberRequests>0) {
-            friend_requests_number.visibility= View.VISIBLE
-            friend_requests_number.text=numberRequests.toString()
-        } else {
-            friend_requests_number.visibility= View.GONE
-        }
-    }
+//    private fun updateFriendRequestsNum(numberRequests: Int) {
+//        if (numberRequests>0) {
+//            friend_requests_number.visibility= View.VISIBLE
+//            friend_requests_number.text=numberRequests.toString()
+//        } else {
+//            friend_requests_number.visibility= View.GONE
+//        }
+//    }
 
     override fun uploadToCloud() {
         Utils.getInfoDialogView(
             this,
             dialogText = "Upload exercises and days to the cloud?",
-            dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+            dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     if (Utils.isConnectedToInternet(this@Profile)) {
@@ -151,7 +150,7 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
         Utils.getInfoDialogView(
             this,
             dialogText = "Downloading backup will replace your current data, are you sure?",
-            dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+            dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     if (Utils.isConnectedToInternet(this@Profile)) {

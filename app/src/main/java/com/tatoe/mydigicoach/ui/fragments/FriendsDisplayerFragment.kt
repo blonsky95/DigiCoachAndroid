@@ -12,22 +12,35 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.FriendRequestPackage
 import com.tatoe.mydigicoach.network.TransferPackage
-import com.tatoe.mydigicoach.viewmodels.FriendsFragmentViewModel
+import com.tatoe.mydigicoach.viewmodels.FriendsDisplayerFragmentViewModel
 import com.tatoe.mydigicoach.viewmodels.MyFriendsFragmentViewModelFactory
 import kotlinx.android.synthetic.main.fragment_friends_screen.*
 import kotlinx.android.synthetic.main.fragment_friends_screen.view.*
 import kotlinx.android.synthetic.main.item_holder_friends.view.*
 
-class FriendsFragment : Fragment() {
+class FriendsDisplayerFragment : Fragment() {
+
+    companion object {
+//        fun newInstance(
+//            receivedPackages: List<TransferPackage>
+//        ): PackageReceivedFragment {
+//            val packageReceivedFragment = PackageReceivedFragment()
+//
+//            packageReceivedFragment.arguments = Bundle().apply {
+//                putString(PackageReceivedFragment.BUNDLE_RECEIVED_PACKAGES_KEY, Gson().toJson(receivedPackages))
+//            }
+//            return packageReceivedFragment
+//        }
+    }
 
     //    private lateinit var cloudActionInterface: HandleCloudActionsInterface
-    private lateinit var friendsFragmentViewModel: FriendsFragmentViewModel
+    private lateinit var friendsDisplayerFragmentViewModel: FriendsDisplayerFragmentViewModel
     private var db = FirebaseFirestore.getInstance()
     private lateinit var friendsAdapter: MyCustomFriendsAdapter
     private lateinit var recyclerView:RecyclerView
@@ -52,11 +65,11 @@ class FriendsFragment : Fragment() {
         //so because the attaching activity implements the interface I can use its context directly to
 //        initialise the interface im using when the buttons selected!!!!!!!!
 
-        friendsFragmentViewModel = ViewModelProviders.of(
+        friendsDisplayerFragmentViewModel = ViewModelProviders.of(
             this,
             MyFriendsFragmentViewModelFactory(db, activity!!.application)
         ).get(
-            FriendsFragmentViewModel::
+            FriendsDisplayerFragmentViewModel::
             class.java
         )
     }
@@ -74,7 +87,7 @@ class FriendsFragment : Fragment() {
         add_friend_btn.setOnClickListener {
             val title = "New friend request"
             val text = "Type friend username"
-            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     for (friend in allFriends) {
@@ -83,7 +96,7 @@ class FriendsFragment : Fragment() {
                             return
                         }
                     }
-                    friendsFragmentViewModel.sendFriendRequest(inputText)
+                    friendsDisplayerFragmentViewModel.sendFriendRequest(inputText)
                 }
             }
             Utils.getDialogViewWithEditText(activity!!,title,text,"username",dialogPositiveNegativeHandler)
@@ -92,49 +105,49 @@ class FriendsFragment : Fragment() {
     }
 
     private fun initObservers() {
-        friendsFragmentViewModel.friends.observe(this, Observer {
+        friendsDisplayerFragmentViewModel.friends.observe(this, Observer {
             allFriends=it
             friendsAdapter.setContent(it)
         })
 
-        friendsFragmentViewModel.receivedRequestsLiveData.observe(this, Observer {
+        friendsDisplayerFragmentViewModel.receivedRequestsLiveData.observe(this, Observer {
             receivedRequestsArray = it
-            updateAcceptButton()
+//            updateAcceptButton()
         })
     }
 
-    private fun updateAcceptButton() {
-        if (receivedRequestsArray.isEmpty()) {
-            request_received_btn.text = "No friend requests"
-        } else {
-            request_received_btn.text = "New Friend Request!"
-
-            var currentFriendRequest = receivedRequestsArray[0]
-            var requestFriendName = currentFriendRequest.mSender
-            val title = "New friend request"
-            val text = "accept request from $requestFriendName"
-            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
-                override fun onPositiveButton(inputText: String) {
-                    super.onPositiveButton(inputText)
-                    val newFriend = Friend(currentFriendRequest.mSender!!,currentFriendRequest.senderDocId!!)
-//                    newFriend.docId=currentFriendRequest.senderDocId!!
-                    friendsFragmentViewModel.insertFriend(newFriend) //GOOD
-                    friendsFragmentViewModel.updateRequestStateReceiver(currentFriendRequest, TransferPackage.STATE_ACCEPTED)
-                    friendsFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_ACCEPTED)
-//                    friendsFragmentViewModel.popFriendRequest()
-                }
-
-                override fun onNegativeButton() {
-                    super.onNegativeButton()
-                    friendsFragmentViewModel.updateRequestStateReceiver(currentFriendRequest,TransferPackage.STATE_REJECTED)
-                    friendsFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_REJECTED)
-                }
-            }
-            request_received_btn.setOnClickListener {
-                Utils.getInfoDialogView(activity!!, title ,text,dialogPositiveNegativeHandler)
-            }
-        }
-    }
+//    private fun updateAcceptButton() {
+//        if (receivedRequestsArray.isEmpty()) {
+//            request_received_btn.text = "No friend requests"
+//        } else {
+//            request_received_btn.text = "New Friend Request!"
+//
+//            var currentFriendRequest = receivedRequestsArray[0]
+//            var requestFriendName = currentFriendRequest.mSender
+//            val title = "New friend request"
+//            val text = "accept request from $requestFriendName"
+//            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
+//                override fun onPositiveButton(inputText: String) {
+//                    super.onPositiveButton(inputText)
+//                    val newFriend = Friend(currentFriendRequest.mSender!!,currentFriendRequest.senderDocId!!)
+////                    newFriend.docId=currentFriendRequest.senderDocId!!
+//                    friendsDisplayerFragmentViewModel.insertFriend(newFriend) //GOOD
+//                    friendsDisplayerFragmentViewModel.updateRequestStateReceiver(currentFriendRequest, TransferPackage.STATE_ACCEPTED)
+//                    friendsDisplayerFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_ACCEPTED)
+////                    friendsFragmentViewModel.popFriendRequest()
+//                }
+//
+//                override fun onNegativeButton() {
+//                    super.onNegativeButton()
+//                    friendsDisplayerFragmentViewModel.updateRequestStateReceiver(currentFriendRequest,TransferPackage.STATE_REJECTED)
+//                    friendsDisplayerFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_REJECTED)
+//                }
+//            }
+//            request_received_btn.setOnClickListener {
+//                Utils.getInfoDialogView(activity!!, title ,text,dialogPositiveNegativeHandler)
+//            }
+//        }
+//    }
 
 
     class MyCustomFriendsAdapter(context: Context) : RecyclerView.Adapter<MyFriendViewHolder>() {

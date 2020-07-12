@@ -17,7 +17,7 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
@@ -185,14 +185,14 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
             //            var receivedExercises = DataHolder.receivedExercises
             var title = "Training programmes"
             var text = "You have not received any new day programmes"
-            var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+            var dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
 
             if (receivedDays.isNotEmpty()) {
                 val dayPackage = receivedDays[0]
                 text =
                     "Import ${Day.toReadableFormat(dayIDToDate(dayPackage.firestoreDay!!.mDayId)!!)} from your friend ${dayPackage.mSender}?" +
                             "\n new exercises will be imported, existing exercises will be recycled"
-                dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
                         getExercisesFirst(dayPackage.firestoreDay.toDay())
@@ -213,7 +213,7 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
                 }
 
             }
-            Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeHandler)
+            Utils.getInfoDialogView(this, title, text, dialogPositiveNegativeInterface)
         }
     }
 

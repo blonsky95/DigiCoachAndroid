@@ -22,8 +22,8 @@ import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.Utils.setProgressDialog
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
-import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.FirebaseListenerService
 import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.util.DataHolder
@@ -106,7 +106,7 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
         dialog = setProgressDialog(activity!!, "Talking with cloud...")
 
         social_button.setOnClickListener {
-            mainViewModel.displayFragmentTriggerAndType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_EXERCISE)
+            mainViewModel.displayPackageReceiverFragmentType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_EXERCISE)
 //            mainViewModel.displayFragmentById.postValue(MainViewModel.PACKAGE_DISPLAYER)
             //update a value in view model which makes mainactivity display the received packages framgnet
         }
@@ -359,13 +359,13 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
             //            var receivedExercises = DataHolder.receivedExercises
             val title = "New Exercises"
             var text = "You have not received any new exercises"
-            var dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+            var dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
 
             if (receivedExercises.isNotEmpty()) {
                 val exePackage = receivedExercises[0]
                 text =
                     "Import ${exePackage.firestoreExercise!!.mName} from your friend ${exePackage.mSender}"
-                dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
                         attemptImportExercise(exePackage)
@@ -380,7 +380,7 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
                     }
                 }
             }
-            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeHandler)
+            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeInterface)
         }
     }
 
@@ -389,7 +389,7 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
         if (theSameExercise(exe) != null) {
             val title = "Overwrite"
             val text = "You already have this exercise, do you want to overwrite it?"
-            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     removeExercise(theSameExercise(exe)!!)
@@ -430,7 +430,7 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
         exerciseViewModel.deleteExercise(theSameExercise)
     }
 
-    private fun rejectExercisePackage(exePackage: ExercisePackage) {
+    private fun rejectExercisePackage(exePackage: TransferPackage) {
         exerciseViewModel.updateTransferExercise(
             exePackage,
             TransferPackage.STATE_REJECTED

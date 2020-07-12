@@ -9,11 +9,14 @@ import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.tatoe.mydigicoach.AppRepository
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.database.AppRoomDatabase
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.*
+import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
@@ -23,18 +26,19 @@ class MainViewModel(application: Application) :
     AndroidViewModel(application) {
 
     companion object {
-        const val NO_FRAGMENT=0
-        const val PACKAGE_DISPLAYER=1
-        const val FRIEND_SHARER=2
-
+        const val NO_FRAGMENT = -1
+        const val PACKAGE_DISPLAYER = 1
+        const val FRIEND_SHARER = 2
+        const val FRIEND_DISPLAYER=3
     }
 
     private val repository: AppRepository
 
     private val viewModelJob = SupervisorJob()
 
-    //    val allExercises: LiveData<List<Exercise>>
+    val allExercises: LiveData<List<Exercise>>
     val allFriends: LiveData<List<Friend>>
+    val allDays: LiveData<List<Day>>
 
     val exercisesToSend = MutableLiveData(listOf<Exercise>())
     val daysToSend = MutableLiveData(listOf<Day>())
@@ -43,7 +47,9 @@ class MainViewModel(application: Application) :
     var receivedExercisesPackages = MutableLiveData(listOf<ExercisePackage>())
     var receivedDaysPackages = MutableLiveData(listOf<DayPackage>())
 
-    var displayFragmentTriggerAndType = MutableLiveData(-1)
+    var dialogBoxBundle = MutableLiveData<Utils.DialogBundle>()
+
+    var displayPackageReceiverFragmentType = MutableLiveData(PackageReceivedFragment.TRANSFER_PACKAGE_NOT_VALUE)
 
     var displayFragmentById = MutableLiveData(NO_FRAGMENT)
 
@@ -64,23 +70,26 @@ class MainViewModel(application: Application) :
             AppRepository(exerciseDao, friendDao, dayDao)
 
         allFriends = repository.allFriends
+        allDays = repository.allDaysLiveData
+        allExercises = repository.allExercisesLiveData
 
         startSnapshotListeners()
 
     }
 
-    fun displayFragmentByID(id:Int){
+    fun displayFragmentByID(id: Int) {
         displayFragmentById.postValue(id)
     }
 
 
     private fun startSnapshotListeners() {
-        startFriendRequestListener()
         startExercisesReceivedListener()
         startDaysReceivedListener()
+        startFriendRequestListener()
+        startFriendRequestAcceptedListener()
     }
 
-    private fun startDaysReceivedListener() {
+    private fun startDaysReceivedListener()  = viewModelScope.launch{
         val docRefDays =
             db.collection("users").document(DataHolder.userDocId).collection("day_transfers")
                 .whereEqualTo("mstate", TransferPackage.STATE_SENT)
@@ -100,7 +109,7 @@ class MainViewModel(application: Application) :
         }
     }
 
-    private fun startExercisesReceivedListener() {
+    private fun startExercisesReceivedListener() = viewModelScope.launch {
         val docRefExes =
             db.collection("users").document(DataHolder.userDocId).collection("exercise_transfers")
                 .whereEqualTo("mstate", TransferPackage.STATE_SENT)
@@ -120,7 +129,7 @@ class MainViewModel(application: Application) :
         }
     }
 
-    private fun startFriendRequestListener() {
+    private fun startFriendRequestListener() = viewModelScope.launch {
         val docRef =
             db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
                 .whereEqualTo("mstate", TransferPackage.STATE_SENT)
@@ -135,6 +144,28 @@ class MainViewModel(application: Application) :
                     receivedFriendRequests.add(friendRequestPackage)
                 }
                 receivedFriendRequestsPackages.value = receivedFriendRequests
+            }
+        }
+    }
+
+    private fun startFriendRequestAcceptedListener() = viewModelScope.launch {
+        val docRefAccepted =
+            db.collection("users").document(DataHolder.userDocId).collection("f_requests_out")
+                .whereEqualTo("mstate", TransferPackage.STATE_ACCEPTED)
+
+        docRefAccepted.addSnapshotListener { snapshot, e ->
+            if (snapshot != null) {
+                if (snapshot.documents.isNotEmpty()) {
+                    for (request in snapshot.documents) {
+                        val friendPackage = request.toObject(FriendRequestPackage::class.java)
+                        val newFriend = Friend(friendPackage!!.mReceiver!!,friendPackage.receiverDocId!!)
+//                        newFriend.docId=friendPackage.receiverDocId!!
+                        viewModelScope.launch {
+                            insertFriend(newFriend)
+                            request.reference.update("mstate","accepted - solved")
+                        }
+                    }
+                }
             }
         }
     }
@@ -202,22 +233,147 @@ class MainViewModel(application: Application) :
         daysToSend.value = listOf()
     }
 
-    fun attemptImportExercise(exercise: Exercise) {
-        //if exists - update live data for dialog - do the dialog object here? - the yes calls the insert
-        //to check if exists need to to run an async operation to get non live data allexercises, allfriends and alldays here and then use them
+    fun attemptImportExercise(
+        exercisePackage: ExercisePackage,
+        allExercises: List<Exercise>
+    ) {
 
+        val newExercise = exercisePackage.firestoreExercise!!.toExercise()
+
+        if (findExerciseInLocal(newExercise, allExercises) != null) {
+            val text = "You already have this exercise, do you want to overwrite it?"
+            val title = "Import exercise"
+            val dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    removeExercise(findExerciseInLocal(newExercise, allExercises)!!)
+                    insertExercise(newExercise)
+                    updateTransferPackage(exercisePackage, TransferPackage.STATE_SAVED)
+                }
+
+                override fun onNegativeButton() {
+                    super.onNegativeButton()
+                    updateTransferPackage(exercisePackage, TransferPackage.STATE_REJECTED)
+                }
+            }
+            dialogBoxBundle.postValue(
+                Utils.DialogBundle(
+                    title,
+                    text,
+                    dialogPositiveNegativeInterface
+                )
+            )
+        } else {
+            insertExercise(newExercise)
+        }
 
     }
 
-    fun insertExercise(newExercise:Exercise) = viewModelScope.launch {
+    private fun findExerciseInLocal(exe: Exercise, fullListExes: List<Exercise>): Exercise? {
+        for (exercise in fullListExes) {
+            if (exe.md5 == exercise.md5) {
+                return exercise
+            }
+        }
+        return null
+    }
+
+    fun insertExercise(newExercise: Exercise) = viewModelScope.launch {
         repository.insertExercise(newExercise)
     }
 
-    fun insertDay(day: Day) {
-
+    private fun removeExercise(theSameExercise: Exercise) = viewModelScope.launch {
+        repository.deleteExercise(theSameExercise)
     }
 
-    fun insertFriend(friend: Friend) {
 
+    fun attemptImportDay(dayPackage: DayPackage, allExercises: List<Exercise>, allDays: List<Day>) {
+        val title = "Import Days"
+        val text =
+            "Import ${Day.toReadableFormat(Day.dayIDToDate(dayPackage.firestoreDay!!.mDayId)!!)} from your friend ${dayPackage.mSender}?" +
+                    "\n new exercises will be imported, existing exercises won't be replaced, your days will be overwritten"
+        val dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
+            override fun onPositiveButton(inputText: String) {
+                super.onPositiveButton(inputText)
+                var toImportDay = dayPackage.firestoreDay.toDay()
+                toImportDay.exercises = replaceExistingExercises(toImportDay, allExercises)
+                updateDay(toImportDay, allDays)
+                updateTransferPackage(
+                    dayPackage,
+                    TransferPackage.STATE_SAVED
+                )
+            }
+
+            override fun onNegativeButton() {
+                super.onNegativeButton()
+                updateTransferPackage(
+                    dayPackage,
+                    TransferPackage.STATE_REJECTED
+                )
+            }
+
+        }
+        dialogBoxBundle.postValue(
+            Utils.DialogBundle(
+                title,
+                text,
+                dialogPositiveNegativeInterface
+            )
+        )
     }
+
+    private fun replaceExistingExercises(
+        toImportDay: Day,
+        allExercises: List<Exercise>
+    ): ArrayList<Exercise> {
+        var newDayExercises = arrayListOf<Exercise>()
+        for (exe in toImportDay.exercises) {
+            //if exe exists we add
+            val existingExercise = findExerciseInLocal(exe, allExercises)
+            if (existingExercise == null) {
+                //it is a new exercise
+                insertExercise(exe)
+                newDayExercises.add(exe)
+            } else {
+                //replace it for your existing instance of the exercise
+                newDayExercises.add(existingExercise)
+            }
+        }
+        return newDayExercises
+    }
+
+    fun updateDay(day: Day, allDays: List<Day>) = viewModelScope.launch {
+        if (!allDays.contains(day)) {
+            insertDay(day)
+        } else {
+            repository.updateDay(day)
+        }
+    }
+
+    fun insertDay(day: Day) = viewModelScope.launch {
+        repository.insertDay(day)
+    }
+
+    fun attemptAddFriend(friend: Friend, allFriends: List<Friend>) {
+        if (!allFriends.contains(friend)) {
+            insertFriend(friend)
+        }
+    }
+
+    private fun insertFriend(friend: Friend) = viewModelScope.launch{
+        repository.insertFriend(friend)
+    }
+
+    fun updateTransferPackage(transferPackage: TransferPackage, newState: String) =
+        viewModelScope.launch {
+            transferPackage.mState = TransferPackage.STATE_SAVED
+            val docRef = db.document(transferPackage.documentPath!!)
+
+            docRef
+                .update("mstate", newState)
+                .addOnSuccessListener { Timber.d("DocumentSnapshot successfully updated!") }
+                .addOnFailureListener { e -> Timber.w("Error updating document: $e") }
+        }
+
+
 }

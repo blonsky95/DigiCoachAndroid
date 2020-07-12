@@ -13,11 +13,10 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.network.ExercisePackage
 import com.tatoe.mydigicoach.network.MyCustomStoreExercise
 import com.tatoe.mydigicoach.viewmodels.LibraryViewModel
 import com.tatoe.mydigicoach.viewmodels.MyLibraryViewModelFactory
@@ -82,7 +81,7 @@ class Library : AppCompatActivity(), SearchView.OnQueryTextListener {
             if (theSameExercise(exe.mExercise) != null) {
                 val title = "Overwrite"
                 val text = "You already have this exercise, do you want to overwrite it?"
-                val dialogPositiveNegativeHandler = object : DialogPositiveNegativeHandler {
+                val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
                         removeExercise(theSameExercise(exe.mExercise)!!)

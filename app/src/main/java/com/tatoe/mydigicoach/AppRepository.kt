@@ -1,7 +1,6 @@
 package com.tatoe.mydigicoach
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.tatoe.mydigicoach.database.BlockDao
 import com.tatoe.mydigicoach.database.DayDao
@@ -11,7 +10,7 @@ import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
-import com.tatoe.mydigicoach.network.ExercisePackage
+import com.tatoe.mydigicoach.network.TransferPackage
 import timber.log.Timber
 
 

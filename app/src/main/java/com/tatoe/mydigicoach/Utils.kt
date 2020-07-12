@@ -22,17 +22,17 @@ object Utils {
         context: Context,
         dialogTitle: String = "",
         dialogText: String = "",
-        dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+        dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
     ) {
         val mDialogView = LayoutInflater.from(context).inflate(R.layout.dialog_window_info, null)
         mDialogView.dialog_text.text = dialogText
         val mBuilder = AlertDialog.Builder(context).setView(mDialogView).setTitle(dialogTitle)
-        if (dialogPositiveNegativeHandler != null) {
+        if (dialogPositiveNegativeInterface != null) {
             mBuilder.setPositiveButton("Yes") { _, _ ->
-                dialogPositiveNegativeHandler.onPositiveButton()
+                dialogPositiveNegativeInterface.onPositiveButton()
             }
             mBuilder.setNegativeButton("No") { _, _ ->
-                dialogPositiveNegativeHandler.onNegativeButton()
+                dialogPositiveNegativeInterface.onNegativeButton()
             }
         }
 
@@ -44,7 +44,7 @@ object Utils {
         dialogTitle: String? = "",
         dialogText: String? = "",
         editTextHint: String? = "Type here",
-        dialogPositiveNegativeHandler: DialogPositiveNegativeHandler
+        dialogPositiveNegativeInterface: DialogPositiveNegativeInterface
     ) {
 
         val mDialogView =
@@ -69,7 +69,7 @@ object Utils {
 
         mDialogView.dialog_btn_left.setOnClickListener {
             val userInput = mDialogView.dialog_edittext.text.trim().toString()
-            dialogPositiveNegativeHandler.onPositiveButton(userInput)
+            dialogPositiveNegativeInterface.onPositiveButton(userInput)
             alertDialog.dismiss()
         }
 
@@ -162,6 +162,12 @@ object Utils {
             }
         }
         return false
+    }
+
+    class DialogBundle(title:String = "", text:String = "", positiveNegativeInterface: DialogPositiveNegativeInterface) {
+        var mTitle=title
+        var mText=text
+        var mPositiveNegativeInterface=positiveNegativeInterface
     }
 
 }
