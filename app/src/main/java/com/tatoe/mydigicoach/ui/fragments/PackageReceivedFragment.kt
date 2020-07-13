@@ -19,16 +19,17 @@ import kotlinx.android.synthetic.main.fragment_incoming_requests_screen.*
 import kotlinx.android.synthetic.main.fragment_incoming_requests_screen.cancel_btn
 import kotlinx.android.synthetic.main.item_holder_friends.view.friend_username_textview
 import kotlinx.android.synthetic.main.item_holder_request_package.view.*
+import java.lang.Exception
 
-class PackageReceivedFragment: Fragment() {
+class PackageReceivedFragment : Fragment() {
 
     private lateinit var requestReceiverAdapter: MyCustomReceivedRequestsAdapter
     private lateinit var recyclerView: RecyclerView
 
-    var packageReceiverInterface :OnPackageReceivedInterface? = null
+    var packageReceiverInterface: OnPackageReceivedInterface? = null
     var transferPackages = listOf<TransferPackage>()
 
-    var transferPackageType:Int? = null
+    var transferPackageType: Int? = null
 
     companion object {
 
@@ -67,31 +68,46 @@ class PackageReceivedFragment: Fragment() {
         }
 
         arguments?.getString(BUNDLE_RECEIVED_PACKAGES_KEY)?.let {
-            transferPackages = Gson().fromJson(it, object : TypeToken<List<TransferPackage>>() {}.type)
-        }
-        if (transferPackages.isNotEmpty()) {
-            if (transferPackages[0] is ExercisePackage) {
-                transferPackageType=TRANSFER_PACKAGE_EXERCISE
-                return
+            // the following code checks what type of packages the
+            // array of their parent abstract class, TransferPackage contains
+            val exercisePackages: List<ExercisePackage> =
+                Gson().fromJson(it, object : TypeToken<List<ExercisePackage>>() {}.type)
+            if (exercisePackages.isNotEmpty() && exercisePackages[0].firestoreExercise != null) {
+                transferPackageType = TRANSFER_PACKAGE_EXERCISE
+                transferPackages = exercisePackages
             }
-            if (transferPackages[0] is DayPackage) {
-                transferPackageType= TRANSFER_PACKAGE_DAY
-                return
-            }
-            if (transferPackages[0] is FriendRequestPackage) {
-                transferPackageType= TRANSFER_PACKAGE_FRIEND
-            }
-        }
 
+            val dayPackages: List<DayPackage> =
+                Gson().fromJson(it, object : TypeToken<List<DayPackage>>() {}.type)
+            if (dayPackages.isNotEmpty() && dayPackages[0].firestoreDay != null) {
+                transferPackageType = TRANSFER_PACKAGE_DAY
+                transferPackages = dayPackages
+            }
+
+            val friendsPackages: List<FriendRequestPackage> =
+                Gson().fromJson(it, object : TypeToken<List<FriendRequestPackage>>() {}.type)
+            if (friendsPackages.isNotEmpty() && transferPackageType == null) {
+                transferPackageType = TRANSFER_PACKAGE_FRIEND
+                transferPackages = friendsPackages
+            }
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        recyclerView=requests_displayer_recycler
-        requestReceiverAdapter=MyCustomReceivedRequestsAdapter(activity!!)
-        requestReceiverAdapter.setContent(transferPackages)
+        recyclerView = requests_displayer_recycler
+        requestReceiverAdapter = MyCustomReceivedRequestsAdapter(activity!!)
         recyclerView.layoutManager = LinearLayoutManager(activity)
+        recyclerView.adapter = requestReceiverAdapter
+        requestReceiverAdapter.setContent(transferPackages)
+
         cancel_btn.setOnClickListener {
             packageReceiverInterface?.onBottomCancelSelected()
+        }
+        when (transferPackageType) {
+            TRANSFER_PACKAGE_DAY -> textView10.text = "Received day programmes"
+            TRANSFER_PACKAGE_EXERCISE -> textView10.text = "Received exercises"
+            TRANSFER_PACKAGE_FRIEND -> textView10.text = "Friend Requests"
+            else -> textView10.text = "This is empty"
         }
     }
 
@@ -105,13 +121,17 @@ class PackageReceivedFragment: Fragment() {
 
         override fun onAttachedToRecyclerView(recyclerView: RecyclerView) {
             super.onAttachedToRecyclerView(recyclerView)
-            if (transferPackageType==null) {
-                throw Error("Package is not readable, not an exercise day or friend")
+            if (transferPackageType == null) {
+//                throw Error("Package is not readable, not an exercise day or friend")
+                //todo do something with empty adapter
             }
 
         }
 
-        override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyReceivedPackageViewHolder {
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): MyReceivedPackageViewHolder {
             val itemView = inflater.inflate(R.layout.item_holder_request_package, parent, false)
             return MyReceivedPackageViewHolder(itemView)
         }
@@ -123,29 +143,36 @@ class PackageReceivedFragment: Fragment() {
         override fun onBindViewHolder(holder: MyReceivedPackageViewHolder, position: Int) {
             holder.usernameTextView.text = transferPackages[position].mSender
 
-            var packageTitle=""
-            if (transferPackageType==TRANSFER_PACKAGE_EXERCISE){
-                packageTitle=(transferPackages[position] as ExercisePackage).firestoreExercise!!.mName
+            var packageTitle = ""
+            if (transferPackageType == TRANSFER_PACKAGE_EXERCISE) {
+                packageTitle =
+                    (transferPackages[position] as ExercisePackage).firestoreExercise!!.mName
             }
-            if (transferPackageType== TRANSFER_PACKAGE_DAY){
-                packageTitle=(transferPackages[position] as DayPackage).firestoreDay!!.mDayId
+            if (transferPackageType == TRANSFER_PACKAGE_DAY) {
+                packageTitle = (transferPackages[position] as DayPackage).firestoreDay!!.mDayId
             }
-            if (transferPackageType== TRANSFER_PACKAGE_FRIEND){
-                holder.packageNameTextView.visibility=View.GONE
+            if (transferPackageType == TRANSFER_PACKAGE_FRIEND) {
+                holder.packageNameTextView.visibility = View.GONE
             } else {
-                holder.packageNameTextView.text=packageTitle
+                holder.packageNameTextView.text = packageTitle
             }
 
             holder.acceptImageView.setOnClickListener {
-                packageReceiverInterface?.onPackageAccepted(transferPackages[position], transferPackageType!!)
+                packageReceiverInterface?.onPackageAccepted(
+                    transferPackages[position],
+                    transferPackageType!!
+                )
             }
             holder.rejectImageView.setOnClickListener {
-                packageReceiverInterface?.onPackageRejected(transferPackages[position], transferPackageType!!)
+                packageReceiverInterface?.onPackageRejected(
+                    transferPackages[position],
+                    transferPackageType!!
+                )
             }
         }
 
         fun setContent(mTransferPackages: List<TransferPackage>) {
-            transferPackages=mTransferPackages
+            transferPackages = mTransferPackages
             notifyDataSetChanged()
         }
 
@@ -153,15 +180,15 @@ class PackageReceivedFragment: Fragment() {
 
     class MyReceivedPackageViewHolder(v: View) : RecyclerView.ViewHolder(v) {
         var usernameTextView = v.friend_username_textview
-        var packageNameTextView=v.package_name_textview
-        var acceptImageView=v.accept_image_view
-        var rejectImageView=v.reject_image_view
+        var packageNameTextView = v.package_name_textview
+        var acceptImageView = v.accept_image_view
+        var rejectImageView = v.reject_image_view
     }
 
 
     interface OnPackageReceivedInterface {
-        fun onPackageAccepted(transferPackage: TransferPackage, packageType:Int)
-        fun onPackageRejected(transferPackage: TransferPackage, packageType:Int)
+        fun onPackageAccepted(transferPackage: TransferPackage, packageType: Int)
+        fun onPackageRejected(transferPackage: TransferPackage, packageType: Int)
         fun onBottomCancelSelected()
     }
 }

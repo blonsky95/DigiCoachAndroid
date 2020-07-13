@@ -1,8 +1,8 @@
 package com.tatoe.mydigicoach.network
 
 abstract class TransferPackage ( var mRemoveResults: Boolean = false,
-                                 var mSender: String?,
-                                 var mReceiver: String?) {
+                                 var mSender: String? = null,
+                                 var mReceiver: String? = null) {
 
     companion object {
         val STATE_SENT = "sent"

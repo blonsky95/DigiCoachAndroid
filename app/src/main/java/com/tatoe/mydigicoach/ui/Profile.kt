@@ -53,7 +53,7 @@ class Profile : AppCompatActivity(), HandleCloudActionsInterface {
             setUpFragment(backupFragment)
         }
 
-        friends_button.setOnClickListener {
+        friends_requests_button.setOnClickListener {
             setUpFragment(friendsFragment)
         }
 

@@ -26,10 +26,11 @@ class MainViewModel(application: Application) :
     AndroidViewModel(application) {
 
     companion object {
+        const val REMOVE_VERTICAL_FRAGMENT = -2
         const val NO_FRAGMENT = -1
         const val PACKAGE_DISPLAYER = 1
         const val FRIEND_SHARER = 2
-        const val FRIEND_DISPLAYER=3
+        const val FRIEND_DISPLAYER = 3
     }
 
     private val repository: AppRepository
@@ -43,13 +44,14 @@ class MainViewModel(application: Application) :
     val exercisesToSend = MutableLiveData(listOf<Exercise>())
     val daysToSend = MutableLiveData(listOf<Day>())
 
-    var receivedFriendRequestsPackages = MutableLiveData(listOf<FriendRequestPackage>())
+    var receivedFriendRequestsPackages = MutableLiveData(arrayListOf<FriendRequestPackage>())
     var receivedExercisesPackages = MutableLiveData(listOf<ExercisePackage>())
     var receivedDaysPackages = MutableLiveData(listOf<DayPackage>())
 
     var dialogBoxBundle = MutableLiveData<Utils.DialogBundle>()
 
-    var displayPackageReceiverFragmentType = MutableLiveData(PackageReceivedFragment.TRANSFER_PACKAGE_NOT_VALUE)
+    var displayPackageReceiverFragmentType =
+        MutableLiveData(PackageReceivedFragment.TRANSFER_PACKAGE_NOT_VALUE)
 
     var displayFragmentById = MutableLiveData(NO_FRAGMENT)
 
@@ -89,7 +91,7 @@ class MainViewModel(application: Application) :
         startFriendRequestAcceptedListener()
     }
 
-    private fun startDaysReceivedListener()  = viewModelScope.launch{
+    private fun startDaysReceivedListener() = viewModelScope.launch {
         val docRefDays =
             db.collection("users").document(DataHolder.userDocId).collection("day_transfers")
                 .whereEqualTo("mstate", TransferPackage.STATE_SENT)
@@ -158,11 +160,12 @@ class MainViewModel(application: Application) :
                 if (snapshot.documents.isNotEmpty()) {
                     for (request in snapshot.documents) {
                         val friendPackage = request.toObject(FriendRequestPackage::class.java)
-                        val newFriend = Friend(friendPackage!!.mReceiver!!,friendPackage.receiverDocId!!)
+                        val newFriend =
+                            Friend(friendPackage!!.mReceiver!!, friendPackage.receiverDocId!!)
 //                        newFriend.docId=friendPackage.receiverDocId!!
                         viewModelScope.launch {
                             insertFriend(newFriend)
-                            request.reference.update("mstate","accepted - solved")
+                            request.reference.update("mstate", "accepted - solved")
                         }
                     }
                 }
@@ -354,13 +357,26 @@ class MainViewModel(application: Application) :
         repository.insertDay(day)
     }
 
-    fun attemptAddFriend(friend: Friend, allFriends: List<Friend>) {
+    fun attemptAddFriend(friendPackage: FriendRequestPackage, allFriends: List<Friend>) {
+        var friend = Friend(friendPackage.mSender!!, friendPackage.senderDocId)
+        var stateString = ""
         if (!allFriends.contains(friend)) {
+            stateString = TransferPackage.STATE_ACCEPTED
             insertFriend(friend)
+
+        } else {
+            stateString = TransferPackage.STATE_REJECTED
         }
+        updateRequestStateReceiver(friendPackage, stateString)
+        updateRequestStateSender(friendPackage, stateString)
     }
 
-    private fun insertFriend(friend: Friend) = viewModelScope.launch{
+    fun rejectFriendRequest(friendPackage: FriendRequestPackage) {
+        updateRequestStateReceiver(friendPackage, TransferPackage.STATE_REJECTED)
+        updateRequestStateSender(friendPackage, TransferPackage.STATE_REJECTED)
+    }
+
+    private fun insertFriend(friend: Friend) = viewModelScope.launch {
         repository.insertFriend(friend)
     }
 
@@ -375,5 +391,43 @@ class MainViewModel(application: Application) :
                 .addOnFailureListener { e -> Timber.w("Error updating document: $e") }
         }
 
+    /**
+     * Updates the mstate field of the request in f_requests_out for the sender
+     */
+    fun updateRequestStateSender(friendRequestPackage: FriendRequestPackage, newState: String) =
+        viewModelScope.launch {
+            //tells sender its accepted (state changes to ACCEPTED) so it will trigger the accepted snapshot, and accept the friend
+
+            val docRef = db.collection("users").document(friendRequestPackage.senderDocId!!)
+                .collection("f_requests_out")
+                .whereEqualTo("mreceiver", DataHolder.userName)
+            docRef.get().addOnSuccessListener { docs ->
+                if (!docs.isEmpty) {
+                    docs.documents[0].reference.update(
+                        "mstate",
+                        newState,
+                        "receiverDocId",
+                        DataHolder.userDocId
+                    )
+                }
+            }
+        }
+
+    /**
+     * Updates the mstate field of the request in f_requests_in for the receiver
+     */
+    fun updateRequestStateReceiver(friendRequestPackage: FriendRequestPackage, newState: String) =
+        viewModelScope.launch {
+            //receiver requests get modified so the state of the request moves to SOLVED (aka ignored)
+//        val docRef = db.document(friendPackage.documentPath!!)
+            val docRef =
+                db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
+                    .whereEqualTo("msender", friendRequestPackage.mSender)
+            docRef.get().addOnSuccessListener { docs ->
+                if (!docs.isEmpty) {
+                    docs.documents[0].reference.update("mstate", newState)
+                }
+            }
+        }
 
 }

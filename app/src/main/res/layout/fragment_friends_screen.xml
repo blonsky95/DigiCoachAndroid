@@ -6,21 +6,21 @@
         android:layout_height="match_parent"
         android:background="@color/lightestBlue">
 
-            <TextView
-                    android:id="@+id/textView10"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="64dp"
-                    android:layout_marginTop="48dp"
-                    android:layout_marginEnd="64dp"
-                    android:fontFamily="@font/open_sans_bold"
-                    android:text="My Friends"
-                    android:textColor="@color/black"
-                    android:textSize="18sp"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.0"
-                    app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent" />
+    <TextView
+            android:id="@+id/textView10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginEnd="64dp"
+            android:fontFamily="@font/open_sans_bold"
+            android:text="My Friends"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/friendsRecyclerView"
@@ -30,64 +30,98 @@
             android:layout_marginTop="24dp"
             android:layout_marginEnd="64dp"
             android:layout_marginBottom="24dp"
-            app:layout_constraintBottom_toTopOf="@+id/add_friend_btn"
+            app:layout_constraintBottom_toTopOf="@+id/add_friend_layout"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView10"
             tools:listitem="@layout/item_holder_friends" />
 
+    <!--    <TextView-->
+    <!--            android:id="@+id/add_friend_btn"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginStart="64dp"-->
+    <!--            android:layout_marginEnd="64dp"-->
+    <!--            android:layout_marginBottom="16dp"-->
+    <!--            android:background="@color/lightGrey"-->
+    <!--            android:fontFamily="@font/open_sans_bold"-->
+    <!--            android:gravity="center"-->
+    <!--            android:paddingTop="8dp"-->
+    <!--            android:paddingBottom="8dp"-->
+    <!--            android:text="Add new friend"-->
+    <!--            app:layout_constraintBottom_toTopOf="@id/back_btn"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintHorizontal_bias="0.0"-->
+    <!--            app:layout_constraintStart_toStartOf="parent" />-->
+
     <TextView
-        android:id="@+id/add_friend_btn"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="64dp"
-        android:layout_marginEnd="64dp"
-        android:layout_marginBottom="16dp"
-        android:background="@color/lightGrey"
-        android:fontFamily="@font/open_sans_bold"
-        android:gravity="center"
-        android:paddingTop="8dp"
-        android:paddingBottom="8dp"
-        android:text="Add new friend"
-        app:layout_constraintBottom_toTopOf="@id/back_btn"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent" />
+            android:id="@+id/back_btn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="64dp"
+            android:layout_marginEnd="64dp"
+            android:layout_marginBottom="32dp"
+            android:background="@color/lightGrey"
+            android:fontFamily="@font/open_sans_bold"
+            android:gravity="center"
+            android:paddingTop="8dp"
+            android:paddingBottom="8dp"
+            android:text="Back"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent" />
+
+    <LinearLayout
+            android:id="@+id/add_friend_layout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="64dp"
+            android:layout_marginStart="64dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            app:layout_constraintBottom_toTopOf="@id/back_btn"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent">
+
+        <EditText
+                android:id="@+id/add_friend_edit_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:ems="10"
+                android:layout_marginEnd="8dp"
+                android:inputType="textPersonName"
+                android:hint="Username" />
 
         <TextView
-                android:id="@+id/back_btn"
-                android:layout_width="0dp"
+                android:id="@+id/add_friend_view_btn"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="64dp"
-                android:layout_marginEnd="64dp"
-                android:layout_marginBottom="32dp"
-                android:background="@color/lightGrey"
-                android:fontFamily="@font/open_sans_bold"
-                android:gravity="center"
-                android:paddingTop="8dp"
-                android:paddingBottom="8dp"
-                android:text="Back"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintHorizontal_bias="0.0"
-                app:layout_constraintStart_toStartOf="parent" />
+                android:padding="6dp"
+                android:textColor="@color/black"
+                android:background="@color/cardview_light_background"
+                android:text="Add"
+                android:gravity="center"/>
+    </LinearLayout>
 
-<!--    <TextView-->
-<!--            android:id="@+id/request_received_btn"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_marginStart="64dp"-->
-<!--            android:layout_marginEnd="64dp"-->
-<!--            android:layout_marginBottom="32dp"-->
-<!--            android:background="@color/lightGrey"-->
-<!--            android:fontFamily="@font/open_sans_bold"-->
-<!--            android:gravity="center"-->
-<!--            android:paddingTop="8dp"-->
-<!--            android:paddingBottom="8dp"-->
-<!--            android:text="You have a friend request"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintHorizontal_bias="0.0"-->
-<!--            app:layout_constraintStart_toStartOf="parent" />-->
+    <!--    <TextView-->
+    <!--            android:id="@+id/request_received_btn"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="wrap_content"-->
+    <!--            android:layout_marginStart="64dp"-->
+    <!--            android:layout_marginEnd="64dp"-->
+    <!--            android:layout_marginBottom="32dp"-->
+    <!--            android:background="@color/lightGrey"-->
+    <!--            android:fontFamily="@font/open_sans_bold"-->
+    <!--            android:gravity="center"-->
+    <!--            android:paddingTop="8dp"-->
+    <!--            android:paddingBottom="8dp"-->
+    <!--            android:text="You have a friend request"-->
+    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintHorizontal_bias="0.0"-->
+    <!--            app:layout_constraintStart_toStartOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

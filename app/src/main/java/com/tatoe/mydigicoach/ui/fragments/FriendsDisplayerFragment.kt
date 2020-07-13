@@ -84,22 +84,24 @@ class FriendsDisplayerFragment : Fragment() {
         recyclerView.adapter = friendsAdapter
         initObservers()
 
-        add_friend_btn.setOnClickListener {
+        add_friend_view_btn.setOnClickListener {
+            var editTextText=add_friend_edit_text.text.trim().toString()
             val title = "New friend request"
-            val text = "Type friend username"
+            val text = "Send friend request to user $editTextText?"
             val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     for (friend in allFriends) {
-                        if (friend.username==inputText) {
-                            Toast.makeText(activity, "$inputText is already a friend", Toast.LENGTH_SHORT).show()
+                        if (friend.username==editTextText) {
+                            Toast.makeText(activity, "$editTextText is already a friend", Toast.LENGTH_SHORT).show()
                             return
                         }
                     }
-                    friendsDisplayerFragmentViewModel.sendFriendRequest(inputText)
+                    friendsDisplayerFragmentViewModel.sendFriendRequest(editTextText)
                 }
             }
-            Utils.getDialogViewWithEditText(activity!!,title,text,"username",dialogPositiveNegativeHandler)
+//            Utils.getDialogViewWithEditText(activity!!,title,text,"username",dialogPositiveNegativeHandler)
+            Utils.getInfoDialogView(activity!!,title,text,dialogPositiveNegativeHandler)
         }
 
     }

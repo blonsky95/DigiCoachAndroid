@@ -14,8 +14,6 @@ import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.viewmodels.*
-import kotlinx.android.synthetic.main.activity_profile.backup_button
-import kotlinx.android.synthetic.main.activity_profile.friends_button
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 class ProfileFragment : Fragment() {
@@ -23,6 +21,8 @@ class ProfileFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var profileViewModel: ProfileViewModel
     private var db = FirebaseFirestore.getInstance()
+    private var isFriendDisplayerFragmentOpen=false
+    private var isFriendRequestReceiverFragmentOpen=false
 
     private lateinit var dialog: Dialog
 
@@ -60,11 +60,24 @@ class ProfileFragment : Fragment() {
 //            setUpFragment(backupFragment)
         }
 
-        friends_button.setOnClickListener {
-            mainViewModel.displayPackageReceiverFragmentType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND)
+        friends_requests_button.setOnClickListener {
+            var int=PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND
+//            if (isFriendRequestReceiverFragmentOpen){
+//                int = MainViewModel.REMOVE_VERTICAL_FRAGMENT
+//            }
+            mainViewModel.displayPackageReceiverFragmentType.postValue(int)
 //            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
 //            setUpFragment(friendsFragment)
             //todo sort this one out
+        }
+
+        friends_display_btn.setOnClickListener {
+            var int=MainViewModel.FRIEND_DISPLAYER
+//            if (isFriendDisplayerFragmentOpen){
+//                int = MainViewModel.REMOVE_VERTICAL_FRAGMENT
+//            }
+            mainViewModel.displayFragmentById.postValue(int)
+//            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
         }
 
         initObservers()
