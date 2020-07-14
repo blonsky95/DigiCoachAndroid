@@ -45,8 +45,10 @@ class MainViewModel(application: Application) :
     val daysToSend = MutableLiveData(listOf<Day>())
 
     var receivedFriendRequestsPackages = MutableLiveData(arrayListOf<FriendRequestPackage>())
-    var receivedExercisesPackages = MutableLiveData(listOf<ExercisePackage>())
-    var receivedDaysPackages = MutableLiveData(listOf<DayPackage>())
+    var receivedExercisesPackages = MutableLiveData(arrayListOf<ExercisePackage>())
+    var receivedDaysPackages = MutableLiveData(arrayListOf<DayPackage>())
+    var adapterTransferPackages = MutableLiveData(arrayListOf<TransferPackage>())
+
 
     var dialogBoxBundle = MutableLiveData<Utils.DialogBundle>()
 
@@ -236,39 +238,48 @@ class MainViewModel(application: Application) :
         daysToSend.value = listOf()
     }
 
-    fun attemptImportExercise(
+    fun exerciseAlreadyInDb(
+        exercisePackage: ExercisePackage,
+        allExercises: List<Exercise>
+    ): Boolean {
+        return findExerciseInLocal(
+            exercisePackage.firestoreExercise!!.toExercise(),
+            allExercises
+        ) != null
+    }
+
+    fun promptOverwriteExerciseDialog(
         exercisePackage: ExercisePackage,
         allExercises: List<Exercise>
     ) {
 
         val newExercise = exercisePackage.firestoreExercise!!.toExercise()
 
-        if (findExerciseInLocal(newExercise, allExercises) != null) {
-            val text = "You already have this exercise, do you want to overwrite it?"
-            val title = "Import exercise"
-            val dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
-                override fun onPositiveButton(inputText: String) {
-                    super.onPositiveButton(inputText)
-                    removeExercise(findExerciseInLocal(newExercise, allExercises)!!)
-                    insertExercise(newExercise)
-                    updateTransferPackage(exercisePackage, TransferPackage.STATE_SAVED)
-                }
+        val text = "You already have this exercise, do you want to overwrite it?"
+        val title = "Import exercise"
+        val dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
+            override fun onPositiveButton(inputText: String) {
+                super.onPositiveButton(inputText)
+                removeExercise(findExerciseInLocal(newExercise, allExercises)!!)
+                insertExercise(newExercise)
+                updateAdapterContent(exercisePackage)
 
-                override fun onNegativeButton() {
-                    super.onNegativeButton()
-                    updateTransferPackage(exercisePackage, TransferPackage.STATE_REJECTED)
-                }
+                updateTransferPackage(exercisePackage, TransferPackage.STATE_SAVED)
             }
-            dialogBoxBundle.postValue(
-                Utils.DialogBundle(
-                    title,
-                    text,
-                    dialogPositiveNegativeInterface
-                )
-            )
-        } else {
-            insertExercise(newExercise)
+
+            override fun onNegativeButton() {
+                super.onNegativeButton()
+//                updateTransferPackage(exercisePackage, TransferPackage.STATE_REJECTED)
+            }
         }
+        dialogBoxBundle.postValue(
+            Utils.DialogBundle(
+                title,
+                text,
+                dialogPositiveNegativeInterface
+            )
+        )
+
 
     }
 
@@ -429,5 +440,27 @@ class MainViewModel(application: Application) :
                 }
             }
         }
+
+    fun removePackage(
+        transferPackagesReceived: ArrayList<TransferPackage>,
+        transferPackage: TransferPackage
+    ): ArrayList<TransferPackage> {
+        for (tPackage in transferPackagesReceived) {
+            if (tPackage.documentPath == transferPackage.documentPath) {
+                transferPackagesReceived.remove(tPackage)
+                return transferPackagesReceived
+            }
+        }
+        return transferPackagesReceived
+    }
+
+    fun updateAdapterContent(transferPackage: TransferPackage) {
+        var newAdapterContent = removePackage(
+            receivedExercisesPackages.value as ArrayList<TransferPackage>,
+            transferPackage
+        )
+        adapterTransferPackages.postValue(newAdapterContent)
+        receivedExercisesPackages.postValue(newAdapterContent as ArrayList<ExercisePackage>)
+    }
 
 }

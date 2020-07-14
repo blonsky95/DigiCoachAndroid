@@ -24,6 +24,7 @@ import java.lang.Exception
 class PackageReceivedFragment : Fragment() {
 
     private lateinit var requestReceiverAdapter: MyCustomReceivedRequestsAdapter
+    //todo method to update adapter content from activity
     private lateinit var recyclerView: RecyclerView
 
     var packageReceiverInterface: OnPackageReceivedInterface? = null
@@ -109,6 +110,10 @@ class PackageReceivedFragment : Fragment() {
             TRANSFER_PACKAGE_FRIEND -> textView10.text = "Friend Requests"
             else -> textView10.text = "This is empty"
         }
+    }
+
+    fun updateAdapterContent(newContent : List<TransferPackage>) {
+        requestReceiverAdapter.setContent(newContent)
     }
 
     inner class MyCustomReceivedRequestsAdapter(context: Context) :

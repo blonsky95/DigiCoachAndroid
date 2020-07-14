@@ -4,7 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/squareOrange"
+        android:background="@color/squareDarkerOrange"
         android:clickable="true"
         android:focusable="true">
 
@@ -49,10 +49,11 @@
             android:background="@color/darkGreen"
             android:fontFamily="@font/open_sans_bold"
             android:gravity="center"
-            android:paddingTop="8dp"
-            android:paddingBottom="8dp"
-            android:text="@android:string/cancel"
+            android:paddingTop="16dp"
+            android:paddingBottom="16dp"
+            android:text="Done"
             android:textColor="@color/white"
+            android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"

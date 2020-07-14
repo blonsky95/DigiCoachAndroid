@@ -1,6 +1,7 @@
 package com.tatoe.mydigicoach.ui
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
@@ -19,7 +20,6 @@ import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.viewmodels.MainViewModel
 import com.tatoe.mydigicoach.viewmodels.MyMainViewModelFactory
 import kotlinx.android.synthetic.main.activity_parent_of_fragments.*
-import timber.log.Timber
 
 class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface,
     PackageReceivedFragment.OnPackageReceivedInterface {
@@ -35,8 +35,8 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 
     private var packagesReceived: List<TransferPackage>? = null
 
-    private var exercisePackagesReceived: List<TransferPackage>? = null
-    private var dayPackagesReceived: List<DayPackage>? = null
+    private var exercisePackagesReceived: ArrayList<ExercisePackage>? = null
+    private var dayPackagesReceived: ArrayList<DayPackage>? = null
     private var friendPackagesReceived: ArrayList<FriendRequestPackage>? = null
 
 //    private var overwriteExerciseDialog
@@ -88,6 +88,13 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
         })
         mainViewModel.receivedFriendRequestsPackages.observe(this, Observer {
             friendPackagesReceived = it
+        })
+
+        mainViewModel.adapterTransferPackages.observe(this, Observer {
+            //if fragment not there then just returns null and doesnt do shit
+            (supportFragmentManager.findFragmentById(R.id.half_fragment_container) as PackageReceivedFragment?)?.updateAdapterContent(
+                it
+            )
         })
 
         mainViewModel.displayPackageReceiverFragmentType.observe(this, Observer {
@@ -178,10 +185,9 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 //        if (supportFragmentManager.fragments.size > 2) {
 //            supportFragmentManager.popBackStack()
 //        }
-        var verticalFragment = supportFragmentManager.findFragmentById(R.id.half_fragment_container)
-        if (verticalFragment!=null){
+        val verticalFragment = supportFragmentManager.findFragmentById(R.id.half_fragment_container)
+        if (verticalFragment != null) {
             supportFragmentManager.popBackStack()
-//            supportFragmentManager.beginTransaction().remove(verticalFragment)
             return
         }
 
@@ -218,7 +224,8 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     }
 
     private fun navigateToFragment(fragment: Fragment) {
-        if (supportFragmentManager.fragments.size > 1) {
+        val verticalFragment = supportFragmentManager.findFragmentById(R.id.half_fragment_container)
+        if (verticalFragment != null) {
             supportFragmentManager.popBackStack()
         }
 
@@ -240,7 +247,7 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
         if (toSendDays != null) {
             mainViewModel.sendDaysToFriend(toSendDays!!, friend)
         }
-
+        Toast.makeText(this, "Sent to ${friend.username}", Toast.LENGTH_SHORT).show()
     }
 
     override fun onCancelSelected() {
@@ -248,34 +255,47 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     }
 
     override fun onPackageAccepted(transferPackage: TransferPackage, packageType: Int) {
+
         when (packageType) {
             PackageReceivedFragment.TRANSFER_PACKAGE_EXERCISE -> {
-                mainViewModel.attemptImportExercise(
-                    (transferPackage as ExercisePackage),
-                    allExercises
-                )
+                val exercisePackage = transferPackage as ExercisePackage
+                if (mainViewModel.exerciseAlreadyInDb(exercisePackage, allExercises)) {
+                    mainViewModel.promptOverwriteExerciseDialog(exercisePackage, allExercises)
+                } else {
+                    mainViewModel.insertExercise(exercisePackage.firestoreExercise!!.toExercise())
+                    mainViewModel.updateAdapterContent(exercisePackage)
+
+//                    var newAdapterContent = mainViewModel.removePackage(
+//                        exercisePackagesReceived as ArrayList<TransferPackage>,
+//                        exercisePackage
+//                    )
+//                    mainViewModel.adapterTransferPackages.postValue(newAdapterContent)
+//                    mainViewModel.receivedExercisesPackages.postValue(newAdapterContent as ArrayList<ExercisePackage>)
+                }
             }
             PackageReceivedFragment.TRANSFER_PACKAGE_DAY -> {
+                val dayPackage = transferPackage as DayPackage
+
                 mainViewModel.attemptImportDay(
-                    (transferPackage as DayPackage),
+                    dayPackage,
                     allExercises,
                     allDays
                 )
+                dayPackagesReceived!!.remove(dayPackage)
+                mainViewModel.receivedDaysPackages.postValue(dayPackagesReceived)
+//                packageReceivedFrag.updateAdapterContent(dayPackagesReceived!!)
+
             }
             PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND -> {
                 //todo take to viewmodel check if existing
                 val friendRequestPackage = transferPackage as FriendRequestPackage
-//                mainViewModel.attemptAddFriend(
-//                    Friend(
-//                        friendRequestPackage.mSender!!,
-//                        friendRequestPackage.senderDocId
-//                    ), allFriends
-//                )
                 mainViewModel.attemptAddFriend(
                     friendRequestPackage, allFriends
                 )
                 friendPackagesReceived!!.remove(friendRequestPackage)
                 mainViewModel.receivedFriendRequestsPackages.postValue(friendPackagesReceived)
+//                packageReceivedFrag.updateAdapterContent(friendPackagesReceived!!)
+
             }
         }
     }
@@ -283,6 +303,10 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     override fun onPackageRejected(transferPackage: TransferPackage, packageType: Int) {
         when (packageType) {
             PackageReceivedFragment.TRANSFER_PACKAGE_EXERCISE -> {
+                mainViewModel.updateAdapterContent(transferPackage)
+
+                mainViewModel.updateTransferPackage(transferPackage, TransferPackage.STATE_REJECTED)
+
 //                mainViewModel.attemptImportExercise(
 //                    (transferPackage as ExercisePackage),
 //                    allExercises
