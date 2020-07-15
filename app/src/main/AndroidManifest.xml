@@ -40,7 +40,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.HomeActivity" />
+        <activity android:name=".ui.HomeActivity"
+                android:windowSoftInputMode="adjustPan"/>
         <activity
                 android:name=".ui.LoginSignUp"
                 android:windowSoftInputMode="adjustPan" />

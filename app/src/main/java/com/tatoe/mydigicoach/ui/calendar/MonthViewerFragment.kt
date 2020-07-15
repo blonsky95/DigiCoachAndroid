@@ -35,7 +35,7 @@ import kotlinx.android.synthetic.main.activity_month_viewer.textOne
 import kotlinx.android.synthetic.main.activity_month_viewer.textView4
 import kotlin.collections.ArrayList
 
-class MonthViewerFragment : Fragment(){
+class MonthViewerFragment : Fragment() {
 
     companion object {
         const val DAY_ID_KEY = "day_id"
@@ -123,8 +123,7 @@ class MonthViewerFragment : Fragment(){
                         setUpNormalCalendar()
                         setUpSelectorUI(false)
                     } else {
-                        string = "Days selected are empty"
-                        Toast.makeText(activity, string, Toast.LENGTH_SHORT).show()
+                        Toast.makeText(activity, "No days selected", Toast.LENGTH_SHORT).show()
                     }
                 } else {
                     string = "No days selected"
@@ -291,8 +290,8 @@ class MonthViewerFragment : Fragment(){
         return null
     }
 
-    private fun updateSocialButtonNumber(number:Int) {
-        if (number==0) {
+    private fun updateSocialButtonNumber(number: Int) {
+        if (number == 0) {
             textOne.visibility = View.GONE
             return
         }

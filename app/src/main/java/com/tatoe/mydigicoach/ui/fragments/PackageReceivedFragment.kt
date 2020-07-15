@@ -24,7 +24,6 @@ import java.lang.Exception
 class PackageReceivedFragment : Fragment() {
 
     private lateinit var requestReceiverAdapter: MyCustomReceivedRequestsAdapter
-    //todo method to update adapter content from activity
     private lateinit var recyclerView: RecyclerView
 
     var packageReceiverInterface: OnPackageReceivedInterface? = null

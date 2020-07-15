@@ -61,11 +61,11 @@ class ProfileFragment : Fragment() {
         }
 
         friends_requests_button.setOnClickListener {
-            var int=PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND
+//            var int=PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND
 //            if (isFriendRequestReceiverFragmentOpen){
 //                int = MainViewModel.REMOVE_VERTICAL_FRAGMENT
 //            }
-            mainViewModel.displayPackageReceiverFragmentType.postValue(int)
+            mainViewModel.displayPackageReceiverFragmentType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND)
 //            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
 //            setUpFragment(friendsFragment)
             //todo sort this one out
@@ -100,7 +100,7 @@ class ProfileFragment : Fragment() {
             }
         })
 
-        mainViewModel.receivedExercisesPackages.observe(this, Observer { exePackages ->
+        mainViewModel.receivedFriendRequestsPackages.observe(this, Observer { exePackages ->
             updateSocialButtonNumber(exePackages.size)
         })
 

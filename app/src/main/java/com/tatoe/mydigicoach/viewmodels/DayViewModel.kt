@@ -111,10 +111,7 @@ class DayViewModel(application: Application) :
                             friend.username
                         )
                     )
-                    Toast.makeText(
-                        getApplication(), "Day sent",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                     repository.isLoading.value = false
 
                 }

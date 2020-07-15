@@ -152,8 +152,7 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
                 if (selectedExercises.isNotEmpty()) {
                     mainViewModel.exercisesToSend.postValue(selectedExercises)
                 } else {
-                    Toast.makeText(activity!!, "No exes selected", Toast.LENGTH_SHORT).show()
-                }
+                    Toast.makeText(activity, "No exercises selected", Toast.LENGTH_SHORT).show()                }
             }
 
             cancel_btn.setOnClickListener {

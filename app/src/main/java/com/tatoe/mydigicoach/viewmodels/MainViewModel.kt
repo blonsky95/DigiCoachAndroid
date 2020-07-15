@@ -202,7 +202,7 @@ class MainViewModel(application: Application) :
                 }
         }
         //empty the exercises to send
-        exercisesToSend.value = listOf()
+        exercisesToSend.postValue(listOf())
     }
 
     fun sendDaysToFriend(
@@ -222,10 +222,6 @@ class MainViewModel(application: Application) :
                             friend.username
                         )
                     )
-                    Toast.makeText(
-                        getApplication(), "Day sent",
-                        Toast.LENGTH_SHORT
-                    ).show()
                     repository.isLoading.value = false
 
                 }
@@ -235,7 +231,7 @@ class MainViewModel(application: Application) :
                 }
         }
         //empty the days to send
-        daysToSend.value = listOf()
+        daysToSend.postValue(listOf())
     }
 
     fun exerciseAlreadyInDb(
@@ -262,14 +258,9 @@ class MainViewModel(application: Application) :
                 super.onPositiveButton(inputText)
                 removeExercise(findExerciseInLocal(newExercise, allExercises)!!)
                 insertExercise(newExercise)
-                updateAdapterContent(exercisePackage)
+                updateExerciseAdapterContentAfterAction(exercisePackage)
 
                 updateTransferPackage(exercisePackage, TransferPackage.STATE_SAVED)
-            }
-
-            override fun onNegativeButton() {
-                super.onNegativeButton()
-//                updateTransferPackage(exercisePackage, TransferPackage.STATE_REJECTED)
             }
         }
         dialogBoxBundle.postValue(
@@ -279,7 +270,6 @@ class MainViewModel(application: Application) :
                 dialogPositiveNegativeInterface
             )
         )
-
 
     }
 
@@ -312,20 +302,13 @@ class MainViewModel(application: Application) :
                 var toImportDay = dayPackage.firestoreDay.toDay()
                 toImportDay.exercises = replaceExistingExercises(toImportDay, allExercises)
                 updateDay(toImportDay, allDays)
+                updateDayAdapterContentAfterAction(dayPackage)
+
                 updateTransferPackage(
                     dayPackage,
                     TransferPackage.STATE_SAVED
                 )
             }
-
-            override fun onNegativeButton() {
-                super.onNegativeButton()
-                updateTransferPackage(
-                    dayPackage,
-                    TransferPackage.STATE_REJECTED
-                )
-            }
-
         }
         dialogBoxBundle.postValue(
             Utils.DialogBundle(
@@ -380,6 +363,7 @@ class MainViewModel(application: Application) :
         }
         updateRequestStateReceiver(friendPackage, stateString)
         updateRequestStateSender(friendPackage, stateString)
+        updateFriendAdapterContentAfterAction(friendPackage)
     }
 
     fun rejectFriendRequest(friendPackage: FriendRequestPackage) {
@@ -454,13 +438,32 @@ class MainViewModel(application: Application) :
         return transferPackagesReceived
     }
 
-    fun updateAdapterContent(transferPackage: TransferPackage) {
-        var newAdapterContent = removePackage(
+    /**
+    Called straight after accepting/rejecting a transfer package - removes it from the list and updates the content
+     **/
+    fun updateExerciseAdapterContentAfterAction(transferPackage: TransferPackage) {
+        val newAdapterContent = removePackage(
             receivedExercisesPackages.value as ArrayList<TransferPackage>,
             transferPackage
         )
         adapterTransferPackages.postValue(newAdapterContent)
         receivedExercisesPackages.postValue(newAdapterContent as ArrayList<ExercisePackage>)
+    }
+    fun updateDayAdapterContentAfterAction(transferPackage: TransferPackage) {
+        val newAdapterContent = removePackage(
+            receivedDaysPackages.value as ArrayList<TransferPackage>,
+            transferPackage
+        )
+        adapterTransferPackages.postValue(newAdapterContent)
+        receivedDaysPackages.postValue(newAdapterContent as ArrayList<DayPackage>)
+    }
+    fun updateFriendAdapterContentAfterAction(transferPackage: TransferPackage) {
+        val newAdapterContent = removePackage(
+            receivedFriendRequestsPackages.value as ArrayList<TransferPackage>,
+            transferPackage
+        )
+        adapterTransferPackages.postValue(newAdapterContent)
+        receivedFriendRequestsPackages.postValue(newAdapterContent as ArrayList<FriendRequestPackage>)
     }
 
 }
