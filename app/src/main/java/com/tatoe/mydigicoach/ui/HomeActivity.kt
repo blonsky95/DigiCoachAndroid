@@ -196,7 +196,6 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 
         val transaction = supportFragmentManager.beginTransaction()
         transaction.setCustomAnimations(R.anim.slide_in_up,R.anim.slide_in_down,R.anim.slide_in_up,R.anim.slide_in_down)
-        //todo add animation of swiping up/down
         when (fragmentId) {
             MainViewModel.FRIEND_SHARER -> {
                 transaction.replace(
@@ -235,7 +234,6 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 
         val transaction = supportFragmentManager.beginTransaction()
         //todo add animation of swiping left/right
-
         transaction.replace(R.id.fragment_container, fragment)
         transaction.commit()
 
