@@ -264,6 +264,8 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
                 } else {
                     mainViewModel.insertExercise(exercisePackage.firestoreExercise!!.toExercise())
                     mainViewModel.updateAdapterContent(exercisePackage)
+                    mainViewModel.updateTransferPackage(transferPackage, TransferPackage.STATE_SAVED)
+
 
 //                    var newAdapterContent = mainViewModel.removePackage(
 //                        exercisePackagesReceived as ArrayList<TransferPackage>,

@@ -333,6 +333,7 @@ class ExerciseCreator : AppCompatActivity() {
                         "${activeExercise?.name} has been deleted",
                         Toast.LENGTH_SHORT
                     ).show()
+
                     backToViewer()
                 }
             })
@@ -385,9 +386,10 @@ class ExerciseCreator : AppCompatActivity() {
 //    }
 
     private fun backToViewer() {
-        val intent = Intent(this, ExerciseViewer::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
+        super.onBackPressed()
+//        val intent = Intent(this, ExerciseViewer::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//        startActivity(intent)
     }
 
     private fun refreshCreator() {
