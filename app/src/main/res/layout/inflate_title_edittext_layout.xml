@@ -1,33 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-        xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
         android:padding="10dp">
-
     <TextView
             android:id="@+id/fieldKey2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginBottom="8dp"
-            android:gravity="start|center_vertical"
-            android:text="Title"
             android:fontFamily="@font/open_sans_regular"
-            android:textSize="16sp"
-            android:inputType="textPersonName" />
+            android:gravity="start|center_vertical"
+            android:inputType="textPersonName"
+            android:text="Title"
+            android:textSize="16sp" />
 
     <EditText
             android:id="@+id/fieldValueEditText2"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="start|center_vertical"
             android:layout_marginBottom="8dp"
+            android:background="@drawable/edittext_background"
             android:drawableStart="@drawable/ic_edit_pink"
             android:drawablePadding="34dp"
+            android:gravity="start|center_vertical"
             android:hint="e.g. hint"
-            android:padding="8dp"
-            android:background="@drawable/edittext_background"
-            android:inputType="textPersonName|textCapSentences" />
+            android:inputType="textPersonName|textCapSentences"
+            android:padding="8dp" />
 
 </LinearLayout>

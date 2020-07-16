@@ -177,7 +177,7 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
         exerciseViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
                 //                Timber.d("I WANNA SEE THIS: $exercises")
-
+                filteredExes.clear()
                 if (it.isEmpty()) {
                     ifEmptyText.visibility = View.VISIBLE
                     recyclerView.visibility = View.GONE
@@ -353,87 +353,87 @@ class ExerciseViewerFragment : Fragment(), SearchView.OnQueryTextListener {
 //        mBound = false
 //    }
 
-    private fun updateSocialButtonListener() {
-        social_button.setOnClickListener {
-            //            var receivedExercises = DataHolder.receivedExercises
-            val title = "New Exercises"
-            var text = "You have not received any new exercises"
-            var dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
+//    private fun updateSocialButtonListener() {
+//        social_button.setOnClickListener {
+//            //            var receivedExercises = DataHolder.receivedExercises
+//            val title = "New Exercises"
+//            var text = "You have not received any new exercises"
+//            var dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
+//
+//            if (receivedExercises.isNotEmpty()) {
+//                val exePackage = receivedExercises[0]
+//                text =
+//                    "Import ${exePackage.firestoreExercise!!.mName} from your friend ${exePackage.mSender}"
+//                dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
+//                    override fun onPositiveButton(inputText: String) {
+//                        super.onPositiveButton(inputText)
+//                        attemptImportExercise(exePackage)
+//                    }
+//
+//                    override fun onNegativeButton() {
+//                        super.onNegativeButton()
+//                        exerciseViewModel.updateTransferExercise(
+//                            exePackage,
+//                            TransferPackage.STATE_REJECTED
+//                        )
+//                    }
+//                }
+//            }
+//            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeInterface)
+//        }
+//    }
 
-            if (receivedExercises.isNotEmpty()) {
-                val exePackage = receivedExercises[0]
-                text =
-                    "Import ${exePackage.firestoreExercise!!.mName} from your friend ${exePackage.mSender}"
-                dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
-                    override fun onPositiveButton(inputText: String) {
-                        super.onPositiveButton(inputText)
-                        attemptImportExercise(exePackage)
-                    }
-
-                    override fun onNegativeButton() {
-                        super.onNegativeButton()
-                        exerciseViewModel.updateTransferExercise(
-                            exePackage,
-                            TransferPackage.STATE_REJECTED
-                        )
-                    }
-                }
-            }
-            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeInterface)
-        }
-    }
-
-    private fun attemptImportExercise(exePackage: ExercisePackage) {
-        val exe = exePackage.firestoreExercise!!.toExercise()
-        if (theSameExercise(exe) != null) {
-            val title = "Overwrite"
-            val text = "You already have this exercise, do you want to overwrite it?"
-            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
-                override fun onPositiveButton(inputText: String) {
-                    super.onPositiveButton(inputText)
-                    removeExercise(theSameExercise(exe)!!)
-                    insertExercise(exePackage)
-                }
-
-                override fun onNegativeButton() {
-                    super.onNegativeButton()
-                    rejectExercisePackage(exePackage)
-                }
-            }
-            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeHandler)
-        } else {
-            insertExercise(exePackage)
-        }
-    }
+//    private fun attemptImportExercise(exePackage: ExercisePackage) {
+//        val exe = exePackage.firestoreExercise!!.toExercise()
+//        if (theSameExercise(exe) != null) {
+//            val title = "Overwrite"
+//            val text = "You already have this exercise, do you want to overwrite it?"
+//            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
+//                override fun onPositiveButton(inputText: String) {
+//                    super.onPositiveButton(inputText)
+//                    removeExercise(theSameExercise(exe)!!)
+//                    insertExercise(exePackage)
+//                }
+//
+//                override fun onNegativeButton() {
+//                    super.onNegativeButton()
+//                    rejectExercisePackage(exePackage)
+//                }
+//            }
+//            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeHandler)
+//        } else {
+//            insertExercise(exePackage)
+//        }
+//    }
 
 
-    private fun theSameExercise(exe: Exercise): Exercise? {
-        for (exercise in allExercises) {
-            if (exe.md5 == exercise.md5) {
-                return exercise
-            }
-        }
-        return null
-    }
-
-    private fun insertExercise(exePackage: ExercisePackage) {
-        exerciseViewModel.insertExercise(exePackage.firestoreExercise!!.toExercise())
-        exerciseViewModel.updateTransferExercise(
-            exePackage,
-            TransferPackage.STATE_SAVED
-        )
-        //update state in firestore to SAVED
-    }
-
-    private fun removeExercise(theSameExercise: Exercise) {
-        exerciseViewModel.deleteExercise(theSameExercise)
-    }
-
-    private fun rejectExercisePackage(exePackage: TransferPackage) {
-        exerciseViewModel.updateTransferExercise(
-            exePackage,
-            TransferPackage.STATE_REJECTED
-        )
-        //update state in firestore to REJECTED
-    }
+//    private fun theSameExercise(exe: Exercise): Exercise? {
+//        for (exercise in allExercises) {
+//            if (exe.md5 == exercise.md5) {
+//                return exercise
+//            }
+//        }
+//        return null
+//    }
+//
+//    private fun insertExercise(exePackage: ExercisePackage) {
+//        exerciseViewModel.insertExercise(exePackage.firestoreExercise!!.toExercise())
+//        exerciseViewModel.updateTransferExercise(
+//            exePackage,
+//            TransferPackage.STATE_SAVED
+//        )
+//        //update state in firestore to SAVED
+//    }
+//
+//    private fun removeExercise(theSameExercise: Exercise) {
+//        exerciseViewModel.deleteExercise(theSameExercise)
+//    }
+//
+//    private fun rejectExercisePackage(exePackage: TransferPackage) {
+//        exerciseViewModel.updateTransferExercise(
+//            exePackage,
+//            TransferPackage.STATE_REJECTED
+//        )
+//        //update state in firestore to REJECTED
+//    }
 }

@@ -17,6 +17,7 @@
             android:textSize="16sp" />
 
 
+
     <TextView
             android:id="@+id/fieldValueTextView1"
             android:layout_width="match_parent"
