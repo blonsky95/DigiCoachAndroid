@@ -2,15 +2,12 @@ package com.tatoe.mydigicoach
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import com.tatoe.mydigicoach.database.BlockDao
 import com.tatoe.mydigicoach.database.DayDao
 import com.tatoe.mydigicoach.database.ExerciseDao
 import com.tatoe.mydigicoach.database.FriendDao
-import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
-import com.tatoe.mydigicoach.network.TransferPackage
 import timber.log.Timber
 
 
@@ -65,21 +62,18 @@ class AppRepository(
     suspend fun updateExercise(updatedExercise: Exercise) {
         exerciseDao.update(updatedExercise)
         Timber.d("updated activeExercise: $updatedExercise)")
-//        updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
         updateDaysContainingExercise(ACTION_UPDATE,updatedExercise)
     }
 
     suspend fun updateExerciseResult(updatedExercise: Exercise) {
         exerciseDao.update(updatedExercise)
         Timber.d("updated currentExerciseResult: $updatedExercise)")
-//        updateBlocksContainingExercise(ACTION_UPDATE,updatedExercise)
         updateDaysContainingExercise(ACTION_UPDATE,updatedExercise)
     }
 
     suspend fun deleteExercise(exercise: Exercise) {
         exerciseDao.delete(exercise)
         Timber.d("deleted: ${exercise.name}")
-//        updateBlocksContainingExercise(ACTION_DELETE,exercise)
         updateDaysContainingExercise(ACTION_DELETE,exercise)
 
     }
@@ -92,23 +86,25 @@ class AppRepository(
         return exerciseDao.insertAll(exercises)
     }
 
-    private suspend fun updateDaysContainingExercise(actionCode:Int, exercise: Exercise) {
+    private suspend fun updateDaysContainingExercise(actionCode:Int, toRemoveExercise: Exercise) {
         val days = dayDao.getAll()
 
         if (days.isNotEmpty()) {
             for (day in days) {
                 for (tmpExercise in day.exercises) {
-                    if (tmpExercise.exerciseId == exercise.exerciseId) {
+                    if (tmpExercise.exerciseId == toRemoveExercise.exerciseId) {
                         Timber.d("EXERCISE DELETE day: ${day.dayId}")
-                        Timber.d("EXERCISE DELETE exercise: ${exercise.name}")
+                        Timber.d("EXERCISE DELETE exercise: ${toRemoveExercise.name}")
 
                         if (actionCode==ACTION_UPDATE) {
-                            day.exercises[day.exercises.indexOf(tmpExercise)] = exercise
+                            day.exercises[day.exercises.indexOf(tmpExercise)] = toRemoveExercise
                             updateDay(day)
+                            break
                         }
                         if (actionCode==ACTION_DELETE) {
                             day.exercises.removeAt(day.exercises.indexOf(tmpExercise))
                             updateDay(day)
+                            break
                         }
                     }
                 }
