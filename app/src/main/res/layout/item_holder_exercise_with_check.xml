@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:layout_marginTop="4dp"
+        android:orientation="vertical">
+
+    <LinearLayout
+            android:id="@+id/linearLayoutExerciseHolder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/lightGrey"
+            android:orientation="horizontal">
+
+        <TextView
+                android:id="@+id/titleTextExerciseHolder"
+                android:padding="14dp"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="4"
+                android:layout_gravity="center_vertical"
+                android:fontFamily="@font/open_sans_bold"
+                android:textSize="16sp"
+                android:textColor="@color/textBlue" />
+
+        <ImageView
+                android:id="@+id/check_button"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:padding="4dp"
+                android:contentDescription="delete_sticker"
+                android:src="@drawable/ic_circle_grey"
+                android:visibility="visible" />
+    </LinearLayout>
+
+
+</LinearLayout>
+

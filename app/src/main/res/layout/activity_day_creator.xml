@@ -15,25 +15,25 @@
             android:theme="@style/Theme.MyFancyTheme"
             app:layout_constraintTop_toTopOf="parent"
             app:menu="@menu/day_viewer_menu"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <ImageView
                 android:id="@+id/backBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:src="@drawable/ic_triangle_back_white_24dp"
                 android:layout_gravity="start"
-                android:layout_marginStart="20dp"/>
+                android:layout_marginStart="20dp"
+                android:src="@drawable/ic_triangle_back_white_24dp" />
 
         <TextView
+                android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:fontFamily="@font/open_sans_bold"
                 android:text="WEEK VIEW"
                 android:textColor="@color/white"
-                android:fontFamily="@font/open_sans_bold"
-                android:textSize="22sp"
-                android:layout_gravity="center"
-                android:id="@+id/toolbar_title" />
+                android:textSize="22sp" />
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -166,16 +166,16 @@
             android:id="@+id/day_creator_exercises_recycler_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="8dp"
+            android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
             android:background="@color/white"
             android:visibility="visible"
             app:layout_constraintBottom_toTopOf="@+id/addToDiaryViewContainer"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view"
+            app:layout_constraintTop_toBottomOf="@+id/search_view"
             tools:listitem="@layout/item_holder_day_slider_item" />
 
 
@@ -189,59 +189,73 @@
     <!--android:layout_marginStart="8dp"/>-->
 
 
-<!--    <androidx.viewpager.widget.ViewPager-->
-<!--            android:id="@+id/pager"-->
-<!--            android:layout_width="0dp"-->
-<!--            android:layout_height="0dp"-->
-<!--            android:layout_marginStart="20dp"-->
-<!--            android:layout_marginEnd="20dp"-->
-<!--            app:layout_constraintBottom_toTopOf="@+id/addTrainingViewContainer"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintStart_toStartOf="parent"-->
-<!--            app:layout_constraintTop_toBottomOf="@+id/view" />-->
+    <!--    <androidx.viewpager.widget.ViewPager-->
+    <!--            android:id="@+id/pager"-->
+    <!--            android:layout_width="0dp"-->
+    <!--            android:layout_height="0dp"-->
+    <!--            android:layout_marginStart="20dp"-->
+    <!--            android:layout_marginEnd="20dp"-->
+    <!--            app:layout_constraintBottom_toTopOf="@+id/addTrainingViewContainer"-->
+    <!--            app:layout_constraintEnd_toEndOf="parent"-->
+    <!--            app:layout_constraintStart_toStartOf="parent"-->
+    <!--            app:layout_constraintTop_toBottomOf="@+id/view" />-->
 
 
     <LinearLayout
             android:id="@+id/addToDiaryViewContainer"
-            android:background="@color/lightGreen"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="4dp"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="48dp"
+            android:background="@color/lightGreen"
             android:gravity="center_vertical"
             android:orientation="horizontal"
+            android:padding="4dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/pager">
 
         <TextView
-                android:textSize="30sp"
-                android:text = "+"
-                android:textColor="@color/white"
-                android:fontFamily="@font/open_sans_bold"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="16dp"
-                android:gravity="start|center_vertical" />
+                android:fontFamily="@font/open_sans_bold"
+                android:gravity="start|center_vertical"
+                android:text="+"
+                android:textColor="@color/white"
+                android:textSize="30sp" />
 
 
         <TextView
-                android:textSize="20sp"
-                android:textAllCaps="true"
-                android:fontFamily="@font/open_sans_bold"
                 android:layout_width="wrap_content"
-                android:textColor="@color/white"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
+                android:fontFamily="@font/open_sans_bold"
                 android:gravity="center_vertical"
-                android:text="Save" />
+                android:text="Save"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="20sp" />
 
 
     </LinearLayout>
+
+    <SearchView
+            android:id="@+id/search_view"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="12dp"
+            android:layout_marginEnd="32dp"
+            android:gravity="center"
+            android:background="@color/transpGrey"
+            android:queryHint="Search exercise here..."
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/view" />
     <!--    <Button-->
     <!--            android:id="@+id/AddTrainingBtn"-->
     <!--            android:layout_width="0dp"-->

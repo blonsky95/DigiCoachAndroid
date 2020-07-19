@@ -33,6 +33,7 @@ class DayViewModel(application: Application) :
     val allFriends: LiveData<List<Friend>>
 
     val activeDayIdStr: MutableLiveData<String> = MutableLiveData()
+    var selectedExercises = arrayListOf<Exercise>()
 
     private var db = FirebaseFirestore.getInstance()
 
@@ -50,6 +51,10 @@ class DayViewModel(application: Application) :
         allFriends = repository.allFriends
 
     }
+
+//    fun addToSelectedExerciseIndexes(index:Int) {
+//
+//    }
 
     fun insertExercise(newExercise: Exercise) = viewModelScope.launch {
         repository.insertExercise(newExercise)
@@ -120,49 +125,6 @@ class DayViewModel(application: Application) :
                     Timber.d("get failed with: $exception ")
                 }
         }
-
-//        var docUid: String
-
-//        val docRef2 = db.collection("users").whereEqualTo("username", username)
-//        docRef2.get().addOnSuccessListener { docs ->
-//            if (docs.isEmpty) {
-//                //no user with this name exists
-//                Toast.makeText(
-//                    getApplication(), " User doesn't exist",
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            } else {
-//                docUid = docs.documents[0].id
-//
-//                val docRef = db.collection("users").document(docUid).collection("day_transfers")
-//                for (dayToSend in daysToSend) {
-//                    docRef.get()
-//                        .addOnSuccessListener {
-//                            docRef.add(
-//                                DayPackage(
-//                                    MyCustomFirestoreTransferDay(dayToSend),
-//                                    true,
-//                                    FirebaseAuth.getInstance().currentUser!!.email!!,
-//                                    username
-//                                )
-//                            )
-//                            Toast.makeText(
-//                                getApplication(), "Day sent",
-//                                Toast.LENGTH_SHORT
-//                            ).show()
-//                            repository.isLoading.value = false
-//
-//                        }
-//                        .addOnFailureListener { exception ->
-//                            repository.isLoading.value = false
-//                            Timber.d("get failed with: $exception ")
-//                        }
-//
-//                }
-//            }
-//
-//        }
-
 
     }
 
