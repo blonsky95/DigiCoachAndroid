@@ -127,7 +127,7 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
             exercises?.let {
                 allExercises = it
                 checkedExercisesPerm=getDefaultArrayOfDayTraining()
-                checkedExercisesTemp=checkedExercisesPerm
+                checkedExercisesTemp.addAll(checkedExercisesPerm)
                 adapter.setContent(checkedExercisesTemp)
             }
         })
@@ -139,11 +139,14 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
                 super.onClick(view, position, holder)
 
                 if (!holder.isChecked) {
-                    checkedExercisesTemp[position].mIsChecked=true
-                    checkedExercisesTemp.remove(checkedExercisesTemp[position])
-                    checkedExercisesTemp.add(0,checkedExercisesTemp[position])
+
+//                    checkedExercisesTemp.add(0,exe)
+//                    checkedExercisesTemp.remove(checkedExercisesTemp[position])
                     checkedExercisesPerm.remove(checkedExercisesTemp[position])
-                    checkedExercisesPerm.add(0,checkedExercisesTemp[position])
+                    var exe=checkedExercisesTemp[position]
+                    exe.mIsChecked=true
+                    checkedExercisesPerm.add(0,exe)
+
                     holder.changeCheckedState(true, this@DayCreator)
 //                    adapter.notifyDataSetChanged()
                 } else {
@@ -216,7 +219,7 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
         } else {
             checkedExercisesTemp=getDefaultArrayOfDayTraining()
         }
-        return checkedExercisesPerm
+        return checkedExercisesTemp
 
     }
 
