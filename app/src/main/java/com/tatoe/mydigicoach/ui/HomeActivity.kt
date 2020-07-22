@@ -4,6 +4,8 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.R
@@ -19,7 +21,9 @@ import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.viewmodels.MainViewModel
 import com.tatoe.mydigicoach.viewmodels.MyMainViewModelFactory
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.activity_parent_of_fragments.*
+import kotlinx.android.synthetic.main.activity_parent_of_fragments.bottom_navigation
 
 class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface,
     PackageReceivedFragment.OnPackageReceivedInterface {
@@ -195,14 +199,18 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
         }
 
         val transaction = supportFragmentManager.beginTransaction()
-        transaction.setCustomAnimations(R.anim.slide_in_up,R.anim.slide_in_down,R.anim.slide_in_up,R.anim.slide_in_down)
+        transaction.setCustomAnimations(
+            R.anim.slide_in_up,
+            R.anim.slide_in_down,
+            R.anim.slide_in_up,
+            R.anim.slide_in_down
+        )
         when (fragmentId) {
             MainViewModel.FRIEND_SHARER -> {
                 transaction.replace(
                     R.id.half_fragment_container,
                     ShareToFriendsFragment.newInstance(allFriends)
                 )
-                transaction.addToBackStack("friends_sharer")
             }
 
             MainViewModel.PACKAGE_DISPLAYER -> {
@@ -210,7 +218,6 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
                     R.id.half_fragment_container,
                     PackageReceivedFragment.newInstance(packagesReceived!!)
                 )
-                transaction.addToBackStack("package_displayer")
             }
 
             MainViewModel.FRIEND_DISPLAYER -> {
@@ -218,36 +225,75 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
                     R.id.half_fragment_container,
                     FriendsDisplayerFragment()
                 )
-                transaction.addToBackStack("friends_displayer")
             }
         }
 
+        transaction.addToBackStack("vertical_fragment")
         transaction.commit()
 
     }
 
     private fun navigateToFragment(fragment: Fragment) {
         val verticalFragment = supportFragmentManager.findFragmentById(R.id.half_fragment_container)
+
+        //when you change horizontal tab, if there is vertical fragments being displayed get rid of them
         if (verticalFragment != null) {
             supportFragmentManager.popBackStack()
         }
 
+        //todo think about vertical frags now
+
         val transaction = supportFragmentManager.beginTransaction()
-        //todo add animation of swiping left/right
         transaction.replace(R.id.fragment_container, fragment)
+
+        if (fragment !is HomeFragment) {
+            supportFragmentManager.popBackStack(
+                "horizontal_fragment",
+                POP_BACK_STACK_INCLUSIVE
+            )
+            transaction.addToBackStack("horizontal_fragment")
+        }
+
+
         transaction.commit()
 
+
+//        supportFragmentManager.addOnBackStackChangedListener {
+//            object : FragmentManager.OnBackStackChangedListener {
+//                override fun onBackStackChanged() {
+//                    var count = supportFragmentManager.backStackEntryCount
+//                   sfm = supportFragmentManager
+
+//                }
+//            }
+//        }
+
+    }
+
+    override fun onBackPressed() {
+
+        //if its home fragment that is active then quit
+        if (supportFragmentManager.findFragmentById(R.id.fragment_container) is HomeFragment) {
+            finish()
+        }
+
+        if (supportFragmentManager.backStackEntryCount>0) {
+            //a backstack made sure home was there
+            //now set the lower nav bar to the right item
+            bottom_navigation.selectedItemId=R.id.page_home
+        }
+        super.onBackPressed()
     }
 
     override fun onFriendSelected(friend: Friend) {
 
         if (toSendExes != null) {
             mainViewModel.sendExercisesToFriend(toSendExes!!, friend)
-            toSendExes= listOf()
+            toSendExes = listOf()
         }
         if (toSendDays != null) {
             mainViewModel.sendDaysToFriend(toSendDays!!, friend)
-            toSendDays= listOf()
+            toSendDays = listOf()
         }
 
         Toast.makeText(this, "Sent to ${friend.username}", Toast.LENGTH_SHORT).show()
@@ -267,7 +313,10 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
                 } else {
                     mainViewModel.insertExercise(exercisePackage.firestoreExercise!!.toExercise())
                     mainViewModel.updateExerciseAdapterContentAfterAction(exercisePackage)
-                    mainViewModel.updateTransferPackage(transferPackage, TransferPackage.STATE_SAVED)
+                    mainViewModel.updateTransferPackage(
+                        transferPackage,
+                        TransferPackage.STATE_SAVED
+                    )
                 }
             }
 
@@ -311,4 +360,6 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     override fun onBottomCancelSelected() {
         super.onBackPressed()
     }
+
+
 }

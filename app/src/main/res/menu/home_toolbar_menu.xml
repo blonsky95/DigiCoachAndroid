@@ -3,7 +3,7 @@
         xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
             android:id="@+id/more_options"
-            android:icon="@drawable/ic_more_options"
+            android:icon="@drawable/ic_baseline_keyboard_arrow_down_24"
             android:title="More opts"
             app:showAsAction="ifRoom">
         <menu>
