@@ -4,7 +4,6 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -21,9 +20,8 @@ import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.viewmodels.MainViewModel
 import com.tatoe.mydigicoach.viewmodels.MyMainViewModelFactory
-import kotlinx.android.synthetic.main.activity_home.*
-import kotlinx.android.synthetic.main.activity_parent_of_fragments.*
 import kotlinx.android.synthetic.main.activity_parent_of_fragments.bottom_navigation
+import timber.log.Timber
 
 class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface,
     PackageReceivedFragment.OnPackageReceivedInterface {
@@ -69,7 +67,7 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 //                supportFragmentManager.popBackStack()
 //            }
             if (it != MainViewModel.NO_FRAGMENT) {
-                displayFragment(it)
+                displayVerticalFragment(it)
             }
         })
 
@@ -119,14 +117,14 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
         mainViewModel.daysToSend.observe(this, Observer { it ->
             if (it.isNotEmpty()) {
                 toSendDays = it
-                displayFragment(MainViewModel.FRIEND_SHARER)
+                displayVerticalFragment(MainViewModel.FRIEND_SHARER)
             }
         })
 
         mainViewModel.exercisesToSend.observe(this, Observer { it ->
             if (it.isNotEmpty()) {
                 toSendExes = it
-                displayFragment(MainViewModel.FRIEND_SHARER)
+                displayVerticalFragment(MainViewModel.FRIEND_SHARER)
             }
 //            else {
 //                Toast.makeText(this,"No exercises selected", Toast.LENGTH_SHORT).show()
@@ -145,23 +143,23 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
             val i: Int
             when (it.itemId) {
                 R.id.page_home -> {
-                    navigateToFragment(HomeFragment())
+                    displayHorizontalFragment(HomeFragment())
                     true
                 }
                 R.id.page_exes -> {
-                    navigateToFragment(ExerciseViewerFragment())
+                    displayHorizontalFragment(ExerciseViewerFragment())
                     true
                 }
                 R.id.page_calendar -> {
-                    navigateToFragment(MonthViewerFragment())
+                    displayHorizontalFragment(MonthViewerFragment())
                     true
                 }
                 R.id.page_store -> {
-                    navigateToFragment(LibraryFragment())
+                    displayHorizontalFragment(LibraryFragment())
                     true
                 }
                 R.id.page_profile -> {
-                    navigateToFragment(ProfileFragment())
+                    displayHorizontalFragment(ProfileFragment())
                     true
                 }
                 else -> false
@@ -170,28 +168,26 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
         bottom_navigation.setOnNavigationItemReselectedListener {
             when (it.itemId) {
                 R.id.page_home -> {
-                    navigateToFragment(HomeFragment())
+                    displayHorizontalFragment(HomeFragment())
                 }
                 R.id.page_exes -> {
-                    navigateToFragment(ExerciseViewerFragment())
+                    displayHorizontalFragment(ExerciseViewerFragment())
                 }
                 R.id.page_calendar -> {
-                    navigateToFragment(MonthViewerFragment())
+                    displayHorizontalFragment(MonthViewerFragment())
                 }
                 R.id.page_store -> {
-                    navigateToFragment(LibraryFragment())
+                    displayHorizontalFragment(LibraryFragment())
                 }
                 R.id.page_profile -> {
-                    navigateToFragment(ProfileFragment())
+                    displayHorizontalFragment(ProfileFragment())
                 }
             }
         }
     }
 
-    private fun displayFragment(fragmentId: Int) {
-//        if (supportFragmentManager.fragments.size > 2) {
-//            supportFragmentManager.popBackStack()
-//        }
+    private fun displayVerticalFragment(fragmentId: Int) {
+
         val verticalFragment = supportFragmentManager.findFragmentById(R.id.half_fragment_container)
         if (verticalFragment != null) {
             supportFragmentManager.popBackStack()
@@ -227,25 +223,20 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
                 )
             }
         }
-
         transaction.addToBackStack("vertical_fragment")
         transaction.commit()
-
     }
 
-    private fun navigateToFragment(fragment: Fragment) {
-        val verticalFragment = supportFragmentManager.findFragmentById(R.id.half_fragment_container)
+    private fun displayHorizontalFragment(fragment: Fragment) {
+//        val verticalFragment = supportFragmentManager.findFragmentById(R.id.half_fragment_container)
 
-        //when you change horizontal tab, if there is vertical fragments being displayed get rid of them
-        if (verticalFragment != null) {
-            supportFragmentManager.popBackStack()
-        }
-
-        //todo think about vertical frags now
 
         val transaction = supportFragmentManager.beginTransaction()
         transaction.replace(R.id.fragment_container, fragment)
 
+        //when you change horizontal tab, if there is vertical fragments being displayed get rid of them,
+        //as well as other horizontal fragments transactions, I only want 1 or 2 in backstack
+        //its what super.onbackpressed accounts for -> 0,1 and 2
         if (fragment !is HomeFragment) {
             supportFragmentManager.popBackStack(
                 "horizontal_fragment",
@@ -253,21 +244,7 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
             )
             transaction.addToBackStack("horizontal_fragment")
         }
-
-
         transaction.commit()
-
-
-//        supportFragmentManager.addOnBackStackChangedListener {
-//            object : FragmentManager.OnBackStackChangedListener {
-//                override fun onBackStackChanged() {
-//                    var count = supportFragmentManager.backStackEntryCount
-//                   sfm = supportFragmentManager
-
-//                }
-//            }
-//        }
-
     }
 
     override fun onBackPressed() {
@@ -277,12 +254,17 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
             finish()
         }
 
-        if (supportFragmentManager.backStackEntryCount>0) {
-            //a backstack made sure home was there
-            //now set the lower nav bar to the right item
-            bottom_navigation.selectedItemId=R.id.page_home
+        var x =supportFragmentManager.backStackEntryCount
+
+        if (x>0) {
+            //only horizontal fragment active = go to home
+            if (x==1) {
+                bottom_navigation.selectedItemId=R.id.page_home
+            } else {
+                //when its 2 or more and it has vertical fragment
+                super.onBackPressed()
+            }
         }
-        super.onBackPressed()
     }
 
     override fun onFriendSelected(friend: Friend) {
