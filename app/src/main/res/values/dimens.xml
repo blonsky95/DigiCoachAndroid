@@ -1,5 +1,9 @@
-<resources>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
     <dimen name="fab_margin">16dp</dimen>
     <dimen name="viewpager_next_item_visible">20dp</dimen>
     <dimen name="viewpager_current_item_horizontal_margin">36dp</dimen>
+
+<!--    this overrides the dimension so bottom nav view has more space-->
+    <dimen name="design_bottom_navigation_height" tools:override="true">60dp</dimen>
 </resources>

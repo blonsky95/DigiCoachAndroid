@@ -90,7 +90,7 @@
             app:mcv_tileHeight="42dp"
             app:mcv_weekDayLabels="@array/week_days_array"
             app:mcv_weekDayTextAppearance="@style/CalendarWidgetWeekDays"
-            app:ptg_setWeekDayBackgroundColor="@color/lightGrey" />
+            app:ptg_setWeekDayBackgroundColor="@color/lightGrey_66" />
 
     <View
             android:id="@+id/view"
@@ -98,7 +98,7 @@
             android:layout_height="3dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp"
-            android:background="@color/lightGrey"
+            android:background="@color/lightGrey_66"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/calendarView" />

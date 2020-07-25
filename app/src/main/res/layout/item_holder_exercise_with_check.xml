@@ -11,7 +11,7 @@
             android:id="@+id/linearLayoutExerciseHolder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/lightGrey"
+            android:background="@color/lightGrey_66"
             android:orientation="horizontal">
 
         <TextView

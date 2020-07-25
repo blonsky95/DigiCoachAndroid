@@ -250,11 +250,12 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
     override fun onBackPressed() {
 
         //if its home fragment that is active then quit
+        //actually
         if (supportFragmentManager.findFragmentById(R.id.fragment_container) is HomeFragment) {
             finish()
         }
 
-        var x =supportFragmentManager.backStackEntryCount
+        val x =supportFragmentManager.backStackEntryCount
 
         if (x>0) {
             //only horizontal fragment active = go to home

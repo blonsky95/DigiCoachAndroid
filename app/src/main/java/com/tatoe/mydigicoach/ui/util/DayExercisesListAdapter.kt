@@ -64,7 +64,7 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
             holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGreen))
             showDONEButton = false
         } else {
-            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGrey))
+            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGrey_66))
             showDONEButton=true
             holder.exerciseDoneButton!!.setOnClickListener(exerciseDoneListener(exercise))
         }

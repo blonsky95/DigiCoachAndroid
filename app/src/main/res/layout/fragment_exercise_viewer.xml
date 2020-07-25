@@ -4,6 +4,7 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:background="@color/white"
         tools:context=".ui.exercise.ExerciseViewer">
 
 
@@ -20,8 +21,8 @@
 
         <View
                 android:id="@+id/share_button"
-                android:layout_width="36dp"
-                android:layout_height="36dp"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
                 android:layout_marginStart="24dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginBottom="16dp"
@@ -29,7 +30,7 @@
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent" />
 
-        <RelativeLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
                 android:id="@+id/social_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -44,23 +45,29 @@
 
             <View
                     android:id="@+id/social_icon"
-                    android:layout_width="36dp"
-                    android:layout_height="36dp"
+                    android:layout_width="34dp"
+                    android:layout_height="34dp"
                     android:background="@drawable/ic_account_box_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="parent" />
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
 
             <TextView
                     android:id="@+id/textOne"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_alignTop="@id/social_icon"
-                    android:layout_alignRight="@id/social_icon"
+                    android:layout_alignEnd="@id/social_icon"
+                    android:layout_gravity="center_vertical"
                     android:background="@drawable/badge_circle"
-                    android:text="9+"
-                    android:textColor="#FFF"
+                    android:text="2"
+                    android:textColor="#F2000000"
                     android:textSize="12sp"
-                    android:textStyle="bold" />
-        </RelativeLayout>
+                    android:textStyle="bold"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/social_icon"
+                    app:layout_constraintTop_toTopOf="parent" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
                 android:layout_width="0dp"
@@ -73,22 +80,17 @@
                 android:fontFamily="@font/open_sans_regular"
                 android:text="EXERCISES"
                 android:textColor="@color/white"
-                android:textSize="20sp" />
+                android:textSize="28sp" />
     </LinearLayout>
-
-
-
-
-
 
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/libraryExercisesList"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="16dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
             app:layout_constraintBottom_toTopOf="@+id/addExerciseLayout"
             app:layout_constraintEnd_toEndOf="parent"
@@ -115,9 +117,9 @@
             android:id="@+id/addExerciseLayout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="16dp"
+            android:layout_marginStart="32dp"
+            android:layout_marginEnd="32dp"
+            android:layout_marginBottom="32dp"
             android:background="@drawable/rounded_border_background"
             android:gravity="center"
             android:orientation="horizontal"
@@ -135,7 +137,7 @@
                 android:gravity="center_vertical"
                 android:text="Add your own exercise"
                 android:textAllCaps="false"
-                android:textColor="@color/black"
+                android:textColor="@color/white"
                 android:textSize="16sp" />
 
 
@@ -182,12 +184,14 @@
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_marginStart="32dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="24dp"
             android:layout_marginEnd="32dp"
-            android:background="@color/transpGrey"
+            android:background="@drawable/search_view_background"
             android:gravity="center"
-            android:queryHint="Search exercise here..."
+            android:queryHint="Search for an exercise"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/top_fragment_layout" />

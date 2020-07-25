@@ -4,25 +4,28 @@
             android:id="@+id/page_home"
             android:enabled="true"
             android:icon="@drawable/ic_home_black_24dp"
-            android:title="home"/>
+            android:title="Home"/>
     <item
             android:id="@+id/page_exes"
             android:enabled="true"
-            android:icon="@drawable/ic_exercise"
+            android:icon="@drawable/ic_fast"
             android:title="Exercises"/>
     <item
             android:id="@+id/page_calendar"
             android:enabled="true"
-            android:icon="@drawable/ic_business_and_finance"
+            android:icon="@drawable/ic_calendar_2"
             android:title="Calendar"/>
-    <item
-            android:id="@+id/page_store"
-            android:enabled="true"
-            android:icon="@drawable/ic_library"
-            android:title="Store"/>
+
     <item
             android:id="@+id/page_profile"
             android:enabled="true"
             android:icon="@drawable/ic_person_white_96dp"
             android:title="Profile"/>
+
+    <item
+            android:id="@+id/page_store"
+            android:enabled="true"
+            android:icon="@drawable/ic_note"
+            android:title="Store"/>
+
 </menu>

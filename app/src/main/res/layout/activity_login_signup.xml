@@ -149,7 +149,7 @@
             android:id="@+id/magic_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:background="@color/lightGrey"
+            android:background="@color/lightGrey_66"
             android:padding="40dp"
             android:text="VIP"
             android:visibility="invisible"

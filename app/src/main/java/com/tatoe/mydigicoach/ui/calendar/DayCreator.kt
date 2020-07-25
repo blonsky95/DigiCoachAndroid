@@ -16,23 +16,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
-import com.tatoe.mydigicoach.network.DayPackage
-import com.tatoe.mydigicoach.network.ExercisePackage
-import com.tatoe.mydigicoach.network.TransferPackage
-import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.EditableItemViewHolder
-import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import com.tatoe.mydigicoach.viewmodels.DayViewModel
 import com.tatoe.mydigicoach.viewmodels.MyDayViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_creator.*
 import kotlinx.android.synthetic.main.activity_day_creator.search_view
-import kotlinx.android.synthetic.main.item_holder_exercise.view.*
 import kotlinx.android.synthetic.main.item_holder_exercise.view.titleTextExerciseHolder
 import kotlinx.android.synthetic.main.item_holder_exercise_with_check.view.*
-import kotlinx.android.synthetic.main.item_holder_friends.view.friend_username_textview
-import kotlinx.android.synthetic.main.item_holder_request_package.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
@@ -116,7 +107,7 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
                 entry.value.setBackgroundColor(resources.getColor(R.color.lightGreen))
                 entry.value.setTextColor(resources.getColor(R.color.white))
             } else {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey))
+                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey_66))
                 entry.value.setTextColor(resources.getColor(R.color.darkGrey))
             }
         }

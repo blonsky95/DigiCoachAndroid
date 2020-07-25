@@ -131,7 +131,7 @@ class WeekViewer : AppCompatActivity() {
 
                 Timber.d("CHANGED ${entry.key} to selected")
             } else {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey))
+                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey_66))
                 entry.value.setTextColor(resources.getColor(R.color.darkGrey))
 
                 Timber.d("CHANGED ${entry.key} to non selected")
