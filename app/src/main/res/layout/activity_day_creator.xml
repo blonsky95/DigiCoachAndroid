@@ -10,30 +10,30 @@
             android:id="@+id/my_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/lightGreen"
+            android:background="@color/palette3"
             android:elevation="4dp"
             android:theme="@style/Theme.MyFancyTheme"
             app:layout_constraintTop_toTopOf="parent"
             app:menu="@menu/day_viewer_menu"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" >
 
         <ImageView
                 android:id="@+id/backBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:src="@drawable/ic_baseline_arrow_back_ios_24"
                 android:layout_gravity="start"
-                android:layout_marginStart="20dp"
-                android:src="@drawable/ic_triangle_back_white_24dp" />
+                android:layout_marginStart="20dp"/>
 
         <TextView
-                android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:fontFamily="@font/open_sans_bold"
                 android:text="WEEK VIEW"
                 android:textColor="@color/white"
-                android:textSize="22sp" />
+                android:fontFamily="@font/open_sans_regular"
+                android:textSize="22sp"
+                android:layout_gravity="center"
+                android:id="@+id/toolbar_title" />
 
     </androidx.appcompat.widget.Toolbar>
 
@@ -44,6 +44,9 @@
             android:layout_marginStart="16dp"
             android:layout_marginTop="20dp"
             android:layout_marginEnd="16dp"
+            android:paddingStart="6dp"
+            android:paddingEnd="6dp"
+            android:background="@color/palette8"
             android:orientation="horizontal"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -55,14 +58,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/lightGrey_66"
+                android:background="@color/palette8"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
-                android:paddingStart="16dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="8dp"
-                android:paddingBottom="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
                 android:text="M"
+                android:textColor="@color/palette9"
                 android:textSize="20sp" />
 
         <TextView
@@ -71,11 +73,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/lightGrey_66"
+                android:background="@color/palette8"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
-                android:padding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
                 android:text="T"
+                android:textColor="@color/palette9"
                 android:textSize="20sp" />
 
         <TextView
@@ -84,11 +88,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/lightGrey_66"
+                android:background="@color/palette8"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
-                android:padding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
                 android:text="W"
+                android:textColor="@color/palette9"
                 android:textSize="20sp" />
 
         <TextView
@@ -97,10 +103,11 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/lightGrey_66"
+                android:background="@color/palette8"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
-                android:padding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
                 android:text="T"
                 android:textSize="20sp" />
 
@@ -110,11 +117,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/lightGrey_66"
+                android:background="@color/palette8"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
-                android:padding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
                 android:text="F"
+                android:textColor="@color/palette9"
                 android:textSize="20sp" />
 
         <TextView
@@ -123,11 +132,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/lightGrey_66"
+                android:background="@color/palette8"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
-                android:padding="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
                 android:text="S"
+                android:textColor="@color/palette9"
                 android:textSize="20sp" />
 
         <TextView
@@ -136,14 +147,13 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_weight="1"
-                android:background="@color/lightGrey_66"
+                android:background="@color/palette8"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
-                android:paddingStart="8dp"
-                android:paddingTop="8dp"
-                android:paddingEnd="16dp"
-                android:paddingBottom="8dp"
+                android:paddingBottom="16dp"
+                android:paddingTop="16dp"
                 android:text="S"
+                android:textColor="@color/palette9"
                 android:textSize="20sp" />
 
     </LinearLayout>
@@ -178,29 +188,6 @@
             app:layout_constraintTop_toBottomOf="@+id/search_view"
             tools:listitem="@layout/item_holder_day_slider_item" />
 
-
-    <!--<TextView-->
-    <!--android:text="TextView"-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:id="@+id/DateDisplay" android:layout_marginTop="32dp"-->
-    <!--app:layout_constraintTop_toTopOf="parent" app:layout_constraintEnd_toEndOf="parent"-->
-    <!--android:layout_marginEnd="8dp" app:layout_constraintStart_toStartOf="parent"-->
-    <!--android:layout_marginStart="8dp"/>-->
-
-
-    <!--    <androidx.viewpager.widget.ViewPager-->
-    <!--            android:id="@+id/pager"-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="0dp"-->
-    <!--            android:layout_marginStart="20dp"-->
-    <!--            android:layout_marginEnd="20dp"-->
-    <!--            app:layout_constraintBottom_toTopOf="@+id/addTrainingViewContainer"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintStart_toStartOf="parent"-->
-    <!--            app:layout_constraintTop_toBottomOf="@+id/view" />-->
-
-
     <LinearLayout
             android:id="@+id/addToDiaryViewContainer"
             android:layout_width="match_parent"
@@ -209,7 +196,7 @@
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
             android:layout_marginBottom="48dp"
-            android:background="@color/lightGreen"
+            android:background="@color/palette3"
             android:gravity="center_vertical"
             android:orientation="horizontal"
             android:padding="4dp"
@@ -247,36 +234,17 @@
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+
             android:layout_marginStart="32dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="24dp"
             android:layout_marginEnd="32dp"
+            android:background="@drawable/search_view_background"
             android:gravity="center"
-            android:background="@color/transpGrey"
-            android:queryHint="Search exercise here..."
+            android:queryHint="Search for an exercise"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view" />
-    <!--    <Button-->
-    <!--            android:id="@+id/AddTrainingBtn"-->
-    <!--            android:layout_width="0dp"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginStart="16dp"-->
-    <!--            android:layout_marginEnd="16dp"-->
-    <!--            android:layout_marginBottom="48dp"-->
-    <!--            android:gravity="start|center_vertical"-->
-    <!--            android:text="Add training"-->
-    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--            app:layout_constraintEnd_toEndOf="parent"-->
-    <!--            app:layout_constraintStart_toStartOf="parent" />-->
 
-    <!--    <Button-->
-    <!--            android:id="@+id/ChangeWeekBtn"-->
-    <!--            android:layout_width="wrap_content"-->
-    <!--            android:layout_height="wrap_content"-->
-    <!--            android:layout_marginStart="16dp"-->
-    <!--            android:layout_marginBottom="16dp"-->
-    <!--            android:text="Change week"-->
-    <!--            app:layout_constraintBottom_toBottomOf="parent"-->
-    <!--            app:layout_constraintStart_toStartOf="parent" />-->
 
 </androidx.constraintlayout.widget.ConstraintLayout>

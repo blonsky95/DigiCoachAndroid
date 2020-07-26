@@ -27,6 +27,8 @@
     <color name="lightGrey">#A8A5A5</color>
     <color name="transpGrey">#409D9D9C</color>
     <color name="darkGrey">#6B6B6B</color>
+    <color name="dividerGrey">#E6E7E8</color>
+
 
     <color name="lightestGreen">#95ABEBAB</color>
     <color name="lightGreen">#99CC99</color>
@@ -41,15 +43,17 @@
 
     <color name="palette1">#4873A6</color>
     <color name="palette2">#3399FF</color>
-    <color name="palette6">#3FA9F5</color>
-
     <color name="palette2_40">#663FA9F5</color>
     <color name="palette3">#40C9C5</color>
+    <color name="palette3_70">#B340C9C5</color>
     <color name="palette4">#FFC0BE</color>
     <color name="palette5">#FFEBE7</color>
-    <color name="palette7">#33FFD3D3</color>
-
     <color name="palette5_30">#4DFFEBE7</color>
+    <color name="palette6">#3FA9F5</color>
+    <color name="palette7">#33FFD3D3</color>
+    <color name="palette8">#F1F2F2</color>
+    <color name="palette9">#992F2260</color>
+
 
 
 

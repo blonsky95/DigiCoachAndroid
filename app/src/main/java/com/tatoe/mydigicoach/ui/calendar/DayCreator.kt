@@ -36,7 +36,6 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
     private lateinit var recyclerView: RecyclerView
     private lateinit var adapter: MyCustomCheckedExercisesAdapter
     private lateinit var selectExercisesListener: ClickListenerRecyclerView
-//    private var selectedIndexes = arrayListOf<Int>()
 
     private lateinit var dayViewModel: DayViewModel
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
@@ -44,10 +43,6 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
     private var allExercises: List<Exercise> = listOf()
     private var checkedExercisesTemp = arrayListOf<ExerciseWithChecked>()
     private var checkedExercisesPerm = arrayListOf<ExerciseWithChecked>()
-//    private var sortedDayExercisesOwnedNotOwned: ArrayList<Exercise> = arrayListOf()
-
-    private var filteredExes = mutableListOf<Exercise>()
-
     lateinit var activeDay: Day
     lateinit var activeDayId: String
 
@@ -98,17 +93,17 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
     }
 
     private fun changeWeekDayHighlight() {
-        var calendar = Calendar.getInstance()
+        val calendar = Calendar.getInstance()
         calendar.time = Day.dayIDToDate(activeDayId)
-        var weekDay = Day.getDayOfWeek0to6(calendar)
+        val weekDay = Day.getDayOfWeek0to6(calendar)
 
         for (entry in weekDaysViewHashMap) {
             if (entry.key == weekDay) {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGreen))
+                entry.value.setBackgroundColor(resources.getColor(R.color.palette3))
                 entry.value.setTextColor(resources.getColor(R.color.white))
             } else {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey_66))
-                entry.value.setTextColor(resources.getColor(R.color.darkGrey))
+                entry.value.setBackgroundColor(resources.getColor(R.color.palette8))
+                entry.value.setTextColor(resources.getColor(R.color.palette9))
             }
         }
     }
@@ -130,20 +125,14 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
                 super.onClick(view, position, holder)
 
                 if (!holder.isChecked) {
-
-//                    checkedExercisesTemp.add(0,exe)
-//                    checkedExercisesTemp.remove(checkedExercisesTemp[position])
                     checkedExercisesPerm.remove(checkedExercisesTemp[position])
                     var exe=checkedExercisesTemp[position]
                     exe.mIsChecked=true
                     checkedExercisesPerm.add(0,exe)
 
                     holder.changeCheckedState(true, this@DayCreator)
-//                    adapter.notifyDataSetChanged()
                 } else {
                     checkedExercisesTemp[position].mIsChecked=false
-//                    checkedExercisesTemp.remove(checkedExercisesTemp[position])
-//                    checkedExercisesTemp.add(0,checkedExercisesTemp[position])
                     checkedExercisesPerm.remove(checkedExercisesTemp[position])
                     checkedExercisesPerm.add(checkedExercisesTemp[position])
                     holder.changeCheckedState(false, this@DayCreator)
@@ -153,7 +142,6 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
         }
     }
 
-    //todo do some sort of permanent selected indexes so when you update day it doesnt just collected the selected index that are displayed on screen in that moment
     private val updateDayListener = View.OnClickListener {
         currentDayExercises = arrayListOf()
         var i = 0
@@ -161,9 +149,6 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
             currentDayExercises.add(checkedExercisesPerm[i].mExercise)
             i++
         }
-//        for (exercisePosition in selectedIndexes) {
-//            currentDayExercises.add(sortedDayExercisesOwnedNotOwned[exercisePosition])
-//        }
 
         if (DataHolder.activeDayHolder != null) {
             activeDay.exercises = currentDayExercises

@@ -11,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.google.gson.Gson
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
-import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
 import kotlinx.android.synthetic.main.fragment_day_view.view.*
 
@@ -27,7 +26,7 @@ class DayFragment : Fragment() {
         const val BUNDLE_DATE_KEY = "date_object"
 
         fun newInstance(day: Day?, date: String): DayFragment {
-            var dayFragment = DayFragment()
+            val dayFragment = DayFragment()
 
             dayFragment.arguments = Bundle().apply {
                 putString(BUNDLE_DAY_KEY, Gson().toJson(day))
@@ -76,9 +75,4 @@ class DayFragment : Fragment() {
 
         return fragmentView
     }
-
-//    fun updateBlankResult(exercise: Exercise) {
-//        (activity as WeekViewer).updateBlankResult(exercise)
-//    }
-
 }

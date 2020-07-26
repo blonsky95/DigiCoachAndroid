@@ -3,6 +3,7 @@ package com.tatoe.mydigicoach.ui.util
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -61,17 +62,19 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
     private fun updateExerciseLayout(holder: DayExerciseViewHolder, exercise: Exercise) {
         val showDONEButton: Boolean
         if (exercise.exerciseResults.containsResult(dayId)) {
-            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGreen))
+            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.palette3))
+            holder.exerciseTextView!!.setTextColor(Color.WHITE)
             showDONEButton = false
         } else {
-            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGrey_66))
+            holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.palette3_70))
+            holder.exerciseTextView!!.setTextColor(context.resources.getColor(R.color.darkGrey))
             showDONEButton=true
             holder.exerciseDoneButton!!.setOnClickListener(exerciseDoneListener(exercise))
         }
 
         loadResultsLayout(holder.collapsibleLinearLayout, exercise.exerciseResults)
 
-        holder.exerciseTextView!!.text = exercise.name
+        holder.exerciseTextView.text = exercise.name
         holder.exerciseTextView.setOnClickListener {
             holder.toggleExpand(exerciseDoneBtnVisibility = showDONEButton)
         }
