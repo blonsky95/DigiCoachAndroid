@@ -1,8 +1,10 @@
 package com.tatoe.mydigicoach.ui.calendar
 
 import android.content.Intent
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.os.Bundle
+import android.text.style.ForegroundColorSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,25 +16,15 @@ import com.prolificinteractive.materialcalendarview.CalendarDay
 import com.prolificinteractive.materialcalendarview.DayViewDecorator
 import com.prolificinteractive.materialcalendarview.DayViewFacade
 import com.prolificinteractive.materialcalendarview.MaterialCalendarView
-import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
-import com.tatoe.mydigicoach.entity.Day.Companion.dayIDToDate
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.DayPackage
 import com.tatoe.mydigicoach.network.FirebaseListenerService
-import com.tatoe.mydigicoach.network.TransferPackage
 import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.viewmodels.*
-import kotlinx.android.synthetic.main.activity_month_viewer.*
-import kotlinx.android.synthetic.main.activity_month_viewer.cancel_btn
-import kotlinx.android.synthetic.main.activity_month_viewer.share_btn
-import kotlinx.android.synthetic.main.activity_month_viewer.share_button
-import kotlinx.android.synthetic.main.activity_month_viewer.social_button
-import kotlinx.android.synthetic.main.activity_month_viewer.textOne
-import kotlinx.android.synthetic.main.activity_month_viewer.textView4
+import kotlinx.android.synthetic.main.fragment_month_viewer.*
 import kotlin.collections.ArrayList
 
 class MonthViewerFragment : Fragment() {
@@ -160,23 +152,6 @@ class MonthViewerFragment : Fragment() {
         return daysToSend.toList()
     }
 
-    private fun setUpFragment() {
-
-//        var fragmentTransaction = fragmentManager.beginTransaction()
-//
-//        fragmentTransaction.setCustomAnimations(
-//            R.anim.slide_in_up,
-//            R.anim.slide_in_down,
-//            R.anim.slide_out_down,
-//            R.anim.slide_out_up
-//        )
-//
-//        fragmentTransaction.addToBackStack("A")
-//            .replace(R.id.frame_layout, ShareToFriendsFragment.newInstance(allFriends))
-//        fragmentTransaction.commit()
-
-    }
-
     //reset selection in calendar, when pressing back button from week viewer to month viewer it restores
     //the calendar state with the month day selected (its decorator is displayed)
     override fun onResume() {
@@ -210,84 +185,6 @@ class MonthViewerFragment : Fragment() {
         dayViewModel.allFriends.observe(this, Observer { friends ->
             allFriends = friends
         })
-    }
-
-//    override fun onFriendSelected(friend: Friend) {
-//        Toast.makeText(activity!!, "Sending to ${friend.username}!", Toast.LENGTH_SHORT).show()
-//        dayViewModel.sendDaysToFriend(calendarDatesToShare, daysWithTraining, friend)
-////        fragmentManager.popBackStack()
-//        calendar.clearSelection()
-//        setUpNormalCalendar()
-//        setUpSelectorUI(false)
-//    }
-//
-//    override fun onCancelSelected() {
-////        fragmentManager.popBackStack()
-//        calendar.clearSelection()
-//        setUpNormalCalendar()
-//        setUpSelectorUI(false)
-//    }
-
-    private fun updateSocialButtonListener() {
-        social_button.setOnClickListener {
-            //            var receivedExercises = DataHolder.receivedExercises
-            var title = "Training programmes"
-            var text = "You have not received any new day programmes"
-            var dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
-
-            if (receivedDays.isNotEmpty()) {
-                val dayPackage = receivedDays[0]
-                text =
-                    "Import ${Day.toReadableFormat(dayIDToDate(dayPackage.firestoreDay!!.mDayId)!!)} from your friend ${dayPackage.mSender}?" +
-                            "\n new exercises will be imported, existing exercises will be recycled"
-                dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
-                    override fun onPositiveButton(inputText: String) {
-                        super.onPositiveButton(inputText)
-                        getExercisesFirst(dayPackage.firestoreDay.toDay())
-                        dayViewModel.updateTransferDay(
-                            dayPackage,
-                            TransferPackage.STATE_SAVED
-                        )
-                    }
-
-                    override fun onNegativeButton() {
-                        super.onNegativeButton()
-                        dayViewModel.updateTransferDay(
-                            dayPackage,
-                            TransferPackage.STATE_REJECTED
-                        )
-                    }
-
-                }
-
-            }
-            Utils.getInfoDialogView(activity!!, title, text, dialogPositiveNegativeInterface)
-        }
-    }
-
-    private fun getExercisesFirst(toImportDay: Day) {
-//        var exes = toImportDay.exercises
-        var modExes = arrayListOf<Exercise>()
-        for (exe in toImportDay.exercises) {
-            if (theSameExercise(exe) == null) {
-                dayViewModel.insertExercise(exe)
-                modExes.add(exe)
-            } else {
-                //replace it for yours
-                modExes.add(theSameExercise(exe)!!)
-            }
-        }
-        toImportDay.exercises = modExes
-        dayViewModel.updateDay(toImportDay)
-    }
-
-    private fun theSameExercise(exe: Exercise): Exercise? {
-        for (exercise in allExercises) {
-            if (exe.md5 == exercise.md5) {
-                return exercise
-            }
-        }
-        return null
     }
 
     private fun updateSocialButtonNumber(number: Int) {
@@ -340,6 +237,7 @@ class MonthViewerFragment : Fragment() {
         }
     }
 
+
     private fun updateCurrentDayDecorator() {
         calendar.addDecorators(
             CurrentDayDecorator(
@@ -353,7 +251,7 @@ class MonthViewerFragment : Fragment() {
         calendar.addDecorators(
             DatesWithDecorator(
                 calendarDaysWithTraining,
-                activity!!.getDrawable(R.drawable.rounded_border_background_light)!!
+                activity!!.getDrawable(R.drawable.circle_background_palette3_20dp)!!
             )
         )
     }
@@ -362,7 +260,7 @@ class MonthViewerFragment : Fragment() {
         calendar.addDecorators(
             DatesWithDecorator(
                 calendarDaysWithTrainingCompleted,
-                activity!!.getDrawable(R.drawable.rounded_border_background)!!
+                activity!!.getDrawable(R.drawable.circle_background_palette6_20dp)!!
             )
         )
     }
@@ -391,45 +289,6 @@ class MonthViewerFragment : Fragment() {
         }
     }
 
-//    private val connection = object : ServiceConnection {
-//
-//        override fun onServiceConnected(className: ComponentName, service: IBinder) {
-//            // We've bound to LocalService, cast the IBinder and get LocalService instance
-//
-//            val binder = service as FirebaseListenerService.LocalBinder
-//            mService = binder.getService()
-//            mBound = true
-//            observe()
-//
-//        }
-//
-//        override fun onServiceDisconnected(arg0: ComponentName) {
-//            mBound = false
-//        }
-//    }
-//
-//    private fun observe() {
-////        mService.receivedDaysLiveData.observe(this, Observer { lol ->
-////            receivedDays = lol
-////            updateSocialButtonListener()
-////            updateSocialButtonNumber()
-////        })
-//    }
-//
-//    override fun onStart() {
-//        super.onStart()
-//        // Bind to LocalService
-////        Intent(activity!!, FirebaseListenerService::class.java).also { intent ->
-////            bindService(intent, connection, Context.BIND_AUTO_CREATE)
-////        }
-//    }
-//
-//    override fun onStop() {
-//        super.onStop()
-////        unbindService(connection)
-//        mBound = false
-//    }
-
     class DatesWithDecorator(var dates: ArrayList<CalendarDay>, var drawable: Drawable) :
         DayViewDecorator {
 
@@ -439,6 +298,7 @@ class MonthViewerFragment : Fragment() {
 
         override fun decorate(view: DayViewFacade) {
             view.setBackgroundDrawable(drawable)
+            view.addSpan(ForegroundColorSpan(Color.WHITE))
         }
 
     }
@@ -453,6 +313,7 @@ class MonthViewerFragment : Fragment() {
 
         override fun decorate(view: DayViewFacade) {
             view.setBackgroundDrawable(drawable)
+            view.addSpan(ForegroundColorSpan(Color.WHITE))
         }
     }
 

@@ -305,7 +305,7 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
         calendar.addDecorators(
             DatesWithDecorator(
                 calendarDaysWithTraining,
-                this.getDrawable(R.drawable.rounded_border_background_light)!!
+                this.getDrawable(R.drawable.rounded_border_background_palette6_3dp)!!
             )
         )
     }
@@ -314,7 +314,7 @@ class MonthViewer : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelected
         calendar.addDecorators(
             DatesWithDecorator(
                 calendarDaysWithTrainingCompleted,
-                this.getDrawable(R.drawable.rounded_border_background)!!
+                this.getDrawable(R.drawable.rounded_border_background_palette6_6dp)!!
             )
         )
     }
