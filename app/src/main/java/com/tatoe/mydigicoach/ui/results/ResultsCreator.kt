@@ -6,7 +6,6 @@ import android.text.SpannableStringBuilder
 import android.view.*
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.size
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.ExerciseResults
@@ -71,7 +70,7 @@ class ResultsCreator : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_exercise_creator)
+        setContentView(R.layout.activity_result_creator)
         toolbar_title.text = "Result"
         backBtn.setOnClickListener {
             super.onBackPressed()
@@ -185,7 +184,7 @@ class ResultsCreator : AppCompatActivity() {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
             fieldLayout.fieldKey5.text = fieldEntryKey
-
+            fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.white))
             fieldLayout.fieldValueTextView5.text =
                 ExerciseResults.toReadableFormat(fieldEntryValue!!, fieldEntryKey!!)
         }
@@ -221,7 +220,7 @@ class ResultsCreator : AppCompatActivity() {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
             fieldLayout.fieldKey5.text = fieldEntryKey
-
+            fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.white))
             fieldLayout.fieldValueTextView5.text = Day.dayIDtoDashSeparator(resultDate)
         }
 
@@ -229,13 +228,15 @@ class ResultsCreator : AppCompatActivity() {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
             fieldLayout.fieldKey5.text = fieldEntryKey
-
+            fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.white))
             fieldLayout.fieldValueTextView5.text = fieldEntryValue
         }
         if (layoutType == LAYOUT_TYPE_EXTRAFIELD_ET) {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_edittext_layout, null)
             fieldLayout.fieldKey6.text = fieldEntryKey
+            fieldLayout.fieldValueEditText6.setBackgroundColor(resources.getColor(R.color.palette3_70))
+            fieldLayout.item_et_divider.setBackgroundColor(resources.getColor(R.color.white))
 
             val editText = fieldLayout.fieldValueEditText6
             if (mAction == OBJECT_NEW) {

@@ -66,7 +66,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
 
-                android:background="@color/evenDarkerGreen"
+                android:background="@color/palette10"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
                 android:paddingStart="32dp"
@@ -85,7 +85,7 @@
                 android:id="@+id/doneBtn"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/evenDarkerGreen"
+                android:background="@color/palette10"
                 android:fontFamily="@font/open_sans_bold"
                 android:gravity="center"
                 android:paddingStart="32dp"

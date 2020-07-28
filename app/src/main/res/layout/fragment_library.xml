@@ -10,7 +10,7 @@
             android:id="@+id/my_toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/squareOrange"
+            android:background="@color/palette6"
             android:elevation="4dp"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:layout_constraintTop_toTopOf="parent"
@@ -25,20 +25,24 @@
                 android:fontFamily="@font/open_sans_bold"
                 android:text="Training Library"
                 android:textAllCaps="true"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:layout_editor_absoluteX="131dp"
+                tools:layout_editor_absoluteY="17dp" />
 
         <TextView
                 android:id="@+id/toolbar_filter"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
-                android:layout_marginEnd="32dp"
+                android:layout_marginEnd="16dp"
                 android:fontFamily="@font/open_sans_regular"
                 android:text="Filter"
                 android:textAllCaps="false"
-                android:textColor="@color/black"
-                android:textSize="16sp" />
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                tools:layout_editor_absoluteX="341dp"
+                tools:layout_editor_absoluteY="17dp" />
 
 
     </androidx.appcompat.widget.Toolbar>
@@ -86,7 +90,7 @@
             android:layout_marginStart="32dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="32dp"
-            android:background="@color/transpGrey"
+            android:background="@drawable/rounded_border_background_palette6_30_3dp"
             android:gravity="center"
             android:queryHint="Search exercise here..."
             app:layout_constraintEnd_toEndOf="parent"
@@ -100,13 +104,13 @@
             android:layout_marginStart="32dp"
             android:layout_marginEnd="32dp"
             android:layout_marginBottom="16dp"
-            android:background="@drawable/rounded_border_background_square_orange"
-            android:textColor="@color/black"
-            android:fontFamily="@font/open_sans_bold"
+            android:background="@drawable/rounded_border_background_palette6_3dp"
+            android:fontFamily="@font/open_sans_regular"
             android:gravity="center"
             android:padding="14dp"
-            android:textSize="16sp"
             android:text="Add to training"
+            android:textColor="@color/white"
+            android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent" />

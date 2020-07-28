@@ -46,7 +46,7 @@
                 android:layout_weight="1"
                 android:contentDescription="delete_sticker"
                 android:padding="4dp"
-                android:src="@drawable/ic_circle_grey"
+                android:src="@drawable/circle_stroke_background"
                 android:visibility="visible" />
     </LinearLayout>
 

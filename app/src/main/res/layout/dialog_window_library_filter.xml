@@ -2,9 +2,9 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:background="@color/squareOrange"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:background="@color/palette3">
 
     <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/libraryCategoriesList"
@@ -26,6 +26,7 @@
             android:layout_marginEnd="24dp"
             android:fontFamily="@font/open_sans_regular"
             android:text="Clear"
+            android:textColor="@color/white"
             android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -38,7 +39,7 @@
             android:layout_marginTop="24dp"
             android:fontFamily="@font/open_sans_bold"
             android:text="Categories"
-            android:textColor="@color/black"
+            android:textColor="@color/white"
             android:textSize="16sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -50,7 +51,7 @@
             android:layout_marginStart="48dp"
             android:layout_marginTop="8dp"
             android:layout_marginEnd="48dp"
-            android:layout_marginBottom="8dp"
+            android:layout_marginBottom="24dp"
             android:background="@drawable/rounded_border_background_white"
             android:fontFamily="@font/open_sans_bold"
             android:gravity="center"

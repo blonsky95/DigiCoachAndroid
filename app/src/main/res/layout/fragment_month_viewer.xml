@@ -105,7 +105,7 @@
             app:ptg_setWeekDayBackgroundColor="@color/lightGrey_66" />
 
     <View
-            android:id="@+id/view"
+            android:id="@+id/item_et_divider"
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:layout_marginStart="16dp"
@@ -127,7 +127,7 @@
             app:layout_constraintBottom_toTopOf="@+id/cancel_btn"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view"
+            app:layout_constraintTop_toBottomOf="@+id/item_et_divider"
             app:layout_constraintVertical_bias="1.0" />
 
     <TextView

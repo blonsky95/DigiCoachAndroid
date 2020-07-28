@@ -88,7 +88,7 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
         activeDayId = intent.getStringExtra(DAY_ID)
         changeWeekDayHighlight()
 
-        addToDiaryViewContainer.setOnClickListener(updateDayListener)
+        save_day_button.setOnClickListener(updateDayListener)
 
     }
 
@@ -276,10 +276,10 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
 
         fun changeCheckedState(shouldCheck: Boolean, context: Context){
             isChecked = if (shouldCheck) {
-               rightCheckButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_check_white_24dp))
+               rightCheckButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_checkmark))
                 true
             } else {
-                rightCheckButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_circle_grey))
+                rightCheckButton.setImageDrawable(context.resources.getDrawable(R.drawable.circle_stroke_background))
                 false
             }
         }

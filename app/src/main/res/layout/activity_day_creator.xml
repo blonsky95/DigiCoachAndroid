@@ -159,7 +159,7 @@
     </LinearLayout>
 
     <View
-            android:id="@+id/view"
+            android:id="@+id/item_et_divider"
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:layout_marginStart="16dp"
@@ -176,59 +176,44 @@
             android:id="@+id/day_creator_exercises_recycler_view"
             android:layout_width="0dp"
             android:layout_height="0dp"
-            android:layout_marginStart="32dp"
-            android:layout_marginTop="8dp"
-            android:layout_marginEnd="32dp"
-            android:layout_marginBottom="16dp"
-            android:background="@color/white"
-            android:visibility="visible"
-            app:layout_constraintBottom_toTopOf="@+id/addToDiaryViewContainer"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/search_view"
-            tools:listitem="@layout/item_holder_day_slider_item" />
-
-    <LinearLayout
-            android:id="@+id/addToDiaryViewContainer"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
             android:layout_marginStart="16dp"
             android:layout_marginTop="16dp"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="48dp"
-            android:background="@color/palette3"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="4dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="24dp"
+            android:background="@color/white"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/save_day_button"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/pager">
+            app:layout_constraintTop_toBottomOf="@+id/search_view"
+            tools:listitem="@layout/item_holder_exercise_with_check" />
 
-        <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="16dp"
-                android:fontFamily="@font/open_sans_bold"
-                android:gravity="start|center_vertical"
-                android:text="+"
-                android:textColor="@color/white"
-                android:textSize="30sp" />
 
 
         <TextView
+                android:id="@+id/save_day_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center"
                 android:layout_marginStart="24dp"
-                android:fontFamily="@font/open_sans_bold"
-                android:gravity="center_vertical"
+                android:fontFamily="@font/open_sans_regular"
+                android:gravity="center|center_vertical"
+                android:background="@drawable/rounded_border_background_palette3_3dp"
+                android:layout_marginEnd="16dp"
+                android:layout_marginBottom="42dp"
+                android:paddingStart="32dp"
+                android:paddingTop="16dp"
+                android:paddingEnd="32dp"
+                android:paddingBottom="16dp"
                 android:text="Save"
-                android:textAllCaps="true"
+                android:textAllCaps="false"
                 android:textColor="@color/white"
-                android:textSize="20sp" />
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="1.0"
+                app:layout_constraintStart_toStartOf="parent"/>
 
-
-    </LinearLayout>
 
     <SearchView
             android:id="@+id/search_view"
@@ -244,7 +229,7 @@
             android:queryHint="Search for an exercise"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/view" />
+            app:layout_constraintTop_toBottomOf="@+id/item_et_divider" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

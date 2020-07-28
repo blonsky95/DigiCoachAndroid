@@ -245,6 +245,7 @@ class ExerciseCreator : AppCompatActivity() {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
             fieldLayout.fieldKey5.text = fieldEntryKey
+            fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.lightGrey_66))
 
             fieldLayout.fieldValueTextView5.text = fieldEntryValue
         }
@@ -252,6 +253,7 @@ class ExerciseCreator : AppCompatActivity() {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_edittext_layout, null)
             fieldLayout.fieldKey6.text = fieldEntryKey
+            fieldLayout.item_et_divider.setBackgroundColor(resources.getColor(R.color.lightGrey_66))
 
             val editText = fieldLayout.fieldValueEditText6
             if (mAction == OBJECT_NEW) {

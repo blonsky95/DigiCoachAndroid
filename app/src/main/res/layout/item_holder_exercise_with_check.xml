@@ -11,7 +11,7 @@
             android:id="@+id/linearLayoutExerciseHolder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="@color/lightGrey_66"
+            android:background="@color/palette3_70"
             android:orientation="horizontal">
 
         <TextView
@@ -33,7 +33,7 @@
                 android:layout_weight="1"
                 android:padding="4dp"
                 android:contentDescription="delete_sticker"
-                android:src="@drawable/ic_circle_grey"
+                android:src="@drawable/circle_stroke_background"
                 android:visibility="visible" />
     </LinearLayout>
 

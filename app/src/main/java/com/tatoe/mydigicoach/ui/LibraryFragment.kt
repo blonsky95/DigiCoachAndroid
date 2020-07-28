@@ -133,7 +133,6 @@ class LibraryFragment : Fragment(), SearchView.OnQueryTextListener {
         mDialogView.libraryCategoriesList.layoutManager = LinearLayoutManager(activity!!)
         mDialogView.libraryCategoriesList.adapter = customCategoriesAdapter
         mDialogView.filter_btn.setOnClickListener {
-
             filterByCategory(customCategoriesAdapter.checkedCategories)
         }
         mDialogView.clear_btn.setOnClickListener {

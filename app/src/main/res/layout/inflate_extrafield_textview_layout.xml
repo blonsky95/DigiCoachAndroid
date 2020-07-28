@@ -36,9 +36,9 @@
     </LinearLayout>
 
     <View
-            android:id="@+id/view"
+            android:id="@+id/item_tv_divider"
             android:layout_width="match_parent"
-            android:layout_height="3dp"
+            android:layout_height="2dp"
 
-            android:background="@color/lightGrey_66" />
+            android:background="@color/white" />
 </LinearLayout>
