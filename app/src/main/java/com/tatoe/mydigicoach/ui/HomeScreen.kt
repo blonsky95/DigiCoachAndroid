@@ -195,31 +195,31 @@ class HomeScreen : AppCompatActivity() {
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.home_toolbar_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.home_toolbar_menu, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        R.id.action_logout -> {
-            homeViewModel.closeDbInstance()
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, UserAccess::class.java)
-            startActivity(intent)
-            finish()
-            true
-        }
-
-        R.id.upload_store_exercises -> {
-            //uncomment this to be able to add stub exercises to store
-//        loginSignUpViewModel.addBunchOfStubStoreExercises()
-            true
-        }
-
-        else -> {
-            super.onOptionsItemSelected(item)
-        }
-    }
+//    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+//
+//        R.id.action_logout -> {
+////            homeViewModel.closeDbInstance()
+////            FirebaseAuth.getInstance().signOut()
+////            val intent = Intent(this, UserAccess::class.java)
+////            startActivity(intent)
+////            finish()
+//            true
+//        }
+//
+//        R.id.upload_store_exercises -> {
+//            //uncomment this to be able to add stub exercises to store
+////        loginSignUpViewModel.addBunchOfStubStoreExercises()
+//            true
+//        }
+//
+//        else -> {
+//            super.onOptionsItemSelected(item)
+//        }
+//    }
 
 }

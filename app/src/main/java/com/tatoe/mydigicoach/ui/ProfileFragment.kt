@@ -2,6 +2,7 @@ package com.tatoe.mydigicoach.ui
 
 import android.app.Dialog
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -9,6 +10,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
@@ -21,9 +23,6 @@ class ProfileFragment : Fragment() {
     private lateinit var mainViewModel: MainViewModel
     private lateinit var profileViewModel: ProfileViewModel
     private var db = FirebaseFirestore.getInstance()
-    private var isFriendDisplayerFragmentOpen=false
-    private var isFriendRequestReceiverFragmentOpen=false
-
     private lateinit var dialog: Dialog
 
     override fun onCreateView(
@@ -80,7 +79,19 @@ class ProfileFragment : Fragment() {
 //            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
         }
 
+        log_out_btn.setOnClickListener {
+            logOut()
+        }
+
         initObservers()
+    }
+
+    private fun logOut() {
+        profileViewModel.closeDbInstance()
+        FirebaseAuth.getInstance().signOut()
+        val intent = Intent(activity, UserAccess::class.java)
+        startActivity(intent)
+        activity!!.finish()
     }
 
     private fun initObservers() {

@@ -24,16 +24,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="24dp"
             android:fontFamily="@font/open_sans_bold"
-            android:text="PROFILE"
+            android:text="My Profile"
             android:textColor="@color/white"
             android:textSize="36sp"
             app:layout_constraintBottom_toBottomOf="@+id/view2"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.15"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toStartOf="@+id/view2"
-            app:layout_constraintTop_toTopOf="@+id/view2"
-            app:layout_constraintVertical_bias="0.73" />
+            app:layout_constraintTop_toBottomOf="@+id/backup_button"
+            app:layout_constraintVertical_bias="0.0" />
 
 
     <View
@@ -84,17 +86,6 @@
             android:textStyle="bold"
             android:background="@drawable/badge_circle"/>
 
-    <View
-            android:id="@+id/view3"
-            android:layout_width="307dp"
-            android:layout_height="233dp"
-            android:layout_marginStart="232dp"
-
-            android:background="@drawable/ic_person_white_96dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
 
     <TextView
             android:id="@+id/textView"
@@ -180,6 +171,25 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
+    <TextView
+            android:id="@+id/log_out_btn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginEnd="24dp"
+            android:layout_marginBottom="32dp"
+            android:background="@drawable/rounded_border_background_palette1_6dp"
+            android:text="Log out"
+            android:textAllCaps="true"
+            android:textColor="@color/white"
+            android:fontFamily="@font/open_sans_regular"
+            android:textSize="24sp"
+            android:gravity="center"
+            android:padding="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
     <FrameLayout
             android:id="@+id/frame_layout"
             android:layout_width="0dp"
@@ -188,11 +198,6 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/view2">
-
-<!--        <fragment android:name="com.tatoe.mydigicoach.ui.fragments.BackupFragment"-->
-<!--                android:id="@+id/backup_frag"-->
-<!--                android:layout_width="match_parent" android:layout_height="match_parent" />-->
-
     </FrameLayout>
 
 

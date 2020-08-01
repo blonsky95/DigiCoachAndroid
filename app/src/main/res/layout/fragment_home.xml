@@ -15,7 +15,6 @@
             android:gravity="center"
             android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
             app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/home_toolbar_menu"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
             tools:layout_editor_absoluteX="85dp">
 

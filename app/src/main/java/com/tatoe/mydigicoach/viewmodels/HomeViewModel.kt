@@ -55,9 +55,7 @@ class HomeViewModel(var application: Application, var db: FirebaseFirestore) : V
         DataHolder.userEmail = auth.currentUser!!.email!!
     }
 
-    fun closeDbInstance() {
-        AppRoomDatabase.destroyInstance()
-    }
+
 
 
 }

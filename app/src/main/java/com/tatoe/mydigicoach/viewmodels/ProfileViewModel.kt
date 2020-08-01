@@ -57,6 +57,10 @@ class ProfileViewModel(var db: FirebaseFirestore, var application: Application) 
 //        loadFriendRequests()
     }
 
+    fun closeDbInstance() {
+        AppRoomDatabase.destroyInstance()
+    }
+
 //    private fun loadFriendRequests() {
 //        val docRef =
 //            db.collection("users").document(DataHolder.userDocId).collection("f_requests_in")
