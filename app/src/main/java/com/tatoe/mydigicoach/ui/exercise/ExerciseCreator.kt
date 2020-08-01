@@ -10,13 +10,14 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
 import com.tatoe.mydigicoach.ui.results.ResultsViewer
 import com.tatoe.mydigicoach.ui.util.DataHolder
+import com.tatoe.mydigicoach.utils.MD5Encrypter
 import com.tatoe.mydigicoach.viewmodels.ExerciseViewModel
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.inflate_description_edittext_layout.view.*
@@ -32,8 +33,6 @@ class ExerciseCreator : AppCompatActivity() {
 
     private lateinit var linearLayout: LinearLayout
 
-    private lateinit var newField: String
-
     private lateinit var rightButton: TextView
     private lateinit var leftButton: TextView
     private lateinit var centreButton: TextView
@@ -42,7 +41,6 @@ class ExerciseCreator : AppCompatActivity() {
 
     private var activeExercise: Exercise? = null
     private var exerciseFieldsMap = HashMap<Int, HashMap<String, String>>()
-
 
     var menuItemRead: MenuItem? = null
     var menuItemEdit: MenuItem? = null
@@ -68,7 +66,7 @@ class ExerciseCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_exercise_creator)
-        addFieldBtn.visibility=View.GONE
+        addFieldBtn.visibility = View.GONE
         title = "Exercise Creator"
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
@@ -96,12 +94,8 @@ class ExerciseCreator : AppCompatActivity() {
                     Timber.d("field map $exerciseFieldsMap")
 
                 }
-//                }
             } else {
-//                exerciseFieldsMap[0]!!["Name"] = ""
-
                 exerciseFieldsMap[0] = hashMapOf("Name" to "")
-//                exerciseFieldsMap[1]!!["Description"] = ""
                 exerciseFieldsMap[1] = hashMapOf("Description" to "")
             }
             createExerciseFieldsLayout()
@@ -143,9 +137,9 @@ class ExerciseCreator : AppCompatActivity() {
 
                 centreButton.visibility = View.INVISIBLE
 
-                leftButton.visibility = View.VISIBLE
-                leftButton.text = "Send"
-                leftButton.setOnClickListener(sendToUserListener)
+                leftButton.visibility = View.GONE
+//                leftButton.text = "Send"
+//                leftButton.setOnClickListener(sendToUserListener)
             }
         }
     }
@@ -251,6 +245,7 @@ class ExerciseCreator : AppCompatActivity() {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
             fieldLayout.fieldKey5.text = fieldEntryKey
+            fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.lightGrey_66))
 
             fieldLayout.fieldValueTextView5.text = fieldEntryValue
         }
@@ -258,6 +253,7 @@ class ExerciseCreator : AppCompatActivity() {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_edittext_layout, null)
             fieldLayout.fieldKey6.text = fieldEntryKey
+            fieldLayout.item_et_divider.setBackgroundColor(resources.getColor(R.color.lightGrey_66))
 
             val editText = fieldLayout.fieldValueEditText6
             if (mAction == OBJECT_NEW) {
@@ -284,8 +280,13 @@ class ExerciseCreator : AppCompatActivity() {
                 layout = layout.getChildAt(0) as LinearLayout
             }
 
-            var fieldName = (layout.getChildAt(0) as TextView).text.toString()
+            val fieldName = (layout.getChildAt(0) as TextView).text.toString()
             var fieldValue = (layout.getChildAt(1) as EditText).text.trim().toString()
+            if (fieldValue.isEmpty()) {
+                fieldValue =
+                    "You can edit this text"
+            }
+
             fieldsMap[i] = hashMapOf(fieldName to fieldValue)
         }
         return fieldsMap
@@ -297,11 +298,11 @@ class ExerciseCreator : AppCompatActivity() {
         var newExercise = Exercise(newExerciseFields)
 
         newExercise.setFieldsMap(newExerciseFields)
-
+        newExercise.md5 = MD5Encrypter.getMD5(newExercise)
         exerciseViewModel.insertExercise(newExercise)
 //        backToViewer()
-        activeExercise=newExercise //new exercise are not fetched from SQLite from creator
-        Toast.makeText(this,"${activeExercise?.name} has been added",Toast.LENGTH_SHORT).show()
+        activeExercise = newExercise //new exercise are not fetched from SQLite from creator
+        Toast.makeText(this, "${activeExercise?.name} has been added", Toast.LENGTH_SHORT).show()
         refreshCreator()
     }
     private val updateButtonListener = View.OnClickListener {
@@ -313,7 +314,7 @@ class ExerciseCreator : AppCompatActivity() {
         activeExercise!!.setFieldsMap(updatingExerciseFields)
 
         exerciseViewModel.updateExercise(activeExercise!!)
-        Toast.makeText(this,"${activeExercise?.name} has been updated",Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "${activeExercise?.name} has been updated", Toast.LENGTH_SHORT).show()
 //        backToViewer()
         refreshCreator()
     }
@@ -324,12 +325,17 @@ class ExerciseCreator : AppCompatActivity() {
             title.toString(),
             "Are you sure you want to delete this exercise?",
             object :
-                DialogPositiveNegativeHandler {
+                DialogPositiveNegativeInterface {
 
                 override fun onPositiveButton(inputText: String) {
                     super.onPositiveButton(inputText)
                     exerciseViewModel.deleteExercise(activeExercise!!)
-                    Toast.makeText(applicationContext,"${activeExercise?.name} has been deleted",Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        applicationContext,
+                        "${activeExercise?.name} has been deleted",
+                        Toast.LENGTH_SHORT
+                    ).show()
+
                     backToViewer()
                 }
             })
@@ -343,7 +349,7 @@ class ExerciseCreator : AppCompatActivity() {
     private fun generateDialog() {
 
         Utils.getDialogViewWithEditText(this, "Add Field", null, "Name of new field",
-            object : DialogPositiveNegativeHandler {
+            object : DialogPositiveNegativeInterface {
                 override fun onPositiveButton(inputText: String) {
                     addNewFieldLayout(inputText)
                 }
@@ -370,21 +376,22 @@ class ExerciseCreator : AppCompatActivity() {
 
         startActivity(intent)
     }
-
-    private val sendToUserListener = View.OnClickListener {
-        Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
-            object : DialogPositiveNegativeHandler {
-                override fun onPositiveButton(username: String) {
-                    exerciseViewModel.sendExerciseToUser(activeExercise, username)
-                }
-
-            })
-    }
+//
+//    private val sendToUserListener = View.OnClickListener {
+//        Utils.getDialogViewWithEditText(this, "Send to User", null, "Username",
+//            object : DialogPositiveNegativeHandler {
+//                override fun onPositiveButton(username: String) {
+////                    exerciseViewModel.sendExerciseToUser(activeExercise, username)
+//                }
+//
+//            })
+//    }
 
     private fun backToViewer() {
-        val intent = Intent(this, ExerciseViewer::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
-        startActivity(intent)
+        super.onBackPressed()
+//        val intent = Intent(this, ExerciseViewer::class.java)
+//        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//        startActivity(intent)
     }
 
     private fun refreshCreator() {

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
         android:id="@+id/mainLinearLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="12dp"
-        android:background="@color/lightGrey"
+        android:background="@color/lightGrey_66"
         android:orientation="vertical">
 
     <LinearLayout
@@ -22,7 +23,7 @@
                 android:fontFamily="@font/open_sans_bold"
                 android:padding="12dp"
                 android:text="Squats"
-                android:textColor="@color/black"
+                android:textColor="@color/darkGrey"
                 android:textSize="14sp" />
         <ImageView
                 android:padding="6dp"
@@ -51,24 +52,55 @@
 
     </LinearLayout>
 
-    <TextView
-            android:id="@+id/resultsBtn"
-            android:layout_width="wrap_content"
+    <RelativeLayout
+            android:id="@+id/bottomBtnsLinearLayout"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
             android:layout_marginBottom="12dp"
-            android:background="@color/evenDarkerGreen"
-            android:fontFamily="@font/open_sans_bold"
-            android:gravity="center"
-            android:layout_gravity="end"
-            android:paddingStart="32dp"
-            android:paddingTop="4dp"
-            android:paddingEnd="32dp"
-            android:paddingBottom="4dp"
-            android:text=" + Result"
-            android:textAllCaps="true"
-            android:textColor="@color/white"
-            android:textSize="15sp"
-            android:visibility="gone"/>
+            android:visibility="gone">
+
+        <TextView
+                android:id="@+id/resultsBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+
+                android:background="@color/palette10"
+                android:fontFamily="@font/open_sans_bold"
+                android:gravity="center"
+                android:paddingStart="32dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="32dp"
+                android:paddingBottom="4dp"
+                android:text=" + Result"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:visibility="visible"
+                android:layout_alignParentEnd="true"
+                />
+
+        <TextView
+                android:id="@+id/doneBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@color/palette10"
+                android:fontFamily="@font/open_sans_bold"
+                android:gravity="center"
+                android:paddingStart="32dp"
+                android:paddingTop="4dp"
+                android:paddingEnd="32dp"
+                android:paddingBottom="4dp"
+                android:text="done!"
+                android:textAllCaps="true"
+                android:textColor="@color/white"
+                android:textSize="15sp"
+                android:visibility="gone"
+                android:layout_alignParentStart="true" />
+
+    </RelativeLayout>
+
+
 
 </LinearLayout>

@@ -1,5 +1,6 @@
 package com.tatoe.mydigicoach.ui
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.text.SpannableStringBuilder
@@ -12,19 +13,17 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.auth.FirebaseUser
 import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.BuildConfig
-import com.tatoe.mydigicoach.DialogPositiveNegativeHandler
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
-import com.tatoe.mydigicoach.viewmodels.LoginSignUpViewModel
-import com.tatoe.mydigicoach.viewmodels.MyLoginSignUpViewModelFactory
-import kotlinx.android.synthetic.main.activity_login_screen_2.login_button
-import kotlinx.android.synthetic.main.activity_login_screen_2.register_button
+import com.tatoe.mydigicoach.viewmodels.UserAccessViewModel
+import com.tatoe.mydigicoach.viewmodels.MyUserAccessViewModelFactory
+import kotlinx.android.synthetic.main.activity_login_screen.login_button
+import kotlinx.android.synthetic.main.activity_login_screen.register_button
 import kotlinx.android.synthetic.main.activity_login_signup.*
 //import org.junit.experimental.results.ResultMatchers.isSuccessful
-import timber.log.Timber
 
 
 class LoginSignUp : AppCompatActivity() {
@@ -39,7 +38,7 @@ class LoginSignUp : AppCompatActivity() {
     private lateinit var auth: FirebaseAuth
     private var db = FirebaseFirestore.getInstance()
 
-    private lateinit var loginSignUpViewModel: LoginSignUpViewModel
+    private lateinit var userAccessViewModel: UserAccessViewModel
 
     private lateinit var progress: ProgressBar
     private var mHasAccess = false
@@ -51,11 +50,13 @@ class LoginSignUp : AppCompatActivity() {
         // Initialize Firebase Auth
         auth = FirebaseAuth.getInstance()
 
-        loginSignUpViewModel = ViewModelProviders.of(
+        val sharedPreferences = getSharedPreferences("USER_DATA", Context.MODE_PRIVATE)
+
+        userAccessViewModel = ViewModelProviders.of(
             this,
-            MyLoginSignUpViewModelFactory(application, db)
+            MyUserAccessViewModelFactory(application, db, sharedPreferences)
         ).get(
-            LoginSignUpViewModel::class.java
+            UserAccessViewModel::class.java
         )
 
         loginButton = login_button
@@ -71,9 +72,9 @@ class LoginSignUp : AppCompatActivity() {
                 "Type your email below",
                 "Email",
                 object :
-                    DialogPositiveNegativeHandler {
+                    DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
-                        loginSignUpViewModel.resetFirebaseUserPassword(inputText, context)
+                        userAccessViewModel.resetFirebaseUserPassword(inputText, context)
 //                    resetPassword(userEmail)
                     }
                 })
@@ -92,16 +93,15 @@ class LoginSignUp : AppCompatActivity() {
 //        checkPermissions()
 
         if (BuildConfig.DEBUG) {
-            magic_btn.visibility = View.VISIBLE
             magic_btn.setOnClickListener {
-                userEditText.text = SpannableStringBuilder("pablo.trescoli@gmail.com")
+                userEditText.text = SpannableStringBuilder("pablo")
                 passwordEditText.text = SpannableStringBuilder("123456")
             }
         }
     }
 
     private fun initObservers() {
-        loginSignUpViewModel.isDoingBackgroundTask.observe(this, Observer {
+        userAccessViewModel.isDoingBackgroundTask.observe(this, Observer {
             if (it) {
                 progress.visibility = View.VISIBLE
             } else {
@@ -109,7 +109,7 @@ class LoginSignUp : AppCompatActivity() {
             }
         })
 
-        loginSignUpViewModel.hasAccess.observe(this, Observer {
+        userAccessViewModel.hasAccess.observe(this, Observer {
             attemptLogIn(it)
         })
     }
@@ -139,47 +139,21 @@ class LoginSignUp : AppCompatActivity() {
     private fun attemptLogIn(hasAccess:Boolean) {
         //assuming you already have permissions if you're here
         if (hasAccess) {
-            val intent = Intent(this, HomeScreen::class.java)
+            val intent = Intent(this, HomeActivity::class.java)
             startActivity(intent)
             finish()
         }
     }
-//    private fun attemptLogIn(user: FirebaseUser?) {
-//        //assuming you already have permissions if you're here
-//        if (user != null) {
-//            val intent = Intent(this, HomeScreen::class.java)
-//            startActivity(intent)
-//            finish()
-//        }
-//    }
 
-//    private fun checkPermissions() {
-//        if (ContextCompat.checkSelfPermission(
-//                this,
-//                android.Manifest.permission.WRITE_EXTERNAL_STORAGE
-//            )
-//            != PackageManager.PERMISSION_GRANTED
-//        ) {
-//            // Permission is not granted
-//            ActivityCompat.requestPermissions(
-//                this,
-//                arrayOf(android.Manifest.permission.WRITE_EXTERNAL_STORAGE),
-//                PERMISSION_REQUEST_CODE
-//            )
-//        } else {
-//            hasPermissions = true
-//        }
-//    }
 
     private val logInUser = View.OnClickListener {
-//        progress.visibility = View.VISIBLE
 
         val username = userEditText.text.toString()
         val password = passwordEditText.text.toString()
 
         if (username.isNotEmpty() && password.isNotEmpty()) {
 
-            loginSignUpViewModel.logInUser(username, password, this)
+            userAccessViewModel.logInUser(username, password, this)
 
         } else {
             progress.visibility = View.GONE
@@ -199,7 +173,7 @@ class LoginSignUp : AppCompatActivity() {
         val email = emailEditText.text.toString()
         val password = passwordEditText.text.toString()
         if (username.isNotEmpty() && email.isNotEmpty() && password.isNotEmpty()) {
-            loginSignUpViewModel.registerNewUser(username,email,password, this)
+            userAccessViewModel.registerNewUser(username,email,password, this)
         } else {
             progress.visibility = View.GONE
             Toast.makeText(

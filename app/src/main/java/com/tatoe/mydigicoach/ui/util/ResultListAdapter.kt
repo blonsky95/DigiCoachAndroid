@@ -34,6 +34,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
 
     override fun onBindViewHolder(holder: DayExerciseViewHolder, position: Int) {
         val bindingResult = sResults[position]
+        holder.exerciseResultButton?.text="MODIFY"
         updateExerciseLayout(holder, bindingResult)
     }
 
@@ -46,7 +47,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
 
         holder.exerciseTextView!!.text = bindingResult[0]!![ExerciseResults.DATE_KEY]
         holder.exerciseTextView.setOnClickListener {
-            holder.toggleExpand(false)
+            holder.toggleExpand(questionBtnVisiblity = false, exerciseDoneBtnVisibility = false)
         }
 
         holder.exerciseResultButton!!.setOnClickListener {

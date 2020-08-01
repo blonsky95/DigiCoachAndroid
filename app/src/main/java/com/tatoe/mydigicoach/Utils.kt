@@ -2,6 +2,9 @@ package com.tatoe.mydigicoach
 
 import android.content.Context
 import android.graphics.Color
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import android.os.Build
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -9,6 +12,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.dialog_window_edittext.view.*
 import kotlinx.android.synthetic.main.dialog_window_info.view.*
+import timber.log.Timber
 
 object Utils {
 
@@ -18,17 +22,17 @@ object Utils {
         context: Context,
         dialogTitle: String = "",
         dialogText: String = "",
-        dialogPositiveNegativeHandler: DialogPositiveNegativeHandler? = null
+        dialogPositiveNegativeInterface: DialogPositiveNegativeInterface? = null
     ) {
         val mDialogView = LayoutInflater.from(context).inflate(R.layout.dialog_window_info, null)
         mDialogView.dialog_text.text = dialogText
         val mBuilder = AlertDialog.Builder(context).setView(mDialogView).setTitle(dialogTitle)
-        if (dialogPositiveNegativeHandler != null) {
+        if (dialogPositiveNegativeInterface != null) {
             mBuilder.setPositiveButton("Yes") { _, _ ->
-                dialogPositiveNegativeHandler.onPositiveButton()
+                dialogPositiveNegativeInterface.onPositiveButton()
             }
             mBuilder.setNegativeButton("No") { _, _ ->
-                dialogPositiveNegativeHandler.onNegativeButton()
+                dialogPositiveNegativeInterface.onNegativeButton()
             }
         }
 
@@ -40,7 +44,7 @@ object Utils {
         dialogTitle: String? = "",
         dialogText: String? = "",
         editTextHint: String? = "Type here",
-        dialogPositiveNegativeHandler: DialogPositiveNegativeHandler
+        dialogPositiveNegativeInterface: DialogPositiveNegativeInterface
     ) {
 
         val mDialogView =
@@ -65,7 +69,7 @@ object Utils {
 
         mDialogView.dialog_btn_left.setOnClickListener {
             val userInput = mDialogView.dialog_edittext.text.trim().toString()
-            dialogPositiveNegativeHandler.onPositiveButton(userInput)
+            dialogPositiveNegativeInterface.onPositiveButton(userInput)
             alertDialog.dismiss()
         }
 
@@ -126,6 +130,44 @@ object Utils {
             dialog.window?.attributes = layoutParams
         }
         return dialog
+    }
+
+    fun isConnectedToInternet(context: Context): Boolean {
+        val connectivityManager =
+            context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val capabilities =
+                connectivityManager.getNetworkCapabilities(connectivityManager.activeNetwork)
+
+            if (capabilities != null) {
+                when {
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> {
+                        Timber.d("Internet - NetworkCapabilities.TRANSPORT_CELLULAR")
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> {
+                        Timber.d("Internet - NetworkCapabilities.TRANSPORT_WIFI")
+                        return true
+                    }
+                    capabilities.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) -> {
+                        Timber.d("Internet - NetworkCapabilities.TRANSPORT_ETHERNET")
+                        return true
+                    }
+                }
+            }
+        } else {
+            val activeNetworkInfo = connectivityManager.activeNetworkInfo
+            if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+                return true
+            }
+        }
+        return false
+    }
+
+    class DialogBundle(title:String = "", text:String = "", positiveNegativeInterface: DialogPositiveNegativeInterface) {
+        var mTitle=title
+        var mText=text
+        var mPositiveNegativeInterface=positiveNegativeInterface
     }
 
 }

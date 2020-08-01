@@ -13,6 +13,7 @@ import com.github.mikephil.charting.interfaces.datasets.ILineDataSet
 import com.tatoe.mydigicoach.PlottableBundle
 import com.tatoe.mydigicoach.R
 import timber.log.Timber
+import java.util.*
 import java.util.concurrent.TimeUnit
 
 class ChartManager(var context:Context, lineChartView: LineChart, plottableBundle: PlottableBundle) {
@@ -59,7 +60,15 @@ class ChartManager(var context:Context, lineChartView: LineChart, plottableBundl
         var yAxisDouble = sPlottableBundle.sValuesy
 
         for (i in xAxisDates.size - 1 downTo 0) {
-            values.add(Entry(xAxisDates[i].time.toFloat(), yAxisDouble[i].toFloat()))
+            //date/times are set to 12am, so adding 12 hours here so training is at middday approximately
+            //however, date to time doesnt take in account the GMT so little problemo here
+            //however, worst case, you are gmt-12 and it puts you at 12am of the right day, or you are gmt+11 and get 11pm right day
+            Timber.d("X AXIS what im adding: ${TimeUnit.HOURS.toMillis(12)}")
+
+            val modifiedResultTimeToMidday=xAxisDates[i].time.toFloat() + TimeUnit.HOURS.toMillis(12)
+            Timber.d("X AXIS results value millis: ${modifiedResultTimeToMidday}")
+
+            values.add(Entry(modifiedResultTimeToMidday, yAxisDouble[i]))
         }
 
 
@@ -98,8 +107,8 @@ class ChartManager(var context:Context, lineChartView: LineChart, plottableBundl
         var yAxis = sChartView.axisLeft
         yAxis.setPosition(YAxis.YAxisLabelPosition.OUTSIDE_CHART)
         yAxis.textSize = 10f
-        yAxis.granularity = 1f
-        yAxis.isGranularityEnabled = false
+        yAxis.granularity = 0.1f
+        yAxis.isGranularityEnabled = true
     }
 
     private fun configureXAxis() {
@@ -107,17 +116,20 @@ class ChartManager(var context:Context, lineChartView: LineChart, plottableBundl
         xAxis.position = XAxis.XAxisPosition.TOP
         xAxis.textSize = 10f
 //        xAxis.setCenterAxisLabels(true)
-//        xAxis.granularity = TimeUnit.DAYS.toMillis(1).toFloat()
-//        xAxis.isGranularityEnabled=true
-        xAxis.setLabelCount(7, true)
+        xAxis.granularity = TimeUnit.DAYS.toMillis(1).toFloat()
+        xAxis.isGranularityEnabled=true
+//        xAxis.setLabelCount(7, true)
         xAxis.axisMinimum = values[0].x - TimeUnit.MINUTES.toMillis(5)
         xAxis.axisMaximum = values[values.size - 1].x + TimeUnit.MINUTES.toMillis(5)
 
+        Timber.d("X AXIS granularity value: ${TimeUnit.DAYS.toMillis(1).toFloat()}")
+        Timber.d("X AXIS Locale ddefault: ${Locale.getDefault()}")
 
         xAxis.valueFormatter = object : ValueFormatter() {
-            var mFormat = java.text.SimpleDateFormat("dd MMM", java.util.Locale.getDefault())
+            var mFormat = java.text.SimpleDateFormat("dd-MM", java.util.Locale.getDefault())
             override fun getFormattedValue(value: Float): String {
 //                Timber.d("DATE FORMAT from $value to ${mFormat.format(value)}")
+                Timber.d("X AXIS formatter millis: ${value.toLong()}")
                 return mFormat.format(value)
             }
         }

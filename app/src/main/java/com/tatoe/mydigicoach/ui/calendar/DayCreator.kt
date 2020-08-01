@@ -1,8 +1,12 @@
 package com.tatoe.mydigicoach.ui.calendar
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.SearchView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.Observer
@@ -10,46 +14,39 @@ import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.ClickListenerRecyclerView
 import com.tatoe.mydigicoach.ui.util.DataHolder
-import com.tatoe.mydigicoach.ui.util.EditableItemViewHolder
-import com.tatoe.mydigicoach.ui.util.ExerciseListAdapter
 import com.tatoe.mydigicoach.viewmodels.DayViewModel
 import com.tatoe.mydigicoach.viewmodels.MyDayViewModelFactory
 import kotlinx.android.synthetic.main.activity_day_creator.*
-import timber.log.Timber
+import kotlinx.android.synthetic.main.activity_day_creator.search_view
+import kotlinx.android.synthetic.main.item_holder_exercise.view.titleTextExerciseHolder
+import kotlinx.android.synthetic.main.item_holder_exercise_with_check.view.*
 import java.util.*
 import kotlin.collections.ArrayList
 
-class DayCreator : AppCompatActivity() {
+class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     companion object {
         var DAY_ID = "day_id"
     }
 
     private lateinit var recyclerView: RecyclerView
-    private lateinit var adapter: ExerciseListAdapter
+    private lateinit var adapter: MyCustomCheckedExercisesAdapter
     private lateinit var selectExercisesListener: ClickListenerRecyclerView
-    private var selectedIndexes = arrayListOf<Int>()
 
-
-    private lateinit var dataViewModel: DayViewModel
-    private var currentDayBlocks: ArrayList<Block> = arrayListOf()
+    private lateinit var dayViewModel: DayViewModel
     private var currentDayExercises: ArrayList<Exercise> = arrayListOf()
 
     private var allExercises: List<Exercise> = listOf()
-    private var differentOrderExercise: ArrayList<Exercise> = arrayListOf()
-
+    private var checkedExercisesTemp = arrayListOf<ExerciseWithChecked>()
+    private var checkedExercisesPerm = arrayListOf<ExerciseWithChecked>()
     lateinit var activeDay: Day
     lateinit var activeDayId: String
 
     private var weekDaysViewHashMap = hashMapOf<Int, TextView>()
-
-
-    //todo fix errors and create the recyclerview for exercises here in the order bla bla
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -61,15 +58,15 @@ class DayCreator : AppCompatActivity() {
             super.onBackPressed()
         }
 
-        weekDaysViewHashMap[Day.MONDAY]=monday_btn
-        weekDaysViewHashMap[Day.TUESDAY]=tuesday_btn
-        weekDaysViewHashMap[Day.WEDNESDAY]=wednesday_btn
-        weekDaysViewHashMap[Day.THURSDAY]=thursday_btn
-        weekDaysViewHashMap[Day.FRIDAY]=friday_btn
-        weekDaysViewHashMap[Day.SATURDAY]=saturday_btn
-        weekDaysViewHashMap[Day.SUNDAY]=sunday_btn
+        weekDaysViewHashMap[Day.MONDAY] = monday_btn
+        weekDaysViewHashMap[Day.TUESDAY] = tuesday_btn
+        weekDaysViewHashMap[Day.WEDNESDAY] = wednesday_btn
+        weekDaysViewHashMap[Day.THURSDAY] = thursday_btn
+        weekDaysViewHashMap[Day.FRIDAY] = friday_btn
+        weekDaysViewHashMap[Day.SATURDAY] = saturday_btn
+        weekDaysViewHashMap[Day.SUNDAY] = sunday_btn
 
-        dataViewModel = ViewModelProviders.of(this, MyDayViewModelFactory(application))
+        dayViewModel = ViewModelProviders.of(this, MyDayViewModelFactory(application))
             .get(DayViewModel::class.java)
 
         initObservers()
@@ -77,108 +74,88 @@ class DayCreator : AppCompatActivity() {
         recyclerView = day_creator_exercises_recycler_view as RecyclerView
 
         initAdapterListeners()
-        adapter = ExerciseListAdapter(this,ExerciseListAdapter.DEFAULT_LAYOUT,true)
-        adapter.imageLeftVisibility=View.GONE
-        adapter.imageRightVisibility=View.VISIBLE
-        adapter.backgroundColor=this.resources.getColor(R.color.lightGrey)
-
+        adapter = MyCustomCheckedExercisesAdapter(this)
         adapter.setOnClickInterface(selectExercisesListener)
         recyclerView.adapter = adapter
         recyclerView.layoutManager = LinearLayoutManager(this)
 
+        search_view.setOnQueryTextListener(this)
+
         DataHolder.activeDayHolder?.let { it ->
             activeDay = it
-
-//            currentDayBlocks = activeDay.blocks
             currentDayExercises = activeDay.exercises
-            Timber.d("data holder: active day: $activeDay")
         }
         activeDayId = intent.getStringExtra(DAY_ID)
         changeWeekDayHighlight()
 
-        addToDiaryViewContainer.setOnClickListener(updateDayListener)
+        save_day_button.setOnClickListener(updateDayListener)
 
     }
 
     private fun changeWeekDayHighlight() {
-        var calendar = Calendar.getInstance()
-        calendar.time=Day.dayIDToDate(activeDayId)
-        var weekDay = Day.getDayOfWeek0to6(calendar)
+        val calendar = Calendar.getInstance()
+        calendar.time = Day.dayIDToDate(activeDayId)
+        val weekDay = Day.getDayOfWeek0to6(calendar)
 
         for (entry in weekDaysViewHashMap) {
-            if (entry.key==weekDay) {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGreen))
+            if (entry.key == weekDay) {
+                entry.value.setBackgroundColor(resources.getColor(R.color.palette3))
                 entry.value.setTextColor(resources.getColor(R.color.white))
             } else {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey))
-                entry.value.setTextColor(resources.getColor(R.color.darkGrey))
+                entry.value.setBackgroundColor(resources.getColor(R.color.palette8))
+                entry.value.setTextColor(resources.getColor(R.color.palette9))
             }
         }
     }
 
     private fun initObservers() {
-
-
-        dataViewModel.allExercises.observe(this, Observer { exercises ->
+        dayViewModel.allExercises.observe(this, Observer { exercises ->
             exercises?.let {
                 allExercises = it
-                for (exercise in currentDayExercises){
-//                    selectedIndexes.add(allExercises.indexOf(exercise))
-                    differentOrderExercise.add(exercise)
-                    selectedIndexes.add(differentOrderExercise.indexOf(exercise))
-                }
-                for (exercise in allExercises) {
-                    if (!differentOrderExercise.contains(exercise)) {
-                        differentOrderExercise.add(exercise)
-                    }
-                }
-                adapter.setSelectableExercises(differentOrderExercise,selectedIndexes)
-
-//                pagerAdapterTop.mExerciseFragment?.updateExerciseAdapterContent(it)
+                checkedExercisesPerm=getDefaultArrayOfDayTraining()
+                checkedExercisesTemp.addAll(checkedExercisesPerm)
+                adapter.setContent(checkedExercisesTemp)
             }
         })
     }
 
     private fun initAdapterListeners() {
         selectExercisesListener = object : ClickListenerRecyclerView {
-            override fun onClick(view: View, position: Int, holder: EditableItemViewHolder) {
+            override fun onClick(view: View, position: Int, holder: MyCheckedExerciseViewHolder) {
                 super.onClick(view, position, holder)
 
-                if (!holder.isChecked && !selectedIndexes.contains(position)) {
-                    selectedIndexes.add(position)
-                    holder.changeCheckedState(true,this@DayCreator)
-//                    view.imageRightExerciseHolder.setImageDrawable(resources.getDrawable(R.drawable.ic_check_white_24dp))
-//                    holder.isChecked=true
+                if (!holder.isChecked) {
+                    checkedExercisesPerm.remove(checkedExercisesTemp[position])
+                    var exe=checkedExercisesTemp[position]
+                    exe.mIsChecked=true
+                    checkedExercisesPerm.add(0,exe)
+
+                    holder.changeCheckedState(true, this@DayCreator)
                 } else {
-                    selectedIndexes.remove(position)
-                    holder.changeCheckedState(false,this@DayCreator)
-//                    view.imageRightExerciseHolder.setImageDrawable(resources.getDrawable(R.drawable.ic_circle_grey))
-//                    holder.isChecked=false
+                    checkedExercisesTemp[position].mIsChecked=false
+                    checkedExercisesPerm.remove(checkedExercisesTemp[position])
+                    checkedExercisesPerm.add(checkedExercisesTemp[position])
+                    holder.changeCheckedState(false, this@DayCreator)
                 }
 
             }
         }
     }
 
-
     private val updateDayListener = View.OnClickListener {
-
-        //todo change this, find a better way of figuring out if updating or inserting
-
-        currentDayExercises=arrayListOf()
-
-        for (exercisePosition in selectedIndexes) {
-            currentDayExercises.add(differentOrderExercise[exercisePosition])
+        currentDayExercises = arrayListOf()
+        var i = 0
+        while (checkedExercisesPerm[i].mIsChecked){
+            currentDayExercises.add(checkedExercisesPerm[i].mExercise)
+            i++
         }
 
         if (DataHolder.activeDayHolder != null) {
-            //update
-            activeDay.blocks = currentDayBlocks
             activeDay.exercises = currentDayExercises
-            dataViewModel.updateDay(activeDay)
+            dayViewModel.selectedExercises=currentDayExercises
+            dayViewModel.updateDay(activeDay)
         } else {
-            //new day
-            dataViewModel.insertDay(Day(activeDayId, currentDayBlocks, currentDayExercises))
+            dayViewModel.insertDay(Day(activeDayId, currentDayExercises))
         }
         backToViewer()
     }
@@ -191,4 +168,120 @@ class DayCreator : AppCompatActivity() {
         startActivity(intent)
     }
 
+    override fun onQueryTextSubmit(query: String?): Boolean {
+        return false
+    }
+
+    override fun onQueryTextChange(filterText: String?): Boolean {
+        adapter.setContent(getFilteredExes(filterText))
+        return true
+    }
+
+    private fun getFilteredExes(filterText: String?): List<ExerciseWithChecked> {
+        checkedExercisesTemp.clear()
+
+        if (filterText != null && filterText.isNotEmpty()) {
+            val text = filterText.toLowerCase()
+            for (exe in allExercises) {
+                //filter exes that meet search characters
+                if (exe.name.toLowerCase().contains(text)) {
+                    if (currentDayExercises.contains(exe)) {
+                        checkedExercisesTemp.add(0,ExerciseWithChecked(exe, true))
+                    } else {
+                        checkedExercisesTemp.add(ExerciseWithChecked(exe,false))
+                    }
+                }
+            }
+        } else {
+            checkedExercisesTemp=getDefaultArrayOfDayTraining()
+        }
+        return checkedExercisesTemp
+
+    }
+
+    private fun getDefaultArrayOfDayTraining(): ArrayList<ExerciseWithChecked> {
+        val arrayList = arrayListOf<ExerciseWithChecked>()
+
+        for (exercise in allExercises) {
+            if (currentDayExercises.contains(exercise)) {
+                arrayList.add(0,ExerciseWithChecked(exercise, true))
+            } else {
+                arrayList.add(ExerciseWithChecked(exercise,false))
+            }
+        }
+        return arrayList
+    }
+
+    class ExerciseWithChecked (exercise: Exercise, isContained:Boolean = false){
+        var mExercise = exercise
+        var mIsChecked=isContained
+    }
+
+    inner class MyCustomCheckedExercisesAdapter(context: Context) :
+        RecyclerView.Adapter<MyCheckedExerciseViewHolder>() {
+
+        var exercisesWithChecked = listOf<ExerciseWithChecked>()
+
+        private val inflater: LayoutInflater = LayoutInflater.from(context)
+        private var listenerRecyclerView: ClickListenerRecyclerView? = null
+
+        override fun onCreateViewHolder(
+            parent: ViewGroup,
+            viewType: Int
+        ): MyCheckedExerciseViewHolder {
+            val itemView = inflater.inflate(R.layout.item_holder_exercise_with_check, parent, false)
+            return MyCheckedExerciseViewHolder(itemView, listenerRecyclerView)
+        }
+
+        override fun getItemCount(): Int {
+            return exercisesWithChecked.size
+        }
+
+        override fun onBindViewHolder(holder: MyCheckedExerciseViewHolder, position: Int) {
+
+            val current = exercisesWithChecked[position]
+            val textString = current.mExercise.name
+            if (current.mIsChecked){
+                holder.changeCheckedState(true,this@DayCreator)
+            } else {
+                holder.changeCheckedState(false,this@DayCreator)
+            }
+            holder.exerciseTextView.text = textString
+
+        }
+
+        fun setContent(mExercisesWithChecked: List<ExerciseWithChecked>) {
+            exercisesWithChecked = mExercisesWithChecked
+            notifyDataSetChanged()
+        }
+
+        fun setOnClickInterface (listener: ClickListenerRecyclerView) {
+            this.listenerRecyclerView=listener
+        }
+
+    }
+
+    class MyCheckedExerciseViewHolder(var v: View, var onClickInterface:ClickListenerRecyclerView?) : RecyclerView.ViewHolder(v), View.OnClickListener {
+        var exerciseTextView = v.titleTextExerciseHolder
+        var rightCheckButton = v.check_button
+        var isChecked = false
+
+        init {
+                rightCheckButton.setOnClickListener(this)
+        }
+
+        override fun onClick(v: View) {
+                onClickInterface?.onClick(v, adapterPosition, this)
+        }
+
+        fun changeCheckedState(shouldCheck: Boolean, context: Context){
+            isChecked = if (shouldCheck) {
+               rightCheckButton.setImageDrawable(context.resources.getDrawable(R.drawable.ic_checkmark))
+                true
+            } else {
+                rightCheckButton.setImageDrawable(context.resources.getDrawable(R.drawable.circle_stroke_background))
+                false
+            }
+        }
+    }
 }

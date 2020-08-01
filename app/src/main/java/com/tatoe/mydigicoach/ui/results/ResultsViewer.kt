@@ -28,8 +28,6 @@ class ResultsViewer : AppCompatActivity() {
     private var plottableBundles = arrayListOf<PlottableBundle>()
     private lateinit var sSpinner: Spinner
 
-    var exerciseId = -1
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_results_viewer)
@@ -54,9 +52,12 @@ class ResultsViewer : AppCompatActivity() {
             ifEmptyResultsText.visibility = View.VISIBLE
             ResultsRecyclerView.visibility = View.GONE
             sSpinner.visibility = View.GONE
+            sChart.visibility = View.GONE
         } else {
             ifEmptyResultsText.visibility = View.GONE
             ResultsRecyclerView.visibility = View.VISIBLE
+            sSpinner.visibility = View.VISIBLE
+            sChart.visibility = View.VISIBLE
             loadData()
         }
     }
@@ -74,8 +75,9 @@ class ResultsViewer : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
+        activeExercise = DataHolder.activeExerciseHolder
+        sResults = activeExercise!!.exerciseResults.getArrayListOfResults()
         loadLayout()
-        Timber.d("RESTART GOOOOO")
     }
 
     private fun getPlottableBundleFromName(pBundleName: String): PlottableBundle? {
@@ -85,6 +87,10 @@ class ResultsViewer : AppCompatActivity() {
         }
         return null
     }
+
+    /**
+     Configuring spinner also configures the data
+     */
 
     private fun configureSpinner() {
         var arrayList = activeExercise!!.exerciseResults.getPlottableNames()
@@ -98,7 +104,7 @@ class ResultsViewer : AppCompatActivity() {
 
 
     private fun displayPlottableParameter(plottableBundle: PlottableBundle?) {
-        if (plottableBundle != null) {
+        if (plottableBundle != null && plottableBundle.sValuesX.isNotEmpty()) {
             if (chartManager != null) {
                 chartManager!!.setLineDataSet(plottableBundle)
             } else {
@@ -117,40 +123,11 @@ class ResultsViewer : AppCompatActivity() {
 
         override fun onItemSelected(parent: AdapterView<*>?, view: View?, position: Int, id: Long) {
             Timber.d("SPINNER - ITEM SELECTED: ${sSpinner.selectedItem}")
-            displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
+//            if (sResults.isNotEmpty()){
+                displayPlottableParameter(getPlottableBundleFromName(sSpinner.selectedItem.toString()))
+
+//            }
         }
 
     }
-
-//    private fun initObserver() {
-//        dataViewModel.allExercises.observe(this, Observer { exercises ->
-//            exercises?.let {
-//                allExercises = it
-//                for (exercise in allExercises) {
-//                    if (exercise.exerciseId == exerciseId) {
-//                        activeExercise = exercise
-//                        if (activeExercise!!.exerciseResults.resultsArrayList.isEmpty()) {
-//                            ifEmptyResultsText.visibility = View.VISIBLE
-//                            ResultsRecyclerView.visibility=View.GONE
-//
-//                        } else {
-//                            ifEmptyResultsText.visibility = View.GONE
-//                            ResultsRecyclerView.visibility=View.VISIBLE
-//                        }
-//                        adapter.setContent(activeExercise!!)
-//                        Timber.d("active exercise = $activeExercise")
-////                        Timber.d("active exercise results 1 ${activeExercise!!.results[0].sResult.toString()}")
-////                        Timber.d("active exercise results 2 ${activeExercise!!.results[1].sResult.toString()}")
-//
-//
-//
-//                        return@let
-//                    }
-//                }
-//
-//            }
-//        })
-//    }
-
-
 }

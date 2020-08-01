@@ -26,7 +26,7 @@ class DayFragment : Fragment() {
         const val BUNDLE_DATE_KEY = "date_object"
 
         fun newInstance(day: Day?, date: String): DayFragment {
-            var dayFragment = DayFragment()
+            val dayFragment = DayFragment()
 
             dayFragment.arguments = Bundle().apply {
                 putString(BUNDLE_DAY_KEY, Gson().toJson(day))
@@ -59,15 +59,12 @@ class DayFragment : Fragment() {
 
         val recyclerViewExercises = fragmentView.dayExercisesRecyclerView as RecyclerView
 
-        if (day == null || (day!!.blocks.isEmpty() && day!!.exercises.isEmpty())) {
+        if (day == null || ( day!!.exercises.isEmpty())) {
             fragmentView.ifEmptyDaytext.visibility = View.VISIBLE
             recyclerViewExercises.visibility = View.GONE
         } else {
             fragmentView.ifEmptyDaytext.visibility = View.GONE
             recyclerViewExercises.visibility = View.VISIBLE
-//            val dayContentAdapterBlocks =
-//                DayContentAdapter(context!!, date, CustomAdapterFragment.BLOCK_TYPE_ADAPTER)
-//            dayContentAdapterBlocks.setContent(day)
 
             val dayContentAdapterExercises =
                 DayExercisesListAdapter(context!!, date, CustomAdapterFragment.EXERCISE_TYPE_ADAPTER)
@@ -78,5 +75,4 @@ class DayFragment : Fragment() {
 
         return fragmentView
     }
-
 }

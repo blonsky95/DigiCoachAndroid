@@ -9,7 +9,7 @@
                 android:id="@+id/unit_value_et"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:background="@color/pinkTransparent"
+                android:background="@color/palette3_70"
                 android:gravity="start|center_vertical"
                 android:hint="0"
                 android:inputType="numberDecimal"

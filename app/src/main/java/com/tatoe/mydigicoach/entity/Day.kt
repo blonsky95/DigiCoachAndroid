@@ -20,13 +20,33 @@ import kotlin.math.roundToInt
 @Entity(tableName = "day_table")
 data class Day(
     @PrimaryKey @ColumnInfo @field: SerializedName("id") var dayId: String, //DDMMYYYY
-    @ColumnInfo(name = "blocks") @field:SerializedName("blocks") var blocks: ArrayList<Block>,
     @ColumnInfo(name = "exercises") @field:SerializedName("exercises") var exercises: ArrayList<Exercise>
 ) {
 
     //todo move this big chunky companion object to a utils file
 
+    fun hasExercises():Boolean{
+        return exercises.isNotEmpty()
+    }
+
+    fun allExercisesHaveResult(): Boolean {
+        if (exercises.isEmpty()) {
+            return false
+        }
+        for (exercise in exercises) {
+            if (!exercise.exerciseResults.containsResult(dayId)) {
+                return false
+            }
+        }
+        return true
+    }
+
     companion object {
+
+        fun toReadableFormat(date:Date) :String {
+            val readableFormat = SimpleDateFormat("EEEE MMMM dd", Locale.getDefault())
+            return readableFormat.format(date)
+        }
         fun intDatetoDayId(day: Int, month: Int, year: Int): String {
             val format = DecimalFormat("00")
             return "${format.format(day)}${format.format(month)}$year"
@@ -54,13 +74,27 @@ data class Day(
             return Calendar.getInstance().time
         }
 
-        fun dayToCalendarDay(day:Day):CalendarDay{
+//        fun calendarDayToDay(calD: CalendarDay): Day {
+//            var date = dayIDToDate(day.dayId)
+//            var calendar = Calendar.getInstance()
+//            calendar.time = date
+//            return CalendarDay.from(
+//                calendar.get(Calendar.YEAR),
+//                calendar.get(Calendar.MONTH) + 1,
+//                calendar.get(Calendar.DAY_OF_MONTH)
+//            )
+//        }
+
+        fun dayToCalendarDay(day: Day): CalendarDay {
             var date = dayIDToDate(day.dayId)
             var calendar = Calendar.getInstance()
-            calendar.time=date
-            return CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH)+1,calendar.get(Calendar.DAY_OF_MONTH))
+            calendar.time = date
+            return CalendarDay.from(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH)
+            )
         }
-
 
 
         fun getDayDifference(date1: Date, date2: Date): Int {
@@ -73,7 +107,7 @@ data class Day(
             return newCalendar!!.get(Calendar.YEAR) % 4 == 0
         }
 
-//        const val MAX_DAYS = 7
+        //        const val MAX_DAYS = 7
         const val DEFAULT_POS = 1
 
         fun dayIdToPosition(dayId: String): Int {
@@ -112,25 +146,26 @@ data class Day(
                 }
             }
             //day of week varies 1-7 but pager positions are 0-6 so subtract 1:
-            return mDayOfWeek -1
+            return mDayOfWeek - 1
         }
 
 
         var dayIdFormat = SimpleDateFormat("ddMMyyyy", Locale.getDefault())
         var dashSeparatedDateFormat = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         var presentableDateFormat = SimpleDateFormat("EEE dd MMM", Locale.getDefault())
+        var hoursMinutesDateFormat = SimpleDateFormat("dd-MM-yyyy HH:mm", Locale.getDefault())
         var dayOfWeekDateFormat = SimpleDateFormat("EEE", Locale.getDefault())
         var numberAndMonthDateFormat = SimpleDateFormat("dd MMM", Locale.getDefault())
         var dayFragmentFormat = SimpleDateFormat("dd MMMM yyyy", Locale.getDefault())
 
         const val MS_IN_DAY: Long = 86400000
-        const val MONDAY=0
-        const val TUESDAY=1
-        const val WEDNESDAY=2
-        const val THURSDAY=3
-        const val FRIDAY=4
-        const val SATURDAY=5
-        const val SUNDAY=6
+        const val MONDAY = 0
+        const val TUESDAY = 1
+        const val WEDNESDAY = 2
+        const val THURSDAY = 3
+        const val FRIDAY = 4
+        const val SATURDAY = 5
+        const val SUNDAY = 6
 
 
     }

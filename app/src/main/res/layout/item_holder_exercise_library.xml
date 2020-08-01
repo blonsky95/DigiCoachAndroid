@@ -7,7 +7,7 @@
         android:orientation="vertical">
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <LinearLayout
             android:id="@+id/linearLayoutExerciseHolder"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -17,10 +17,10 @@
                 android:id="@+id/checkboxLeftExerciseHolder"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:minWidth="0dp"
-                android:minHeight="0dp"
                 android:layout_gravity="center"
-                android:buttonTint="@color/squareOrange" />
+                android:buttonTint="@color/palette6"
+                android:minWidth="0dp"
+                android:minHeight="0dp" />
 
         <TextView
                 android:id="@+id/titleTextExerciseHolder"

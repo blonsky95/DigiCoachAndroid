@@ -60,7 +60,7 @@ class ExerciseResults {
         }
 
         fun stringToDate(sString: String): Date {
-            val format = SimpleDateFormat("dd-MM-yy")
+            val format = SimpleDateFormat("dd-MM-yy", Locale.getDefault())
             return format.parse(sString) as Date
         }
 
@@ -112,7 +112,14 @@ class ExerciseResults {
         }
 
         fun toNumericFormat(fieldEntryValue: String, fieldEntryKey: String): ArrayList<Float> {
-            var float = arrayListOf<Float>()
+            val float = arrayListOf<Float>()
+            if (fieldEntryValue.isEmpty()) {
+                //return array of 0s to fill in the maximum of 3 empty edit texts
+                while (float.size<3) {
+                    float.add(0.toFloat())
+                }
+                return float
+            }
             when (fieldEntryKey) {
                 TIME_1 -> {
                     float.add(fieldEntryValue.toFloat())
@@ -176,6 +183,19 @@ class ExerciseResults {
                 }
             }
             return -1
+        }
+
+        fun getPositionFromKey(position:Int, context: Context): String {
+            var typesArray = context.resources.getStringArray(R.array.units_array)
+            return typesArray[position]
+        }
+
+        //use when you want to add a one click result, so without going to results creator, it simply generates the map with a date field (parameter) and a note saying "completed"
+        fun getQuickResultMap(dayId: String): java.util.HashMap<Int, java.util.HashMap<String, String>> {
+            return  hashMapOf(
+                0 to hashMapOf("Date" to Day.dayIDtoDashSeparator(dayId)),
+                1 to hashMapOf("Note" to "Completed!")
+            )
         }
     }
 
@@ -253,7 +273,7 @@ class ExerciseResults {
 
         if (resultType == TIME_2) {
             var x = toNumericFormat(string, TIME_2)
-            return (x[0]*60 + x[1]).toFloat()
+            return (x[0]*60 + x[1])
         }
         if (resultType == WEIGHT_2) {
             return toNumericFormat(string, WEIGHT_2)[2]
@@ -271,6 +291,8 @@ class ExerciseResults {
         while (i < intResultsArrayList.size) {
             try {
                 val newDate = stringToDate(newResultMap[0]!![DATE_KEY]!!)
+                Timber.d("X AXIS results new date: ${newDate}")
+
                 val oldDate =
                     stringToDate(intResultsArrayList[i][0]!![DATE_KEY]!!) //getting the value (second) of DATE field (0) of the result you are iterating through (i)
                 if (newDate.after(oldDate)) {

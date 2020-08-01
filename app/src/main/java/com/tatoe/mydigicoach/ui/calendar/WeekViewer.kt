@@ -11,8 +11,8 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.lifecycle.ViewModelProviders
 import androidx.viewpager.widget.ViewPager
 import com.tatoe.mydigicoach.R
-import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
+import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.DayViewModel
 import com.tatoe.mydigicoach.viewmodels.MyDayViewModelFactory
@@ -25,7 +25,7 @@ class WeekViewer : AppCompatActivity() {
 
     private lateinit var mPager: ViewPager
     private lateinit var pagerAdapter: ScreenSlidePagerAdapter
-    private lateinit var dataViewModel: DayViewModel
+    private lateinit var dayViewModel: DayViewModel
     private var weekDaysViewHashMap = hashMapOf<Int,TextView>()
 
     private var activeDay: Day? = null
@@ -64,42 +64,27 @@ class WeekViewer : AppCompatActivity() {
 
         mPager = findViewById(R.id.pager)
 
-        dataViewModel = ViewModelProviders.of(this, MyDayViewModelFactory(application))
+        dayViewModel = ViewModelProviders.of(this, MyDayViewModelFactory(application))
             .get(DayViewModel::class.java)
 
         addTrainingViewContainer.setOnClickListener(updateDayTrainingListener)
 
         initObservers()
 
-        dataViewModel.changeActiveDay(intent.getStringExtra(MonthViewer.DAY_ID_KEY))
+        dayViewModel.changeActiveDay(intent.getStringExtra(MonthViewer.DAY_ID_KEY))
 
     }
 
     private fun initObservers() {
-        dataViewModel.activeDayIdStr.observe(this, androidx.lifecycle.Observer { dayId ->
+        dayViewModel.activeDayIdStr.observe(this, androidx.lifecycle.Observer { dayId ->
             activeDayId = dayId
             var nonCurrentCalendar = getDayIDCalendar(dayId)
             activePosition = changeDayPositionInPager(nonCurrentCalendar)
             changeSelectedDay(activePosition)
             mPager.currentItem = activePosition
-
-            Timber.d("OBSERVER NEW DAYID: $dayId and pager position ${changeDayPositionInPager((nonCurrentCalendar))}")
-
         })
 
-//        dataViewModel.activePosition.observe(this, androidx.lifecycle.Observer { position ->
-////            activeDayId = dayId
-//            var nonCurrentCalendar = getDayIDCalendar(activeDayId)
-//            changeSelectedDay(position)
-//            activeDayId=Day.calendarAndPositionToDayId(nonCurrentCalendar,position)
-//
-////            mPager.currentItem = position0To6
-//
-////            Timber.d("OBSERVER NEW DAYID: $dayId and pager position ${changeDayPositionInPager((nonCurrentCalendar))}")
-//
-//        })
-
-        dataViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
+        dayViewModel.allDays.observe(this, androidx.lifecycle.Observer { days ->
             days?.let {
                 allDays = days
             }
@@ -109,13 +94,15 @@ class WeekViewer : AppCompatActivity() {
             mPager.adapter = pagerAdapter
             if (DataHolder.pagerPosition >= 0) {
                 mPager.setCurrentItem(DataHolder.pagerPosition, false)
-//                mPager.currentItem = DataHolder.pagerPosition
                 DataHolder.pagerPosition = -1
             } else {
-//                mPager.currentItem = dayOfWeek
                 mPager.setCurrentItem(Day.getDayOfWeek0to6(getDayIDCalendar(activeDayId)), false)
             }
         })
+    }
+
+    fun updateBlankResult(exercise: Exercise){
+        dayViewModel.updateExercise(exercise)
     }
 
     private fun getDayIDCalendar(dayId: String?): Calendar {
@@ -130,18 +117,14 @@ class WeekViewer : AppCompatActivity() {
         return Day.getDayOfWeek0to6(nonCurrentCalendar)
     }
 
-    private fun changeSelectedDay(position0To6: Int) {
+    private fun changeSelectedDay(activeDayOfWeek: Int) {
         for (entry in weekDaysViewHashMap) {
-            if (entry.key==position0To6) {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGreen))
+            if (entry.key==activeDayOfWeek) {
+                entry.value.setBackgroundColor(resources.getColor(R.color.palette3))
                 entry.value.setTextColor(resources.getColor(R.color.white))
-
-                Timber.d("CHANGED ${entry.key} to selected")
             } else {
-                entry.value.setBackgroundColor(resources.getColor(R.color.lightGrey))
-                entry.value.setTextColor(resources.getColor(R.color.darkGrey))
-
-                Timber.d("CHANGED ${entry.key} to non selected")
+                entry.value.setBackgroundColor(resources.getColor(R.color.palette8))
+                entry.value.setTextColor(resources.getColor(R.color.palette9))
             }
         }
     }
@@ -153,8 +136,7 @@ class WeekViewer : AppCompatActivity() {
 
     private val updateDayTrainingListener = View.OnClickListener {
 
-//        changeSelectedDay(activePosition)
-        var nonCurrentCalendar = getDayIDCalendar(activeDayId)
+        val nonCurrentCalendar = getDayIDCalendar(activeDayId)
         activeDayId=Day.calendarAndPositionToDayId(nonCurrentCalendar,activePosition)
 
         activeDay = getDayByDayId(activeDayId)
@@ -170,13 +152,13 @@ class WeekViewer : AppCompatActivity() {
         View.OnClickListener {
 
         override fun onClick(v: View?) {
-            var activeDayIdCalendar = Calendar.getInstance()
+            val activeDayIdCalendar = Calendar.getInstance()
             activeDayIdCalendar.time=Day.dayIDToDate(activeDayId!!)
-            var activeDayIdDayWeek=Day.getDayOfWeek0to6(activeDayIdCalendar)
+            val activeDayIdDayWeek=Day.getDayOfWeek0to6(activeDayIdCalendar)
 
             activeDayIdCalendar.timeInMillis+=((dayOfWeekInt-activeDayIdDayWeek)*Day.MS_IN_DAY)
 
-            dataViewModel.changeActiveDay(Day.dateToDayID(activeDayIdCalendar.time))
+            dayViewModel.changeActiveDay(Day.dateToDayID(activeDayIdCalendar.time))
         }
     }
 
@@ -191,7 +173,6 @@ class WeekViewer : AppCompatActivity() {
             super.setPrimaryItem(container, position, `object`)
             if (alreadyInitialised!=position) {  //this function is called 2 or 3 times per swipe so avoid reupdating the dayid variable unnecesarily and creating conflicts
                 //this should be done with live data, but setprimary item is quite slow and has an initial trigger at position 0
-//                activeDayId=positionToDayId(position)
                 if (position!=activePosition){
                     activePosition=position
                     changeSelectedDay(activePosition)
@@ -206,7 +187,6 @@ class WeekViewer : AppCompatActivity() {
 
         override fun getItem(position: Int): Fragment {
             //this is also called to load the adjacent fragments - so shouldnt be used to know which fragment dayId is currently active
-//            var loadingDayId = toDayIdFormat(dayOfWeek - position)
             var loadingDayId = positionToDayId(position)
             var loadDay = getDayByDayId(loadingDayId)
             Timber.d("ptg generating day $loadingDayId position: $position")
@@ -237,23 +217,4 @@ class WeekViewer : AppCompatActivity() {
         return null
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.day_viewer_menu, menu)
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.action_info -> {
-            Utils.getInfoDialogView(
-                this,
-                "Duplicate exercises",
-                "There can only be one result per exercise per date"
-            )
-            true
-        }
-        else -> {
-            super.onOptionsItemSelected(item)
-        }
-    }
 }

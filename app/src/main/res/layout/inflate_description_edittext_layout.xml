@@ -30,6 +30,6 @@
             android:paddingStart="14dp"
             android:paddingEnd="14dp"
             android:background="@color/pinkTransparent"
-            android:inputType="textPersonName" />
+            android:inputType="textMultiLine|textCapSentences" />
 
 </LinearLayout>

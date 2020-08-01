@@ -19,13 +19,14 @@ class ExerciseListAdapter(var context: Context, var layout:Int=0, var rightImage
     private var selectedIndexes = arrayListOf<Int>()
     private var listenerRecyclerView: ClickListenerRecyclerView? = null
 
-    var backgroundColor = context.resources.getColor(R.color.white)
+    var backgroundColor = context.resources.getColor(R.color.palette7)
     var imageLeftVisibility = View.VISIBLE
     var imageRightVisibility = View.GONE
     var textColor = context.resources.getColor(R.color.textBlue)
 
     companion object{
         var DEFAULT_LAYOUT=0
+        var SELECTOR_LAYOUT = 1
     }
 
 

@@ -8,7 +8,6 @@ import android.view.*
 import androidx.annotation.DimenRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
-import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.viewpager2.widget.ViewPager2
 import com.google.firebase.auth.FirebaseAuth
@@ -17,15 +16,13 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.*
 import com.tatoe.mydigicoach.entity.Day
 //import com.google.firebase.iid.FirebaseInstanceId
-import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
 import com.tatoe.mydigicoach.ui.calendar.DayCreator
 import com.tatoe.mydigicoach.ui.calendar.MonthViewer
 import com.tatoe.mydigicoach.ui.calendar.WeekViewer
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewer
-import com.tatoe.mydigicoach.ui.util.DayExercisesListAdapter
-import com.tatoe.mydigicoach.viewmodels.LoginSignUpViewModel
-import com.tatoe.mydigicoach.viewmodels.MyLoginSignUpViewModelFactory
-import kotlinx.android.synthetic.main.activity_home_2.*
+import com.tatoe.mydigicoach.viewmodels.HomeViewModel
+import com.tatoe.mydigicoach.viewmodels.MyHomeViewModelFactory
+import kotlinx.android.synthetic.main.activity_home.*
 import kotlinx.android.synthetic.main.item_holder_home_slider.view.*
 import timber.log.Timber
 
@@ -34,30 +31,28 @@ class HomeScreen : AppCompatActivity() {
     private var firebaseUser: FirebaseUser? = null
     private var db = FirebaseFirestore.getInstance()
 
-    private lateinit var loginSignUpViewModel: LoginSignUpViewModel
+    private lateinit var homeViewModel: HomeViewModel
     private var dayToday: Day? = null
-    private lateinit var recyclerViewExercises: RecyclerView
-
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home_2)
+        setContentView(R.layout.activity_home)
 
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
 
-        loginSignUpViewModel = ViewModelProviders.of(
+        homeViewModel = ViewModelProviders.of(
             this,
-            MyLoginSignUpViewModelFactory(application, db)
+            MyHomeViewModelFactory(db, application)
         ).get(
-            LoginSignUpViewModel::class.java
+            HomeViewModel::class.java
         )
 
         firebaseUser = FirebaseAuth.getInstance().currentUser
 
         if (firebaseUser != null) {
-            loginSignUpViewModel.saveUserToDataholder()
+            homeViewModel.saveUserToDataholder()
 
         }
 
@@ -90,9 +85,7 @@ class HomeScreen : AppCompatActivity() {
 //        recyclerViewExercises = dayExercisesRecyclerView as RecyclerView
 
         initObservers()
-
     }
-
 
     class CustomPagerAdapter(homeScreen: HomeScreen) :
         RecyclerView.Adapter<CustomPagerAdapter.MyViewHolder>() {
@@ -111,7 +104,7 @@ class HomeScreen : AppCompatActivity() {
 
         override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-            var classVar: Class<*> = ExerciseViewer::class.java
+            var classVar: Class<*>? = null
             when (position) {
                 0 -> {
                     holder.name.text = "Exercises"
@@ -125,10 +118,16 @@ class HomeScreen : AppCompatActivity() {
                     holder.name.text = "Store"
                     classVar = Library::class.java
                 }
-                3 -> holder.name.text = "Profile"
+                3 -> {
+                    holder.name.text = "Profile"
+                    classVar = Profile::class.java
+
+                }
             }
             holder.container.setOnClickListener {
-                context.startActivity(Intent(context, classVar))
+                if (classVar!=null){
+                    context.startActivity(Intent(context, classVar))
+                }
             }
         }
 
@@ -156,7 +155,7 @@ class HomeScreen : AppCompatActivity() {
     }
 
     private fun initObservers() {
-        loginSignUpViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
+        homeViewModel.dayToday.observe(this, androidx.lifecycle.Observer { day ->
             dayToday = day
             var isDayEmpty =
                 dayToday == null || dayToday?.exercises!!.isEmpty()
@@ -173,16 +172,8 @@ class HomeScreen : AppCompatActivity() {
                 intent.putExtra(DayCreator.DAY_ID, Day.dateToDayID(Day.getTodayDate()))
                 startActivity(intent)
             }
-//            ifEmptyTodaytext.visibility = View.VISIBLE
-//            recyclerViewExercises.visibility = View.GONE
-//            ifEmptyTodaytext.setOnClickListener {
-//                val intent = Intent(this, DayCreator::class.java)
-//                intent.putExtra(DayCreator.DAY_ID, Day.dateToDayID(Day.getTodayDate()))
-//                startActivity(intent)
-//            }
         } else {
-//            ifEmptyTodaytext.visibility = View.GONE
-//            recyclerViewExercises.visibility = View.VISIBLE
+
             var todayText = ""
             val itemMax = 3
             var i = 0
@@ -201,42 +192,34 @@ class HomeScreen : AppCompatActivity() {
                 intent.putExtra(MonthViewer.DAY_ID_KEY, Day.dateToDayID(Day.getTodayDate()))
                 startActivity(intent)
             }
-//            val dayContentAdapterExercises =
-//                DayExercisesListAdapter(
-//                    this,
-//                    dayToday!!.dayId,
-//                    CustomAdapterFragment.EXERCISE_TYPE_ADAPTER
-//                )
-//            recyclerViewExercises.adapter = dayContentAdapterExercises
-//            recyclerViewExercises.layoutManager = LinearLayoutManager(this)
-//            dayContentAdapterExercises.setContent(dayToday)
         }
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        menuInflater.inflate(R.menu.home_toolbar_menu, menu)
-        return super.onCreateOptionsMenu(menu)
-    }
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.home_toolbar_menu, menu)
+//        return super.onCreateOptionsMenu(menu)
+//    }
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-
-        R.id.action_logout -> {
-            FirebaseAuth.getInstance().signOut()
-            val intent = Intent(this, UserAccess::class.java)
-            startActivity(intent)
-            finish()
-            true
-        }
-
-        R.id.upload_store_exercises -> {
-            //uncomment this to be able to add stub exercises to store
-//        loginSignUpViewModel.addBunchOfStubStoreExercises()
-            true
-        }
-
-        else -> {
-            super.onOptionsItemSelected(item)
-        }
-    }
+//    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+//
+//        R.id.action_logout -> {
+////            homeViewModel.closeDbInstance()
+////            FirebaseAuth.getInstance().signOut()
+////            val intent = Intent(this, UserAccess::class.java)
+////            startActivity(intent)
+////            finish()
+//            true
+//        }
+//
+//        R.id.upload_store_exercises -> {
+//            //uncomment this to be able to add stub exercises to store
+////        loginSignUpViewModel.addBunchOfStubStoreExercises()
+//            true
+//        }
+//
+//        else -> {
+//            super.onOptionsItemSelected(item)
+//        }
+//    }
 
 }
