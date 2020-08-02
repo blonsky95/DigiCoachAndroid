@@ -33,8 +33,6 @@ class ExerciseResults {
     companion object {
 
         const val NOTE_KEY = "Note"
-        const val PLOTTABLE_KEY = "Plottable value"
-        const val PLOTTABLE_VALUE = "plottable"
         const val DATE_KEY = "Date"
 
         const val TIME_1 = "Time (s)"
@@ -50,7 +48,6 @@ class ExerciseResults {
 
             genericResultFields[0] = hashMapOf(DATE_KEY to "04-03-1995")
             genericResultFields[1] = hashMapOf(NOTE_KEY to "String")
-//            genericResultFields[2] = hashMapOf(PLOTTABLE_KEY to PLOTTABLE_VALUE)
 
             return genericResultFields
         }
@@ -216,7 +213,7 @@ class ExerciseResults {
     }
 
     fun setArrayListOfResults(arrayList: ArrayList<HashMap<Int, HashMap<String, String>>>) {
-        var stringArrayList = ArrayList<HashMap<String, HashMap<String, String>>>()
+        val stringArrayList = ArrayList<HashMap<String, HashMap<String, String>>>()
         arrayList.forEach {
             stringArrayList.add(Exercise.intMapToStringMap(it))
         }

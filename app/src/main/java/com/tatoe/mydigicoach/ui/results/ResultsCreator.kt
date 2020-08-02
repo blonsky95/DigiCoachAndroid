@@ -1,9 +1,14 @@
 package com.tatoe.mydigicoach.ui.results
 
+//import kotlinx.android.synthetic.main.activity_results_creator.left_button
+//import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
-import android.view.*
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
@@ -19,11 +24,14 @@ import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_VIEW
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import com.tatoe.mydigicoach.viewmodels.MyResultsViewModelFactory
 import com.tatoe.mydigicoach.viewmodels.ResultsViewModel
-import kotlinx.android.synthetic.main.activity_exercise_creator.*
+import kotlinx.android.synthetic.main.activity_exercise_creator.addFieldBtn
 import kotlinx.android.synthetic.main.activity_exercise_creator.backBtn
+import kotlinx.android.synthetic.main.activity_exercise_creator.centre_button
+import kotlinx.android.synthetic.main.activity_exercise_creator.exercise_properties
+import kotlinx.android.synthetic.main.activity_exercise_creator.left_button
+import kotlinx.android.synthetic.main.activity_exercise_creator.right_button
 import kotlinx.android.synthetic.main.activity_exercise_creator.toolbar_title
-//import kotlinx.android.synthetic.main.activity_results_creator.left_button
-//import kotlinx.android.synthetic.main.activity_results_creator.right_button
+import kotlinx.android.synthetic.main.activity_result_creator.*
 import kotlinx.android.synthetic.main.inflate_extrafield_edittext_layout.view.*
 import kotlinx.android.synthetic.main.inflate_extrafield_textview_layout.view.*
 import kotlinx.android.synthetic.main.inflate_spinner_units_selector.view.*
@@ -31,11 +39,18 @@ import kotlinx.android.synthetic.main.inflate_units_field_mins_secs.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_one_rm.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_secs.view.*
 import timber.log.Timber
-import java.util.ArrayList
+import java.util.*
+import kotlin.collections.HashMap
+import kotlin.collections.arrayListOf
+import kotlin.collections.hashMapOf
+import kotlin.collections.isNotEmpty
+import kotlin.collections.set
 
 class ResultsCreator : AppCompatActivity() {
 
     private val MAX_NUMBER_ENTRIES = 5
+    private val MEDIA_PICKED=1
+
     private lateinit var rightButton: TextView
     private lateinit var leftButton: TextView
 
@@ -141,7 +156,32 @@ class ResultsCreator : AppCompatActivity() {
             addLayout(null, null, LAYOUT_TYPE_NEW_FIELD_EDIT)
             updateAddFieldBtnVisibility()
         }
+
+        addMediaBtn.setOnClickListener {
+            //open intent to select media
+            val intent =  Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
+            intent.type = "image/* video/*"
+            startActivityForResult(intent,MEDIA_PICKED)
+//            val intent = Intent(Intent.ACTION_VIEW)
+//            intent.setDataAndType(Uri.parse(newVideoPath), "video/mp4")
+//            startActivity(intent)
+        }
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if (resultCode == RESULT_OK) {
+           var selectedMediaUri = data!!.data
+            Timber.d("selected media URI: $selectedMediaUri")
+//            if (selectedMediaUri!!.toString().contains("image")) {
+//                //handle image
+//            } else if (selectedMediaUri.toString().contains("video")) {
+//                //handle video
+//            }
+        }
+        super.onActivityResult(requestCode, resultCode, data)
+
+    }
+
 
     private fun updateAddFieldBtnVisibility() {
         if (linearLayout.childCount >= MAX_NUMBER_ENTRIES) {
@@ -576,6 +616,7 @@ class ResultsCreator : AppCompatActivity() {
     private fun updateButtonUI(actionType: String) {
         if (actionType == OBJECT_NEW) {
             addFieldBtn.visibility = View.VISIBLE
+            addMediaBtn.visibility = View.VISIBLE
             rightButton.visibility = View.VISIBLE
             rightButton.text = "Add"
             rightButton.setOnClickListener(addButtonListener)
@@ -598,6 +639,7 @@ class ResultsCreator : AppCompatActivity() {
             }
             if (actionType == OBJECT_VIEW) {
                 addFieldBtn.visibility = View.GONE
+                addMediaBtn.visibility=View.GONE
                 rightButton.visibility = View.INVISIBLE
                 leftButton.visibility = View.INVISIBLE
             }
