@@ -74,7 +74,7 @@ class UserAccess : AppCompatActivity() {
         if (hasAccess) {
             if (hasPermissions) {
 //                val intent = Intent(this, HomeScreen::class.java)
-                val intent = Intent(this, HomeActivity::class.java)
+                val intent = Intent(this, MainActivity::class.java)
 
                 startActivity(intent)
                 finish()

@@ -71,7 +71,7 @@ class WeekViewer : AppCompatActivity() {
 
         initObservers()
 
-        dayViewModel.changeActiveDay(intent.getStringExtra(MonthViewer.DAY_ID_KEY))
+        dayViewModel.changeActiveDay(intent.getStringExtra(MonthViewerFragment.DAY_ID_KEY))
 
     }
 

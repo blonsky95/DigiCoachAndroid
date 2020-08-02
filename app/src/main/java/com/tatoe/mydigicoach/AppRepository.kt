@@ -17,7 +17,6 @@ class AppRepository(
     private val dayDao: DayDao
 ) {
     lateinit var allExercises: List<Exercise>
-    lateinit var allDays: List<Day>
 
     val allFriends:LiveData<List<Friend>> = friendDao.getAllLiveData()
 

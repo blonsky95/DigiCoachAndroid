@@ -4,8 +4,6 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import com.tatoe.mydigicoach.ExerciseResults
-import com.tatoe.mydigicoach.ResultSet
-import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Exercise
 
 class DataConverter {
@@ -40,13 +38,4 @@ class DataConverter {
         return Gson().toJson(hashMap)
     }
 
-    @TypeConverter
-    fun stringToBlockList(data: String?): ArrayList<Block> {
-        return Gson().fromJson(data, object : TypeToken<ArrayList<Block>>() {}.type)
-    }
-
-    @TypeConverter
-    fun blockListToString(blockList: ArrayList<Block>): String? {
-        return Gson().toJson(blockList)
-    }
 }

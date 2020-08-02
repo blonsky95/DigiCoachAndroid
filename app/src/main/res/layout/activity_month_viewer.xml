@@ -7,7 +7,6 @@
         android:orientation="vertical">
 
     <View
-            android:id="@+id/view3"
             android:layout_width="110dp"
             android:layout_height="110dp"
             android:layout_marginTop="32dp"

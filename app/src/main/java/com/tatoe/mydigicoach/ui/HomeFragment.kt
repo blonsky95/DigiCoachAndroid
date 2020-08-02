@@ -14,10 +14,10 @@ import com.google.firebase.firestore.FirebaseFirestore
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.ui.calendar.DayCreator
-import com.tatoe.mydigicoach.ui.calendar.MonthViewer
+import com.tatoe.mydigicoach.ui.calendar.MonthViewerFragment
 import com.tatoe.mydigicoach.ui.calendar.WeekViewer
 import com.tatoe.mydigicoach.viewmodels.*
-import kotlinx.android.synthetic.main.activity_home.*
+import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment() {
 
@@ -70,7 +70,7 @@ class HomeFragment : Fragment() {
 
     private fun updateTodayTrainingText(isDayEmpty: Boolean) {
         if (isDayEmpty) {
-            todayDiaryText.text = "Click here to add today's training!"
+            todayTrainingText.text = "Click here to add today's training!"
             todayDairyImage.setOnClickListener {
                 val intent = Intent(activity, DayCreator::class.java)
                 intent.putExtra(DayCreator.DAY_ID, Day.dateToDayID(Day.getTodayDate()))
@@ -90,10 +90,10 @@ class HomeFragment : Fragment() {
                     break
                 }
             }
-            todayDiaryText.text = todayText
+            todayTrainingText.text = todayText
             todayDairyImage.setOnClickListener {
                 val intent = Intent(activity, WeekViewer::class.java)
-                intent.putExtra(MonthViewer.DAY_ID_KEY, Day.dateToDayID(Day.getTodayDate()))
+                intent.putExtra(MonthViewerFragment.DAY_ID_KEY, Day.dateToDayID(Day.getTodayDate()))
                 startActivity(intent)
             }
         }

@@ -2,27 +2,18 @@ package com.tatoe.mydigicoach.database
 
 import android.content.Context
 import androidx.room.*
-import androidx.sqlite.db.SupportSQLiteDatabase
-import com.tatoe.mydigicoach.entity.Block
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.entity.Friend
-import com.tatoe.mydigicoach.ioThread
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import timber.log.Timber
 
 @Database(
-    entities = [Exercise::class, Block::class, Day::class, Friend::class],
-    version = 2
+    entities = [Exercise::class, Day::class, Friend::class],
+    version = 3
 )
 @TypeConverters(DataConverter::class)
 abstract class AppRoomDatabase : RoomDatabase() {
 
     abstract fun exercisesDao(): ExerciseDao
-    abstract fun blockDao(): BlockDao
     abstract fun dayDao(): DayDao
     abstract fun friendDao(): FriendDao
 

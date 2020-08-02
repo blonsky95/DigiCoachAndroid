@@ -145,7 +145,7 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
     private val updateDayListener = View.OnClickListener {
         currentDayExercises = arrayListOf()
         var i = 0
-        while (checkedExercisesPerm[i].mIsChecked){
+        while (i<checkedExercisesPerm.size && checkedExercisesPerm[i].mIsChecked){
             currentDayExercises.add(checkedExercisesPerm[i].mExercise)
             i++
         }
@@ -163,7 +163,7 @@ class DayCreator : AppCompatActivity(), SearchView.OnQueryTextListener {
 
     private fun backToViewer() {
         val intent = Intent(this, WeekViewer::class.java)
-        intent.putExtra(MonthViewer.DAY_ID_KEY, activeDayId)
+        intent.putExtra(MonthViewerFragment.DAY_ID_KEY, activeDayId)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(intent)
     }

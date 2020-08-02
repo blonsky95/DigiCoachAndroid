@@ -71,6 +71,7 @@ class ExerciseCreator : AppCompatActivity() {
 
         setSupportActionBar(findViewById(R.id.my_toolbar))
         supportActionBar?.setDisplayShowTitleEnabled(false)
+        supportActionBar?.setDisplayHomeAsUpEnabled(false)
         backBtn.setOnClickListener {
             super.onBackPressed()
         }

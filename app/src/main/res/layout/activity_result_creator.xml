@@ -2,10 +2,10 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
-        android:id="@+id/exercise_lab_layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         tools:context=".ui.exercise.ExerciseCreator">
+
 
     <androidx.appcompat.widget.Toolbar
             android:id="@+id/my_toolbar"
@@ -17,7 +17,8 @@
 
             app:layout_constraintTop_toTopOf="parent"
             app:menu="@menu/creator_toolbar_menu"
-            app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            tools:layout_editor_absoluteX="72dp">
 
         <ImageView
                 android:id="@+id/backBtn"
@@ -31,8 +32,7 @@
                 android:id="@+id/toolbar_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginEnd="32dp"
+                android:layout_gravity="center"
                 android:fontFamily="@font/open_sans_regular"
                 android:text="Create activity"
                 android:textAllCaps="true"
@@ -41,7 +41,6 @@
 
 
     </androidx.appcompat.widget.Toolbar>
-
 
     <ScrollView
             android:id="@+id/scrollView"

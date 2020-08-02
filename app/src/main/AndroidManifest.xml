@@ -42,7 +42,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.HomeActivity"
+        <activity android:name=".ui.MainActivity"
                 android:windowSoftInputMode="adjustPan"
                 android:screenOrientation="portrait"
                 />
@@ -50,25 +50,11 @@
         <activity
                 android:name=".ui.LoginSignUp"
                 android:windowSoftInputMode="adjustPan" />
-        <activity
-                android:name=".ui.HomeScreen"
-                android:launchMode="singleTask" />
-        <activity
-                android:name=".ui.Library"
-                android:parentActivityName=".ui.HomeScreen"
-                android:windowSoftInputMode="adjustPan" />
-        <activity
-                android:name=".ui.Profile"
-                android:parentActivityName=".ui.HomeScreen"
-                android:windowSoftInputMode="adjustPan" />
-        <activity
-                android:name=".ui.exercise.ExerciseViewer"
-                android:parentActivityName=".ui.HomeScreen"
-                android:windowSoftInputMode="adjustPan" />
+
 
         <activity
                 android:name=".ui.calendar.WeekViewer"
-                android:parentActivityName=".ui.HomeScreen" />
+                android:parentActivityName=".ui.MainActivity" />
         <activity
                 android:name=".ui.exercise.ExerciseCreator"
                 android:screenOrientation="portrait"
@@ -79,9 +65,7 @@
                 android:screenOrientation="portrait"
 
                 android:windowSoftInputMode="adjustPan" />
-        <activity
-                android:name=".ui.calendar.MonthViewer"
-                android:windowSoftInputMode="adjustPan" />
+
         <activity
                 android:name=".ui.results.ResultsViewer"
                 android:screenOrientation="portrait"

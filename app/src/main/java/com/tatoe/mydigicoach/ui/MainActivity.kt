@@ -20,10 +20,9 @@ import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
 import com.tatoe.mydigicoach.viewmodels.MainViewModel
 import com.tatoe.mydigicoach.viewmodels.MyMainViewModelFactory
-import kotlinx.android.synthetic.main.activity_parent_of_fragments.bottom_navigation
-import timber.log.Timber
+import kotlinx.android.synthetic.main.main_activity.bottom_navigation
 
-class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface,
+class MainActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface,
     PackageReceivedFragment.OnPackageReceivedInterface {
 
     lateinit var mainViewModel: MainViewModel
@@ -45,7 +44,7 @@ class HomeActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_parent_of_fragments)
+        setContentView(R.layout.main_activity)
 
         mainViewModel = ViewModelProviders.of(this, MyMainViewModelFactory(application))
             .get(MainViewModel::class.java)

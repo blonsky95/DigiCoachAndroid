@@ -21,7 +21,6 @@
                 android:textSize="14sp" />
 
         <TextView
-                android:id="@+id/unit_tv_mins"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/open_sans_regular"
@@ -47,7 +46,6 @@
                 android:textSize="14sp" />
 
         <TextView
-                android:id="@+id/unit_tv_secs"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/open_sans_regular"

@@ -22,8 +22,8 @@ import com.tatoe.mydigicoach.viewmodels.ResultsViewModel
 import kotlinx.android.synthetic.main.activity_exercise_creator.*
 import kotlinx.android.synthetic.main.activity_exercise_creator.backBtn
 import kotlinx.android.synthetic.main.activity_exercise_creator.toolbar_title
-import kotlinx.android.synthetic.main.activity_results_creator.left_button
-import kotlinx.android.synthetic.main.activity_results_creator.right_button
+//import kotlinx.android.synthetic.main.activity_results_creator.left_button
+//import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import kotlinx.android.synthetic.main.inflate_extrafield_edittext_layout.view.*
 import kotlinx.android.synthetic.main.inflate_extrafield_textview_layout.view.*
 import kotlinx.android.synthetic.main.inflate_spinner_units_selector.view.*
