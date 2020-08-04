@@ -3,7 +3,6 @@ package com.tatoe.mydigicoach.ui.results
 //import kotlinx.android.synthetic.main.activity_results_creator.left_button
 //import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.Menu
@@ -13,8 +12,10 @@ import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProviders
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator.Companion.OBJECT_ACTION
@@ -33,7 +34,9 @@ import kotlinx.android.synthetic.main.activity_exercise_creator.right_button
 import kotlinx.android.synthetic.main.activity_exercise_creator.toolbar_title
 import kotlinx.android.synthetic.main.activity_result_creator.*
 import kotlinx.android.synthetic.main.inflate_extrafield_edittext_layout.view.*
+import kotlinx.android.synthetic.main.inflate_extrafield_media.view.*
 import kotlinx.android.synthetic.main.inflate_extrafield_textview_layout.view.*
+import kotlinx.android.synthetic.main.inflate_extrafield_textview_layout.view.item_tv_divider
 import kotlinx.android.synthetic.main.inflate_spinner_units_selector.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_mins_secs.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_one_rm.view.*
@@ -49,7 +52,7 @@ import kotlin.collections.set
 class ResultsCreator : AppCompatActivity() {
 
     private val MAX_NUMBER_ENTRIES = 5
-    private val MEDIA_PICKED=1
+    private val MEDIA_PICKED = 1
 
     private lateinit var rightButton: TextView
     private lateinit var leftButton: TextView
@@ -71,11 +74,15 @@ class ResultsCreator : AppCompatActivity() {
     private var resultDate = "unknown date"
     private var resultIndex = -1
 
+    private var mediaItemCount = 0
+
     private var LAYOUT_TYPE_EXTRAFIELD_TV = 5
     private var LAYOUT_TYPE_EXTRAFIELD_ET = 6
     private var LAYOUT_TYPE_DATE_TV = 7
     private var LAYOUT_TYPE_NEW_FIELD_EDIT = 8
     private var LAYOUT_TYPE_NEW_FIELD_READ = 9
+    private var LAYOUT_TYPE_MEDIA = 10
+
 
     companion object {
         var RESULTS_DATE = "results_date"
@@ -148,7 +155,15 @@ class ResultsCreator : AppCompatActivity() {
             val fieldEntryKey = firstEntry.key //first of pair - title of entry
             val fieldEntryValue = firstEntry.value //second of pair - value of entry
 
-            addLayout(fieldEntryKey, fieldEntryValue, getLayoutType(fieldPosition))
+            var layoutType: Int
+
+            if (fieldEntryKey == ExerciseResults.MEDIA_KEY) {
+                layoutType = LAYOUT_TYPE_MEDIA
+            } else {
+                layoutType = getLayoutType(fieldPosition)
+            }
+
+            addLayout(fieldEntryKey, fieldEntryValue, layoutType)
 
         }
         Timber.d("LINEAR LAYOUT CHILD COUNT: ${linearLayout.childCount}")
@@ -156,30 +171,39 @@ class ResultsCreator : AppCompatActivity() {
             addLayout(null, null, LAYOUT_TYPE_NEW_FIELD_EDIT)
             updateAddFieldBtnVisibility()
         }
-
+//        addMediaBtn.setOnClickListener()
         addMediaBtn.setOnClickListener {
-            //open intent to select media
-            val intent =  Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI)
-            intent.type = "image/* video/*"
-            startActivityForResult(intent,MEDIA_PICKED)
-//            val intent = Intent(Intent.ACTION_VIEW)
-//            intent.setDataAndType(Uri.parse(newVideoPath), "video/mp4")
-//            startActivity(intent)
+            if (mediaItemCount!=0){
+                val dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
+                    override fun onPositiveButton(inputText: String) {
+                        super.onPositiveButton(inputText)
+                        intentPickMedia()
+                    }
+                }
+                Utils.getInfoDialogView(this, "Add Media", "This will override the current media file, continue?", dialogPositiveNegativeInterface)
+            } else {
+                intentPickMedia()
+            }
         }
+    }
+
+    private fun intentPickMedia() {
+        //open intent to select media
+        val intent = Intent(
+            Intent.ACTION_PICK,
+            android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        )
+        intent.type = "image/* video/*"
+        startActivityForResult(intent, MEDIA_PICKED)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK) {
-           var selectedMediaUri = data!!.data
+            val selectedMediaUri = data!!.data
             Timber.d("selected media URI: $selectedMediaUri")
-//            if (selectedMediaUri!!.toString().contains("image")) {
-//                //handle image
-//            } else if (selectedMediaUri.toString().contains("video")) {
-//                //handle video
-//            }
+            addLayout(ExerciseResults.MEDIA_KEY, selectedMediaUri!!.path, LAYOUT_TYPE_MEDIA)
         }
         super.onActivityResult(requestCode, resultCode, data)
-
     }
 
 
@@ -220,6 +244,17 @@ class ResultsCreator : AppCompatActivity() {
 
         var fieldLayout = View(this)
 
+        if (layoutType == LAYOUT_TYPE_MEDIA) {
+            if (mediaItemCount==0) {
+                fieldLayout = layoutInflater.inflate(R.layout.inflate_extrafield_media, null)
+                fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.white))
+                fieldLayout.mediaPathValue.text = fieldEntryValue
+                mediaItemCount++
+            }else {
+                changeValueOfMediaEntry(fieldEntryValue)
+            }
+        }
+
         if (layoutType == LAYOUT_TYPE_NEW_FIELD_READ) {
             fieldLayout =
                 layoutInflater.inflate(R.layout.inflate_extrafield_textview_layout, null)
@@ -240,7 +275,7 @@ class ResultsCreator : AppCompatActivity() {
                 fieldLayout.units_spinner.adapter = vAdapter
             }
 
-            var deleteBtn=fieldLayout.delete_extra_field_btn
+            var deleteBtn = fieldLayout.delete_extra_field_btn
             deleteBtn.setOnClickListener {
                 linearLayout.removeView(fieldLayout)
             }
@@ -291,45 +326,70 @@ class ResultsCreator : AppCompatActivity() {
 
     }
 
+    private fun changeValueOfMediaEntry(fieldEntryValue: String?) {
+        for (i in 2 until linearLayout.childCount) {
+            var layout = linearLayout.getChildAt(i) as LinearLayout
+
+            if (layout.getChildAt(0) !is Spinner) {
+                var layout2 = layout.getChildAt(0) as LinearLayout
+                (layout2.getChildAt(1) as TextView).text=fieldEntryValue
+            }
+        }
+
+    }
+
     private fun getFieldContents(): HashMap<Int, HashMap<String, String>> {
 
         var fieldsMap = java.util.HashMap<Int, java.util.HashMap<String, String>>()
         for (i in 0 until linearLayout.childCount) {
 
-            var layout = linearLayout.getChildAt(i) as LinearLayout
+            if (linearLayout.getChildAt(i) is LinearLayout) {
+                var layout = linearLayout.getChildAt(i) as LinearLayout
+                var fieldName = ""
+                var fieldValue = ""
 
-            var fieldName = ""
-            var fieldValue = ""
+                if (i > 1) {
+                    if (layout.getChildAt(0) is Spinner) {
+                        fieldName = (layout.getChildAt(0) as Spinner).selectedItem.toString()
 
-            if (i > 1) {
-                if (layout.getChildAt(0) is Spinner) {
-                    fieldName = (layout.getChildAt(0) as Spinner).selectedItem.toString()
-
-                    var nextLayout =
-                        (layout.getChildAt(1) as LinearLayout).getChildAt(0) as LinearLayout
-                    var dash = ""
-                    for (ite in 0 until (nextLayout.childCount - 1) step 2) {
-                        fieldValue += "$dash${(nextLayout.getChildAt(ite) as EditText).text.trim()}"
-                        dash = "-"
+                        var nextLayout =
+                            (layout.getChildAt(1) as LinearLayout).getChildAt(0) as LinearLayout
+                        var dash = ""
+                        for (ite in 0 until (nextLayout.childCount - 1) step 2) {
+                            fieldValue += "$dash${(nextLayout.getChildAt(ite) as EditText).text.trim()}"
+                            dash = "-"
+                        }
+                        if (nextLayout.childCount == 5) {
+                            fieldValue += "$dash${(nextLayout.getChildAt(4) as TextView).text.trim()}"
+                        }
                     }
-                    if (nextLayout.childCount == 5) {
-                        fieldValue += "$dash${(nextLayout.getChildAt(4) as TextView).text.trim()}"
-                    }
-                }
-            } else {
-                if (layout.getChildAt(0) is LinearLayout) {
-                    layout = layout.getChildAt(0) as LinearLayout
-                }
+                    //must be media if its not spinner
+                    else {
+                        var layout2 = layout.getChildAt(0) as LinearLayout
 
-                fieldName = (layout.getChildAt(0) as TextView).text.toString()
-                fieldValue = if (i == 0) {
-                    (layout.getChildAt(1) as TextView).text.trim().toString()
+                        fieldName = ExerciseResults.MEDIA_KEY
+                        fieldValue = (layout2.getChildAt(1) as TextView).text.trim().toString()
+                    }
                 } else {
-                    (layout.getChildAt(1) as EditText).text.trim().toString()
+                    if (layout.getChildAt(0) is LinearLayout) {
+                        layout = layout.getChildAt(0) as LinearLayout
+                    }
+
+                    fieldName = (layout.getChildAt(0) as TextView).text.toString()
+                    fieldValue =
+                        if (i == 0) {
+                            (layout.getChildAt(1) as TextView).text.trim().toString()
+                        } else {
+                            (layout.getChildAt(1) as EditText).text.trim().toString()
+                        }
                 }
+
+                fieldsMap[i] = hashMapOf(fieldName to fieldValue)
+
+            } else {
+                //not a linear layout
             }
 
-            fieldsMap[i] = hashMapOf(fieldName to fieldValue)
         }
         return fieldsMap
 
@@ -577,7 +637,7 @@ class ResultsCreator : AppCompatActivity() {
         //this updates the new field skeleton of the result (if new fields per e.g.)
 
         var defaultExerciseFieldsSize = 2
-        var newExtraFields=newResultFields.size-defaultExerciseFieldsSize
+        var newExtraFields = newResultFields.size - defaultExerciseFieldsSize
 //        var oldExtraFields = activeExercise!!.exerciseResults.resultsTypes.size
         activeExercise!!.exerciseResults.resultsTypes.clear()
         if (newExtraFields > 0) {
@@ -639,7 +699,7 @@ class ResultsCreator : AppCompatActivity() {
             }
             if (actionType == OBJECT_VIEW) {
                 addFieldBtn.visibility = View.GONE
-                addMediaBtn.visibility=View.GONE
+                addMediaBtn.visibility = View.GONE
                 rightButton.visibility = View.INVISIBLE
                 leftButton.visibility = View.INVISIBLE
             }

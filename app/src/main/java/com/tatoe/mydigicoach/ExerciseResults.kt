@@ -34,6 +34,7 @@ class ExerciseResults {
 
         const val NOTE_KEY = "Note"
         const val DATE_KEY = "Date"
+        const val MEDIA_KEY="Media"
 
         const val TIME_1 = "Time (s)"
         const val TIME_2 = "Time (mins)"
