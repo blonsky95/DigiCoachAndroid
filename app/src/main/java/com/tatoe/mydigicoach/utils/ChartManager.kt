@@ -59,7 +59,7 @@ class ChartManager(var context:Context, lineChartView: LineChart, plottableBundl
         var xAxisDates = sPlottableBundle.sValuesX
         var yAxisDouble = sPlottableBundle.sValuesy
 
-        for (i in xAxisDates.size - 1 downTo 0) {
+        for (i in yAxisDouble.size - 1 downTo 0) {
             //date/times are set to 12am, so adding 12 hours here so training is at middday approximately
             //however, date to time doesnt take in account the GMT so little problemo here
             //however, worst case, you are gmt-12 and it puts you at 12am of the right day, or you are gmt+11 and get 11pm right day
@@ -119,8 +119,11 @@ class ChartManager(var context:Context, lineChartView: LineChart, plottableBundl
         xAxis.granularity = TimeUnit.DAYS.toMillis(1).toFloat()
         xAxis.isGranularityEnabled=true
 //        xAxis.setLabelCount(7, true)
-        xAxis.axisMinimum = values[0].x - TimeUnit.MINUTES.toMillis(5)
-        xAxis.axisMaximum = values[values.size - 1].x + TimeUnit.MINUTES.toMillis(5)
+        if (values.isNotEmpty()) {
+            xAxis.axisMinimum = values[0].x - TimeUnit.MINUTES.toMillis(5)
+            xAxis.axisMaximum = values[values.size - 1].x + TimeUnit.MINUTES.toMillis(5)
+        }
+
 
         Timber.d("X AXIS granularity value: ${TimeUnit.DAYS.toMillis(1).toFloat()}")
         Timber.d("X AXIS Locale ddefault: ${Locale.getDefault()}")

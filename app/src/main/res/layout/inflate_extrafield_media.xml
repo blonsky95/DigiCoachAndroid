@@ -29,6 +29,7 @@
                 android:paddingTop="6dp"
                 android:paddingEnd="6dp"
                 android:paddingBottom="6dp"
+                android:background="@color/palette6_30"
                 android:text="media path"
                 android:textColor="@color/darkGrey"
                 android:textSize="14sp" />

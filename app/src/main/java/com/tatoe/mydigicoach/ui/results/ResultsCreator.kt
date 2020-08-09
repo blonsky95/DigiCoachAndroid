@@ -3,13 +3,17 @@ package com.tatoe.mydigicoach.ui.results
 //import kotlinx.android.synthetic.main.activity_results_creator.left_button
 //import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import android.content.Intent
+import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.FileProvider
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
@@ -31,7 +35,6 @@ import kotlinx.android.synthetic.main.activity_exercise_creator.centre_button
 import kotlinx.android.synthetic.main.activity_exercise_creator.exercise_properties
 import kotlinx.android.synthetic.main.activity_exercise_creator.left_button
 import kotlinx.android.synthetic.main.activity_exercise_creator.right_button
-import kotlinx.android.synthetic.main.activity_exercise_creator.toolbar_title
 import kotlinx.android.synthetic.main.activity_result_creator.*
 import kotlinx.android.synthetic.main.inflate_extrafield_edittext_layout.view.*
 import kotlinx.android.synthetic.main.inflate_extrafield_media.view.*
@@ -42,6 +45,7 @@ import kotlinx.android.synthetic.main.inflate_units_field_mins_secs.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_one_rm.view.*
 import kotlinx.android.synthetic.main.inflate_units_field_secs.view.*
 import timber.log.Timber
+import java.io.File
 import java.util.*
 import kotlin.collections.HashMap
 import kotlin.collections.arrayListOf
@@ -93,7 +97,6 @@ class ResultsCreator : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_result_creator)
-        toolbar_title.text = "Result"
         backBtn.setOnClickListener {
             super.onBackPressed()
         }
@@ -140,6 +143,8 @@ class ResultsCreator : AppCompatActivity() {
 
     private fun createExerciseFieldsLayout() {
 
+        mediaItemCount=0
+
         linearLayout.removeAllViews()
 
         val hashMapHashMap =
@@ -148,6 +153,8 @@ class ResultsCreator : AppCompatActivity() {
             } else {
                 sResultsArrayList[resultIndex]
             }
+
+        Timber.d("create result layout, hashmap field: ${hashMapHashMap.entries}")
         for (fieldPosition in 0 until hashMapHashMap.size) {
 
             val currentField = hashMapHashMap[fieldPosition]
@@ -193,15 +200,31 @@ class ResultsCreator : AppCompatActivity() {
             Intent.ACTION_PICK,
             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         )
+//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+//        intent.addCategory(Intent.CATEGORY_OPENABLE)
+//        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
+        intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+
         intent.type = "image/* video/*"
+//        intent.type = "video/*"
+
         startActivityForResult(intent, MEDIA_PICKED)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK) {
+
             val selectedMediaUri = data!!.data
-            Timber.d("selected media URI: $selectedMediaUri")
-            addLayout(ExerciseResults.MEDIA_KEY, selectedMediaUri!!.path, LAYOUT_TYPE_MEDIA)
+
+//            val takeFlags = intent.flags
+//            val contentResolver = contentResolver
+//            contentResolver.takePersistableUriPermission(selectedMediaUri!!,takeFlags)
+            var axxx = Environment.getExternalStorageDirectory()
+
+            var ayyy = selectedMediaUri
+            var azzz = ayyy!!.path
+            val overWriteMediaItem = (mediaItemCount>0)
+            addLayout(ExerciseResults.MEDIA_KEY, selectedMediaUri!!.path, LAYOUT_TYPE_MEDIA, overWriteMediaItem)
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -240,19 +263,42 @@ class ResultsCreator : AppCompatActivity() {
         return layoutType
     }
 
-    private fun addLayout(fieldEntryKey: String?, fieldEntryValue: String?, layoutType: Int) {
+    private fun addLayout(fieldEntryKey: String?, fieldEntryValue: String?, layoutType: Int, overWriteMediaItem:Boolean=false) {
 
         var fieldLayout = View(this)
 
         if (layoutType == LAYOUT_TYPE_MEDIA) {
-            if (mediaItemCount==0) {
+            if (!overWriteMediaItem) {
                 fieldLayout = layoutInflater.inflate(R.layout.inflate_extrafield_media, null)
                 fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.white))
                 fieldLayout.mediaPathValue.text = fieldEntryValue
+                fieldLayout.mediaPathValue.setOnClickListener {
+                    //for videos
+
+                    val videoFile = File(fieldEntryValue!!)
+                    val fileUri2 = Uri.fromFile(videoFile)
+
+                    //todo clean the possible directories
+                    //for external storage directory -     <external-path name="external_files" path="." />
+                    val testFileVideo = File("${Environment.getExternalStorageDirectory()}/DCIM/Camera/VID_20200725_114406.mp4") // - works
+                    val testFilePhoto = File("${Environment.getExternalStorageDirectory()}/DCIM/Camera/IMG_20200805_113421.jpg") // - works
+
+                    //check with other
+
+                    //do the others
+                    val fileUri = FileProvider.getUriForFile(this,this.application.packageName + ".provider",testFilePhoto)
+
+                    val intent = Intent(Intent.ACTION_VIEW, fileUri)
+                    intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+//                    intent.setDataAndType(fileUri, "video/*")
+//                    intent.flags=FLAG_GRANT_READ_URI_PERMISSION
+                    startActivity(intent)
+                }
                 mediaItemCount++
             }else {
-                changeValueOfMediaEntry(fieldEntryValue)
+                overwriteValueOfMediaEntry(fieldEntryValue)
             }
+
         }
 
         if (layoutType == LAYOUT_TYPE_NEW_FIELD_READ) {
@@ -326,13 +372,19 @@ class ResultsCreator : AppCompatActivity() {
 
     }
 
-    private fun changeValueOfMediaEntry(fieldEntryValue: String?) {
+    private fun overwriteValueOfMediaEntry(fieldEntryValue: String?) {
         for (i in 2 until linearLayout.childCount) {
             var layout = linearLayout.getChildAt(i) as LinearLayout
 
             if (layout.getChildAt(0) !is Spinner) {
                 var layout2 = layout.getChildAt(0) as LinearLayout
                 (layout2.getChildAt(1) as TextView).text=fieldEntryValue
+                (layout2.getChildAt(1) as TextView).setOnClickListener {
+                    //for videos
+                    val intent = Intent(Intent.ACTION_VIEW)
+                    intent.setDataAndType(Uri.parse(fieldEntryValue), "video/*")
+                    startActivity(intent)
+                }
             }
         }
 
@@ -688,6 +740,7 @@ class ResultsCreator : AppCompatActivity() {
 
             if (actionType == OBJECT_EDIT) {
                 updateAddFieldBtnVisibility()
+                addMediaBtn.visibility = View.VISIBLE
 
                 rightButton.visibility = View.VISIBLE
                 rightButton.text = "Update"
