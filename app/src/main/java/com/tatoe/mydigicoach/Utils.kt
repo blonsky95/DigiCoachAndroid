@@ -5,6 +5,7 @@ import android.graphics.Color
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
+import android.os.Environment
 import android.view.*
 import android.widget.LinearLayout
 import android.widget.ProgressBar
@@ -13,6 +14,7 @@ import androidx.appcompat.app.AlertDialog
 import kotlinx.android.synthetic.main.dialog_window_edittext.view.*
 import kotlinx.android.synthetic.main.dialog_window_info.view.*
 import timber.log.Timber
+import java.io.File
 
 object Utils {
 
@@ -162,6 +164,33 @@ object Utils {
             }
         }
         return false
+    }
+
+    fun purgeExtStorageDirectoryPath(filePath: String): String {
+        val extStorageDirKeyWords="emulated/0"
+        var finalString = ""
+        if (filePath.contains(extStorageDirKeyWords.toRegex())) {
+            //now remove anything preceeding /storage/emulated/0
+            val fileLocationInExtStorage = filePath.substring(filePath.indexOf(extStorageDirKeyWords)+extStorageDirKeyWords.length, filePath.length)
+            finalString = "${Environment.getExternalStorageDirectory()}$fileLocationInExtStorage"
+        }
+        return finalString
+    }
+
+    fun getDataTypeBasedOnExt(substring: String): String {
+        if (substring.contains("mp4")) {
+            return "video/*"
+        }
+        if (substring.contains("jpg")) {
+            return "image/*"
+        }
+        return ""
+    }
+
+    fun getFileName(fieldEntryValue: String): String {
+//        fieldEntryValue.lastIndexOf(File.separatorChar)
+        val file = File(fieldEntryValue)
+        return file.name
     }
 
     class DialogBundle(title:String = "", text:String = "", positiveNegativeInterface: DialogPositiveNegativeInterface) {

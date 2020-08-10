@@ -4,9 +4,7 @@ package com.tatoe.mydigicoach.ui.results
 //import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
-import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.text.SpannableStringBuilder
 import android.view.Menu
 import android.view.MenuItem
@@ -79,6 +77,9 @@ class ResultsCreator : AppCompatActivity() {
     private var resultIndex = -1
 
     private var mediaItemCount = 0
+    private var mediaFile = mutableMapOf("file_path" to "path", "file_name" to "name")
+    private val fp = "file_path"
+    private val fn = "file_name"
 
     private var LAYOUT_TYPE_EXTRAFIELD_TV = 5
     private var LAYOUT_TYPE_EXTRAFIELD_ET = 6
@@ -143,7 +144,7 @@ class ResultsCreator : AppCompatActivity() {
 
     private fun createExerciseFieldsLayout() {
 
-        mediaItemCount=0
+        mediaItemCount = 0
 
         linearLayout.removeAllViews()
 
@@ -180,14 +181,19 @@ class ResultsCreator : AppCompatActivity() {
         }
 //        addMediaBtn.setOnClickListener()
         addMediaBtn.setOnClickListener {
-            if (mediaItemCount!=0){
+            if (mediaItemCount != 0) {
                 val dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
                     override fun onPositiveButton(inputText: String) {
                         super.onPositiveButton(inputText)
                         intentPickMedia()
                     }
                 }
-                Utils.getInfoDialogView(this, "Add Media", "This will override the current media file, continue?", dialogPositiveNegativeInterface)
+                Utils.getInfoDialogView(
+                    this,
+                    "Add Media",
+                    "This will override the current media file, continue?",
+                    dialogPositiveNegativeInterface
+                )
             } else {
                 intentPickMedia()
             }
@@ -215,16 +221,13 @@ class ResultsCreator : AppCompatActivity() {
         if (resultCode == RESULT_OK) {
 
             val selectedMediaUri = data!!.data
-
-//            val takeFlags = intent.flags
-//            val contentResolver = contentResolver
-//            contentResolver.takePersistableUriPermission(selectedMediaUri!!,takeFlags)
-            var axxx = Environment.getExternalStorageDirectory()
-
-            var ayyy = selectedMediaUri
-            var azzz = ayyy!!.path
-            val overWriteMediaItem = (mediaItemCount>0)
-            addLayout(ExerciseResults.MEDIA_KEY, selectedMediaUri!!.path, LAYOUT_TYPE_MEDIA, overWriteMediaItem)
+            val overWriteMediaItem = (mediaItemCount > 0)
+            addLayout(
+                ExerciseResults.MEDIA_KEY,
+                selectedMediaUri!!.path,
+                LAYOUT_TYPE_MEDIA,
+                overWriteMediaItem
+            )
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
@@ -263,39 +266,42 @@ class ResultsCreator : AppCompatActivity() {
         return layoutType
     }
 
-    private fun addLayout(fieldEntryKey: String?, fieldEntryValue: String?, layoutType: Int, overWriteMediaItem:Boolean=false) {
+    private fun addLayout(
+        fieldEntryKey: String?,
+        fieldEntryValue: String?,
+        layoutType: Int,
+        overWriteMediaItem: Boolean = false
+    ) {
 
         var fieldLayout = View(this)
 
         if (layoutType == LAYOUT_TYPE_MEDIA) {
+
+            mediaFile[fp] = fieldEntryValue!!
+            mediaFile[fn]=Utils.getFileName(fieldEntryValue)
             if (!overWriteMediaItem) {
                 fieldLayout = layoutInflater.inflate(R.layout.inflate_extrafield_media, null)
                 fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.white))
-                fieldLayout.mediaPathValue.text = fieldEntryValue
+                fieldLayout.mediaPathValue.text = mediaFile[fn]
                 fieldLayout.mediaPathValue.setOnClickListener {
-                    //for videos
-
-                    val videoFile = File(fieldEntryValue!!)
-                    val fileUri2 = Uri.fromFile(videoFile)
-
-                    //todo clean the possible directories
                     //for external storage directory -     <external-path name="external_files" path="." />
-                    val testFileVideo = File("${Environment.getExternalStorageDirectory()}/DCIM/Camera/VID_20200725_114406.mp4") // - works
-                    val testFilePhoto = File("${Environment.getExternalStorageDirectory()}/DCIM/Camera/IMG_20200805_113421.jpg") // - works
 
-                    //check with other
-
-                    //do the others
-                    val fileUri = FileProvider.getUriForFile(this,this.application.packageName + ".provider",testFilePhoto)
-
-                    val intent = Intent(Intent.ACTION_VIEW, fileUri)
-                    intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-//                    intent.setDataAndType(fileUri, "video/*")
-//                    intent.flags=FLAG_GRANT_READ_URI_PERMISSION
-                    startActivity(intent)
+                    val finalFileString = Utils.purgeExtStorageDirectoryPath(fieldEntryValue)
+                    if (finalFileString.isNotEmpty()) {
+                        val fileUri = FileProvider.getUriForFile(
+                            this,
+                            this.application.packageName + ".provider",
+                            File(finalFileString)
+                        )
+                        val dataType = Utils.getDataTypeBasedOnExt(finalFileString.substring(finalFileString.length-4,finalFileString.length))
+                        val intent = Intent(Intent.ACTION_VIEW, fileUri)
+                        intent.setDataAndType(fileUri, dataType)
+                        intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                        startActivity(intent)
+                    }
                 }
                 mediaItemCount++
-            }else {
+            } else {
                 overwriteValueOfMediaEntry(fieldEntryValue)
             }
 
@@ -378,12 +384,21 @@ class ResultsCreator : AppCompatActivity() {
 
             if (layout.getChildAt(0) !is Spinner) {
                 var layout2 = layout.getChildAt(0) as LinearLayout
-                (layout2.getChildAt(1) as TextView).text=fieldEntryValue
+                (layout2.getChildAt(1) as TextView).text =  mediaFile[fn]
                 (layout2.getChildAt(1) as TextView).setOnClickListener {
-                    //for videos
-                    val intent = Intent(Intent.ACTION_VIEW)
-                    intent.setDataAndType(Uri.parse(fieldEntryValue), "video/*")
-                    startActivity(intent)
+                    val finalFileString = Utils.purgeExtStorageDirectoryPath(fieldEntryValue!!)
+                    if (finalFileString.isNotEmpty()) {
+                        val fileUri = FileProvider.getUriForFile(
+                            this,
+                            this.application.packageName + ".provider",
+                            File(finalFileString)
+                        )
+                        val dataType = Utils.getDataTypeBasedOnExt(finalFileString.substring(finalFileString.length-4,finalFileString.length))
+                        val intent = Intent(Intent.ACTION_VIEW, fileUri)
+                        intent.setDataAndType(fileUri, dataType)
+                        intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                        startActivity(intent)
+                    }
                 }
             }
         }
@@ -420,7 +435,9 @@ class ResultsCreator : AppCompatActivity() {
                         var layout2 = layout.getChildAt(0) as LinearLayout
 
                         fieldName = ExerciseResults.MEDIA_KEY
-                        fieldValue = (layout2.getChildAt(1) as TextView).text.trim().toString()
+//                        fieldValue = (layout2.getChildAt(1) as TextView).text.trim().toString()
+                        fieldValue = mediaFile[fp]!!
+
                     }
                 } else {
                     if (layout.getChildAt(0) is LinearLayout) {
