@@ -679,7 +679,7 @@ class ResultsCreator : AppCompatActivity() {
         if (newResultFields.size > defaultExerciseFieldsSize) {
             for (i in defaultExerciseFieldsSize until newResultFields.size) {
                 var newResultKey = newResultFields[i]!!.entries.iterator().next().key
-                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey)) {
+                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey) && newResultKey!=ExerciseResults.MEDIA_KEY) {
                     activeExercise!!.exerciseResults.resultsTypes.add(newResultKey)
                 }
             }

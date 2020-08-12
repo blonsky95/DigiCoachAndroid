@@ -9,12 +9,11 @@
     <androidx.appcompat.widget.Toolbar
             android:id="@+id/my_toolbar"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="@color/lightGreen"
+            android:layout_height="wrap_content"
+            android:background="@color/palette6"
             android:elevation="4dp"
             android:theme="@style/Theme.MyFancyTheme"
             app:layout_constraintTop_toTopOf="parent"
-            app:menu="@menu/day_viewer_menu"
             app:popupTheme="@style/ThemeOverlay.AppCompat.Light">
 
         <ImageView
@@ -23,6 +22,8 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="start"
                 android:layout_marginStart="12dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="16dp"
                 android:src="@drawable/ic_triangle_back_white_24dp" />
 
         <TextView
@@ -30,10 +31,12 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:fontFamily="@font/open_sans_bold"
+                android:fontFamily="@font/open_sans_regular"
                 android:text="EXERCISE RESULTS"
                 android:textColor="@color/white"
-                android:textSize="22sp" />
+                android:textSize="22sp"
+                tools:layout_editor_absoluteX="107dp"
+                tools:layout_editor_absoluteY="13dp" />
 
     </androidx.appcompat.widget.Toolbar>
 

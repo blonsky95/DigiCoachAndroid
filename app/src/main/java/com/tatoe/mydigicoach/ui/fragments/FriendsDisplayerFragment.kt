@@ -26,31 +26,12 @@ import kotlinx.android.synthetic.main.item_holder_friends.view.*
 
 class FriendsDisplayerFragment : Fragment() {
 
-    companion object {
-//        fun newInstance(
-//            receivedPackages: List<TransferPackage>
-//        ): PackageReceivedFragment {
-//            val packageReceivedFragment = PackageReceivedFragment()
-//
-//            packageReceivedFragment.arguments = Bundle().apply {
-//                putString(PackageReceivedFragment.BUNDLE_RECEIVED_PACKAGES_KEY, Gson().toJson(receivedPackages))
-//            }
-//            return packageReceivedFragment
-//        }
-    }
-
-    //    private lateinit var cloudActionInterface: HandleCloudActionsInterface
     private lateinit var friendsDisplayerFragmentViewModel: FriendsDisplayerFragmentViewModel
     private var db = FirebaseFirestore.getInstance()
     private lateinit var friendsAdapter: MyCustomFriendsAdapter
     private lateinit var recyclerView:RecyclerView
     private var receivedRequestsArray = arrayListOf<FriendRequestPackage>()
     private var allFriends = listOf<Friend>()
-
-
-    //So I have the profile view model here, meaning there was no need for me to implement the interface
-    //however I'd rather have the fragment specify on UI logic, and the activity on other stuff.
-    //Plus, I also use some interfaces.
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -75,9 +56,6 @@ class FriendsDisplayerFragment : Fragment() {
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        myExercisesAdapter = Library.MyCustomExercisesAdapter(this)
-//        friendsAdapter = MyCustomFriendsAdapter(activity!!)
-//        friendsRecyclerView.adapter = friendsAdapter
         recyclerView=view.friendsRecyclerView
         friendsAdapter = MyCustomFriendsAdapter(activity!!)
         recyclerView.layoutManager=LinearLayoutManager(activity)
@@ -100,7 +78,6 @@ class FriendsDisplayerFragment : Fragment() {
                     friendsDisplayerFragmentViewModel.sendFriendRequest(editTextText)
                 }
             }
-//            Utils.getDialogViewWithEditText(activity!!,title,text,"username",dialogPositiveNegativeHandler)
             Utils.getInfoDialogView(activity!!,title,text,dialogPositiveNegativeHandler)
         }
 
@@ -114,42 +91,8 @@ class FriendsDisplayerFragment : Fragment() {
 
         friendsDisplayerFragmentViewModel.receivedRequestsLiveData.observe(this, Observer {
             receivedRequestsArray = it
-//            updateAcceptButton()
         })
     }
-
-//    private fun updateAcceptButton() {
-//        if (receivedRequestsArray.isEmpty()) {
-//            request_received_btn.text = "No friend requests"
-//        } else {
-//            request_received_btn.text = "New Friend Request!"
-//
-//            var currentFriendRequest = receivedRequestsArray[0]
-//            var requestFriendName = currentFriendRequest.mSender
-//            val title = "New friend request"
-//            val text = "accept request from $requestFriendName"
-//            val dialogPositiveNegativeHandler = object : DialogPositiveNegativeInterface {
-//                override fun onPositiveButton(inputText: String) {
-//                    super.onPositiveButton(inputText)
-//                    val newFriend = Friend(currentFriendRequest.mSender!!,currentFriendRequest.senderDocId!!)
-////                    newFriend.docId=currentFriendRequest.senderDocId!!
-//                    friendsDisplayerFragmentViewModel.insertFriend(newFriend) //GOOD
-//                    friendsDisplayerFragmentViewModel.updateRequestStateReceiver(currentFriendRequest, TransferPackage.STATE_ACCEPTED)
-//                    friendsDisplayerFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_ACCEPTED)
-////                    friendsFragmentViewModel.popFriendRequest()
-//                }
-//
-//                override fun onNegativeButton() {
-//                    super.onNegativeButton()
-//                    friendsDisplayerFragmentViewModel.updateRequestStateReceiver(currentFriendRequest,TransferPackage.STATE_REJECTED)
-//                    friendsDisplayerFragmentViewModel.updateRequestStateSender(currentFriendRequest,TransferPackage.STATE_REJECTED)
-//                }
-//            }
-//            request_received_btn.setOnClickListener {
-//                Utils.getInfoDialogView(activity!!, title ,text,dialogPositiveNegativeHandler)
-//            }
-//        }
-//    }
 
 
     class MyCustomFriendsAdapter(context: Context) : RecyclerView.Adapter<MyFriendViewHolder>() {

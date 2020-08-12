@@ -9,7 +9,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import com.google.firebase.firestore.FirebaseFirestore
-import com.tatoe.mydigicoach.HandleCloudActionsInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.viewmodels.MyBackupFragmentViewModelFactory
 import com.tatoe.mydigicoach.viewmodels.BackupFragmentViewModel
@@ -72,6 +71,14 @@ class BackupFragment : Fragment() {
     private fun updateBackUpTimeText(text: String) {
         val string = "Last backup: $text"
         last_backup_time.text = string
+    }
+
+    interface HandleCloudActionsInterface {
+        fun uploadToCloud() {
+        }
+
+        fun downloadFromCloud() {
+        }
     }
 
 

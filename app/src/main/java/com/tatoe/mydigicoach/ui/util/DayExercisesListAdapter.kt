@@ -12,6 +12,7 @@ import androidx.core.content.ContextCompat.startActivity
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.calendar.CustomAdapterFragment
@@ -131,12 +132,21 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
                 //iterate through the entries and get the first one I use that, otherwise could get entries
                 val keyString = resultsMap[i]!!.iterator().next().key
                 val valueString = resultsMap[i]!!.iterator().next().value
+
+                if (valueString.isEmpty()) {
+                    continue
+                }
+
                 fieldLayout.fieldKey7.text = keyString
                 if (ExerciseResults.isANumericEntry(keyString)) {
                     fieldLayout.fieldValueTextView8.text =
                         ExerciseResults.toReadableFormat(valueString, keyString)
                 } else {
-                    fieldLayout.fieldValueTextView8.text = valueString
+                    var stringValue = valueString
+                    if (keyString==ExerciseResults.MEDIA_KEY) {
+                        stringValue=Utils.getFileName(valueString)
+                    }
+                    fieldLayout.fieldValueTextView8.text = stringValue
                 }
                 collapsibleLinearLayout.addView(fieldLayout)
             }
@@ -165,32 +175,10 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
 
     internal fun setContent(day: Day?) {
         if (day != null) {
-//            this.blocks = day.blocks
             this.exercises = day.exercises
             this.sDay = day
             notifyDataSetChanged()
         }
     }
 
-    fun setOnClickInterface(listener: ClickListenerRecyclerView) {
-        this.listenerRecyclerView = listener
-    }
-//    //checks if that result already has an entry and returns a different colour to apply to button
-//    private fun getExerciseResultButtonStateColour(exercise: Exercise): Int {
-//        var colourInt = R.color.lightBlue
-//        if (exercise.exerciseResults.containsResult(date)) {
-//            colourInt = R.color.darkBlue
-//        }
-//
-//        return ContextCompat.getColor(context, colourInt)
-//    }
-//
-//    private fun getExerciseResultButtonDrawable(exercise: Exercise): Int {
-//        var color = R.color.lightGrey
-//        if (exercise.exerciseResults.containsResult(date)) {
-//            color = R.color.darkGreen
-//        }
-//        return context.resources.getColor(color)
-//
-//    }
 }

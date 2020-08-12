@@ -19,8 +19,11 @@ import com.tatoe.mydigicoach.network.*
 import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.util.DataHolder
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.util.*
+import kotlin.collections.ArrayList
 
 class MainViewModel(application: Application) :
     AndroidViewModel(application) {
@@ -31,6 +34,7 @@ class MainViewModel(application: Application) :
         const val PACKAGE_DISPLAYER = 1
         const val FRIEND_SHARER = 2
         const val FRIEND_DISPLAYER = 3
+        const val BACKUP_FRAGMENT = 4
     }
 
     private val repository: AppRepository
@@ -80,11 +84,6 @@ class MainViewModel(application: Application) :
         startSnapshotListeners()
 
     }
-
-    fun displayFragmentByID(id: Int) {
-        displayFragmentById.postValue(id)
-    }
-
 
     private fun startSnapshotListeners() {
         startExercisesReceivedListener()
@@ -449,6 +448,7 @@ class MainViewModel(application: Application) :
         adapterTransferPackages.postValue(newAdapterContent)
         receivedExercisesPackages.postValue(newAdapterContent as ArrayList<ExercisePackage>)
     }
+
     fun updateDayAdapterContentAfterAction(transferPackage: TransferPackage) {
         val newAdapterContent = removePackage(
             receivedDaysPackages.value as ArrayList<TransferPackage>,
@@ -457,6 +457,7 @@ class MainViewModel(application: Application) :
         adapterTransferPackages.postValue(newAdapterContent)
         receivedDaysPackages.postValue(newAdapterContent as ArrayList<DayPackage>)
     }
+
     fun updateFriendAdapterContentAfterAction(transferPackage: TransferPackage) {
         val newAdapterContent = removePackage(
             receivedFriendRequestsPackages.value as ArrayList<TransferPackage>,
@@ -464,6 +465,255 @@ class MainViewModel(application: Application) :
         )
         adapterTransferPackages.postValue(newAdapterContent)
         receivedFriendRequestsPackages.postValue(newAdapterContent as ArrayList<FriendRequestPackage>)
+    }
+
+
+    /**
+     * Code to upload backup
+     */
+
+    fun uploadBackup() = viewModelScope.launch {
+
+        repository.isLoading.value = true
+
+        //using asynchronous functions, so by using this you create a deffered class which you can call the
+        //.await() method, once its done it will carry out that code
+        val allExes = async { repository.getAllExercises() }
+        val allDays = async { repository.getAllDays() }
+        val allFriends = async { repository.getAllFriends() }
+
+        if (!allExes.await().isNullOrEmpty()) {
+            postExercisesToFirestore(allExes.await())
+        }
+
+        if (!allDays.await().isNullOrEmpty()) {
+            postDaysToFirestore(allDays.await())
+        }
+
+        if (!allFriends.await().isNullOrEmpty()) {
+            postFriendsToFirestore(allFriends.await())
+        }
+
+        val docRef = db.collection("users").whereEqualTo("email", DataHolder.userEmail)
+        docRef.get().addOnSuccessListener { docs ->
+            if (!docs.isEmpty) {
+                val doc = docs.documents[0]
+                doc.reference.update(
+                    "last_upload",
+                    Day.hoursMinutesDateFormat.format(Date(System.currentTimeMillis()))
+                )
+                    .addOnSuccessListener {
+                        Toast.makeText(getApplication(), "last upload updated", Toast.LENGTH_SHORT)
+                            .show()
+
+                        repository.isLoading.value = false
+                        Timber.d("Yay worked")
+                    }
+                    .addOnFailureListener {
+                        Toast.makeText(
+                            getApplication(),
+                            "ups something wrong updating",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        repository.isLoading.value = false
+                    }
+            } else {
+                Toast.makeText(getApplication(), "No Internet - action denied", Toast.LENGTH_SHORT)
+                    .show()
+                repository.isLoading.value = false
+            }
+
+        }.addOnFailureListener {
+            Toast.makeText(
+                getApplication(),
+                "ups something wrong fetching email",
+                Toast.LENGTH_SHORT
+            )
+                .show()
+
+            Timber.d("Something went wrong - this user reference doesnt exist")
+            repository.isLoading.value = false
+
+        }
+
+
+    }
+
+    private fun postExercisesToFirestore(listExercises: List<Exercise>) = viewModelScope.launch {
+
+        val docRef =
+            db.collection("users").document(DataHolder.userDocId).collection("my_exercises")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    document.reference.delete()
+                }
+
+                for (exercise in listExercises) {
+                    docRef.add(MyCustomFirestoreTransferExercise(exercise))
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+    private fun postDaysToFirestore(days: List<Day>) = viewModelScope.launch {
+        val docRef = db.collection("users").document(DataHolder.userDocId).collection("my_days")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    document.reference.delete()
+                }
+
+                for (day in days) {
+                    docRef.add(MyCustomFirestoreTransferDay(day))
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+    private fun postFriendsToFirestore(friends: List<Friend>) {
+        val docRef = db.collection("users").document(DataHolder.userDocId).collection("my_friends")
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                for (document in documents) {
+                    document.reference.delete()
+                }
+
+                for (friend in friends) {
+                    docRef.add(MyCustomFirestoreFriend(friend))
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+    /**
+     * Code to download backup
+     */
+
+    fun downloadBackup() {
+        repository.isLoading.value = true
+
+        getExercisesFromFirestore()
+        getDaysFromFirestore()
+        getFriendsFromFirestore()
+
+    }
+
+
+    fun getExercisesFromFirestore() = viewModelScope.launch {
+        val docRef = db.collection("users").document(DataHolder.userDocId)
+            .collection("my_exercises")
+        var exercises = mutableListOf<Exercise>()
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                if (documents != null && !documents.isEmpty) {
+                    for (document in documents) {
+                        Timber.d("DocumentSnapshot data: ${document.data}")
+                        exercises.add(
+                            document.toObject(MyCustomFirestoreTransferExercise::class.java)
+                                .toExercise()
+                        )
+                    }
+                } else {
+                    Timber.d("documents is empty or null")
+                }
+
+                modifyLocalExercisesTable(exercises)
+            }
+            .addOnFailureListener { exception ->
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+    private fun getDaysFromFirestore() = viewModelScope.launch {
+        val docRef = db.collection("users").document(DataHolder.userDocId)
+            .collection("my_days")
+        var days = mutableListOf<Day>()
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                if (documents != null && !documents.isEmpty) {
+                    for (document in documents) {
+                        Timber.d("DocumentSnapshot data: ${document.data}")
+                        days.add(
+                            document.toObject(MyCustomFirestoreTransferDay::class.java).toDay()
+                        )
+                    }
+                } else {
+                    Timber.d("documents is empty or null")
+                }
+
+                modifyLocalDaysTable(days)
+
+            }
+            .addOnFailureListener { exception ->
+                //                repository.isLoading.value = false
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+    private fun getFriendsFromFirestore() {
+        val docRef = db.collection("users").document(DataHolder.userDocId)
+            .collection("my_friends")
+        val friends = mutableListOf<Friend>()
+        docRef.get()
+            .addOnSuccessListener { documents ->
+                if (documents != null && !documents.isEmpty) {
+                    for (document in documents) {
+                        Timber.d("DocumentSnapshot data: ${document.data}")
+                        friends.add(
+                            document.toObject(MyCustomFirestoreFriend::class.java).toFriend()
+                        )
+                    }
+                } else {
+                    Timber.d("documents is empty or null")
+                }
+
+                modifyLocalFriendsTable(friends)
+
+            }
+            .addOnFailureListener { exception ->
+                //                repository.isLoading.value = false
+                Timber.d("get failed with: $exception ")
+            }
+    }
+
+
+    private fun modifyLocalExercisesTable(exercises: MutableList<Exercise>) =
+        viewModelScope.launch {
+            Timber.d("About to delete exercises table")
+            repository.deleteExercisesTable()
+            Timber.d("About to insert firestore exercises")
+            repository.insertExercises(exercises)
+
+            repository.isLoading.value = false
+        }
+
+    private fun modifyLocalDaysTable(days: MutableList<Day>) = viewModelScope.launch {
+
+        Timber.d("About to delete days table")
+        repository.deleteDaysTable()
+        Timber.d("About to insert firestore days")
+        repository.insertDays(days)
+        repository.isLoading.value = false
+
+    }
+
+    private fun modifyLocalFriendsTable(friends: MutableList<Friend>) = viewModelScope.launch {
+        Timber.d("About to delete friends table")
+        repository.deleteFriendsTable()
+        Timber.d("About to insert firestore days")
+        repository.insertFriends(friends)
+        repository.isLoading.value = false
+
     }
 
 }

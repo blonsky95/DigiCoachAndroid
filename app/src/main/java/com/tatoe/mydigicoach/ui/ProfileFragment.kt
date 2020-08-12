@@ -56,27 +56,15 @@ class ProfileFragment : Fragment() {
 
 
         backup_button.setOnClickListener {
-//            setUpFragment(backupFragment)
+            mainViewModel.displayFragmentById.postValue(MainViewModel.BACKUP_FRAGMENT)
         }
 
         friends_requests_button.setOnClickListener {
-//            var int=PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND
-//            if (isFriendRequestReceiverFragmentOpen){
-//                int = MainViewModel.REMOVE_VERTICAL_FRAGMENT
-//            }
             mainViewModel.displayPackageReceiverFragmentType.postValue(PackageReceivedFragment.TRANSFER_PACKAGE_FRIEND)
-//            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
-//            setUpFragment(friendsFragment)
-            //todo sort this one out
         }
 
         friends_display_btn.setOnClickListener {
-            var int=MainViewModel.FRIEND_DISPLAYER
-//            if (isFriendDisplayerFragmentOpen){
-//                int = MainViewModel.REMOVE_VERTICAL_FRAGMENT
-//            }
-            mainViewModel.displayFragmentById.postValue(int)
-//            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
+            mainViewModel.displayFragmentById.postValue(MainViewModel.FRIEND_DISPLAYER)
         }
 
         log_out_btn.setOnClickListener {

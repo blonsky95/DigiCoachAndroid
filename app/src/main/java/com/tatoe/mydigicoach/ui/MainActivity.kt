@@ -7,6 +7,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager.POP_BACK_STACK_INCLUSIVE
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
+import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
 import com.tatoe.mydigicoach.R
 import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Day
@@ -15,6 +16,7 @@ import com.tatoe.mydigicoach.entity.Friend
 import com.tatoe.mydigicoach.network.*
 import com.tatoe.mydigicoach.ui.calendar.MonthViewerFragment
 import com.tatoe.mydigicoach.ui.exercise.ExerciseViewerFragment
+import com.tatoe.mydigicoach.ui.fragments.BackupFragment
 import com.tatoe.mydigicoach.ui.fragments.FriendsDisplayerFragment
 import com.tatoe.mydigicoach.ui.fragments.PackageReceivedFragment
 import com.tatoe.mydigicoach.ui.fragments.ShareToFriendsFragment
@@ -23,7 +25,7 @@ import com.tatoe.mydigicoach.viewmodels.MyMainViewModelFactory
 import kotlinx.android.synthetic.main.main_activity.bottom_navigation
 
 class MainActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelectedListenerInterface,
-    PackageReceivedFragment.OnPackageReceivedInterface {
+    PackageReceivedFragment.OnPackageReceivedInterface, BackupFragment.HandleCloudActionsInterface {
 
     lateinit var mainViewModel: MainViewModel
 
@@ -62,9 +64,6 @@ class MainActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 
     private fun initObservers() {
         mainViewModel.displayFragmentById.observe(this, Observer {
-//            if (it == MainViewModel.REMOVE_VERTICAL_FRAGMENT) {
-//                supportFragmentManager.popBackStack()
-//            }
             if (it != MainViewModel.NO_FRAGMENT) {
                 displayVerticalFragment(it)
             }
@@ -221,6 +220,13 @@ class MainActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
                     FriendsDisplayerFragment()
                 )
             }
+
+            MainViewModel.BACKUP_FRAGMENT -> {
+                transaction.replace(
+                    R.id.half_fragment_container,
+                    BackupFragment()
+                )
+            }
         }
         transaction.addToBackStack("vertical_fragment")
         transaction.commit()
@@ -254,12 +260,12 @@ class MainActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
             finish()
         }
 
-        val x =supportFragmentManager.backStackEntryCount
+        val x = supportFragmentManager.backStackEntryCount
 
-        if (x>0) {
+        if (x > 0) {
             //only horizontal fragment active = go to home
-            if (x==1) {
-                bottom_navigation.selectedItemId=R.id.page_home
+            if (x == 1) {
+                bottom_navigation.selectedItemId = R.id.page_home
             } else {
                 //when its 2 or more and it has vertical fragment
                 super.onBackPressed()
@@ -341,6 +347,40 @@ class MainActivity : AppCompatActivity(), ShareToFriendsFragment.OnFriendSelecte
 
     override fun onBottomCancelSelected() {
         super.onBackPressed()
+    }
+
+    override fun downloadFromCloud() {
+        Utils.getInfoDialogView(
+            this,
+            dialogText = "Downloading backup will replace your current data, are you sure?",
+            dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    if (Utils.isConnectedToInternet(this@MainActivity)) {
+                        mainViewModel.downloadBackup()
+                    } else {
+                        Toast.makeText(application, "No Internet connection", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            })
+    }
+
+    override fun uploadToCloud() {
+        Utils.getInfoDialogView(
+            this,
+            dialogText = "Upload exercises and days to the cloud?",
+            dialogPositiveNegativeInterface = object : DialogPositiveNegativeInterface {
+                override fun onPositiveButton(inputText: String) {
+                    super.onPositiveButton(inputText)
+                    if (Utils.isConnectedToInternet(this@MainActivity)) {
+                        mainViewModel.uploadBackup()
+                    } else {
+                        Toast.makeText(application, "No Internet connection", Toast.LENGTH_SHORT)
+                            .show()
+                    }
+                }
+            })
     }
 
 

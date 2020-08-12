@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
+import com.tatoe.mydigicoach.Utils
 import com.tatoe.mydigicoach.entity.Exercise
 import com.tatoe.mydigicoach.ui.exercise.ExerciseCreator
 import com.tatoe.mydigicoach.ui.results.ResultsCreator
@@ -42,7 +43,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
         holder: DayExerciseViewHolder,
         bindingResult: java.util.HashMap<Int, java.util.HashMap<String, String>>
     ) {
-        holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.lightGreen))
+        holder.mainLinearLayout!!.setBackgroundColor(context.resources.getColor(R.color.palette6_30))
         loadResultsLayout(holder.collapsibleLinearLayout, bindingResult)
 
         holder.exerciseTextView!!.text = bindingResult[0]!![ExerciseResults.DATE_KEY]
@@ -81,8 +82,20 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
             //iterate through the entries and get the first one I use that, otherwise could get entries
             val resultKey= bindingResult[i]!!.iterator().next().key
             val resultValue = bindingResult[i]!!.iterator().next().value
+
+            if (resultValue.isEmpty()) {
+                continue
+            }
+
+            var stringValue = ExerciseResults.toReadableFormat(resultValue, resultKey)
+            if (resultKey==ExerciseResults.MEDIA_KEY) {
+                stringValue= Utils.getFileName(resultValue)
+            }
+
             fieldLayout.fieldKey7.text = resultKey
-            fieldLayout.fieldValueTextView8.text = ExerciseResults.toReadableFormat(resultValue, resultKey)
+            fieldLayout.fieldKey7.setTextColor(context.resources.getColor(R.color.darkGrey))
+            fieldLayout.fieldValueTextView8.text = stringValue
+            fieldLayout.fieldValueTextView8.setTextColor(context.resources.getColor(R.color.darkGrey))
             collapsibleLinearLayout?.addView(fieldLayout)
         }
     }
@@ -92,9 +105,5 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
         sExercise = exercise
         this.sResults = exercise?.exerciseResults!!.getArrayListOfResults()
         notifyDataSetChanged()
-    }
-
-    fun setOnClickInterface(listener: ClickListenerRecyclerView) {
-        this.listenerRecyclerView = listener
     }
 }
