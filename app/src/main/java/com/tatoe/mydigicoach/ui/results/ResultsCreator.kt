@@ -4,6 +4,8 @@ package com.tatoe.mydigicoach.ui.results
 //import kotlinx.android.synthetic.main.activity_results_creator.right_button
 import android.content.Intent
 import android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION
+import android.content.Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+import android.net.Uri
 import android.os.Bundle
 import android.text.SpannableStringBuilder
 import android.view.Menu
@@ -12,6 +14,8 @@ import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
+import androidx.core.net.toFile
+import androidx.core.net.toUri
 import androidx.core.widget.doAfterTextChanged
 import androidx.lifecycle.ViewModelProviders
 import com.tatoe.mydigicoach.DialogPositiveNegativeInterface
@@ -77,8 +81,8 @@ class ResultsCreator : AppCompatActivity() {
     private var resultIndex = -1
 
     private var mediaItemCount = 0
-    private var mediaFile = mutableMapOf("file_path" to "path", "file_name" to "name")
-    private val fp = "file_path"
+    private var mediaFile = mutableMapOf("uri_string" to "uri_str", "file_name" to "name")
+    private val fp = "uri_string"
     private val fn = "file_name"
 
     private var LAYOUT_TYPE_EXTRAFIELD_TV = 5
@@ -201,30 +205,29 @@ class ResultsCreator : AppCompatActivity() {
     }
 
     private fun intentPickMedia() {
-        //open intent to select media
+
         val intent = Intent(
-            Intent.ACTION_PICK,
+            Intent.ACTION_OPEN_DOCUMENT,
             android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
         )
-//        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
-//        intent.addCategory(Intent.CATEGORY_OPENABLE)
-//        intent.addFlags(Intent.FLAG_GRANT_PERSISTABLE_URI_PERMISSION)
-        intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-
-        intent.type = "image/* video/*"
-//        intent.type = "video/*"
-
+//        intent.type = "image/* video/*"
         startActivityForResult(intent, MEDIA_PICKED)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         if (resultCode == RESULT_OK) {
-
             val selectedMediaUri = data!!.data
             val overWriteMediaItem = (mediaItemCount > 0)
+
+            val uriToFile = selectedMediaUri!!.toString()
+            contentResolver.takePersistableUriPermission(
+                selectedMediaUri,
+                FLAG_GRANT_READ_URI_PERMISSION
+            )
+
             addLayout(
                 ExerciseResults.MEDIA_KEY,
-                selectedMediaUri!!.path,
+                uriToFile,
                 LAYOUT_TYPE_MEDIA,
                 overWriteMediaItem
             )
@@ -277,32 +280,30 @@ class ResultsCreator : AppCompatActivity() {
 
         if (layoutType == LAYOUT_TYPE_MEDIA) {
 
-            mediaFile[fp] = fieldEntryValue!!
-            mediaFile[fn]=Utils.getFileName(fieldEntryValue)
+            val uriFile = fieldEntryValue.toString()
+
+            mediaFile[fp] = uriFile
+            mediaFile[fn] = Utils.getUriFileName(uriFile)
+
             if (!overWriteMediaItem) {
                 fieldLayout = layoutInflater.inflate(R.layout.inflate_extrafield_media, null)
                 fieldLayout.item_tv_divider.setBackgroundColor(resources.getColor(R.color.white))
                 fieldLayout.mediaPathValue.text = mediaFile[fn]
                 fieldLayout.mediaPathValue.setOnClickListener {
-                    //for external storage directory -     <external-path name="external_files" path="." />
 
-                    val finalFileString = Utils.purgeExtStorageDirectoryPath(fieldEntryValue)
-                    if (finalFileString.isNotEmpty()) {
-                        val fileUri = FileProvider.getUriForFile(
-                            this,
-                            this.application.packageName + ".provider",
-                            File(finalFileString)
-                        )
-                        val dataType = Utils.getDataTypeBasedOnExt(finalFileString.substring(finalFileString.length-4,finalFileString.length))
-                        val intent = Intent(Intent.ACTION_VIEW, fileUri)
-                        intent.setDataAndType(fileUri, dataType)
-                        intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-                        startActivity(intent)
-                    }
+                    val parsedFromStringURI = fieldEntryValue!!.toUri()
+                    val intent = Intent(Intent.ACTION_VIEW, parsedFromStringURI)
+                    intent.setDataAndType(
+                        parsedFromStringURI,
+                        contentResolver.getType(parsedFromStringURI)
+                    )
+                    intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                    startActivity(intent)
+
                 }
                 mediaItemCount++
             } else {
-                overwriteValueOfMediaEntry(fieldEntryValue)
+                overwriteValueOfMediaEntry(uriFile)
             }
 
         }
@@ -378,28 +379,23 @@ class ResultsCreator : AppCompatActivity() {
 
     }
 
-    private fun overwriteValueOfMediaEntry(fieldEntryValue: String?) {
+    private fun overwriteValueOfMediaEntry(mediaUri: String) {
         for (i in 2 until linearLayout.childCount) {
             var layout = linearLayout.getChildAt(i) as LinearLayout
 
             if (layout.getChildAt(0) !is Spinner) {
                 var layout2 = layout.getChildAt(0) as LinearLayout
-                (layout2.getChildAt(1) as TextView).text =  mediaFile[fn]
+                (layout2.getChildAt(1) as TextView).text = mediaFile[fn]
                 (layout2.getChildAt(1) as TextView).setOnClickListener {
-                    val finalFileString = Utils.purgeExtStorageDirectoryPath(fieldEntryValue!!)
-                    if (finalFileString.isNotEmpty()) {
-                        val fileUri = FileProvider.getUriForFile(
-                            this,
-                            this.application.packageName + ".provider",
-                            File(finalFileString)
-                        )
-                        val dataType = Utils.getDataTypeBasedOnExt(finalFileString.substring(finalFileString.length-4,finalFileString.length))
-                        val intent = Intent(Intent.ACTION_VIEW, fileUri)
-                        intent.setDataAndType(fileUri, dataType)
-                        intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
-                        startActivity(intent)
-                    }
+                    val parsedURIFromString = mediaUri.toUri()
+                    val intent = Intent(Intent.ACTION_VIEW, parsedURIFromString)
+                    intent.setDataAndType(
+                        parsedURIFromString, contentResolver.getType(parsedURIFromString)
+                    )
+                    intent.addFlags(FLAG_GRANT_READ_URI_PERMISSION)
+                    startActivity(intent)
                 }
+                break
             }
         }
 
@@ -679,7 +675,7 @@ class ResultsCreator : AppCompatActivity() {
         if (newResultFields.size > defaultExerciseFieldsSize) {
             for (i in defaultExerciseFieldsSize until newResultFields.size) {
                 var newResultKey = newResultFields[i]!!.entries.iterator().next().key
-                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey) && newResultKey!=ExerciseResults.MEDIA_KEY) {
+                if (!activeExercise!!.exerciseResults.resultsTypes.contains(newResultKey) && newResultKey != ExerciseResults.MEDIA_KEY) {
                     activeExercise!!.exerciseResults.resultsTypes.add(newResultKey)
                 }
             }

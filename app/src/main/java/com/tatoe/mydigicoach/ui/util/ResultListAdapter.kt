@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
@@ -89,7 +90,7 @@ class ResultListAdapter(var context: Context) : RecyclerView.Adapter<DayExercise
 
             var stringValue = ExerciseResults.toReadableFormat(resultValue, resultKey)
             if (resultKey==ExerciseResults.MEDIA_KEY) {
-                stringValue= Utils.getFileName(resultValue)
+                stringValue= Utils.getUriFileName(resultValue)
             }
 
             fieldLayout.fieldKey7.text = resultKey

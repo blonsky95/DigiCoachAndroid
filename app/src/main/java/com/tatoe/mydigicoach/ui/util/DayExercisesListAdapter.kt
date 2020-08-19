@@ -9,6 +9,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.LinearLayout
 import androidx.core.content.ContextCompat.startActivity
+import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.tatoe.mydigicoach.ExerciseResults
 import com.tatoe.mydigicoach.R
@@ -144,7 +145,7 @@ class DayExercisesListAdapter(var context: Context, var dayId: String, var itemT
                 } else {
                     var stringValue = valueString
                     if (keyString==ExerciseResults.MEDIA_KEY) {
-                        stringValue=Utils.getFileName(valueString)
+                        stringValue=Utils.getUriFileName(valueString)
                     }
                     fieldLayout.fieldValueTextView8.text = stringValue
                 }

@@ -187,10 +187,24 @@ object Utils {
         return ""
     }
 
-    fun getFileName(fieldEntryValue: String): String {
-//        fieldEntryValue.lastIndexOf(File.separatorChar)
-        val file = File(fieldEntryValue)
-        return file.name
+    fun getUriFileName(uriString: String): String {
+        val lastSegment = File(uriString).name
+
+        var dataType=""
+        var mediaId=""
+
+        var i = 0
+        var char = lastSegment[0]
+        while (char.isLetter()) {
+            dataType += char
+            i++
+            char = lastSegment[i]
+
+        }
+        //there is a %3A separator between type and ID
+        mediaId = lastSegment.substring(i+3,lastSegment.length)
+
+        return "$dataType-$mediaId"
     }
 
     class DialogBundle(title:String = "", text:String = "", positiveNegativeInterface: DialogPositiveNegativeInterface) {
